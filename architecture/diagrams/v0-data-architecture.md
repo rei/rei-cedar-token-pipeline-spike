@@ -20,7 +20,7 @@ This diagram complements the V0 architecture by focusing specifically on data fl
 
 ## Data Architecture Diagram
 
-![V0 Data Architecture](../assets/v0-data-architecture.png)
+![V0 Data Architecture](../../assets/v0-data-architecture.png)
 
 ---
 
