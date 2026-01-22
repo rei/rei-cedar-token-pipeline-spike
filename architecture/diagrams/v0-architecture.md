@@ -22,7 +22,7 @@ The goal of this architecture is to validate feasibility, reduce manual effort, 
 
 ### Production Pipeline Overview
 
-![V0 Architecture](../assets/v0-architecture.png)
+![V0 Architecture](../../assets/v0-architecture.png)
 
 ### V0 spike architecture
  
