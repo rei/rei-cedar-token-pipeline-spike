@@ -11,8 +11,7 @@ The purpose of this diagram is to provide a stable reference for ADR‑0001 (Can
 The data architecture is structured around three core principles:
 
 - **Raw → Normalized → Canonical → Transformed**
-- **Environment boundaries are explicit** (Figma, GitHub, SD, Distribution)
-- **Only the Canonical Token Model is the source of truth**
+- **The Canonical Token Model is the source of truth**
 
 This diagram complements the V0 architecture by focusing specifically on data flow, not process flow.
 
