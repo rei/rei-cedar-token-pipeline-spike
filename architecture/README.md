@@ -11,8 +11,8 @@ This directory contains the canonical documentation for Cedar’s token pipeline
 
 | Document | Description |
 |---------|-------------|
-| **V0 Architecture Diagram** | Early visualization of the token pipeline from Figma → Canonical → SD → NPM. |
-
+| **[V0 Architecture Diagram](./diagrams/v0-architecture.md)** | Early visualization of the token pipeline from Figma → Canonical → SD → NPM. |
+| **[V0 Data Architecture Diagram](./diagrams/v0-data-architecture.md)** | Diagram illustrating the data layers and transformations referenced across ADR‑0001 to ADR‑0003. |
 ---
 
 ### Architecture Decision Records (ADRs)
