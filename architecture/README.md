@@ -19,9 +19,9 @@ This directory contains the canonical documentation for Cedar’s token pipeline
 
 | ADR | Title | Status | Description |
 |-----|--------|---------|-------------|
-| **ADR‑0001** | Token Canonical Model | Draft | Defines the governed, platform‑agnostic token shape used as the source of truth. |
-| **ADR‑0002** | Normalization Layer | Planned | Defines how raw Figma variables are transformed into the canonical model. |
-| **ADR‑0003** | Figma Input Contract | Planned | Documents assumptions and structure of raw Figma variable payloads. |
+| **[ADR‑0001](/ADR/adr-0001-token-canonical-model.md)** | Token Canonical Model | Draft | Defines the governed, platform‑agnostic token shape used as the source of truth. |
+| **[ADR‑0002](/ADR/adr-0002-token-normalization-layer.md)** | Normalization Layer | Planned | Defines how raw Figma variables are transformed into the canonical model. |
+| **[ADR‑0003](/ADR/adr-0003-figma-input-contract.md)** | Figma Input Contract | Planned | Documents assumptions and structure of raw Figma variable payloads. |
 | **ADR‑0004** | Token Pipeline Architecture | Planned | Describes the full system architecture including CI/CD, transforms, and publishing. |
 
 ---
