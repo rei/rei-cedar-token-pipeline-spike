@@ -6,8 +6,8 @@ Planned
 ## Context  
 Cedar receives two ungoverned design‑time inputs from Figma:
 
-- **Raw Figma Variables** (atomic values, references, modes, metadata)  
-- **Local Styles** (typography, effects, grids, paint styles, variable bindings)
+- **Raw Figma Variables** — atomic values representing colors, numbers, strings, booleans, and references  
+- **Local Styles** — composite design styles (typography, effects, grids, paint styles) that may reference variables
 
 These inputs reflect design intent but lack semantic typing, naming conventions, platform‑agnostic structure, and governance. They cannot be consumed directly by Style Dictionary or downstream platforms.
 
@@ -17,7 +17,7 @@ The Normalization Layer transforms these raw inputs into the governed, semantica
 
 ## Purpose of the Normalization Layer
 
-The Normalization Layer is responsible for:
+The Normalization Layer is the authoritative transformation step between raw design input and the canonical token model. It is responsible for:
 
 - interpreting raw Figma data  
 - enforcing governance rules  
@@ -33,51 +33,61 @@ It is the **only** layer allowed to transform raw design input into canonical to
 
 ## Responsibilities
 
-### **1. Merge Raw Inputs**
-Combine:
+### Merge Raw Inputs
+
+**Combine:**
 
 - `raw-figma-variables.json`  
 - `raw-figma-styles.json`  
 
-into a unified intermediate representation.
+into a unified intermediate representation that preserves all raw metadata.
 
-### **2. Semantic Typing**
-Infer canonical `$type` based on:
+### Semantic Typing
+
+**Infer canonical `$type` based on:**
 
 - Figma variable `resolvedType`  
 - style metadata  
 - naming conventions  
 - Cedar governance rules  
 
-Examples:
+**Examples:**
 
 - `COLOR` → `color`  
 - `FLOAT` → `dimension`  
 - text style → `typography`  
 - effect style → `shadow`  
 
-### **3. Naming Normalization**
-Apply Cedar’s naming conventions:
+### Naming Normalization
+
+Apply Cedar’s naming conventions to produce:
 
 - hierarchical, semantic paths  
 - platform‑agnostic grouping  
-- no file‑system or SD‑shaped paths  
-- no plugin‑generated names  
+- stable, governed token names  
 
-### **4. Reference Resolution**
-Resolve:
+The Normalization Layer must remove:
+
+- plugin‑generated names  
+- file‑system‑shaped paths  
+- platform‑specific naming artifacts  
+
+### Reference Resolution
+
+**Resolve:**
 
 - variable → variable references  
 - style → variable bindings  
 - composite → atomic references  
 
-Ensure:
+**Ensure:**
 
 - no broken references  
 - no circular references  
-- all references use DTCG syntax in the canonical model  
+- all references use DTCG alias syntax in the canonical model  
 
-### **5. Composite Token Construction**
+### Composite Token Construction
+
 Convert Local Styles into canonical composite tokens:
 
 - typography  
@@ -85,8 +95,77 @@ Convert Local Styles into canonical composite tokens:
 - grids  
 - paint styles  
 
-Each composite token must be represented as a structured object in the canonical model.
+Each composite token must be represented as a structured object in the canonical model, not flattened or platform‑specific.
 
-### **6. Metadata Isolation**
+### Metadata Isolation
+
 Move all non‑DTCG metadata into:
+
+`$extensions.cedar`
+
+**Examples:**
+
+- `figmaId`  
+- `styleId`  
+- `variableCollectionId`  
+- documentation metadata  
+- raw Figma mode identifiers  
+
+### Validation
+
+Validate:
+
+- schema compliance  
+- type correctness  
+- semantic value validity  
+- reference resolution  
+- duplicate path prevention  
+- mode completeness (if applicable)  
+
+Invalid tokens must fail CI.
+
+### Canonical Output
+
+Produce a single governed, platform‑agnostic JSON artifact:
+
+**Artifact:** `canonical-tokens.json`
+
+This file is the input to Style Dictionary and all downstream platforms.
+
+---
+
+## Non‑Responsibilities
+
+The Normalization Layer does **not**:
+
+- generate platform outputs (CSS, iOS, Android)  
+- apply platform‑specific transforms  
+- sync tokens back to Figma  
+- enforce design‑time constraints inside Figma  
+- manage versioning or publishing  
+- perform diffing or impact detection (future work)  
+
+Those responsibilities belong to other layers.
+
+---
+
+## Risks and Assumptions
+
+- Raw Figma data may change shape without warning  
+- Designers may rename variables or styles unpredictably  
+- References may be broken or incomplete  
+- Composite styles may not map cleanly to canonical structures  
+- Multi‑mode support may require additional governance  
+- Future Figma API changes may require schema updates  
+
+---
+
+## Future Considerations
+
+- Automated diffing of raw input  
+- Impact detection for variable and style changes  
+- Multi‑file normalization  
+- Reverse sync from Canonical → Figma  
+- Validation of designer proposals before merge  
+- Support for multi‑mode canonical tokens  
 
