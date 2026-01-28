@@ -3,10 +3,16 @@
 ## Status  
 Planned
 
+> [!NOTE]
+> V0 implements only a minimal subset of this ADR for pipeline validation. > Full implementation begins in V1.
+
+
 ## Context  
 Cedar’s token pipeline begins with design proposals authored in Figma. These proposals are exported via the Figma REST API as two complementary raw inputs:
 
 - **Raw Figma Variables** — atomic values representing colors, numbers, strings, booleans, and references  
+- **Variables API:**  
+  https://developers.figma.com/docs/rest-api/variables/
 - **Local Styles** — composite design styles (typography, effects, grids, paint styles) that may reference variables
 
 Both inputs reflect design intent but lack governance, semantic structure, or platform readiness. Together, they form the unprocessed design‑time source material for Cedar’s normalization layer.
@@ -14,6 +20,10 @@ Both inputs reflect design intent but lack governance, semantic structure, or pl
 This document defines the structure, limitations, and assumptions of the raw Figma input layer. It serves as the foundation for the Normalization Layer (ADR‑0002) and informs the shape of the Canonical Token Model (ADR‑0001).
 
 ---
+
+# Future: Full Input Contract
+
+The following sections describe the complete Figma input contract Cedar will support in V1 and beyond.
 
 ## Raw Figma Variables
 

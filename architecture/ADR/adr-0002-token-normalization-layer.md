@@ -11,8 +11,6 @@ Cedar receives two ungoverned design‑time inputs from Figma:
 
 These inputs reflect design intent but lack semantic typing, naming conventions, platform‑agnostic structure, and governance. They cannot be consumed directly by Style Dictionary or downstream platforms.
 
-The Normalization Layer transforms these raw inputs into the governed, semantically valid **Canonical Token Model** defined in ADR‑0001.
-
 ---
 
 ## Purpose of the Normalization Layer
@@ -29,7 +27,12 @@ The Normalization Layer is the authoritative transformation step between raw des
 
 It is the **only** layer allowed to transform raw design input into canonical tokens.
 
+> [!NOTE]
+> In V0, only a minimal subset of these responsibilities is implemented. Full normalization begins in V1.
+
 ---
+
+# Future: Full Normalization
 
 ## Responsibilities
 
