@@ -221,7 +221,7 @@ The V0 canonical model does not support:
 
 These responsibilities begin in V1.
 
-`ock Options (private) ↓ Mock Alias Tokens (public) ↓ Mock Component Library (public) ↓ Mock Consumer App (uses alias + component) ↓ Dev Handoff Validation`
+`Mock Options (private) ↓ Mock Alias Tokens (public) ↓ Mock Component Library (public) ↓ Mock Consumer App (uses alias + component) ↓ Dev Handoff Validation`
 ---
 
 # Goals (Organized by ADR)
