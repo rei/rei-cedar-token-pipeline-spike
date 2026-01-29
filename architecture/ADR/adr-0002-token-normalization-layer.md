@@ -75,6 +75,29 @@ The Normalization Layer must remove:
 - file‑system‑shaped paths  
 - platform‑specific naming artifacts  
 
+## Slash → Dot Path Conversion
+
+Figma variable names use **slash‑delimited paths** (e.g., `warm-grey/600`, `surface/default`).  
+The canonical token model defined in ADR‑0001 uses **dot‑notation paths** (e.g., `color.warm-grey.600`, `color.surface.default`).
+
+The Normalization Layer is the **only** layer responsible for converting Figma’s slash‑notation into canonical dot‑notation.
+
+This conversion MUST:
+
+- preserve the hierarchical meaning of the original Figma name  
+- apply Cedar’s semantic naming conventions  
+- remove platform‑specific or plugin‑generated artifacts  
+- ensure all canonical paths follow ADR‑0001 rules (lowercase, dot‑delimited, semantic)
+
+Normalization MUST NOT:
+
+- emit slash‑notation names  
+- emit platform‑specific naming (dash, camelCase, snake_case)  
+- infer platform naming conventions  
+
+All downstream transforms (ADR‑0005) derive their naming from the canonical dot‑notation paths produced here.
+
+
 ### Reference Resolution
 
 **Resolve:**

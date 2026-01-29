@@ -28,6 +28,23 @@ The Transform Layer is responsible for:
 
 It is the **only** layer that generates platform‑specific code.
 
+### Canonical Input Requirement
+
+The Transform Layer MUST consume the canonical token model defined in ADR‑0001.
+Canonical tokens use **dot‑notation** paths and represent the fully normalized, platform‑agnostic structure of the design token system.
+
+The Transform Layer MUST NOT:
+
+- read raw Figma variable exports
+- consume slash‑notation names
+- resolve aliases from Figma directly
+- infer naming structure from platform conventions
+
+All platform naming conventions (CSS dash‑case, iOS camelCase, Android snake_case, etc.) MUST be derived from the canonical dot‑notation path.
+
+Normalization (ADR‑0002) is the only layer responsible for converting Figma’s slash‑notation into canonical dot‑notation.
+The Transform Layer operates only on canonical tokens.
+
 ---
 
 ## Architecture Overview

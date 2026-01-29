@@ -3,6 +3,8 @@
 ## Status  
 Planned
 
+> [!NOTE] > V0 implements only a minimal subset of this ADR for pipeline validation. > Full implementation begins in V1.
+
 ## Context  
 Cedar’s design token pipeline requires a stable, governed, platform‑agnostic representation of design intent.  
 This representation — the **Canonical Token Model** — is the single source of truth for all downstream transformations (web, iOS, Android, React Native, etc.).
@@ -55,6 +57,71 @@ Every token in the canonical model MUST follow this structure:
 - implicit units  
 
 ---
+
+### V0 Canonical Token Example:
+
+options: 
+```json
+{
+  "options": {
+    "color": {
+      "warm": {
+        "grey": {
+          "600": {
+            "$type": "color",
+            "$value": "#6B6B6B"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+alias:
+```json
+{
+  "color": {
+    "action": {
+      "accent": {
+        "$type": "color",
+        "$value": "{options.color.warm.grey.600}",
+        "$extensions": {
+          "cedar": {
+            "source": "figma",
+            "figmaName": "Primary/Button/Background"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+## Canonical Token Path Rules
+
+Canonical token paths MUST:
+
+- use dot‑delimited segments
+- use lowercase only
+- contain no hyphens, underscores, or slashes
+- contain no platform names (css, ios, android)
+- contain no component names
+- reflect semantic structure, not implementation details
+
+
+---
+
+## Canonical Naming Grammar & Transform Relationship
+
+The canonical model defines the authoritative naming grammar for all Cedar design tokens.
+Canonical token paths MUST use dot‑delimited notation, and this dot‑notation structure is the only naming format consumed by downstream transformation layers.
+
+Normalization (ADR‑0002) is responsible for converting Figma’s slash‑notation variable names into canonical dot‑notation paths.
+All platform transformers — including Style Dictionary — MUST consume the canonical model and MUST NOT read raw Figma data directly.
+
+Transform layers MAY convert dot‑notation paths into platform‑specific naming conventions (e.g., kebab‑case for CSS custom properties, camelCase for iOS, snake_case for Android), but the canonical dot‑notation path remains the single source of truth.
+
 
 ## Supported Canonical Token Types
 
