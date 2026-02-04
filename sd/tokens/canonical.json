@@ -1,0 +1,10 @@
+{
+  "color": {
+    "example": {
+      "base": {
+        "$value": "#ff0000",
+        "$type": "color"
+      }
+    }
+  }
+}
