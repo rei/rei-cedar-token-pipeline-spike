@@ -1,0 +1,5 @@
+node_modules/
+.env
+tokens_new/
+dist/
+.DS_Store
