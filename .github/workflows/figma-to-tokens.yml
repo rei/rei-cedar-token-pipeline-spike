@@ -38,7 +38,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
-          commit-message: Update tokens from Figma
+          commit-message: 'chore: update tokens from Figma'
           title: Update tokens from Figma
           body: "Update tokens from Figma from file: https://www.figma.com/file/${{ inputs.file_key }}"
           branch: update-tokens
