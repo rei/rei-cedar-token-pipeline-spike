@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "sd:compile": "tsc -p ./tsconfig.json",
-    "sd:build": "npm run sd:compile && style-dictionary build --config ./dist/config/sd.config.js"
+    "sd:build": "npm run sd:compile && node sd.build.js"
   },
   "repository": {
     "type": "git",
