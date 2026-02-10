@@ -13,16 +13,9 @@ It is not intended to be production code.
 This V0 spike supports:
 
 - Establish a **mock Figma token ecosystem**
-- Build a **manual ingestion layer** using Figma Variables API output
-- Demonstrate **awareness & impact detection**
-- Validate **Style Dictionary integration**
-
-The spike also produces:
-
-- A **normalized token contract**
-- A **manual diff + impact model**
-- A **governance checkpoint**
-- A **future‑proofed architecture** with explicit ports for reverse‑sync
+- Build an **automated ingestion layer** using Figma Variables API
+- Validate **Design Token (W3C) formatting**
+- Establish **automated workflows** via GitHub Actions
 
 ---
 
@@ -31,22 +24,18 @@ The spike also produces:
 ### In Scope
 
 - One‑directional flow: **Figma → Style Dictionary**
-- Manual ingestion of Figma variable JSON
-- Manual normalization into SD‑ready token contract
-- Manual diffing and impact detection
-- Manual governance application
-- Manual SD output simulation (CSS + Figma‑shaped JSON)
+- Automation via **GitHub Actions**
+- Ingestion of Figma variables using REST API
+- Normalization into W3C design token contract
+- Validation and error handling
 - Documentation of assumptions, risks, and learnings
 - Architecture that supports future bidirectional sync
 
 ### Out of Scope
 
-- Automation
-- GitHub Actions
-- CI/CD
 - Real token publishing
 - Real Figma plugin development
-- Bidirectional sync (future V1+)
+- Full bidirectional sync (placeholder implemented)
 
 ---
 

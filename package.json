@@ -1,0 +1,42 @@
+{
+  "name": "rei-cedar-token-pipeline-spike",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "oxlint src",
+    "format": "oxfmt --write src",
+    "prepare": "husky",
+    "commit": "cz",
+    "sync:figma-to-tokens": "tsx src/sync/figma-to-tokens.ts",
+    "sync:tokens-to-figma": "tsx src/sync/tokens-to-figma.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.23.0",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "oxfmt --write",
+      "oxlint"
+    ]
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.4.1",
+    "@commitlint/config-conventional": "^20.4.1",
+    "@figma/rest-api-spec": "^0.36.0",
+    "@types/node": "^25.2.2",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "oxfmt": "^0.28.0",
+    "oxlint": "^1.43.0",
+    "tsx": "^4.21.0"
+  }
+}
