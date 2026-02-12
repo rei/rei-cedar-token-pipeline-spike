@@ -17,3 +17,30 @@
 | **Semantic Layer Instability** | V0 does not enforce semantic grammar; V1 may require renaming or restructuring. | High | Medium | **H** | Treat V0 semantics as provisional; define V1 semantic grammar ADR. |
 | **Future Backward Compatibility** | V0 canonical shapes may not be forward-compatible with V1. | Medium | Medium | **M** | Keep V0 canonical minimal; avoid premature structure decisions. |
 | **Team Adoption Risk** | Developers or designers may not understand the V0 pipeline or its limitations. | Low | Medium | **L** | Provide clear documentation; include diagrams and examples. |
+
+
+## Open Questions:
+
+1. **Can Style Dictionary resolve platform overrides from metadata?**  
+   (I believe yes, but validate)
+
+2. **Do designers actually need to preview all palette combinations?**  
+   (My bet: no, especially since palettes are surface-scoped, but validate with users)
+
+3. **Is a Figma plugin for platform preview feasible?**  
+   (Technical investigation needed)
+
+4. **Can palettes be specified outside Figma with inheritance rules?**  
+   (Governance/workflow question - does YAML or Figma table work for designers?)
+
+5. **How often do platform overrides actually differ?**  
+   (If rare, even simpler solution possible)
+
+6. **Can palette inheritance be validated at build time?**  
+   (Ensure all palettes reference valid default tokens)
+
+7. **How do designers think about palette creation?**  
+   (Full redesign or "change these 3 colors"? Answer determines if inheritance model works)
+
+---
+

@@ -1,16 +1,31 @@
 # ADR‑0001: Canonical Token Model
 
 ## Status  
-Planned
+Draft 
 
 > [!NOTE] > V0 implements only a minimal subset of this ADR for pipeline validation. > Full implementation begins in V1.
 
 ## Context  
 Cedar’s design token pipeline requires a stable, governed, platform‑agnostic representation of design intent.  
-This representation — the **Canonical Token Model** — is the single source of truth for all downstream transformations (web, iOS, Android, React Native, etc.).
+This representation — the **Canonical Token Model** — is the single source of truth for all downstream transformations.
+
+- normalization output
+- Style Dictionary input
+- Semantic token resolution
+- lifecycle validation
+- governance and breaking‑change rules
+- future bi‑directional sync with Figma
 
 The canonical model is produced by the Normalization Layer (ADR‑0002) from raw Figma inputs (ADR‑0003).  
-It must be semantically meaningful, structurally consistent, and free of platform‑specific assumptions.
+It must be:
+
+- semantically meaningful
+- structurally consistent
+- free of platform assumptions
+- stable across versions
+- diff‑friendly
+- machine‑validatable
+
 
 ---
 
@@ -18,11 +33,12 @@ It must be semantically meaningful, structurally consistent, and free of platfor
 The Canonical Token Model defines:
 
 - the allowed token types  
-- the structure of `$value` for each type  
+- the structure of `$value` for each type
+- how primitive, alias, and semantic tiers relate 
 - how references (aliases) are represented  
 - how composite tokens (typography, shadows, etc.) are modeled  
-- which metadata is preserved and where  
-- which formats are allowed or prohibited  
+- how platform overrides are expressed (future‑facing)  
+- how metadata is preserved
 - how validation is enforced  
 
 This model is the **only** format consumed by Style Dictionary and other platform transformers.
@@ -36,10 +52,10 @@ Every token in the canonical model MUST follow this structure:
 ```json
 {
   "$type": "<canonical-type>",
-  "$value": <structured-value>,
+  "$value": <structured-value-or-alias>,
   "$extensions": {
     "cedar": {
-    // metadata from Figma or normalization
+      // metadata from Figma or normalization
     }
   }
 }
@@ -47,56 +63,18 @@ Every token in the canonical model MUST follow this structure:
 
 ### Required fields
 - `$type` — canonical token type  
-- `$value` — structured, platform‑agnostic value  
+- `$value` — structured, platform‑agnostic value or alias
 - `$extensions.cedar` — metadata not defined by DTCG  
 
 ### Prohibited
 - CSS strings  
 - platform‑specific values  
 - flattened or stringified composite tokens  
-- implicit units  
+- implicit units
+- platform naming conventions
+- Figma slash notation
 
 ---
-
-### V0 Canonical Token Example:
-
-options: 
-```json
-{
-  "options": {
-    "color": {
-      "warm": {
-        "grey": {
-          "600": {
-            "$type": "color",
-            "$value": "#6B6B6B"
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-alias:
-```json
-{
-  "color": {
-    "action": {
-      "accent": {
-        "$type": "color",
-        "$value": "{options.color.warm.grey.600}",
-        "$extensions": {
-          "cedar": {
-            "source": "figma",
-            "figmaName": "Primary/Button/Background"
-          }
-        }
-      }
-    }
-  }
-}
-```
 
 ## Canonical Token Path Rules
 
@@ -258,6 +236,122 @@ Metadata MUST NOT affect `$value`.
 
 ---
 
+## Canonical Token Tiers
+The canonical model defines three tiers of tokens. These tiers are essential for semantic token implementation, lifecycle validation, and governance.
+
+### Option Tokens
+The lowest‑level, non‑alias, non‑semantic values.
+
+Examples:
+
+- raw colors
+- raw spacing values
+- raw typography metrics
+- raw radii
+
+Must:
+- be stable and versioned
+- define a concrete $value
+
+Must not: 
+- reference other tokens
+
+Option Example: 
+```json
+{
+  "options": {
+    "color": {
+      "warm": {
+        "grey": {
+          "600": {
+            "$type": "color",
+            "$value": "#6B6B6B"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Alias Tokens
+Tokens whose '$value' references another canonical token.
+
+Must:
+
+- MUST be validated for cycles
+- MUST reference a valid canonical path
+- MUST preserve semantic relationships
+
+Must Not 
+
+- MUST NOT resolve aliases in the canonical model
+
+Alias Example: 
+```json
+{
+  "color": {
+    "action": {
+      "accent": {
+        "$type": "color",
+        "$value": "{options.color.warm.grey.600}",
+        "$extensions": {
+          "cedar": {
+            "source": "figma",
+            "figmaName": "Primary/Button/Background"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+#### Semantic Tokens 
+
+Tokens that represent design intent, not implementation.
+
+Examples:
+
+- `color.action.accent`
+- `color.text.primary`
+- `size.button.padding`
+
+Must: 
+MUST reference primitive or alias tokens
+
+- Be stable across themes/modes
+- Support future multi‑mode structures
+
+Must Not 
+- contain raw values
+
+--- 
+
+## Platforms
+
+Platform overrides allow a semantic token to define platform‑specific values without polluting the canonical model.
+
+Overrides are stored under `$extensions.cedar.platformOverrides`.
+
+Example: 
+
+```json
+{
+  "$type": "color",
+  "$value": "{color.action.accent.base}",
+  "$extensions": {
+    "cedar": {
+      "platformOverrides": {
+        "ios": { "$value": "#123456" },
+        "android": { "$value": "#654321" }
+      }
+    }
+  }
+}
+```
+
+---
 ## Validation Requirements
 
 The canonical model MUST be validated using:
