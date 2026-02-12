@@ -1,7 +1,5 @@
 node_modules/
 .npm/
-./sd/dist/
-
 *.tsbuildinfo
 
 npm-debug.log*
