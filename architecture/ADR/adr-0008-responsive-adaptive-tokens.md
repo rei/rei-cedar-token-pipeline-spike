@@ -1,4 +1,4 @@
-# ADR-0013: Responsive and Adaptive Tokens
+# ADR-0008: Responsive and Adaptive Tokens
 
 ## Status
 Proposed (V1.2)
