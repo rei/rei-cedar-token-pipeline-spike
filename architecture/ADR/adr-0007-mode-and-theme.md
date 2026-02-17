@@ -1,7 +1,7 @@
 # ADR-0007: Modes and Palettes
 
 ## Status
-Proposed (V1)
+Proposed
 
 ## Context
 
