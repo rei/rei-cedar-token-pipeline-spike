@@ -2,47 +2,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
-import type {
-  CanonicalRoot,
-  CanonicalTokenGroup,
-  CanonicalColorToken,
-} from "../types/canonical-token.js";
+import { recursiveTokensLookUp } from "../utils/recursiveTokensLookUp.js";
+import type { NormalizeSuccess, NormalizeError } from "../types/types.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-
-/**
- * Deep merges groups and sanitizes leaf nodes (tokens).
- */
-function recursiveTokensLookUp(
-  tokensData: CanonicalTokenGroup
-): CanonicalTokenGroup {
-  let recursiveObject: CanonicalTokenGroup = {};
-  const currentKeys = Object.keys(tokensData);
-
-  for (const key of currentKeys) {
-    const currentObject: CanonicalTokenGroup | CanonicalColorToken =
-      tokensData[key];
-
-    if (
-      currentObject &&
-      typeof currentObject === "object" &&
-      "$value" in currentObject
-    ) {
-      const { $value, $type } = currentObject as CanonicalColorToken;
-
-      recursiveObject[key] = {
-        $value: $value.replace(/\{/g, "{color."),
-        $type,
-      };
-    } else {
-      recursiveObject[key] = {
-        ...recursiveTokensLookUp(currentObject),
-      } as CanonicalTokenGroup;
-    }
-  }
-
-  return recursiveObject;
-}
 
 export function normalizeAlias() {
   try {
@@ -53,15 +16,21 @@ export function normalizeAlias() {
     );
     const data = fs.readFileSync(pathToFile, { encoding: "utf-8" });
     const parsedData = JSON.parse(data);
-    let nestedObject: CanonicalRoot = { color: {} };
+    const nestedObject: NormalizeSuccess = {
+      success: true,
+      data: { color: {} },
+    };
 
-    nestedObject.color = {
-      ...nestedObject.color,
-      ...recursiveTokensLookUp(parsedData.color),
+    nestedObject.data.color = {
+      ...nestedObject.data.color,
+      ...recursiveTokensLookUp(parsedData.color, true),
     };
 
     return nestedObject;
   } catch (error) {
     console.error("Error reading raw-figma-alias file: ", error);
+    const message = error instanceof Error ? error.message : String(error);
+
+    return { success: false, error: message } as NormalizeError;
   }
 }

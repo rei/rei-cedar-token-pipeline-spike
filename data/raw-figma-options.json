@@ -1,5 +1,5 @@
 {
-  "neutral": {
+  "Neutral Colors": {
     "warm-grey": {
       "100": {
         "$type": "color",
@@ -101,7 +101,7 @@
       }
     }
   },
-  "brand": {
+  "Brand Colors": {
     "blue": {
       "400": {
         "$type": "color",

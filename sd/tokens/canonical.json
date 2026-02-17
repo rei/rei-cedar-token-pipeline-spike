@@ -1,6 +1,6 @@
 {
   "color": {
-    "neutral": {
+    "Neutral Colors": {
       "warm-grey": {
         "100": {
           "$value": "#edeae3",
@@ -38,7 +38,7 @@
         }
       }
     },
-    "brand": {
+    "Brand Colors": {
       "blue": {
         "400": {
           "$value": "#406eb5",
@@ -86,39 +86,39 @@
     },
     "surface": {
       "base": {
-        "$value": "{color.neutral.base-neutrals.white}",
+        "$value": "{color.Neutral Colors.base-neutrals.white}",
         "$type": "color"
       },
       "raised": {
-        "$value": "{color.neutral.warm-grey.100}",
+        "$value": "{color.Neutral Colors.warm-grey.100}",
         "$type": "color"
       }
     },
     "text": {
       "base": {
-        "$value": "{color.neutral.warm-grey.900}",
+        "$value": "{color.Neutral Colors.warm-grey.900}",
         "$type": "color"
       },
       "subtle": {
-        "$value": "{color.neutral.warm-grey.600}",
+        "$value": "{color.Neutral Colors.warm-grey.600}",
         "$type": "color"
       },
       "link": {
-        "$value": "{color.brand.blue.600}",
+        "$value": "{color.Brand Colors.blue.600}",
         "$type": "color"
       },
       "link-hover": {
-        "$value": "{color.brand.blue.400}",
+        "$value": "{color.Brand Colors.blue.400}",
         "$type": "color"
       }
     },
     "border": {
       "base": {
-        "$value": "{color.neutral.warm-grey.300}",
+        "$value": "{color.Neutral Colors.warm-grey.300}",
         "$type": "color"
       },
       "subtle": {
-        "$value": "{color.neutral.warm-grey.100}",
+        "$value": "{color.Neutral Colors.warm-grey.100}",
         "$type": "color"
       }
     }

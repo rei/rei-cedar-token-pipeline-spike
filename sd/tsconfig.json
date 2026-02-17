@@ -20,7 +20,9 @@
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "src/types/types.ts",
+    "src/utils/**/*"
   ],
   "ts-node": {
     "esm": true

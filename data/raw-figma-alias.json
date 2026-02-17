@@ -3,7 +3,7 @@
     "surface": {
       "base": {
         "$type": "color",
-        "$value": "{neutral.base-neutrals.white}",
+        "$value": "{Neutral Colors.base-neutrals.white}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -15,7 +15,7 @@
       },
       "raised": {
         "$type": "color",
-        "$value": "{neutral.warm-grey.100}",
+        "$value": "{Neutral Colors.warm-grey.100}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -29,7 +29,7 @@
     "text": {
       "base": {
         "$type": "color",
-        "$value": "{neutral.warm-grey.900}",
+        "$value": "{Neutral Colors.warm-grey.900}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -41,7 +41,7 @@
       },
       "subtle": {
         "$type": "color",
-        "$value": "{neutral.warm-grey.600}",
+        "$value": "{Neutral Colors.warm-grey.600}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -53,7 +53,7 @@
       },
       "link": {
         "$type": "color",
-        "$value": "{brand.blue.600}",
+        "$value": "{Brand Colors.blue.600}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -65,7 +65,7 @@
       },
       "link-hover": {
         "$type": "color",
-        "$value": "{brand.blue.400}",
+        "$value": "{Brand Colors.blue.400}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -79,7 +79,7 @@
     "border": {
       "base": {
         "$type": "color",
-        "$value": "{neutral.warm-grey.300}",
+        "$value": "{Neutral Colors.warm-grey.300}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -91,7 +91,7 @@
       },
       "subtle": {
         "$type": "color",
-        "$value": "{neutral.warm-grey.100}",
+        "$value": "{Neutral Colors.warm-grey.100}",
         "$description": "",
         "$extensions": {
           "com.figma": {

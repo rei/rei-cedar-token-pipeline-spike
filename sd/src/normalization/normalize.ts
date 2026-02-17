@@ -8,15 +8,22 @@ import { normalizeAlias } from "./normalize-alias.js";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 try {
-  const optionsVariables = normalizeOptions();
-  const variablesAliases = normalizeAlias();
+  const optionsResult = normalizeOptions();
+  const aliasResult = normalizeAlias();
   const filePath = path.join(__dirname, "../../", "/tokens/canonical.json");
   const directoryPath = path.dirname(filePath);
   let mergedObject = { color: {} };
 
+  if (!optionsResult.success) {
+    throw new Error(`Options failed: ${optionsResult.error}`);
+  }
+
+  if (!aliasResult.success)
+    throw new Error(`Alias failed: ${aliasResult.error}`);
+
   mergedObject.color = {
-    ...optionsVariables?.color,
-    ...variablesAliases?.color,
+    ...optionsResult.data.color,
+    ...aliasResult.data.color,
   };
 
   if (!fs.existsSync(directoryPath)) {
@@ -27,5 +34,5 @@ try {
 
   console.log(`Successfully created: ${filePath}`);
 } catch (error) {
-  console.error("Error creating canonical.json file: ", error);
+  console.error("Error creating canonical.json file - ", error);
 }
