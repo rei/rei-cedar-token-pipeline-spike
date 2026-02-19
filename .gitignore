@@ -1,4 +1,11 @@
 node_modules/
+.npm/
+./sd/dist/
+
+*.tsbuildinfo
+
+npm-debug.log*
+pnpm-debug.log*
 .env
 tokens_new/
 dist/
