@@ -126,9 +126,7 @@ async function main() {
     let totalFilesWritten = 0;
 
     for (const fileKey of fileKeys) {
-      // When syncing multiple files, write to subdirectories per file key to avoid collisions
-      const outputDir = fileKeys.length > 1 ? `${baseOutputDir}/${fileKey}` : baseOutputDir;
-      const filesWritten = await syncFileToTokens(api, fileKey, outputDir);
+      const filesWritten = await syncFileToTokens(api, fileKey, baseOutputDir);
       totalFilesWritten += filesWritten;
     }
 
