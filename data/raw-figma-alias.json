@@ -1,0 +1,106 @@
+{
+  "color": {
+    "surface": {
+      "base": {
+        "$type": "color",
+        "$value": "{Neutral Colors.base-neutrals.white}",
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": ["ALL_SCOPES"],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "raised": {
+        "$type": "color",
+        "$value": "{Neutral Colors.warm-grey.100}",
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": ["ALL_SCOPES"],
+            "codeSyntax": {}
+          }
+        }
+      }
+    },
+    "text": {
+      "base": {
+        "$type": "color",
+        "$value": "{Neutral Colors.warm-grey.900}",
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": ["ALL_SCOPES"],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "subtle": {
+        "$type": "color",
+        "$value": "{Neutral Colors.warm-grey.600}",
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": ["ALL_SCOPES"],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "link": {
+        "$type": "color",
+        "$value": "{Brand Colors.blue.600}",
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": ["ALL_SCOPES"],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "link-hover": {
+        "$type": "color",
+        "$value": "{Brand Colors.blue.400}",
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": ["ALL_SCOPES"],
+            "codeSyntax": {}
+          }
+        }
+      }
+    },
+    "border": {
+      "base": {
+        "$type": "color",
+        "$value": "{Neutral Colors.warm-grey.300}",
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": ["ALL_SCOPES"],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "subtle": {
+        "$type": "color",
+        "$value": "{Neutral Colors.warm-grey.100}",
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": ["ALL_SCOPES"],
+            "codeSyntax": {}
+          }
+        }
+      }
+    }
+  }
+}
