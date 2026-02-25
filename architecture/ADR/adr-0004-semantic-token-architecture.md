@@ -3,211 +3,463 @@
 ## Status  
 Planned
 
-> [!NOTE]
-> V0 implements only a minimal subset of this ADR for pipeline validation. > Full implementation begins in V1.
-
+> **Note**  
+> V0 implements only a minimal subset of this ADR for pipeline validation.  
+> Full multi‑category semantic implementation begins in V1.
 
 ## Context  
-Cedar’s current token set is heavily component‑specific and lacks a semantic abstraction layer. To modernize Cedar’s token architecture, we adopt a three‑tier
+Cedar’s current token set is heavily component‑specific and lacks a unified semantic abstraction layer. As a result:
 
-`Primitives → Alias → Component`
+- design intent is not consistently represented across platforms  
+- components duplicate logic that should be centralized  
+- tokens cannot be governed or validated at scale  
+- platform outputs (Web, iOS, Android, etc.) cannot be generated reliably  
+- naming conventions drift between teams and libraries  
 
-This ADR defines the long‑term semantic architecture, naming grammar, token flow, and the integration between Figma, the canonical model, and Style Dictionary. It focuses on color first; other foundations (spacing, typography, radius, prominence, motion) will be added incrementally.
----
+To modernize Cedar’s design token architecture, this ADR defines a **three‑tier semantic model** that applies to *all* token categories:
 
-## Purpose  
-This ADR establishes:
+**Foundations (Options) → Alias (Semantic Ancestors) → Component**
 
-- the three‑tier token architecture
-- tier defenition and usage
-- how Figma maps into the semantic alias layer
-- how Style Dictionary consumes the canonical model
-- a governed naming grammar
-- a semantic lookup table for color
-- a minimal approach to component tokens
-- the V0 design workflow and Figma library structure
+This model establishes:
+
+- a stable, governed semantic vocabulary  
+- a consistent mapping from Figma → Semantic → Canonical → Platform  
+- a naming grammar that applies across all token categories  
+- a separation between palette values, semantic roles, and component usage  
+- a future‑proof structure that supports theming, modes, and platform overrides  
+
+While earlier ADRs focused on the canonical model (ADR‑0001), normalization (ADR‑0002), and Figma ingestion (ADR‑0003), this ADR defines the **semantic layer** that sits between raw design intent and platform‑specific output.
 
 This semantic layer is the foundation for:
 
-- ADR‑0001 (Canonical Token Model)  
-- ADR‑0002 (Normalization Layer)  
-- ADR‑0003 (Figma Input Contract)  
+- cross‑platform consistency  
+- design/dev visibility  
+- alias token governance  
+- component token stability  
+- future theming and platform overrides  
+- automated validation and linting  
+
+### Platform Considerations 
+Cedar’s semantic architecture must support **multiple platform outputs**, 
+beginning with: - 
+- **Web** 
+- **iOS**
+- **Android**
+
+These are the platforms that ultimately consume Cedar’s platform‑specific token outputs. This ADR does not define output formats (e.g., CSS, SCSS, JS, TS, Swift). Those are handled by the canonical model and platform‑specific transforms defined in ADR‑0001–0003. Figma remains the **design input source**, not a runtime platform. Designers work with semantic alias tokens in Figma, which are then normalized and transformed into platform‑specific outputs for Web, iOS, and Android.
+
+---
+
+## Purpose
+
+This ADR defines Cedar’s long‑term semantic token architecture across **all token categories**, not just color. It establishes the rules, naming grammar, and transformation flow that govern how design intent becomes stable, platform‑agnostic, and consumable by engineering.
+
+Specifically, this ADR establishes:
+
+- the three‑tier token architecture  
+  **Foundations (Options) → Alias (Semantic Ancestors) → Component**
+- the definition and responsibilities of each tier  
+- how Figma variables map into the semantic alias layer  
+- how the Normalization Layer (ADR‑0002) converts semantic tokens into canonical tokens  
+- how Style Dictionary transforms canonical tokens into platform‑specific outputs  
+- a governed naming grammar that applies to all token categories  
+- semantic building blocks for color, typography, spacing, radius, border, shadow, opacity, motion, and grid  
+- a minimal, stable approach to component tokens  
+- the V0/V1 design workflow and Figma library structure that supports this architecture  
+
+This semantic layer is the connective tissue between:
+
+- **ADR‑0001** (Canonical Token Model)  
+- **ADR‑0002** (Normalization Layer)  
+- **ADR‑0003** (Figma Input Contract)  
+
+and the platform‑specific outputs consumed by Web, iOS, Android, and future platforms.
+
+The goals of this architecture are to:
+
+- provide a stable, governed semantic vocabulary  
+- ensure design intent is expressed consistently across platforms  
+- eliminate component‑specific duplication and drift  
+- enable automated validation, linting, and contrast checks  
+- support theming, modes, and platform overrides  
+- create a predictable, inspectable design‑to‑code pipeline  
+
+This ADR defines the **semantic system Cedar will use for all token categories**, ensuring long‑term scalability, governance, and cross‑platform consistency.
 
 ---
 
 ## Token Architecture Overview
 
-Cedar’s token system is structured as:
+Cedar’s semantic token system is structured as a three‑tier architecture that applies consistently across **all token categories**:
 
-**Foundations (options) → Alias (semantic ancestors) → Component**
+**Foundations (Options) → Alias (Semantic Ancestors) → Component**
 
+Each tier has a distinct purpose, governance model, and set of constraints.  
+Together, they form a stable, scalable, cross‑platform design token system.
+
+### Tier Responsibilities
+
+| Tier | Purpose | Who Uses It | Allowed Values | Stability |
+|------|----------|--------------|----------------|-----------|
+| **Foundations (Options)** | Raw palette and primitive values | Cedar Design only | Literal values | Low (brand‑driven) |
+| **Alias (Semantic Ancestors)** | Semantic roles expressing design intent | Designers + Developers | References to Foundations | High (governed) |
+| **Component Tokens** | Component‑specific usage of semantic tokens | Developers + Component Library | References to Alias tokens | Medium (component‑driven) |
+
+### Why This Architecture
+
+This three‑tier model ensures:
+
+- **Design intent is stable** even when palette values change  
+- **Components remain consistent** across platforms  
+- **Developers consume a predictable API**  
+- **Designers work with meaningful semantics**, not raw values  
+- **Platform outputs (Web, iOS, Android)** can diverge safely  
+- **Theming and modes** can be layered on without breaking semantics  
+- **Governance and validation** can be applied at the semantic layer  
+
+### Categories Covered by This Architecture
+
+This ADR applies the three‑tier model to **all token categories**, including:
+
+- **Color**  
+- **Typography** (font families, sizes, weights, line heights, letter spacing)  
+- **Spacing** (scale, layout spacing, component spacing)  
+- **Radius** (corner radii, shape tokens)  
+- **Border** (widths, styles)  
+- **Shadow** (elevation, depth)  
+- **Opacity**  
+- **Motion** (durations, easings)  
+- **Grid & Layout** (columns, gutters, breakpoints)  
+
+Each category defines:
+
+- its own semantic intents  
+- its own naming grammar  
+- its own mapping rules  
+- its own invariants and validation requirements  
+
+### Flow of Design Intent
+
+The semantic architecture governs the transformation pipeline:
+
+**Figma → Semantic Alias Tokens → Canonical Tokens → Platform Tokens**
+
+- **Figma** expresses designer intent through variables and styles  
+- **Semantic Alias Tokens** express meaning (e.g., `color.text.primary`)  
+- **Canonical Tokens** store normalized, governed, platform‑agnostic data  
+- **Platform Tokens** (CSS, Swift, XML, etc.) express final implementation  
+
+This ADR defines the **semantic layer**, which is the backbone of the entire pipeline.
 
 ---
 
-## Tier 1 — Foundations
+## Tier 1 — Foundations (Options)
 
-Options are raw design primitives. these tokens are private, and unpublished palettes and neutrals. These are literal values with no semantic meaning.
+Foundations (also called **Options**) are Cedar’s raw design primitives.  
+They represent the **literal, brand‑authored values** that form the base of all design expression.  
+Foundations contain **no semantic meaning** and are **never consumed directly** by product teams.
+
+Foundations are private to Cedar Design and Brand.
+
+### Purpose of Foundations
+
+Foundations serve three primary purposes:
+
+1. **Brand Source of Truth**  
+   They store the literal palette, typography primitives, spacing scales, radii, shadows, and motion curves defined by Cedar Design and Brand.
+
+2. **Stable Inputs for Semantic Mapping**  
+   Alias tokens reference Foundations, ensuring that semantic tokens remain stable even when brand values evolve.
+
+3. **Governed, Private Layer**  
+   Foundations are not exposed to product teams, preventing accidental coupling to raw palette values.
 
 ### Characteristics
 
-- Represent the actual palette (e.g., brand colors, neutrals). 
-- Named by Foundation role rather than implentation intent.
-- Not consumed directly by components.
-- Not available to members outside of Cedar Design. 
-- Represent the Brand source of truth.
+Foundations are:
 
+- literal values (colors, numbers, strings, booleans)  
+- brand‑authored and brand‑governed  
+- private and unpublished  
+- not platform‑agnostic (they are raw values)  
+- not consumed directly by components  
+- not visible to non‑Cedar designers  
 
-### Nameing 
+Foundations **must never** appear in:
 
-Options use the following naming convention:
+- component libraries  
+- product team Figma files  
+- Style Dictionary outputs  
+- platform SDKs  
 
-| Palette | range |
+Only Alias tokens may reference Foundations.
 
-#### Examples: 
+### Categories of Foundations
 
-- white.75
-- warm.grey.600
-- blue.spruce.green.1000
+Foundations exist for all token categories:
 
----
+- **Color Foundations**  
+  Raw palette values (e.g., brand blues, neutrals, accent palettes)
 
-## Tier 2 — Alias Tokens (Semantic Ancestor Tokens)
+- **Typography Foundations**  
+  Font families, weights, base sizes, line‑height primitives
 
-Alias tokens are semantic roles that map design intent to primitives.
+- **Spacing Foundations**  
+  Base spacing scale (e.g., 2, 4, 8, 12, 16…)
 
-They are:
+- **Radius Foundations**  
+  Corner radius primitives (e.g., 2, 4, 8, 16)
 
-- platform‑agnostic 
-- stable
-- governed
-- the “API” that components consume
-- the layer that Figma normalization produces
-- the layer that Style Dictionary transforms into platform outputs
+- **Border Foundations**  
+  Border widths and styles
 
-Alias tokens **alias primitives**, never raw values.
+- **Shadow Foundations**  
+  Raw shadow definitions (offsets, blur, spread, color)
 
-`color.action.accent → {options.color.blue.spruce.green.1000}`
+- **Opacity Foundations**  
+  Raw opacity values
 
-### Semantic Color Naming Reference 
+- **Motion Foundations**  
+  Durations, easings, curves
 
-Alias tokens conform the the following naming convention
+- **Grid & Layout Foundations**  
+  Columns, gutters, breakpoints
 
-`color.<intent>.<family>.<variant>` 
+Each category defines its own primitive vocabulary.
 
-addtionally alias tokens employ the useage of pre and post modifiers to the variant space
+### Naming
 
-#### rules: 
+Foundations use a **brand‑driven naming convention**, not a semantic one.  
+Names reflect palette or primitive structure, not UX intent.
 
-- dot is the only delimiter - style dictionary will transform into dash 
-- lowercase only 
-- no hyphens, underscores, of slashes 
-- no component names 
-- no raw figma names 
-- family, prefix, and variant are optional 
+Examples:
 
-## Semantic Color Naming Reference (Intents, Families, Prefixes, Variants)
+**Color Foundations**
+- `blue.spruce.1000`
+- `warm.grey.600`
+- `white.75`
 
-This table defines the semantic building blocks used to construct alias token names.  
-Alias tokens follow the general grammar:
+**Typography Foundations**
+- `font.family.sans`
+- `font.weight.semibold`
+- `font.size.300`
 
-`color.<intent>[.<family>].<variant>`
+**Spacing Foundations**
+- `space.025`
+- `space.050`
+- `space.100`
 
+**Radius Foundations**
+- `radius.025`
+- `radius.050`
+- `radius.100`
+
+These names are **not semantic** and must never appear in component usage.
+
+### Invariants (V1)
+
+Foundations must follow these rules:
+
+- Foundations may contain **only literal values**  
+- Foundations must not reference other tokens  
+- Foundations must not encode semantic meaning  
+- Foundations must not include component names  
+- Foundations must not include platform‑specific values  
+- Foundations must not be exposed outside Cedar Design  
+
+### Example (Color Foundations)
+
+```json
+{
+  "options": {
+    "color": {
+      "blue": {
+        "spruce": {
+          "900": "#004488",
+          "1000": "#003366"
+        }
+      },
+      "warm": {
+        "grey": {
+          "600": "#6B6B6B"
+        }
+      },
+      "white": {
+        "75": "rgba(255,255,255,0.75)"
+      }
+    }
+  }
+}
+```
+
+Foundations are the root layer of Cedar’s token architecture.
+All semantic meaning is introduced in Tier 2 — Alias Tokens.
+
+## Tier 2 — Alias Tokens (Semantic Ancestors)
+
+Alias tokens represent **semantic design intent**.  
+They are the stable, platform‑agnostic vocabulary that designers and developers use to describe how UI elements should look and behave.
+
+Alias tokens **never contain literal values**.  
+They always reference Foundations (Options).
+
+Alias tokens are the **API** of the design system.
+
+> **Note on Tier Evolution (V0 → V1)**  
+> In V0/V1, the Alias tier intentionally combines two conceptual responsibilities:  
+> 1. **Palette indirection** (mapping primitives to palette roles)  
+> 2. **Semantic intent** (mapping palette roles to UX meaning)  
+>  
+> A future ADR will formalize these as distinct tiers within a four‑tier model:  
+>  
+> **Foundations → Alias (Palette Roles) → Semantic (Design Intent) → Component**  
+>  
+> For now, this ADR defines the combined tier as **Alias Tokens**.
+
+### Purpose of Alias Tokens
+
+Alias tokens provide:
+
+- a **stable semantic vocabulary** for all token categories  
+- a **platform‑agnostic layer** that survives palette changes  
+- a **governed naming grammar**  
+- a **consistent mapping** from Figma → Canonical → Platform  
+- a **single source of truth** for component styling  
+- a **lintable, inspectable, enforceable** semantic layer  
+
+Alias tokens are the layer that:
+
+- designers use in Figma  
+- developers see in Dev Mode  
+- the normalization layer produces  
+- Style Dictionary consumes  
+- components depend on  
+
+### Characteristics
+
+Alias tokens are:
+
+- semantic (express meaning, not values)  
+- stable across platforms  
+- governed by naming grammar  
+- validated during normalization  
+- the only tokens exposed to product teams  
+- the only tokens components may reference  
+
+Alias tokens **must never**:
+
+- contain literal values  
+- reference other alias tokens (except for state variants)  
+- encode component names  
+- encode platform names  
+- encode raw Figma names  
+- encode brand palette names  
+
+### Categories of Alias Tokens
+
+Alias tokens exist for **all token categories**, each with its own semantic vocabulary:
+
+- **Color**  
+  `color.text.primary`, `color.surface.base`, `color.action.accent`
+
+- **Typography**  
+  `type.body.md`, `type.heading.lg`, `type.label.sm`
+
+- **Spacing**  
+  `space.component.sm`, `space.layout.md`, `space.inline.lg`
+
+- **Radius**  
+  `radius.container.md`, `radius.interactive.sm`
+
+- **Border**  
+  `border.width.default`, `border.color.subtle`
+
+- **Shadow**  
+  `shadow.card.default`, `shadow.overlay.lg`
+
+- **Opacity**  
+  `opacity.disabled`, `opacity.overlay`
+
+- **Motion**  
+  `motion.duration.fast`, `motion.easing.standard`
+
+- **Grid & Layout**  
+  `grid.columns.default`, `grid.gutter.md`
+
+Each category defines:
+
+- semantic intents  
+- variants  
+- optional families  
+- optional modifiers  
+- naming grammar  
+- invariants  
+
+### Alias Token Naming Grammar (High‑Level)
+
+Alias tokens follow a consistent grammar across categories:
+
+```
+<category>.<intent>[.<family>][.<variant>]
+```
 Optional modifiers:
 
-- `color.<intent>[.<family>].on.<variant>`
-- `color.<intent>[.<family>].inverse.<variant>`
-- `color.<intent>[.<family>].over.<variant>`
+```
+<category>.<intent>.on.<intent>
+<category>.<intent>.inverse.<variant>
+<category>.<intent>.over.<variant>
+```
 
-All segments are optional except `<intent>`.
+Examples:
 
-| Category | Token Segment | Meaning / Usage |
-|---------|----------------|------------------|
-| **Intents (UX Roles)** | `surface` | Background layers (surface, surface‑variant) |
-| | `action` | Interactive elements (buttons, controls, links) |
-| | `navigation` | Navigation surfaces and items |
-| | `page` | Page‑level backgrounds |
-| | `text` | Foreground text/icon roles |
-| | `error` | Error state colors |
-| | `success` | Success state colors |
-| | `warning` | Warning state colors |
-| | `info` | Informational state colors |
-| | `outline` | Strokes and borders |
-| | `on.<intent>` | Foreground elements that sit on another intent (e.g., `on.surface`, `on.action`) |
-|  |  |  |
-| **Color Families (Palette Roles)** | `brand` | Brand color family (primary brand palette) |
-| | `primary` | Primary palette family for the intent |
-| | `secondary` | Secondary palette family for the intent |
-| | `tertiary` | Tertiary or complementary palette family |
-| | `neutral` | Neutral/gray palette family |
-|  |  |  |
-| **Prefixes (Relationships)** | `color.` | Base namespace for fills and foregrounds |
-| | `on` | Foreground content that sits *on top of* another color intent |
-| | `inverse` | Flipped foreground/background relationship (e.g., light‑on‑dark) |
-| | `over` | Semi‑transparent scrims or overlays |
-|  |  |  |
-| **Variants (Tonal / Emphasis)** | `highlight` | Very light, subtle fills |
-| | `subtle` | Low‑emphasis surfaces |
-| | `muted` | Disabled or subdued |
-| | `base` | Default surface/text value |
-| | `accent` | Interactive emphasis (variant, not family) |
-| | `shade` | Darker fills/borders |
-| | `strong` | Primary fills, critical states |
-| | `vibrant` | Elevated, saturated emphasis |
+- `color.text.primary`  
+- `color.text.on.surface`  
+- `type.heading.lg`  
+- `space.component.sm`  
+- `radius.interactive.md`  
+- `shadow.card.default`  
 
+### Invariants (V1)
 
-## State Tokens & State Metadata
+Alias tokens must follow these rules:
 
-Cedar supports a staged approach to state handling that aligns with current design workflows (explicit state colors) while preparing for a future overlay‑based system.
+- Alias tokens must reference Foundations  
+- Alias tokens must not contain literal values  
+- Alias tokens must not include component names  
+- Alias tokens must not include platform names  
+- Alias tokens must follow the naming grammar  
+- Alias tokens must use lowercase and dot‑delimited segments  
+- Alias tokens must not include hyphens, slashes, or underscores  
+- Alias tokens must not encode raw Figma names  
 
-### Explicit State Tokens (Current Behavior)
+Violations MUST fail normalization.
 
-Designers define state colors by selecting new palette values (e.g., blue.1000 → blue.900).  
-These appear in the semantic layer as explicit tokens:
-
-- color.action.accent
-- color.action.accent.hover
-- color.action.accent.pressed
-
-
-These tokens are treated as independent values.
-
-### Metadata: Preparing for Overlay-Based States
-
-To support future computed states, canonical tokens may include metadata describing:
-
-- the luminance of the base color  
-- the recommended overlay color (white or black)  
-- the opacity that would produce an equivalent tonal shift  
-- the base token the state was derived from  
-
-Example:
+### Example (Color Alias Token)
 
 ```json
 {
   "color": {
     "action": {
       "accent": {
-        "$value": "{options.color.blue.1000}",
-        "$extensions": {
-          "cedar": {
-            "luminance": 0.30,
-            "stateLayer": "white"
-          }
-        }
-      },
-      "accent": {
-        "hover": {
-          "$value": "{options.color.blue.900}",
-          "$extensions": {
-            "cedar": {
-              "derivedFrom": "{color.action.accent}",
-              "overlayEquivalent": {
-                "base": "{color.action.accent}",
-                "layer": "white",
-                "opacity": 0.08
-              }
-            }
-          }
+        "$value": "{options.color.blue.spruce.1000}"
+      }
+    }
+  }
+}
+```
+
+### Example (Typography Alias Token)
+
+```json
+{
+  "type": {
+    "body": {
+      "md": {
+        "$value": {
+          "fontFamily": "{options.type.family.sans}",
+          "fontSize": "{options.type.size.300}",
+          "lineHeight": "{options.type.lineHeight.400}",
+          "fontWeight": "{options.type.weight.regular}"
         }
       }
     }
@@ -215,247 +467,235 @@ Example:
 }
 ```
 
-This metadata enables:
+Alias tokens are the semantic backbone of Cedar’s design system.
+Component tokens (Tier 3) may reference only this tier.
 
-- future overlay computation
-- contrast validation
-- automated state generation
-- palette‑wide consistency checks
+--- 
 
+## Semantic Naming Grammar (All Categories)
 
-### V1: Hybrid State System (Explicit + Computed)
+Semantic alias tokens follow a unified naming grammar across all token categories.  
+This grammar ensures that semantic tokens are:
 
-- computed overlays for hover/pressed
-- fallback explicit tokens for legacy components
-- a rule‑based system for selecting overlay color
-- automated generation of state tokens during build
-- no explicit hover/pressed tokens
-- state layers computed from base color
-- luminance‑aware overlay selection
-- consistent tonal shifts across all components
+- stable  
+- predictable  
+- platform‑agnostic  
+- enforceable by normalization  
+- readable by designers and developers  
+- compatible with Style Dictionary  
 
-However we should note that this system requires design to adopt overlay‑based state creation, which is out of scope for this doc.
+The grammar applies to **all token categories**, with category‑specific extensions.
 
+--- 
 
----
+## 6.1 Unified Naming Grammar All semantic alias tokens follow the general structure:
 
-## Tier 3 — Component Tokens
-
-Component tokens define how a component uses semantic alias tokens.
-
-### Key principles
-
-- Component tokens never reference primitives
-- Component tokens never define raw values
-- Component tokens should be minimal
-- Component tokens should not proliferate
-- Component tokens should not encode semantics
-- Component tokens should only express usage
-
-
-Examples: 
-
-- button.background → `{color.action.accent}`
-- button.text → `{color.action.on.accent}`
----
-
-## Mapping Figma → Semantic → Canonical
-
-The Cedar token pipeline transforms design intent into platform‑specific output through four stages:
-
-`Figma → Semantic Alias Tokens → Canonical Tokens → Platform Tokens` 
-
-Each stage is governed and explicit.
-
----
-
-## Design Workflow and Figma Library Architecture
-
-Designers use:
-
-- variables
-- modes
-- collections
-- naming conventions
-
-### Design deliverables 
-
-#### Options Library (Private)
-
-Owned by Cedar Design + Brand.
-
-- contains raw palette values
-- not exposed to product teams
-- not used directly in component design
-- provides the root values to the Alias library
-
-#### Alias Color Library (Public)
-
-Published by Cedar Design.
-
-- contains all semantic alias tokens
-- is the **only** color library non Cedar designers use
-- maps primitives → alias tokens
-- provides a stable semantic vocabulary
-- provided as figma variables
-
-Designers use:
-
-- color.surface.base
-- color.surface.accent
-- color.surface.on.accent
-- color.brand.primary
-
-#### Cedar Component Library (Public)
-
-Published by Cedar Design.
-
-Components:
-
-- use alias tokens internally
-- expose alias tokens in their properties
-- never expose primitives
-- never expose component tokens 
-
-Example (Button):
-
-- background → `color.action.accent`
-- button.text → {color.action.on.accent}
-
-
-#### Non‑Cedar Teams
-
-##### A. Using Cedar components
-
-They drag components from the Cedar library.
-They inherit alias tokens automatically.
-
-##### B. Building their own components
-
-They use the alias library to style them.
-They never touch primitives.
-
-
-##### Developer Workflow
-
-Developers have access to:
-- alias tokens (via Style Dictionary output)
-- component tokens (via Cedar Vue library)
-- Cedar components
-
-Design to Dev handoff:
-
-- using figma dev mode inspect Figma
-- see alias tokens
-- use the Cedar Vue component directly
-- or find the alias tokens in code
-
-### Figma variable names → Semantic Paths
-
-Normalization (ADR‑0002) converts Figma variable names into semantic alias tokens.
-
-| Figma variable | Semantic alias token |
-|`"Primary/Button/Background/Hover"`| color.action.accent.hover |
-
-Normalization performs:
-
-- Parse Figma hierarchy
-- Map to semantic intent (e.g., “Button” → action)
-- Map to variant (e.g., “Primary” → accent)
-- Map to state (e.g., “Hover” → .hover)
-- Construct semantic alias token
-
-#### Figma → Semantic Modes
-
-Figma modes (e.g., Light, Dark, High Contrast) are preserved and stored in the canonical model under:
-
-`$extensions.cedar.modes` 
-
-This ensures:
-
-- mode information is not lost
-- semantic tokens can vary by mode
-- Style Dictionary can generate multi‑mode outputs
-
-Modes are not part of the semantic token name; they are metadata.
-
-
-### 2. Normalization (ADR‑0002)
-
-Semantic alias tokens become canonical tokens with:
-
-- `$type`
-- `$value`
-- `$extensions.cedar` metadata
-
-### 3. Canonical Model (ADR‑0001)
-```json
-{
-  "$type": "color",
-  "$value": "{options.color.blue.spruce.green.900}",
-  "$extensions": {
-    "cedar": {
-      "source": "figma",
-      "figmaName": "Primary/Button/Background/Hover",
-      "modes": ["light", "dark"]
-    }
-  }
-}
 ```
-The canonical model is the single source of truth for all platforms.
+<category>.<intent>[.<family>][.<variant>]
+```
+Optional modifiers:
 
-### 4. Style Dictionary
-
-Style Dictionary transforms canonical tokens into platform‑specific outputs.
-
-It resolves:
-- alias references
-- units
-- platform color formats
-- platform naming conventions (dash)
+```
+<category>.<intent>.on.<intent>
+<category>.<intent>.inverse.<variant>
+<category>.<intent>.over.<variant>
+```
 
 
-Example: 
+### Required Rules
 
-css
-`--cdr-color-action-accent: #0055cc;`
+- **Lowercase only**  
+- **Dot-delimited segments**  
+- **No hyphens, underscores, or slashes**  
+- **No component names**  
+- **No platform names**  
+- **No raw Figma names**  
+- **No brand palette names**  
+- **No literal values**  
 
-ios
-`Color.actionAccent`
-
----
-
-## Governance Rules
-
-Normalization MUST enforce:
-
-- naming grammar  
-- allowed intents  
-- allowed variants  
-- allowed states  
-- allowed tiers  
-- no component‑specific tokens  
-- no raw Figma names  
-- no hyphens or slashes  
-- no platform‑specific values  
-
-Violations MUST fail normalization.
+Normalization MUST reject tokens that violate these rules.
 
 ---
 
-## Future Considerations
+## 6.2 Categories and Their Semantic Grammars
 
-- Multi‑mode canonical tokens  
-- Theming support  
-- Motion semantic roles  
-- Layout density tokens  
-- Cross‑platform typography roles  
-- Color contrast automation  
+Each token category defines its own semantic vocabulary.  
+The unified grammar applies, but each category has its own:
+
+- intents  
+- families  
+- variants  
+- modifiers  
+- invariants  
+
+Below are the category‑specific grammars.
 
 ---
 
-## Related Documents
+## 6.2.1 Color Tokens
 
-- ADR‑0001: Canonical Token Model  
-- ADR‑0002: Normalization Layer  
-- ADR‑0003: Figma Input Contract  
+**Grammar**
+
+```
+color.<intent>[.<family>][.<variant>]
+color.<intent>.on.<intent>
+color.<intent>.inverse.<variant>
+color.<intent>.over.<variant>
+```
+
+
+**Intents (UX Roles)**  
+- `surface`  
+- `action`  
+- `navigation`  
+- `page`  
+- `text`  
+- `error`, `success`, `warning`, `info`  
+- `outline`  
+
+**Families (Palette Roles)**  
+- `brand`  
+- `primary`, `secondary`, `tertiary`  
+- `neutral`  
+
+**Variants (Tonal / Emphasis)**  
+- `base`, `subtle`, `muted`, `highlight`  
+- `accent`, `strong`, `vibrant`  
+- `shade`  
+
+**Examples**
+
+- `color.text.primary`  
+- `color.surface.base`  
+- `color.action.accent.hover`  
+- `color.text.on.surface`  
+
+---
+
+## 6.2.2 Typography Tokens
+
+**Grammar**
+
+```
+color.<intent>[.<family>][.<variant>]
+color.<intent>.on.<intent>
+color.<intent>.inverse.<variant>
+color.<intent>.over.<variant>
+```
+
+
+**Intents (UX Roles)**  
+- `surface`  
+- `action`  
+- `navigation`  
+- `page`  
+- `text`  
+- `error`, `success`, `warning`, `info`  
+- `outline`  
+
+**Families (Palette Roles)**  
+- `brand`  
+- `primary`, `secondary`, `tertiary`  
+- `neutral`  
+
+**Variants (Tonal / Emphasis)**  
+- `base`, `subtle`, `muted`, `highlight`  
+- `accent`, `strong`, `vibrant`  
+- `shade`  
+
+**Examples**
+
+- `color.text.primary`  
+- `color.surface.base`  
+- `color.action.accent.hover`  
+- `color.text.on.surface`  
+
+---
+
+## 6.2.2 Typography Tokens
+
+**Grammar**
+
+```
+type.<intent>.<size>
+type.<intent>.<size>.<emphasis>
+```
+
+
+**Intents**  
+- `body`  
+- `heading`  
+- `label`  
+- `code`  
+
+**Sizes**  
+- `xs`, `sm`, `md`, `lg`, `xl`, `xxl`  
+
+**Emphasis**  
+- `regular`, `medium`, `semibold`, `bold`  
+
+**Examples**
+
+- `type.body.md`  
+- `type.heading.lg.semibold`  
+- `type.label.sm.medium`  
+
+---
+
+## 6.2.3 Spacing Tokens
+
+**Grammar**
+
+```
+space.<intent>.<scale>
+```
+
+
+**Intents**  
+- `component`  
+- `layout`  
+- `inline`  
+- `stack`  
+
+**Scale**  
+- `xxs`, `xs`, `sm`, `md`, `lg`, `xl`, `xxl`  
+
+**Examples**
+
+- `space.component.sm`  
+- `space.layout.lg`  
+- `space.inline.md`  
+
+---
+
+## 6.2.4 Radius Tokens
+
+**Grammar**
+
+```
+radius.<intent>.<size>
+```
+
+
+**Intents**  
+- `interactive`  
+- `container`  
+- `surface`  
+
+**Sizes**  
+- `none`, `sm`, `md`, `lg`, `full`  
+
+**Examples**
+
+- `radius.interactive.sm`  
+- `radius.container.md`  
+- `radius.surface.lg`  
+
+---
+
+## 6.2.5 Border Tokens
+
+**Grammar**
+
+
+
