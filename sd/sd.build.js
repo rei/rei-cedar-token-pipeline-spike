@@ -1,5 +1,5 @@
 import StyleDictionary from "style-dictionary";
-import config from "./dist/config/sd.config.js";
+import config from "./src/config/sd.config.ts";
 
 const sd = new StyleDictionary(config);
 
