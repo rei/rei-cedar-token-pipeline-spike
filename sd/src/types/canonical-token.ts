@@ -1,10 +1,10 @@
-export interface CanonicalColorToken {
-  $value: string;
+export interface CanonicalToken {
+  $value: string | number | boolean;
   $type: string;
 }
 
 export interface CanonicalTokenGroup {
-  [tokenName: string]: CanonicalColorToken | CanonicalTokenGroup;
+  [tokenName: string]: CanonicalToken | CanonicalTokenGroup;
 }
 
 /** The canonical token root — any number of top-level sections (color, spacing, typography, …) */

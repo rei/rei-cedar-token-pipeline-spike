@@ -1,7 +1,8 @@
 import type {
-  CanonicalColorToken,
+  CanonicalToken,
   CanonicalTokenGroup,
   CanonicalRoot,
 } from "./canonical-token.js";
 
-export type { CanonicalColorToken, CanonicalTokenGroup, CanonicalRoot };
+export type { CanonicalToken, CanonicalTokenGroup, CanonicalRoot };
+

@@ -1,6 +1,6 @@
 import type {
+  CanonicalToken,
   CanonicalTokenGroup,
-  CanonicalColorToken,
 } from "../types/canonical-token.js";
 
 export function recursiveTokensLookUp(
@@ -11,7 +11,7 @@ export function recursiveTokensLookUp(
   const currentKeys = Object.keys(tokensData);
 
   for (const key of currentKeys) {
-    const currentObject: CanonicalTokenGroup | CanonicalColorToken =
+    const currentObject: CanonicalTokenGroup | CanonicalToken =
       tokensData[key];
 
     if (
@@ -19,11 +19,11 @@ export function recursiveTokensLookUp(
       typeof currentObject === "object" &&
       "$value" in currentObject
     ) {
-      const { $value, $type } = currentObject as CanonicalColorToken;
+      const { $value, $type } = currentObject as CanonicalToken;
 
       recursiveObject[key] = aliasTokens
         ? {
-            $value: $value.replace(/\{/g, "{color."),
+            $value: String($value).replace(/\{/g, "{color."),
             $type,
           }
         : {
