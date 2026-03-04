@@ -260,8 +260,8 @@ export const LiveDiff: StoryObj = {
   name: "Live Diff (fetched)",
   render: asyncStory(async () => {
     const [baseRes, currRes] = await Promise.all([
-      fetch("/normalized/baseline.json"),
-      fetch("/normalized/current.json"),
+      fetch("./normalized/baseline.json"),
+      fetch("./normalized/current.json"),
     ]);
 
     if (baseRes.status === 404 || currRes.status === 404) {
