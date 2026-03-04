@@ -87,16 +87,6 @@
           "$type": "color"
         }
       },
-      "yellow": {
-        "400": {
-          "$value": "#ffbf59",
-          "$type": "color"
-        },
-        "600": {
-          "$value": "#ffe7b3",
-          "$type": "color"
-        }
-      },
       "red": {
         "400": {
           "$value": "#c7370f",
@@ -104,6 +94,16 @@
         },
         "600": {
           "$value": "#610a0a",
+          "$type": "color"
+        }
+      },
+      "yellow": {
+        "400": {
+          "$value": "#ffbf59",
+          "$type": "color"
+        },
+        "600": {
+          "$value": "#ffe7b3",
           "$type": "color"
         }
       },
