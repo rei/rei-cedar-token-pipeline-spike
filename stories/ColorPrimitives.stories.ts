@@ -1,4 +1,5 @@
 import type { StoryObj, Meta } from "@storybook/html";
+import { loadPrimitiveColors } from "./lib/load-tokens.js";
 
 type ColorSwatchArgs = Record<string, never>;
 
@@ -9,6 +10,36 @@ const meta: Meta<ColorSwatchArgs> = {
 export default meta;
 
 type Story = StoryObj<ColorSwatchArgs>;
+
+// ─── Async story wrapper ──────────────────────────────────────────────────────
+
+function asyncStory(
+  fn: () => Promise<string>,
+): () => HTMLElement {
+  return () => {
+    const container = document.createElement("div");
+    container.style.cssText = "min-height:200px;background:#f5f2eb;";
+
+    container.innerHTML = `
+      <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:.85rem;color:#736e65">
+        Loading token data…
+      </div>`;
+
+    fn()
+      .then((html) => {
+        container.innerHTML = html;
+      })
+      .catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        container.innerHTML = `
+          <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:.85rem;color:#be342d">
+            Error loading tokens: ${msg}
+          </div>`;
+      });
+
+    return container;
+  };
+}
 
 // ─── Shared design system ─────────────────────────────────────────────────────
 
@@ -242,30 +273,12 @@ const BASE_STYLES = `
   }
 `;
 
-// ─── Colour palette data ───────────────────────────────────────────────────────
-
-interface Swatch { name: string; value: string; }
-
-const WARM_GREY: Swatch[] = [
-  { name: "warm-grey.100", value: "#edeae3" },
-  { name: "warm-grey.300", value: "#b2ab9f" },
-  { name: "warm-grey.600", value: "#736e65" },
-  { name: "warm-grey.900", value: "#2e2e2b" },
-];
-
-const BASE_NEUTRALS: Swatch[] = [
-  { name: "base-neutrals.black",    value: "#000000" },
-  { name: "base-neutrals.white",    value: "#ffffff" },
-  { name: "base-neutrals.white-85", value: "#ffffffd9" },
-  { name: "base-neutrals.white-75", value: "#ffffffbf" },
-];
-
-const BRAND_BLUE: Swatch[]   = [{ name: "blue.400", value: "#406eb5" }, { name: "blue.600", value: "#0b2d60" }];
-const BRAND_RED: Swatch[]    = [{ name: "red.400",  value: "#be342d" }, { name: "red.600",  value: "#610a0a" }];
-const BRAND_GREEN: Swatch[]  = [{ name: "green.400",value: "#3b8349" }, { name: "green.600",value: "#1f513f" }];
-const BRAND_YELLOW: Swatch[] = [{ name: "yellow.400",value: "#ffbf59"}, { name: "yellow.600",value: "#ffe7b3"}, { name: "yellow.800",value: "#ede285"}];
-
 // ─── Rendering helpers ────────────────────────────────────────────────────────
+
+interface Swatch {
+  name: string;
+  value: string;
+}
 
 function needsDarkLabel(hex: string): boolean {
   const r = parseInt(hex.slice(1, 3), 16);
@@ -356,92 +369,131 @@ function breadcrumb(...parts: string[]): string {
 
 export const NeutralWarmGrey: Story = {
   name: "Neutral / Warm Grey",
-  render: () => `
-    <style>${BASE_STYLES}</style>
-    <div class="page">
-      ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Neutral / Warm Grey")}
-      <div class="token-section">
-        ${sectionHeader("Neutral Colors", "Warm Grey", WARM_GREY.length)}
-        ${groupBlock("Warm Grey Scale", WARM_GREY)}
+  render: asyncStory(async () => {
+    const colors = await loadPrimitiveColors();
+    const warmGrey = colors.filter((c) => c.name.includes("warm-grey"));
+
+    return `
+      <style>${BASE_STYLES}</style>
+      <div class="page">
+        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Neutral / Warm Grey")}
+        <div class="token-section">
+          ${sectionHeader("Neutral Colors", "Warm Grey", warmGrey.length)}
+          ${groupBlock("Warm Grey Scale", warmGrey)}
+        </div>
       </div>
-    </div>
-  `,
+    `;
+  }),
 };
 
 export const NeutralBaseNeutrals: Story = {
   name: "Neutral / Base Neutrals",
-  render: () => `
-    <style>${BASE_STYLES}</style>
-    <div class="page">
-      ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Neutral / Base Neutrals")}
-      <div class="token-section">
-        ${sectionHeader("Neutral Colors", "Base Neutrals", BASE_NEUTRALS.length)}
-        ${groupBlock("Base Neutrals", BASE_NEUTRALS)}
+  render: asyncStory(async () => {
+    const colors = await loadPrimitiveColors();
+    const baseNeutrals = colors.filter((c) => c.name.includes("base-neutrals"));
+
+    return `
+      <style>${BASE_STYLES}</style>
+      <div class="page">
+        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Neutral / Base Neutrals")}
+        <div class="token-section">
+          ${sectionHeader("Neutral Colors", "Base Neutrals", baseNeutrals.length)}
+          ${groupBlock("Base Neutrals", baseNeutrals)}
+        </div>
       </div>
-    </div>
-  `,
+    `;
+  }),
 };
 
 export const BrandBlue: Story = {
   name: "Brand / Blue",
-  render: () => `
-    <style>${BASE_STYLES}</style>
-    <div class="page">
-      ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Blue")}
-      <div class="token-section">
-        ${sectionHeader("Brand Colors", "Blue", BRAND_BLUE.length)}
-        ${groupBlock("Blue Scale", BRAND_BLUE)}
+  render: asyncStory(async () => {
+    const colors = await loadPrimitiveColors();
+    const blue = colors.filter((c) => c.name.includes("brand-palette") && c.name.includes(".blue"));
+
+    return `
+      <style>${BASE_STYLES}</style>
+      <div class="page">
+        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Blue")}
+        <div class="token-section">
+          ${sectionHeader("Brand Colors", "Blue", blue.length)}
+          ${groupBlock("Blue Scale", blue)}
+        </div>
       </div>
-    </div>
-  `,
+    `;
+  }),
 };
 
 export const BrandRed: Story = {
   name: "Brand / Red",
-  render: () => `
-    <style>${BASE_STYLES}</style>
-    <div class="page">
-      ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Red")}
-      <div class="token-section">
-        ${sectionHeader("Brand Colors", "Red", BRAND_RED.length)}
-        ${groupBlock("Red Scale", BRAND_RED)}
+  render: asyncStory(async () => {
+    const colors = await loadPrimitiveColors();
+    const red = colors.filter((c) => c.name.includes("brand-palette") && c.name.includes(".red"));
+
+    return `
+      <style>${BASE_STYLES}</style>
+      <div class="page">
+        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Red")}
+        <div class="token-section">
+          ${sectionHeader("Brand Colors", "Red", red.length)}
+          ${groupBlock("Red Scale", red)}
+        </div>
       </div>
-    </div>
-  `,
+    `;
+  }),
 };
 
 export const BrandGreen: Story = {
   name: "Brand / Green",
-  render: () => `
-    <style>${BASE_STYLES}</style>
-    <div class="page">
-      ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Green")}
-      <div class="token-section">
-        ${sectionHeader("Brand Colors", "Green", BRAND_GREEN.length)}
-        ${groupBlock("Green Scale", BRAND_GREEN)}
+  render: asyncStory(async () => {
+    const colors = await loadPrimitiveColors();
+    const green = colors.filter((c) => c.name.includes("brand-palette") && c.name.includes(".green"));
+
+    return `
+      <style>${BASE_STYLES}</style>
+      <div class="page">
+        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Green")}
+        <div class="token-section">
+          ${sectionHeader("Brand Colors", "Green", green.length)}
+          ${groupBlock("Green Scale", green)}
+        </div>
       </div>
-    </div>
-  `,
+    `;
+  }),
 };
 
 export const BrandYellow: Story = {
   name: "Brand / Yellow",
-  render: () => `
-    <style>${BASE_STYLES}</style>
-    <div class="page">
-      ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Yellow")}
-      <div class="token-section">
-        ${sectionHeader("Brand Colors", "Yellow", BRAND_YELLOW.length)}
-        ${groupBlock("Yellow Scale", BRAND_YELLOW)}
+  render: asyncStory(async () => {
+    const colors = await loadPrimitiveColors();
+    const yellow = colors.filter((c) => c.name.includes("brand-palette") && c.name.includes(".yellow"));
+
+    return `
+      <style>${BASE_STYLES}</style>
+      <div class="page">
+        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Yellow")}
+        <div class="token-section">
+          ${sectionHeader("Brand Colors", "Yellow", yellow.length)}
+          ${groupBlock("Yellow Scale", yellow)}
+        </div>
       </div>
-    </div>
-  `,
+    `;
+  }),
 };
 
 export const AllPrimitives: Story = {
   name: "All Primitives",
-  render: () => {
-    const total = WARM_GREY.length + BASE_NEUTRALS.length + BRAND_BLUE.length + BRAND_RED.length + BRAND_GREEN.length + BRAND_YELLOW.length;
+  render: asyncStory(async () => {
+    const colors = await loadPrimitiveColors();
+    const warmGrey = colors.filter((c) => c.name.includes("warm-grey"));
+    const baseNeutrals = colors.filter((c) => c.name.includes("base-neutrals"));
+    const blue = colors.filter((c) => c.name.includes("brand-palette") && c.name.includes(".blue"));
+    const red = colors.filter((c) => c.name.includes("brand-palette") && c.name.includes(".red"));
+    const green = colors.filter((c) => c.name.includes("brand-palette") && c.name.includes(".green"));
+    const yellow = colors.filter((c) => c.name.includes("brand-palette") && c.name.includes(".yellow"));
+
+    const total = colors.length;
+
     return `
       <style>${BASE_STYLES}</style>
       <div class="page">
@@ -462,28 +514,28 @@ export const AllPrimitives: Story = {
 
         <div class="token-section" style="position:relative;">
           <div class="deco-index">01</div>
-          ${sectionHeader("Neutral Colors", "Warm Grey + Base Neutrals", WARM_GREY.length + BASE_NEUTRALS.length)}
+          ${sectionHeader("Neutral Colors", "Warm Grey + Base Neutrals", warmGrey.length + baseNeutrals.length)}
           <div class="primitives-grid" style="margin-top:1.5rem;">
             <div>
-              ${groupBlock("Warm Grey", WARM_GREY)}
+              ${groupBlock("Warm Grey", warmGrey)}
             </div>
             <div>
-              ${groupBlock("Base Neutrals", BASE_NEUTRALS)}
+              ${groupBlock("Base Neutrals", baseNeutrals)}
             </div>
           </div>
         </div>
 
         <div class="token-section" style="position:relative;">
           <div class="deco-index">02</div>
-          ${sectionHeader("Brand Colors", "Blue · Red · Green · Yellow", BRAND_BLUE.length + BRAND_RED.length + BRAND_GREEN.length + BRAND_YELLOW.length)}
+          ${sectionHeader("Brand Colors", "Blue · Red · Green · Yellow", blue.length + red.length + green.length + yellow.length)}
           <div class="primitives-grid" style="margin-top:1.5rem;">
-            <div>${groupBlock("Blue", BRAND_BLUE)}</div>
-            <div>${groupBlock("Red", BRAND_RED)}</div>
-            <div>${groupBlock("Green", BRAND_GREEN)}</div>
-            <div>${groupBlock("Yellow", BRAND_YELLOW)}</div>
+            <div>${groupBlock("Blue", blue)}</div>
+            <div>${groupBlock("Red", red)}</div>
+            <div>${groupBlock("Green", green)}</div>
+            <div>${groupBlock("Yellow", yellow)}</div>
           </div>
         </div>
       </div>
     `;
-  },
+  }),
 };

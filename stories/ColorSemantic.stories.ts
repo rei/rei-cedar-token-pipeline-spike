@@ -1,4 +1,5 @@
 import type { StoryObj, Meta } from "@storybook/html";
+import { loadColorTokens } from "./lib/load-tokens.js";
 
 type SemanticTokenArgs = Record<string, never>;
 
@@ -10,20 +11,35 @@ export default meta;
 
 type Story = StoryObj<SemanticTokenArgs>;
 
-// ─── Resolved alias values from canonical.json ────────────────────────────────
+// ─── Async story wrapper ──────────────────────────────────────────────────────
 
-const R = {
-  "surface.base":       { hex: "#ffffff", ref: "Neutral Colors → base-neutrals.white" },
-  "surface.raised":     { hex: "#edeae3", ref: "Neutral Colors → warm-grey.100" },
-  "text.base":          { hex: "#2e2e2b", ref: "Neutral Colors → warm-grey.900" },
-  "text.subtle":        { hex: "#736e65", ref: "Neutral Colors → warm-grey.600" },
-  "text.link":          { hex: "#0b2d60", ref: "Brand Colors → blue.600" },
-  "text.link-hover":    { hex: "#406eb5", ref: "Brand Colors → blue.400" },
-  "border.base":        { hex: "#b2ab9f", ref: "Neutral Colors → warm-grey.300" },
-  "border.subtle":      { hex: "#edeae3", ref: "Neutral Colors → warm-grey.100" },
-} as const;
+function asyncStory(
+  fn: () => Promise<string>,
+): () => HTMLElement {
+  return () => {
+    const container = document.createElement("div");
+    container.style.cssText = "min-height:200px;background:#f5f2eb;";
 
-type TokenKey = keyof typeof R;
+    container.innerHTML = `
+      <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:.85rem;color:#736e65">
+        Loading token data…
+      </div>`;
+
+    fn()
+      .then((html) => {
+        container.innerHTML = html;
+      })
+      .catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        container.innerHTML = `
+          <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:.85rem;color:#be342d">
+            Error loading tokens: ${msg}
+          </div>`;
+      });
+
+    return container;
+  };
+}
 
 // ─── Shared design tokens ─────────────────────────────────────────────────────
 
@@ -184,7 +200,6 @@ const BASE_STYLES = `
     font-family: var(--font-sans);
     font-size: 1.25rem;
     font-weight: 700;
-    color: #2e2e2b;
     letter-spacing: -0.02em;
     margin-bottom: 0.5rem;
     line-height: 1.2;
@@ -192,14 +207,12 @@ const BASE_STYLES = `
   .text-demo-body {
     font-family: var(--font-sans);
     font-size: 0.875rem;
-    color: #736e65;
     line-height: 1.6;
     margin-bottom: 1rem;
   }
   .text-demo-link {
     font-family: var(--font-mono);
     font-size: 0.8125rem;
-    color: #0b2d60;
     text-decoration: underline;
     text-underline-offset: 3px;
     text-decoration-thickness: 1px;
@@ -209,38 +222,13 @@ const BASE_STYLES = `
     margin-left: 0.5rem;
     font-family: var(--font-mono);
     font-size: 0.5625rem;
-    color: #406eb5;
     letter-spacing: 0.06em;
     opacity: 0.7;
     vertical-align: middle;
   }
   .text-demo-divider {
     height: 1px;
-    background: #edeae3;
     margin: 1.25rem 0;
-  }
-  .text-demo-tokens-row {
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-  }
-  .text-token-chip {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-  .text-token-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    border: 1px solid var(--rule-heavy);
-    flex-shrink: 0;
-  }
-  .text-token-name {
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    color: var(--ink-faint);
-    letter-spacing: 0.04em;
   }
 
   /* ── Border demo ── */
@@ -324,7 +312,10 @@ function sectionHeader(category: string, title: string, count: number): string {
   `;
 }
 
-function tokenGrid(tokens: TokenKey[]): string {
+function tokenGrid(
+  tokens: Map<string, { hex: string; ref: string }>,
+  keys: string[],
+): string {
   return `
     <div class="token-grid">
       <div class="token-grid-header">
@@ -333,13 +324,15 @@ function tokenGrid(tokens: TokenKey[]): string {
         <div>Resolves to</div>
         <div style="text-align:right;">Hex</div>
       </div>
-      ${tokens.map((key) => {
-        const { hex, ref } = R[key];
+      ${keys.map((key) => {
+        const data = tokens.get(key);
+        if (!data) return "";
+        const { hex, ref } = data;
         return `
           <div class="trow-chip-wrap">
             <span class="trow-chip" style="background:${hex};"></span>
           </div>
-          <div class="trow-token">color.${key}</div>
+          <div class="trow-token">${key}</div>
           <div class="trow-ref">${ref}</div>
           <div class="trow-hex">${hex.slice(0, 7).toUpperCase()}</div>
         `;
@@ -352,121 +345,147 @@ function tokenGrid(tokens: TokenKey[]): string {
 
 export const Surface: Story = {
   name: "Surface",
-  render: () => `
-    <style>${BASE_STYLES}</style>
-    <div class="page">
-      ${breadcrumb("Cedar Tokens", "Color", "Semantic", "Surface")}
-      ${sectionHeader("Semantic Colors", "Surface", 2)}
+  render: asyncStory(async () => {
+    const tokens = await loadColorTokens();
+    const surfaceKeys = ["color.surface.base", "color.surface.raised"];
+    const surface = tokens.get("color.surface.base");
 
-      ${tokenGrid(["surface.base", "surface.raised"])}
+    if (!surface) return "<p>No tokens loaded</p>";
 
-      <div class="group-header" style="margin-top:2.5rem;">
-        <span class="group-pip"></span>
-        <span class="group-name">Live Preview</span>
-        <span class="group-rule"></span>
-      </div>
+    return `
+      <style>${BASE_STYLES}</style>
+      <div class="page">
+        ${breadcrumb("Cedar Tokens", "Color", "Semantic", "Surface")}
+        ${sectionHeader("Semantic Colors", "Surface", 2)}
 
-      <div class="demo-card">
-        <div class="demo-layer" style="background:${R["surface.base"].hex};">
-          <span class="demo-layer-label" style="color:${R["text.base"].hex};">color.surface.base</span>
-          <span class="demo-layer-desc" style="color:${R["text.subtle"].hex};">Base — page background, modal backdrop</span>
+        ${tokenGrid(tokens, surfaceKeys)}
+
+        <div class="group-header" style="margin-top:2.5rem;">
+          <span class="group-pip"></span>
+          <span class="group-name">Live Preview</span>
+          <span class="group-rule"></span>
         </div>
-        <div class="demo-divider" style="background:${R["border.subtle"].hex};"></div>
-        <div class="demo-layer" style="background:${R["surface.raised"].hex};">
-          <span class="demo-layer-label" style="color:${R["text.base"].hex};">color.surface.raised</span>
-          <span class="demo-layer-desc" style="color:${R["text.subtle"].hex};">Raised — cards, sidebars, dropdowns</span>
+
+        <div class="demo-card">
+          <div class="demo-layer" style="background:${tokens.get("color.surface.base")?.hex};">
+            <span class="demo-layer-label" style="color:${tokens.get("color.text.base")?.hex};">color.surface.base</span>
+            <span class="demo-layer-desc" style="color:${tokens.get("color.text.subtle")?.hex};">Base — page background, modal backdrop</span>
+          </div>
+          <div class="demo-divider" style="background:${tokens.get("color.border.subtle")?.hex};"></div>
+          <div class="demo-layer" style="background:${tokens.get("color.surface.raised")?.hex};">
+            <span class="demo-layer-label" style="color:${tokens.get("color.text.base")?.hex};">color.surface.raised</span>
+            <span class="demo-layer-desc" style="color:${tokens.get("color.text.subtle")?.hex};">Raised — cards, sidebars, dropdowns</span>
+          </div>
         </div>
       </div>
-    </div>
-  `,
+    `;
+  }),
 };
 
 export const Text: Story = {
   name: "Text",
-  render: () => `
-    <style>${BASE_STYLES}</style>
-    <div class="page">
-      ${breadcrumb("Cedar Tokens", "Color", "Semantic", "Text")}
-      ${sectionHeader("Semantic Colors", "Text", 4)}
+  render: asyncStory(async () => {
+    const tokens = await loadColorTokens();
+    const textKeys = ["color.text.base", "color.text.subtle", "color.text.link", "color.text.link-hover"];
 
-      ${tokenGrid(["text.base", "text.subtle", "text.link", "text.link-hover"])}
+    return `
+      <style>${BASE_STYLES}</style>
+      <div class="page">
+        ${breadcrumb("Cedar Tokens", "Color", "Semantic", "Text")}
+        ${sectionHeader("Semantic Colors", "Text", 4)}
 
-      <div class="group-header" style="margin-top:2.5rem;">
-        <span class="group-pip"></span>
-        <span class="group-name">Live Preview</span>
-        <span class="group-rule"></span>
+        ${tokenGrid(tokens, textKeys)}
+
+        <div class="group-header" style="margin-top:2.5rem;">
+          <span class="group-pip"></span>
+          <span class="group-name">Live Preview</span>
+          <span class="group-rule"></span>
+        </div>
+
+        <div class="text-demo">
+          <div class="text-demo-headline" style="color:${tokens.get("color.text.base")?.hex};">
+            Gear up for your next adventure.
+          </div>
+          <div class="text-demo-body" style="color:${tokens.get("color.text.subtle")?.hex};">
+            From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside. Explore our curated collections, built for every terrain.
+          </div>
+          <div>
+            <a class="text-demo-link" href="#" style="color:${tokens.get("color.text.link")?.hex};">View all collections</a>
+            <span class="text-demo-hover-note" style="color:${tokens.get("color.text.link-hover")?.hex};">hover → ${tokens.get("color.text.link-hover")?.hex.slice(0, 7).toUpperCase()}</span>
+          </div>
+          <div class="text-demo-divider" style="background:${tokens.get("color.border.base")?.hex};"></div>
+          <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+            ${textKeys.map((key) => {
+              const data = tokens.get(key);
+              return `
+                <div style="display:flex;align-items:center;gap:0.4rem;">
+                  <span style="width:8px;height:8px;border-radius:50%;border:1px solid var(--rule-heavy);flex-shrink:0;background:${data?.hex};"></span>
+                  <span style="font-family:var(--font-mono);font-size:0.5625rem;color:var(--ink-faint);letter-spacing:0.04em;">${key}</span>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
       </div>
-
-      <div class="text-demo">
-        <div class="text-demo-headline" style="color:${R["text.base"].hex};">
-          Gear up for your next adventure.
-        </div>
-        <div class="text-demo-body" style="color:${R["text.subtle"].hex};">
-          From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside. Explore our curated collections, built for every terrain.
-        </div>
-        <div>
-          <a class="text-demo-link" href="#" style="color:${R["text.link"].hex};">View all collections</a>
-          <span class="text-demo-hover-note">hover → ${R["text.link-hover"].hex.toUpperCase()}</span>
-        </div>
-        <div class="text-demo-divider" style="background:${R["border.base"].hex};"></div>
-        <div class="text-demo-tokens-row">
-          ${(["text.base", "text.subtle", "text.link", "text.link-hover"] as TokenKey[]).map((key) => `
-            <div class="text-token-chip">
-              <span class="text-token-dot" style="background:${R[key].hex};"></span>
-              <span class="text-token-name">color.${key}</span>
-            </div>
-          `).join("")}
-        </div>
-      </div>
-    </div>
-  `,
+    `;
+  }),
 };
 
 export const Border: Story = {
   name: "Border",
-  render: () => `
-    <style>${BASE_STYLES}</style>
-    <div class="page">
-      ${breadcrumb("Cedar Tokens", "Color", "Semantic", "Border")}
-      ${sectionHeader("Semantic Colors", "Border", 2)}
+  render: asyncStory(async () => {
+    const tokens = await loadColorTokens();
+    const borderKeys = ["color.border.base", "color.border.subtle"];
 
-      ${tokenGrid(["border.base", "border.subtle"])}
+    return `
+      <style>${BASE_STYLES}</style>
+      <div class="page">
+        ${breadcrumb("Cedar Tokens", "Color", "Semantic", "Border")}
+        ${sectionHeader("Semantic Colors", "Border", 2)}
 
-      <div class="group-header" style="margin-top:2.5rem;">
-        <span class="group-pip"></span>
-        <span class="group-name">Live Preview</span>
-        <span class="group-rule"></span>
-      </div>
+        ${tokenGrid(tokens, borderKeys)}
 
-      <div class="border-demo-grid">
-        <div class="border-demo-cell" style="border:1.5px solid ${R["border.base"].hex};">
-          <div class="border-demo-label">color.border.base</div>
-          <div class="border-demo-desc" style="color:${R["text.subtle"].hex};">Default — cards, inputs, containers</div>
-          <div style="margin-top:0.75rem; height:1px; background:${R["border.base"].hex};"></div>
-          <div style="font-family:var(--font-mono); font-size:0.5rem; color:var(--ink-faint); letter-spacing:0.06em; margin-top:0.25rem;">${R["border.base"].hex.toUpperCase()}</div>
+        <div class="group-header" style="margin-top:2.5rem;">
+          <span class="group-pip"></span>
+          <span class="group-name">Live Preview</span>
+          <span class="group-rule"></span>
         </div>
-        <div class="border-demo-cell" style="border:1.5px solid ${R["border.subtle"].hex};">
-          <div class="border-demo-label">color.border.subtle</div>
-          <div class="border-demo-desc" style="color:${R["text.subtle"].hex};">Subtle — dividers, section separators</div>
-          <div style="margin-top:0.75rem; height:1px; background:${R["border.subtle"].hex};"></div>
-          <div style="font-family:var(--font-mono); font-size:0.5rem; color:var(--ink-faint); letter-spacing:0.06em; margin-top:0.25rem;">${R["border.subtle"].hex.toUpperCase()}</div>
-        </div>
-      </div>
 
-      <div style="margin-top:1rem; padding:1.5rem; background:${R["surface.raised"].hex}; border-radius:4px; border-top:3px solid ${R["border.base"].hex};">
-        <div style="font-family:var(--font-sans); font-size:0.5625rem; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:0.5rem;">Usage note</div>
-        <div style="font-family:var(--font-sans); font-size:0.8125rem; color:${R["text.subtle"].hex}; line-height:1.6;">
-          Use <code style="font-family:var(--font-mono); font-size:0.75rem; color:${R["text.base"].hex};">border.base</code> for interactive and structural boundaries. Use <code style="font-family:var(--font-mono); font-size:0.75rem; color:${R["text.base"].hex};">border.subtle</code> for low-emphasis visual separators that shouldn't compete with content.
+        <div class="border-demo-grid">
+          <div class="border-demo-cell" style="border:1.5px solid ${tokens.get("color.border.base")?.hex};">
+            <div class="border-demo-label">color.border.base</div>
+            <div class="border-demo-desc" style="color:${tokens.get("color.text.subtle")?.hex};">Default — cards, inputs, containers</div>
+            <div style="margin-top:0.75rem; height:1px; background:${tokens.get("color.border.base")?.hex};"></div>
+            <div style="font-family:var(--font-mono); font-size:0.5rem; color:var(--ink-faint); letter-spacing:0.06em; margin-top:0.25rem;">${tokens.get("color.border.base")?.hex.slice(0, 7).toUpperCase()}</div>
+          </div>
+          <div class="border-demo-cell" style="border:1.5px solid ${tokens.get("color.border.subtle")?.hex};">
+            <div class="border-demo-label">color.border.subtle</div>
+            <div class="border-demo-desc" style="color:${tokens.get("color.text.subtle")?.hex};">Subtle — dividers, section separators</div>
+            <div style="margin-top:0.75rem; height:1px; background:${tokens.get("color.border.subtle")?.hex};"></div>
+            <div style="font-family:var(--font-mono); font-size:0.5rem; color:var(--ink-faint); letter-spacing:0.06em; margin-top:0.25rem;">${tokens.get("color.border.subtle")?.hex.slice(0, 7).toUpperCase()}</div>
+          </div>
+        </div>
+
+        <div style="margin-top:1rem; padding:1.5rem; background:${tokens.get("color.surface.raised")?.hex}; border-radius:4px; border-top:3px solid ${tokens.get("color.border.base")?.hex};">
+          <div style="font-family:var(--font-sans); font-size:0.5625rem; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:0.5rem;">Usage note</div>
+          <div style="font-family:var(--font-sans); font-size:0.8125rem; color:${tokens.get("color.text.subtle")?.hex}; line-height:1.6;">
+            Use <code style="font-family:var(--font-mono); font-size:0.75rem; color:${tokens.get("color.text.base")?.hex};">border.base</code> for interactive and structural boundaries. Use <code style="font-family:var(--font-mono); font-size:0.75rem; color:${tokens.get("color.text.base")?.hex};">border.subtle</code> for low-emphasis visual separators that shouldn't compete with content.
+          </div>
         </div>
       </div>
-    </div>
-  `,
+    `;
+  }),
 };
 
 export const AllSemantic: Story = {
   name: "All Semantic Tokens",
-  render: () => {
-    const total = Object.keys(R).length;
+  render: asyncStory(async () => {
+    const tokens = await loadColorTokens();
+    const total = tokens.size;
+    const surfaceKeys = ["color.surface.base", "color.surface.raised"];
+    const textKeys = ["color.text.base", "color.text.subtle", "color.text.link", "color.text.link-hover"];
+    const borderKeys = ["color.border.base", "color.border.subtle"];
+
     return `
       <style>${BASE_STYLES}</style>
       <div class="page">
@@ -488,16 +507,16 @@ export const AllSemantic: Story = {
         <div class="section-block" style="position:relative;">
           <div class="deco-index">01</div>
           ${sectionHeader("Semantic", "Surface", 2)}
-          <div style="margin-top:1.25rem;">${tokenGrid(["surface.base", "surface.raised"])}</div>
+          <div style="margin-top:1.25rem;">${tokenGrid(tokens, surfaceKeys)}</div>
           <div style="margin-top:1.25rem;" class="demo-card">
-            <div class="demo-layer" style="background:${R["surface.base"].hex};">
-              <span class="demo-layer-label" style="color:${R["text.base"].hex};">surface.base</span>
-              <span class="demo-layer-desc" style="color:${R["text.subtle"].hex};">Page background</span>
+            <div class="demo-layer" style="background:${tokens.get("color.surface.base")?.hex};">
+              <span class="demo-layer-label" style="color:${tokens.get("color.text.base")?.hex};">surface.base</span>
+              <span class="demo-layer-desc" style="color:${tokens.get("color.text.subtle")?.hex};">Page background</span>
             </div>
-            <div class="demo-divider" style="background:${R["border.subtle"].hex};"></div>
-            <div class="demo-layer" style="background:${R["surface.raised"].hex};">
-              <span class="demo-layer-label" style="color:${R["text.base"].hex};">surface.raised</span>
-              <span class="demo-layer-desc" style="color:${R["text.subtle"].hex};">Cards &amp; panels</span>
+            <div class="demo-divider" style="background:${tokens.get("color.border.subtle")?.hex};"></div>
+            <div class="demo-layer" style="background:${tokens.get("color.surface.raised")?.hex};">
+              <span class="demo-layer-label" style="color:${tokens.get("color.text.base")?.hex};">surface.raised</span>
+              <span class="demo-layer-desc" style="color:${tokens.get("color.text.subtle")?.hex};">Cards &amp; panels</span>
             </div>
           </div>
         </div>
@@ -505,31 +524,15 @@ export const AllSemantic: Story = {
         <div class="section-block" style="position:relative;">
           <div class="deco-index">02</div>
           ${sectionHeader("Semantic", "Text", 4)}
-          <div style="margin-top:1.25rem;">${tokenGrid(["text.base", "text.subtle", "text.link", "text.link-hover"])}</div>
-          <div class="text-demo" style="margin-top:1.25rem;">
-            <div class="text-demo-headline" style="color:${R["text.base"].hex};">Gear up for your next adventure.</div>
-            <div class="text-demo-body" style="color:${R["text.subtle"].hex};">Explore our curated collections, built for every terrain and condition.</div>
-            <a class="text-demo-link" href="#" style="color:${R["text.link"].hex};">View all collections</a>
-            <span class="text-demo-hover-note">hover → ${R["text.link-hover"].hex.toUpperCase()}</span>
-          </div>
+          <div style="margin-top:1.25rem;">${tokenGrid(tokens, textKeys)}</div>
         </div>
 
         <div class="section-block" style="position:relative;">
           <div class="deco-index">03</div>
           ${sectionHeader("Semantic", "Border", 2)}
-          <div style="margin-top:1.25rem;">${tokenGrid(["border.base", "border.subtle"])}</div>
-          <div class="border-demo-grid" style="margin-top:1.25rem;">
-            <div class="border-demo-cell" style="border:1.5px solid ${R["border.base"].hex};">
-              <div class="border-demo-label">border.base</div>
-              <div class="border-demo-desc" style="color:${R["text.subtle"].hex};">Cards, inputs, containers</div>
-            </div>
-            <div class="border-demo-cell" style="border:1.5px solid ${R["border.subtle"].hex};">
-              <div class="border-demo-label">border.subtle</div>
-              <div class="border-demo-desc" style="color:${R["text.subtle"].hex};">Dividers, separators</div>
-            </div>
-          </div>
+          <div style="margin-top:1.25rem;">${tokenGrid(tokens, borderKeys)}</div>
         </div>
       </div>
     `;
-  },
+  }),
 };

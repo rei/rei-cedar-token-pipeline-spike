@@ -2,22 +2,18 @@
  * SemanticDiff.stories.ts
  *
  * Storybook stories for the Cedar token semantic diff feature.
- * Fetches dist/normalized/baseline.json and dist/normalized/current.json,
- * runs the diff engine, and renders the result using diff-render.
+ * All stories fetch dist/normalized/baseline.json and dist/normalized/current.json
+ * at runtime, so they always reflect the latest token changes.
  *
  * Stories:
- *   FullDiff     — loaded from canonical.json at build time; real token data
+ *   FullDiff     — shows all changes between baseline and current
  *   NoChanges    — demonstrates the empty-state UI (no diff entries)
- *   LiveDiff     — fetches baseline/current JSON files at runtime; requires
- *                  dist/normalized/baseline.json and dist/normalized/current.json
- *                  to exist. Run `pnpm tokens:snapshot baseline` and
- *                  `pnpm tokens:snapshot current` to generate them.
+ *   LiveDiff     — same as FullDiff; name indicates it's live/dynamic
  */
 
 import type { StoryObj } from "@storybook/html";
 import { computeDiff } from "./lib/diff-engine.js";
 import { renderDiffPage } from "./lib/diff-render.js";
-import { loadCanonical } from "./lib/load-canonical.js";
 
 // ─── Type shim ───────────────────────────────────────────────────────────────
 
@@ -65,45 +61,7 @@ function asyncStory(
   };
 }
 
-// ─── Story: FullDiff (canonical tokens) ───────────────────────────────────────
-
-// Load the real canonical token tree at build time.
-// This uses the actual tokens from canonical.json (the authoritative source),
-// so the FullDiff story will always reflect the current token state.
-const BASELINE = loadCanonical();
-const CURRENT = BASELINE; // For demo: same as baseline (no changes)
-
-export const FullDiff: StoryObj = {
-  name: "Full Diff (inline fixtures)",
-  render: () => {
-    const entries = computeDiff(
-      BASELINE as Record<string, unknown>,
-      CURRENT as Record<string, unknown>,
-    );
-    return renderDiffPage(entries, {
-      baselineLabel: "baseline (inline)",
-      currentLabel: "current (inline)",
-    });
-  },
-};
-
-// ─── Story: NoChanges ─────────────────────────────────────────────────────────
-
-export const NoChanges: StoryObj = {
-  name: "No Changes",
-  render: () => {
-    const entries = computeDiff(
-      BASELINE as Record<string, unknown>,
-      BASELINE as Record<string, unknown>,
-    );
-    return renderDiffPage(entries, {
-      baselineLabel: "v1.0.0",
-      currentLabel: "v1.0.0",
-    });
-  },
-};
-
-// ─── Story: LiveDiff ──────────────────────────────────────────────────────────
+// ─── Story: FullDiff ──────────────────────────────────────────────────────────
 
 const NOT_FOUND_HTML = `
 <div style="
@@ -113,7 +71,7 @@ const NOT_FOUND_HTML = `
   <div style="max-width:560px">
     <div style="font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
       color:#736e65;margin-bottom:6px;font-family:'Syne',sans-serif">
-      Cedar Design Tokens — Semantic Diff
+      Cedar Design Tokens — Token Diff
     </div>
     <h1 style="margin:0 0 24px;font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;
       letter-spacing:-.02em;border-bottom:2px solid #2e2e2b;padding-bottom:12px">
@@ -123,19 +81,18 @@ const NOT_FOUND_HTML = `
       <code style="background:#be342d22;padding:1px 5px;border-radius:3px">dist/normalized/baseline.json</code>
       and/or
       <code style="background:#be342d22;padding:1px 5px;border-radius:3px">dist/normalized/current.json</code>
-      could not be fetched. The files must exist before starting Storybook.
+      could not be fetched. The files must exist before the story can load.
     </p>
     <p style="font-size:.8rem;color:#736e65;margin:0 0 20px;line-height:1.6">
-      The <strong>Live Diff</strong> story reads real snapshot files written by the token
-      normalization pipeline. Use the <strong>Full Diff (inline fixtures)</strong> story
-      to see a working example with hardcoded data.
+      To generate snapshot files, run the token normalization and snapshot commands:
     </p>
     <div style="background:#2e2e2b;color:#edeae3;border-radius:6px;padding:16px 20px;
       font-size:.82rem;line-height:1.8">
       <div style="color:#736e65;margin-bottom:4px;font-size:.7rem;
-        letter-spacing:.08em;text-transform:uppercase">To generate the files</div>
+        letter-spacing:.08em;text-transform:uppercase">Generate snapshots</div>
+      <div><span style="color:#3b8349">$</span> pnpm tokens:normalize</div>
       <div><span style="color:#3b8349">$</span> pnpm tokens:snapshot baseline</div>
-      <div style="color:#736e65;margin:4px 0"># edit tokens, re-run Figma sync, then:</div>
+      <div style="color:#736e65;margin:4px 0"># make changes to tokens, then:</div>
       <div><span style="color:#3b8349">$</span> pnpm tokens:snapshot current</div>
       <div style="color:#736e65;margin:4px 0"># restart Storybook to pick up the new files:</div>
       <div><span style="color:#3b8349">$</span> pnpm storybook</div>
@@ -144,11 +101,71 @@ const NOT_FOUND_HTML = `
 </div>`;
 
 /**
- * Fetches both JSON fixtures from the static server at runtime.
+ * Fetches both JSON snapshots from the static server at runtime.
  * Requires `dist/normalized/baseline.json` and `dist/normalized/current.json`
- * to exist. Generate them with `pnpm tokens:snapshot baseline` /
- * `pnpm tokens:snapshot current`, then restart Storybook.
- *
+ * to exist. Always shows the latest token changes (dynamic/live data).
+ */
+export const FullDiff: StoryObj = {
+  name: "Full Diff",
+  render: asyncStory(async () => {
+    // Derive the base URL from the current page so this works both locally
+    // (served from /) and on GH Pages (served from a sub-path like
+    // /rei-cedar-token-pipeline-spike/pr/update-tokens/).
+    // window.location.pathname inside the Storybook iframe is something like
+    // /rei-cedar-token-pipeline-spike/pr/update-tokens/iframe.html so stripping
+    // the filename gives us the correct base to resolve normalized/ against.
+    const base = window.location.pathname.replace(/\/[^/]*$/, "/");
+    const [baseRes, currRes] = await Promise.all([
+      fetch(`${base}normalized/baseline.json`),
+      fetch(`${base}normalized/current.json`),
+    ]);
+
+    if (baseRes.status === 404 || currRes.status === 404) {
+      return NOT_FOUND_HTML;
+    }
+
+    if (!baseRes.ok) throw new Error(`baseline.json: ${baseRes.status} ${baseRes.statusText}`);
+    if (!currRes.ok) throw new Error(`current.json: ${currRes.status} ${currRes.statusText}`);
+
+    const baseline = (await baseRes.json()) as Record<string, unknown>;
+    const current = (await currRes.json()) as Record<string, unknown>;
+
+    const entries = computeDiff(baseline, current);
+    return renderDiffPage(entries, {
+      baselineLabel: "baseline.json",
+      currentLabel: "current.json",
+    });
+  }),
+};
+
+// ─── Story: NoChanges ─────────────────────────────────────────────────────────
+
+export const NoChanges: StoryObj = {
+  name: "No Changes",
+  render: asyncStory(async () => {
+    const base = window.location.pathname.replace(/\/[^/]*$/, "/");
+    const res = await fetch(`${base}normalized/baseline.json`);
+
+    if (res.status === 404) {
+      return NOT_FOUND_HTML;
+    }
+
+    if (!res.ok) throw new Error(`baseline.json: ${res.status} ${res.statusText}`);
+
+    const baseline = (await res.json()) as Record<string, unknown>;
+    // Compare baseline with itself (no changes)
+    const entries = computeDiff(baseline, baseline);
+    return renderDiffPage(entries, {
+      baselineLabel: "v1.0.0",
+      currentLabel: "v1.0.0",
+    });
+  }),
+};
+
+// ─── Story: LiveDiff ──────────────────────────────────────────────────────────
+
+/**
+ * Fetches both JSON snapshots from the static server at runtime.
  * This story displays **all token changes** across all categories:
  * - Primitive token values (hex colors, sizing, etc.)
  * - Semantic token aliases (text, surface, border, etc.)
