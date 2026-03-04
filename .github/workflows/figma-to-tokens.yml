@@ -58,10 +58,12 @@ jobs:
         run: pnpm diff:current
 
       # ── 6. Build Storybook (snapshots are baked in as static assets) ─────────
-      # --base-url tells Storybook/Vite the sub-path it will be served from so
+      # STORYBOOK_BASE_URL tells Vite the sub-path it will be served from so
       # all asset references in the built HTML are correct.
       - name: Build Storybook
-        run: pnpm storybook:build --output-dir storybook-static --base-url /rei-cedar-token-pipeline-spike/pr/${{ env.PR_BRANCH }}/
+        run: pnpm storybook:build
+        env:
+          STORYBOOK_BASE_URL: /rei-cedar-token-pipeline-spike/pr/${{ env.PR_BRANCH }}/
 
       # ── 7. Deploy Storybook to GH Pages under /pr/update-tokens/ ─────────────
       #

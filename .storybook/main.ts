@@ -18,6 +18,15 @@ const config: StorybookConfig = {
       to: "/normalized",
     },
   ],
+  // Allow overriding Vite's base path at build time via STORYBOOK_BASE_URL.
+  // This is needed when deploying to a GH Pages sub-path, e.g.:
+  //   STORYBOOK_BASE_URL=/rei-cedar-token-pipeline-spike/pr/update-tokens/
+  viteFinal: async (config) => {
+    if (process.env.STORYBOOK_BASE_URL) {
+      config.base = process.env.STORYBOOK_BASE_URL;
+    }
+    return config;
+  },
 };
 
 export default config;
