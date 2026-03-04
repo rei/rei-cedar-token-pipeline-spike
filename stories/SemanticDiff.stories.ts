@@ -6,16 +6,18 @@
  * runs the diff engine, and renders the result using diff-render.
  *
  * Stories:
- *   FullDiff     — inline fixture; always works, no server required
- *   NoChanges    — demonstrates the empty-state UI
- *   LiveDiff     — fetches both JSON files at runtime; requires the files to
- *                  exist in dist/normalized/. Run `pnpm tokens:snapshot` to
- *                  generate them, then restart Storybook.
+ *   FullDiff     — loaded from canonical.json at build time; real token data
+ *   NoChanges    — demonstrates the empty-state UI (no diff entries)
+ *   LiveDiff     — fetches baseline/current JSON files at runtime; requires
+ *                  dist/normalized/baseline.json and dist/normalized/current.json
+ *                  to exist. Run `pnpm tokens:snapshot baseline` and
+ *                  `pnpm tokens:snapshot current` to generate them.
  */
 
 import type { StoryObj } from "@storybook/html";
 import { computeDiff } from "./lib/diff-engine.js";
 import { renderDiffPage } from "./lib/diff-render.js";
+import { loadCanonical } from "./lib/load-canonical.js";
 
 // ─── Type shim ───────────────────────────────────────────────────────────────
 
@@ -63,125 +65,13 @@ function asyncStory(
   };
 }
 
-// ─── Story: FullDiff (inline fixtures) ───────────────────────────────────────
+// ─── Story: FullDiff (canonical tokens) ───────────────────────────────────────
 
-// Inline copies of the fixture data using the new section-nested structure.
-// The canonical tree now nests all collections under their section key:
-//   color.neutral-palette.base-neutrals.white     (was: color["Neutral Colors"].base-neutrals.white)
-//   color.brand-palette.blue.600                 (was: color["Brand Colors"].blue.600)
-const BASELINE = {
-  color: {
-    "neutral-palette": {
-      "warm-grey": {
-        "100": { $value: "#edeae3", $type: "color" },
-        "300": { $value: "#b2ab9f", $type: "color" },
-        "600": { $value: "#736e65", $type: "color" },
-        "900": { $value: "#2e2e2b", $type: "color" },
-      },
-      "base-neutrals": {
-        black: { $value: "#000000", $type: "color" },
-        white: { $value: "#ffffff", $type: "color" },
-        "white-85": { $value: "#ffffffd9", $type: "color" },
-        "white-75": { $value: "#ffffffbf", $type: "color" },
-      },
-    },
-    "brand-palette": {
-      blue: {
-        "400": { $value: "#406eb5", $type: "color" },
-        "600": { $value: "#0b2d60", $type: "color" },
-      },
-      red: {
-        "400": { $value: "#be342d", $type: "color" },
-        "600": { $value: "#610a0a", $type: "color" },
-      },
-      green: {
-        "400": { $value: "#3b8349", $type: "color" },
-        "600": { $value: "#1f513f", $type: "color" },
-      },
-      yellow: {
-        "400": { $value: "#ffbf59", $type: "color" },
-        "600": { $value: "#ffe7b3", $type: "color" },
-        "800": { $value: "#ede285", $type: "color" },
-      },
-    },
-    surface: {
-      base: { $value: "{color.neutral-palette.base-neutrals.white}", $type: "color" },
-      raised: { $value: "{color.neutral-palette.warm-grey.100}", $type: "color" },
-    },
-    text: {
-      base: { $value: "{color.neutral-palette.warm-grey.900}", $type: "color" },
-      subtle: { $value: "{color.neutral-palette.warm-grey.600}", $type: "color" },
-      link: { $value: "{color.brand-palette.blue.600}", $type: "color" },
-      "link-hover": { $value: "{color.brand-palette.blue.400}", $type: "color" },
-    },
-    border: {
-      base: { $value: "{color.neutral-palette.warm-grey.300}", $type: "color" },
-      subtle: { $value: "{color.neutral-palette.warm-grey.100}", $type: "color" },
-    },
-  },
-};
-
-const CURRENT = {
-  color: {
-    "neutral-palette": {
-      "warm-grey": {
-        "100": { $value: "#edeae3", $type: "color" },
-        "300": { $value: "#b2ab9f", $type: "color" },
-        "600": { $value: "#736e65", $type: "color" },
-        "900": { $value: "#1a1a18", $type: "color" }, // changed value
-      },
-      "base-neutrals": {
-        black: { $value: "#000000", $type: "color" },
-        white: { $value: "#ffffff", $type: "color" },
-        "white-85": { $value: "#ffffffd9", $type: "color" },
-        // white-75 removed
-      },
-    },
-    "brand-palette": {
-      blue: {
-        "400": { $value: "#4a7ec8", $type: "color" }, // changed value
-        "600": { $value: "#0b2d60", $type: "color" },
-      },
-      red: {
-        "400": { $value: "#be342d", $type: "color" },
-        "600": { $value: "#610a0a", $type: "color" },
-      },
-      green: {
-        "400": { $value: "#3b8349", $type: "color" },
-        "600": { $value: "#1f513f", $type: "color" },
-      },
-      yellow: {
-        "400": { $value: "#ffbf59", $type: "color" },
-        "600": { $value: "#ffe7b3", $type: "color" },
-        "800": { $value: "#ede285", $type: "color" },
-      },
-      teal: { // new group
-        "400": { $value: "#2a8a8a", $type: "color" },
-        "600": { $value: "#1a5555", $type: "color" },
-      },
-    },
-    surface: {
-      base: { $value: "{color.neutral-palette.base-neutrals.white}", $type: "color" },
-      raised: { $value: "{color.neutral-palette.warm-grey.100}", $type: "color" },
-      overlay: { $value: "{color.neutral-palette.base-neutrals.black}", $type: "color" }, // added token
-    },
-    text: {
-      base: { $value: "{color.neutral-palette.warm-grey.900}", $type: "color" },
-      subtle: { $value: "{color.neutral-palette.warm-grey.600}", $type: "color" },
-      link: { $value: "{color.brand-palette.blue.400}", $type: "color" }, // alias retargeted
-      "link-hover": { $value: "{color.brand-palette.blue.400}", $type: "color" },
-    },
-    border: {
-      base: { $value: "{color.neutral-palette.warm-grey.300}", $type: "color" },
-      subtle: { $value: "{color.neutral-palette.warm-grey.100}", $type: "color" },
-    },
-    feedback: { // new group
-      success: { $value: "{color.brand-palette.green.400}", $type: "color" },
-      warning: { $value: "{color.brand-palette.yellow.400}", $type: "color" },
-      error: { $value: "{color.brand-palette.red.400}", $type: "color" },
-    },
-  },
-};
+// Load the real canonical token tree at build time.
+// This uses the actual tokens from canonical.json (the authoritative source),
+// so the FullDiff story will always reflect the current token state.
+const BASELINE = loadCanonical();
+const CURRENT = BASELINE; // For demo: same as baseline (no changes)
 
 export const FullDiff: StoryObj = {
   name: "Full Diff (inline fixtures)",
@@ -258,6 +148,18 @@ const NOT_FOUND_HTML = `
  * Requires `dist/normalized/baseline.json` and `dist/normalized/current.json`
  * to exist. Generate them with `pnpm tokens:snapshot baseline` /
  * `pnpm tokens:snapshot current`, then restart Storybook.
+ *
+ * This story displays **all token changes** across all categories:
+ * - Primitive token values (hex colors, sizing, etc.)
+ * - Semantic token aliases (text, surface, border, etc.)
+ * - Spacing and other sections
+ * - Structural changes (added/removed groups)
+ *
+ * The diff includes 8 kinds of changes:
+ * - added, removed (token-level)
+ * - changed-value, changed-alias (token modifications)
+ * - alias-to-value, value-to-alias (structural type changes)
+ * - group-added, group-removed (section-level changes)
  */
 export const LiveDiff: StoryObj = {
   name: "Live Diff (fetched)",

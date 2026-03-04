@@ -225,7 +225,7 @@ function summaryBar(entries: DiffEntry[]): string {
   }
 
   if (pills.length === 0) {
-    return `<p style="font-family:'DM Mono',monospace;font-size:.85rem;color:${COLOR.inkFaint};padding:16px 0">No semantic changes detected.</p>`;
+    return `<p style="font-family:'DM Mono',monospace;font-size:.85rem;color:${COLOR.inkFaint};padding:16px 0">No changes detected.</p>`;
   }
 
   return `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px">${pills.join("")}</div>`;
@@ -263,7 +263,7 @@ ${FONTS}
   <!-- Header -->
   <div style="margin-bottom:32px;border-bottom:2px solid ${COLOR.ink};padding-bottom:16px">
     <div style="font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${COLOR.inkFaint};margin-bottom:6px">Cedar Design Tokens</div>
-    <h1 style="margin:0;font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-.02em;line-height:1.1">Semantic Diff</h1>
+    <h1 style="margin:0;font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-.02em;line-height:1.1">Token Diff</h1>
     <div style="margin-top:8px;font-size:.78rem;color:${COLOR.inkFaint}">
       Comparing <code style="background:${COLOR.removedBorder}22;padding:1px 5px;border-radius:3px">${baselineLabel}</code>
       → <code style="background:${COLOR.addedBorder}22;padding:1px 5px;border-radius:3px">${currentLabel}</code>
