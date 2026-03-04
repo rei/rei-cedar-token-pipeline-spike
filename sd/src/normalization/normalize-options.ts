@@ -12,7 +12,7 @@ export function normalizeOptions() {
     const pathToFile = path.join(
       __dirname,
       "../../../",
-      "/data/raw-figma-options.json"
+      "/tokens/options.color.light.json"
     );
     const data = fs.readFileSync(pathToFile, { encoding: "utf-8" });
     const parsedData = JSON.parse(data);
@@ -30,7 +30,7 @@ export function normalizeOptions() {
 
     return nestedObject;
   } catch (error) {
-    console.error("Error reading raw-figma-options file: ", error);
+    console.error("Error reading options.color.light.json file: ", error);
     const message = error instanceof Error ? error.message : String(error);
 
     return { success: false, error: message } as NormalizeError;

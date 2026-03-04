@@ -12,7 +12,7 @@ export function normalizeAlias() {
     const pathToFile = path.join(
       __dirname,
       "../../../",
-      "/data/raw-figma-alias.json"
+      "/tokens/alias.color.light.json"
     );
     const data = fs.readFileSync(pathToFile, { encoding: "utf-8" });
     const parsedData = JSON.parse(data);
@@ -28,7 +28,7 @@ export function normalizeAlias() {
 
     return nestedObject;
   } catch (error) {
-    console.error("Error reading raw-figma-alias file: ", error);
+    console.error("Error reading alias.color.light.json file: ", error);
     const message = error instanceof Error ? error.message : String(error);
 
     return { success: false, error: message } as NormalizeError;
