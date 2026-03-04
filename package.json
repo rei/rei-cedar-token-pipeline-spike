@@ -9,7 +9,13 @@
     "prepare": "husky",
     "commit": "cz",
     "sync:figma-to-tokens": "tsx src/sync/figma-to-tokens.ts",
-    "sync:tokens-to-figma": "tsx src/sync/tokens-to-figma.ts"
+    "sync:tokens-to-figma": "tsx src/sync/tokens-to-figma.ts",
+    "storybook": "storybook dev -p 6006",
+    "storybook:build": "storybook build",
+    "tokens:snapshot": "tsx src/snapshot.ts",
+    "tokens:normalize": "npm run sd:normalize --prefix sd",
+    "diff:baseline": "pnpm tokens:normalize && pnpm tokens:snapshot baseline",
+    "diff:current": "pnpm tokens:normalize && pnpm tokens:snapshot current"
   },
   "keywords": [],
   "author": "",
@@ -30,13 +36,16 @@
     "@commitlint/cli": "^20.4.1",
     "@commitlint/config-conventional": "^20.4.1",
     "@figma/rest-api-spec": "^0.36.0",
+    "@storybook/html": "^10.2.15",
+    "@storybook/html-vite": "^10.2.15",
     "@types/node": "^25.2.2",
     "commitizen": "^4.3.1",
     "cz-conventional-changelog": "^3.3.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
-    "oxfmt": "^0.28.0",
-    "oxlint": "^1.43.0",
+    "oxfmt": "^0.36.0",
+    "oxlint": "^1.51.0",
+    "storybook": "^10.2.15",
     "tsx": "^4.21.0"
   }
 }
