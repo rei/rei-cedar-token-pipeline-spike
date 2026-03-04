@@ -15,7 +15,8 @@
     "tokens:snapshot": "tsx src/snapshot.ts",
     "tokens:normalize": "npm run sd:normalize --prefix sd",
     "diff:baseline": "pnpm tokens:normalize && pnpm tokens:snapshot baseline",
-    "diff:current": "pnpm tokens:normalize && pnpm tokens:snapshot current"
+    "diff:current": "pnpm tokens:normalize && pnpm tokens:snapshot current",
+    "test": "vitest run --reporter=verbose"
   },
   "keywords": [],
   "author": "",
@@ -46,6 +47,7 @@
     "oxfmt": "^0.36.0",
     "oxlint": "^1.51.0",
     "storybook": "^10.2.15",
-    "tsx": "^4.21.0"
+    "tsx": "^4.21.0",
+    "vitest": "^4.0.18"
   }
 }
