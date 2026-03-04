@@ -259,9 +259,16 @@ const NOT_FOUND_HTML = `
 export const LiveDiff: StoryObj = {
   name: "Live Diff (fetched)",
   render: asyncStory(async () => {
+    // Derive the base URL from the current page so this works both locally
+    // (served from /) and on GH Pages (served from a sub-path like
+    // /rei-cedar-token-pipeline-spike/pr/update-tokens/).
+    // window.location.pathname inside the Storybook iframe is something like
+    // /rei-cedar-token-pipeline-spike/pr/update-tokens/iframe.html so stripping
+    // the filename gives us the correct base to resolve normalized/ against.
+    const base = window.location.pathname.replace(/\/[^/]*$/, "/");
     const [baseRes, currRes] = await Promise.all([
-      fetch("./normalized/baseline.json"),
-      fetch("./normalized/current.json"),
+      fetch(`${base}normalized/baseline.json`),
+      fetch(`${base}normalized/current.json`),
     ]);
 
     if (baseRes.status === 404 || currRes.status === 404) {
