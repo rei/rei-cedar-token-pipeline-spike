@@ -65,10 +65,13 @@ function asyncStory(
 
 // ─── Story: FullDiff (inline fixtures) ───────────────────────────────────────
 
-// Inline copies of the fixture data so this story works without a server.
+// Inline copies of the fixture data using the new section-nested structure.
+// The canonical tree now nests all collections under their section key:
+//   color.neutral-palette.base-neutrals.white     (was: color["Neutral Colors"].base-neutrals.white)
+//   color.brand-palette.blue.600                 (was: color["Brand Colors"].blue.600)
 const BASELINE = {
   color: {
-    "Neutral Colors": {
+    "neutral-palette": {
       "warm-grey": {
         "100": { $value: "#edeae3", $type: "color" },
         "300": { $value: "#b2ab9f", $type: "color" },
@@ -82,7 +85,7 @@ const BASELINE = {
         "white-75": { $value: "#ffffffbf", $type: "color" },
       },
     },
-    "Brand Colors": {
+    "brand-palette": {
       blue: {
         "400": { $value: "#406eb5", $type: "color" },
         "600": { $value: "#0b2d60", $type: "color" },
@@ -102,25 +105,25 @@ const BASELINE = {
       },
     },
     surface: {
-      base: { $value: "{color.Neutral Colors.base-neutrals.white}", $type: "color" },
-      raised: { $value: "{color.Neutral Colors.warm-grey.100}", $type: "color" },
+      base: { $value: "{color.neutral-palette.base-neutrals.white}", $type: "color" },
+      raised: { $value: "{color.neutral-palette.warm-grey.100}", $type: "color" },
     },
     text: {
-      base: { $value: "{color.Neutral Colors.warm-grey.900}", $type: "color" },
-      subtle: { $value: "{color.Neutral Colors.warm-grey.600}", $type: "color" },
-      link: { $value: "{color.Brand Colors.blue.600}", $type: "color" },
-      "link-hover": { $value: "{color.Brand Colors.blue.400}", $type: "color" },
+      base: { $value: "{color.neutral-palette.warm-grey.900}", $type: "color" },
+      subtle: { $value: "{color.neutral-palette.warm-grey.600}", $type: "color" },
+      link: { $value: "{color.brand-palette.blue.600}", $type: "color" },
+      "link-hover": { $value: "{color.brand-palette.blue.400}", $type: "color" },
     },
     border: {
-      base: { $value: "{color.Neutral Colors.warm-grey.300}", $type: "color" },
-      subtle: { $value: "{color.Neutral Colors.warm-grey.100}", $type: "color" },
+      base: { $value: "{color.neutral-palette.warm-grey.300}", $type: "color" },
+      subtle: { $value: "{color.neutral-palette.warm-grey.100}", $type: "color" },
     },
   },
 };
 
 const CURRENT = {
   color: {
-    "Neutral Colors": {
+    "neutral-palette": {
       "warm-grey": {
         "100": { $value: "#edeae3", $type: "color" },
         "300": { $value: "#b2ab9f", $type: "color" },
@@ -134,7 +137,7 @@ const CURRENT = {
         // white-75 removed
       },
     },
-    "Brand Colors": {
+    "brand-palette": {
       blue: {
         "400": { $value: "#4a7ec8", $type: "color" }, // changed value
         "600": { $value: "#0b2d60", $type: "color" },
@@ -158,24 +161,24 @@ const CURRENT = {
       },
     },
     surface: {
-      base: { $value: "{color.Neutral Colors.base-neutrals.white}", $type: "color" },
-      raised: { $value: "{color.Neutral Colors.warm-grey.100}", $type: "color" },
-      overlay: { $value: "{color.Neutral Colors.base-neutrals.black}", $type: "color" }, // added token
+      base: { $value: "{color.neutral-palette.base-neutrals.white}", $type: "color" },
+      raised: { $value: "{color.neutral-palette.warm-grey.100}", $type: "color" },
+      overlay: { $value: "{color.neutral-palette.base-neutrals.black}", $type: "color" }, // added token
     },
     text: {
-      base: { $value: "{color.Neutral Colors.warm-grey.900}", $type: "color" },
-      subtle: { $value: "{color.Neutral Colors.warm-grey.600}", $type: "color" },
-      link: { $value: "{color.Brand Colors.blue.400}", $type: "color" }, // alias retargeted
-      "link-hover": { $value: "{color.Brand Colors.blue.400}", $type: "color" },
+      base: { $value: "{color.neutral-palette.warm-grey.900}", $type: "color" },
+      subtle: { $value: "{color.neutral-palette.warm-grey.600}", $type: "color" },
+      link: { $value: "{color.brand-palette.blue.400}", $type: "color" }, // alias retargeted
+      "link-hover": { $value: "{color.brand-palette.blue.400}", $type: "color" },
     },
     border: {
-      base: { $value: "{color.Neutral Colors.warm-grey.300}", $type: "color" },
-      subtle: { $value: "{color.Neutral Colors.warm-grey.100}", $type: "color" },
+      base: { $value: "{color.neutral-palette.warm-grey.300}", $type: "color" },
+      subtle: { $value: "{color.neutral-palette.warm-grey.100}", $type: "color" },
     },
     feedback: { // new group
-      success: { $value: "{color.Brand Colors.green.400}", $type: "color" },
-      warning: { $value: "{color.Brand Colors.yellow.400}", $type: "color" },
-      error: { $value: "{color.Brand Colors.red.400}", $type: "color" },
+      success: { $value: "{color.brand-palette.green.400}", $type: "color" },
+      warning: { $value: "{color.brand-palette.yellow.400}", $type: "color" },
+      error: { $value: "{color.brand-palette.red.400}", $type: "color" },
     },
   },
 };
