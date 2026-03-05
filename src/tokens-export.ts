@@ -61,6 +61,22 @@ function tokenValueFromVariable(
  * @param localVariablesResponse - The response from Figma's GET local variables API
  * @returns An object mapping file names to their token file contents
  */
+
+// AC: Mode ID to name mapping
+const MODE_ID_TO_NAME: Record<string, string> = {
+  Web: "web",
+  iOS: "ios",
+};
+
+function getModeName(modeId: string, modeNameFromFigma: string): string {
+  // If the mode name matches our known mappings, use the mapped name
+  if (MODE_ID_TO_NAME[modeNameFromFigma]) {
+    return MODE_ID_TO_NAME[modeNameFromFigma];
+  }
+  // Otherwise use the mode name from Figma as-is
+  return modeNameFromFigma;
+}
+
 export function tokenFilesFromLocalVariables(localVariablesResponse: GetLocalVariablesResponse) {
   const tokenFiles: { [fileName: string]: TokensFile } = {};
   const localVariableCollections = localVariablesResponse.meta.variableCollections;
@@ -75,7 +91,8 @@ export function tokenFilesFromLocalVariables(localVariablesResponse: GetLocalVar
     const collection = localVariableCollections[variable.variableCollectionId];
 
     collection.modes.forEach((mode) => {
-      const fileName = `${collection.name}.${mode.name}.json`;
+      const modeName = getModeName(mode.modeId, mode.name);
+      const fileName = `${collection.name}.${modeName}.json`;
 
       if (!tokenFiles[fileName]) {
         tokenFiles[fileName] = {};

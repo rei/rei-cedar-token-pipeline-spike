@@ -3,5 +3,28 @@
  */
 
 :root {
-  --color-example-base: #ff0000;
+  --color-neutral-palette-warm-grey-100: #edeae3;
+  --color-neutral-palette-warm-grey-300: #b2ab9f;
+  --color-neutral-palette-warm-grey-600: #736e65;
+  --color-neutral-palette-warm-grey-900: #2e2e2b;
+  --color-neutral-palette-base-neutrals-black: #000000;
+  --color-neutral-palette-base-neutrals-white: #ffffff;
+  --color-neutral-palette-base-neutrals-white-85: #ffffffd9;
+  --color-neutral-palette-base-neutrals-white-75: #ffffffbf;
+  --color-brand-palette-blue-400: #406eb5;
+  --color-brand-palette-blue-600: #0b2d60;
+  --color-brand-palette-yellow-400: #ffbf59;
+  --color-brand-palette-yellow-600: #ffe7b3;
+  --color-brand-palette-green-400: #3b8349;
+  --color-brand-palette-green-600: #1f513f;
+  --color-brand-palette-red-400: #c7370f;
+  --color-brand-palette-red-600: #610a0a;
+  --color-surface-base: #ffffff;
+  --color-surface-raised: #edeae3;
+  --color-text-base: #2e2e2b;
+  --color-text-subtle: #736e65;
+  --color-text-link: #0b2d60;
+  --color-text-link-hover: #406eb5;
+  --color-border-base: #b2ab9f;
+  --color-border-subtle: #edeae3;
 }

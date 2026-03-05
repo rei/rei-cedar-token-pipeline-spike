@@ -9,7 +9,7 @@
 
 export type TokenNode =
   | { [key: string]: TokenNode }
-  | { $value: string | number | boolean; $type: string };
+  | { $value: string | number | boolean | { web: string; ios: string }; $type: string };
 
 export type ParsedFile = { file: string; data: Record<string, unknown> };
 
@@ -17,7 +17,7 @@ export type ParsedFile = { file: string; data: Record<string, unknown> };
 
 export function isLeaf(
   node: unknown,
-): node is { $value: string | number | boolean; $type: string; [k: string]: unknown } {
+): node is { $value: string | number | boolean | { web: string; ios: string }; $type: string; [k: string]: unknown } {
   return typeof node === "object" && node !== null && "$value" in node;
 }
 
@@ -214,4 +214,87 @@ export function deepMerge(
       dest[key] = value;
     }
   }
+}
+
+// ─── joinPlatformTokens ───────────────────────────────────────────────────────
+
+/**
+ * Recursively merge web and iOS tokens into a single token structure
+ * where each color token has both web and iOS values.
+ *
+ * Validates that every leaf's web value is a 6–9 digit hex string and fails
+ * fast with a descriptive error (non-zero exit) if it is not. iOS value falls
+ * back to the web value when absent.
+ *
+ * Examples:
+ *   Web:  { "100": { $value: "#edeae3", $type: "color" } }
+ *   iOS:  { "100": { $value: "#2E2E2B", $type: "color" } }
+ *   Result: { "100": { $value: { web: "#edeae3", ios: "#2E2E2B" }, $type: "color" } }
+ */
+export function joinPlatformTokens(
+  webNode: TokenNode,
+  iosNode: TokenNode,
+  path = "",
+): TokenNode {
+  const hexRegex = /^#([A-Fa-f0-9]{6,9})$/;
+  const out: Record<string, unknown> = {};
+  const allKeys = new Set([
+    ...Object.keys(webNode as Record<string, unknown>),
+    ...Object.keys(iosNode as Record<string, unknown>),
+  ]);
+
+  for (const key of allKeys) {
+    const webValue = (webNode as Record<string, unknown>)[key];
+    const iosValue = (iosNode as Record<string, unknown>)[key];
+    const currentPath = path ? `${path}.${key}` : key;
+
+    if (isLeaf(webValue) && isLeaf(iosValue)) {
+      const webStr = String(webValue.$value);
+      const iosRaw = String(iosValue.$value);
+      const iosStr = iosRaw !== "" ? iosRaw : webStr;
+
+      // AC: Required Field — web value must be present
+      if (!webStr) {
+        throw new Error(
+          `Validation Failed: Token "${currentPath}" is missing required "web" value. Workflow halted.`,
+        );
+      }
+      // AC: Hex Validation — web must be 6–9 digit hex
+      if (!hexRegex.test(webStr.trim())) {
+        throw new Error(
+          `Validation Failed: Token "${currentPath}" has invalid web value "${webStr}". Expected 6-9 digit hex (e.g., "#406EB5" or "#406EB5FF"). Workflow halted.`,
+        );
+      }
+      // AC: Hex Validation — iOS must be 6–9 digit hex
+      if (!hexRegex.test(iosStr.trim())) {
+        throw new Error(
+          `Validation Failed: Token "${currentPath}" has invalid iOS value "${iosStr}". Expected 6-9 digit hex (e.g., "#406EB5" or "#406EB5FF"). Workflow halted.`,
+        );
+      }
+
+      out[key] = {
+        $value: { web: webStr, ios: iosStr },
+        $type: webValue.$type,
+      };
+    } else if (isLeaf(webValue)) {
+      // Only web is a leaf: use it as-is
+      out[key] = webValue;
+    } else if (isLeaf(iosValue)) {
+      // Only iOS is a leaf: use it as-is
+      out[key] = iosValue;
+    } else if (typeof webValue === "object" && webValue !== null && typeof iosValue === "object" && iosValue !== null) {
+      // Both are token groups: recurse
+      out[key] = joinPlatformTokens(
+        webValue as TokenNode,
+        iosValue as TokenNode,
+        currentPath,
+      );
+    } else if (typeof webValue === "object" && webValue !== null) {
+      out[key] = webValue;
+    } else {
+      out[key] = iosValue;
+    }
+  }
+
+  return out as TokenNode;
 }

@@ -1,5 +1,5 @@
 export interface CanonicalToken {
-  $value: string | number | boolean;
+  $value: string | number | boolean | { web: string; ios: string };
   $type: string;
 }
 
