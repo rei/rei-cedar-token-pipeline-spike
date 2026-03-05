@@ -16,7 +16,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { clean, deepMerge, buildCollectionToSection, nestUnderSections } from "./normalize-utils.js";
+import { clean, deepMerge, buildCollectionToSection, nestUnderSections, joinPlatformTokens } from "./normalize-utils.js";
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 
@@ -368,5 +368,87 @@ describe("clean + nestUnderSections + deepMerge integration", () => {
     const sm = spacingSection.sm as Record<string, unknown>;
     expect(sm.$value).toBe("4");
     expect(sm.$type).toBe("dimension");
+  });
+});
+
+// ─── joinPlatformTokens ───────────────────────────────────────────────────────
+
+describe("joinPlatformTokens", () => {
+  const leaf = (value: string, type = "color") => ({ $value: value, $type: type });
+
+  it("merges web and iOS leaf tokens into a { web, ios } value", () => {
+    const web = { "100": leaf("#edeae3") };
+    const ios = { "100": leaf("#2E2E2B") };
+    const result = joinPlatformTokens(web, ios) as Record<string, unknown>;
+    expect(result["100"]).toEqual({ $value: { web: "#edeae3", ios: "#2E2E2B" }, $type: "color" });
+  });
+
+  it("falls back to web value when iOS value is empty string", () => {
+    const web = { white: leaf("#ffffff") };
+    const ios = { white: leaf("") };
+    const result = joinPlatformTokens(web, ios) as Record<string, unknown>;
+    expect(result.white).toEqual({ $value: { web: "#ffffff", ios: "#ffffff" }, $type: "color" });
+  });
+
+  it("handles 8-digit hex (alpha channel) correctly", () => {
+    const web = { "white-85": leaf("#ffffffd9") };
+    const ios = { "white-85": leaf("#ffffffd9") };
+    const result = joinPlatformTokens(web, ios) as Record<string, unknown>;
+    expect(result["white-85"]).toEqual({ $value: { web: "#ffffffd9", ios: "#ffffffd9" }, $type: "color" });
+  });
+
+  it("recurses into nested token groups", () => {
+    const web = { "neutral-palette": { "warm-grey": { "100": leaf("#edeae3") } } };
+    const ios = { "neutral-palette": { "warm-grey": { "100": leaf("#2E2E2B") } } };
+    const result = joinPlatformTokens(web, ios) as Record<string, Record<string, Record<string, unknown>>>;
+    expect(result["neutral-palette"]["warm-grey"]["100"]).toEqual({
+      $value: { web: "#edeae3", ios: "#2E2E2B" },
+      $type: "color",
+    });
+  });
+
+  it("uses web token as-is when iOS key is missing", () => {
+    const web = { extra: leaf("#000000") };
+    const ios = {};
+    const result = joinPlatformTokens(web, ios) as Record<string, unknown>;
+    expect(result.extra).toEqual({ $value: "#000000", $type: "color" });
+  });
+
+  it("uses iOS token as-is when web key is missing", () => {
+    const web = {};
+    const ios = { extra: leaf("#111111") };
+    const result = joinPlatformTokens(web, ios) as Record<string, unknown>;
+    expect(result.extra).toEqual({ $value: "#111111", $type: "color" });
+  });
+
+  it("throws when web value is an invalid hex string", () => {
+    const web = { bad: leaf("not-a-color") };
+    const ios = { bad: leaf("#ffffff") };
+    expect(() => joinPlatformTokens(web, ios)).toThrow(
+      /invalid web value "not-a-color"/,
+    );
+  });
+
+  it("throws when iOS value is an invalid hex string", () => {
+    const web = { bad: leaf("#ffffff") };
+    const ios = { bad: leaf("oops") };
+    expect(() => joinPlatformTokens(web, ios)).toThrow(
+      /invalid iOS value "oops"/,
+    );
+  });
+
+  it("error message includes the token path", () => {
+    const web = { palette: { "50": leaf("invalid") } };
+    const ios = { palette: { "50": leaf("#ffffff") } };
+    expect(() => joinPlatformTokens(web, ios)).toThrow(/palette\.50/);
+  });
+
+  it("throws when web value is missing (empty string, non-fallback path)", () => {
+    const web = { missing: leaf("") };
+    const ios = { missing: leaf("#ffffff") };
+    // empty web str → validation error
+    expect(() => joinPlatformTokens(web, ios)).toThrow(
+      /missing required "web" value/,
+    );
   });
 });
