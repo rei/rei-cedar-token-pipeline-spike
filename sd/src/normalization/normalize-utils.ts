@@ -215,3 +215,59 @@ export function deepMerge(
     }
   }
 }
+
+// ─── joinPlatformTokens ───────────────────────────────────────────────────────
+
+/**
+ * Recursively merge web and iOS tokens into a single token structure
+ * where each color token has both web and iOS values.
+ *
+ * Examples:
+ *   Web:  { "100": { $value: "#edeae3", $type: "color" } }
+ *   iOS:  { "100": { $value: "#2E2E2B", $type: "color" } }
+ *   Result: { "100": { $value: { web: "#edeae3", ios: "#2E2E2B" }, $type: "color" } }
+ */
+export function joinPlatformTokens(
+  webNode: TokenNode,
+  iosNode: TokenNode,
+): TokenNode {
+  const out: Record<string, unknown> = {};
+  const allKeys = new Set([
+    ...Object.keys(webNode as Record<string, unknown>),
+    ...Object.keys(iosNode as Record<string, unknown>),
+  ]);
+
+  for (const key of allKeys) {
+    const webValue = (webNode as Record<string, unknown>)[key];
+    const iosValue = (iosNode as Record<string, unknown>)[key];
+
+    if (isLeaf(webValue) && isLeaf(iosValue)) {
+      // Both are leaf tokens: merge their values
+      out[key] = {
+        $value: {
+          web: webValue.$value,
+          ios: iosValue.$value,
+        },
+        $type: webValue.$type,
+      };
+    } else if (isLeaf(webValue)) {
+      // Only web is a leaf: use it as-is
+      out[key] = webValue;
+    } else if (isLeaf(iosValue)) {
+      // Only iOS is a leaf: use it as-is
+      out[key] = iosValue;
+    } else if (typeof webValue === "object" && webValue !== null && typeof iosValue === "object" && iosValue !== null) {
+      // Both are token groups: recurse
+      out[key] = joinPlatformTokens(
+        webValue as TokenNode,
+        iosValue as TokenNode,
+      );
+    } else if (typeof webValue === "object" && webValue !== null) {
+      out[key] = webValue;
+    } else {
+      out[key] = iosValue;
+    }
+  }
+
+  return out as TokenNode;
+}

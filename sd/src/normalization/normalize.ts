@@ -12,12 +12,15 @@
  *      a. clean()           → strip Figma metadata, rewrite bare alias references
  *      b. nestUnderSections → rearrange so all keys nest under section keys
  *      c. deepMerge         → accumulate into the canonical tree
- *   4. Write canonical.json with section-nested structure
+ *   4. For options.color files (web/ios): merge them with platform-specific values
+ *   5. Write canonical.json with section-nested structure
  *
  * Input file naming convention (from Figma sync):
  *   {collection}.{section}.{mode}.json
  *   Examples:
  *   - options.color.light.json   → bare color collections (neutral-palette, brand-palette)
+ *   - options.color.ios.json     → iOS-specific color collections
+ *   - options.color.web.json     → Web-specific color collections
  *   - alias.color.light.json     → semantic color tokens (text, surface, border)
  *   - spacing.default.json       → spacing dimensions
  *   - typography.font.regular.json → typography tokens
@@ -25,8 +28,8 @@
  * Output canonical.json structure:
  *   {
  *     "color": {
- *       "neutral-palette": { ... },    ← from options.color.light.json
- *       "brand-palette": { ... },      ← from options.color.light.json
+ *       "neutral-palette": { ... },    ← from options.color files (merged iOS+web)
+ *       "brand-palette": { ... },      ← from options.color files (merged iOS+web)
  *       "text": { ... },               ← from alias.color.light.json
  *       "surface": { ... },            ← from alias.color.light.json
  *       "border": { ... }              ← from alias.color.light.json
@@ -44,7 +47,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
-import { buildCollectionToSection, clean, nestUnderSections, deepMerge } from "./normalize-utils.js";
+import { buildCollectionToSection, clean, nestUnderSections, deepMerge, joinPlatformTokens } from "./normalize-utils.js";
+import type { TokenNode } from "./normalize-utils.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const tokensDir = path.resolve(__dirname, "../../../tokens");
@@ -63,12 +67,37 @@ try {
     data: JSON.parse(fs.readFileSync(path.join(tokensDir, file), "utf-8")) as Record<string, unknown>,
   }));
 
+  // Separate platform-specific options files from other files
+  const optionsWebFile = parsed.find(p => p.file === "options.color.web.json");
+  const optionsIosFile = parsed.find(p => p.file === "options.color.ios.json");
+  const otherFiles = parsed.filter(p => 
+    p.file !== "options.color.web.json" && 
+    p.file !== "options.color.ios.json"
+  );
+
   // Build collection → section mapping by analyzing filenames and file content
   const collectionToSection = buildCollectionToSection(parsed);
 
   // Normalize and merge each file into the canonical tree
   const canonical: Record<string, unknown> = {};
-  for (const { file, data } of parsed) {
+
+  // Handle platform-specific options files if both exist
+  if (optionsWebFile && optionsIosFile) {
+    const cleanedWeb = clean(optionsWebFile.data, collectionToSection);
+    const cleanedIos = clean(optionsIosFile.data, collectionToSection);
+    
+    // Join the web and iOS tokens
+    const joinedTokens = joinPlatformTokens(cleanedWeb, cleanedIos);
+    
+    // Nest under sections
+    const nested = nestUnderSections(joinedTokens as Record<string, unknown>, collectionToSection);
+    
+    console.log(`  ✓ ${optionsWebFile.file} + ${optionsIosFile.file} (platform-specific merge)`);
+    deepMerge(canonical, nested);
+  }
+
+  // Process all other files
+  for (const { file, data } of otherFiles) {
     // Step 1: Clean metadata and fix alias references
     const cleaned = clean(data, collectionToSection);
     
