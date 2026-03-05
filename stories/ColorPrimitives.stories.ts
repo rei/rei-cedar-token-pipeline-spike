@@ -281,9 +281,10 @@ interface Swatch {
 }
 
 function needsDarkLabel(hex: string): boolean {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
+  const cleanHex = hex.slice(0, 7);
+  const r = parseInt(cleanHex.slice(1, 3), 16);
+  const g = parseInt(cleanHex.slice(3, 5), 16);
+  const b = parseInt(cleanHex.slice(5, 7), 16);
   return (r * 299 + g * 587 + b * 114) / 1000 > 140;
 }
 
@@ -295,7 +296,7 @@ function strip(swatches: Swatch[]): string {
         return `
           <div class="strip-segment" style="background:${s.value};">
             <div class="strip-label" style="color:${dark ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.8)"}; background:${dark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.2)"};">
-              ${s.value.slice(0, 7).toUpperCase()}
+              ${s.value.toUpperCase()}
             </div>
           </div>
         `;
@@ -321,7 +322,7 @@ function table(swatches: Swatch[]): string {
               <span class="swatch-chip" style="background:${s.value};"></span>
             </td>
             <td class="td-token">${s.name}</td>
-            <td class="td-hex">${s.value.slice(0, 7).toUpperCase()}</td>
+            <td class="td-hex">${s.value.toUpperCase()}</td>
           </tr>
         `).join("")}
       </tbody>
