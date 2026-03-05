@@ -39,7 +39,7 @@ export interface DiffEntry {
 // A flat map from path → leaf token
 type FlatMap = Map<string, TokenLeaf>;
 
-function isLeaf(node: unknown): node is TokenLeaf {
+export function isLeaf(node: unknown): node is TokenLeaf {
   return (
     typeof node === "object" &&
     node !== null &&

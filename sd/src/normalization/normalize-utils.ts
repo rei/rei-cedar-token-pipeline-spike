@@ -9,7 +9,7 @@
 
 export type TokenNode =
   | { [key: string]: TokenNode }
-  | { $value: string | number | boolean; $type: string };
+  | { $value: string | number | boolean | { web: string; ios: string }; $type: string };
 
 export type ParsedFile = { file: string; data: Record<string, unknown> };
 
@@ -17,7 +17,7 @@ export type ParsedFile = { file: string; data: Record<string, unknown> };
 
 export function isLeaf(
   node: unknown,
-): node is { $value: string | number | boolean; $type: string; [k: string]: unknown } {
+): node is { $value: string | number | boolean | { web: string; ios: string }; $type: string; [k: string]: unknown } {
   return typeof node === "object" && node !== null && "$value" in node;
 }
 

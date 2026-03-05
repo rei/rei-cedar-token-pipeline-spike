@@ -5,10 +5,7 @@
  * This allows color stories to display the latest token values dynamically.
  */
 
-interface TokenLeaf {
-  $value: string | { web: string; ios: string };
-  $type: string;
-}
+import { type TokenLeaf, isLeaf } from "./diff-engine.js";
 
 /**
  * Fetch the current token snapshot and extract color tokens.
@@ -88,15 +85,6 @@ export async function loadPrimitiveColors(): Promise<
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function isLeaf(node: unknown): node is TokenLeaf {
-  return (
-    typeof node === "object" &&
-    node !== null &&
-    "$value" in node &&
-    "$type" in node
-  );
-}
 
 function flattenTokens(
   node: Record<string, unknown>,
