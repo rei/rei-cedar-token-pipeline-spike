@@ -99,15 +99,21 @@ function isHex(v: string): boolean {
 }
 
 /** Render a colour swatch chip + the raw value string. */
-function valueCell(value: string | null, strikethrough = false): string {
+function valueCell(value: string | { web: string; ios: string } | null, strikethrough = false): string {
   if (value === null) return `<span style="color:${COLOR.inkFaint}">—</span>`;
+  
+  const strValue = typeof value === 'string' ? value : value.web;
+  const platformLabels = typeof value !== 'string' 
+    ? `<span style="font-size:.65rem;margin-left:4px;color:${COLOR.inkFaint}">(web)</span>`
+    : '';
+  
   const strike = strikethrough
     ? `text-decoration:line-through;opacity:.55;`
     : "";
-  const chip = isHex(value)
-    ? `<span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${value};border:1px solid ${COLOR.chip};vertical-align:middle;margin-right:6px;flex-shrink:0"></span>`
+  const chip = isHex(strValue)
+    ? `<span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${strValue};border:1px solid ${COLOR.chip};vertical-align:middle;margin-right:6px;flex-shrink:0"></span>`
     : "";
-  return `<span style="display:inline-flex;align-items:center;font-family:'DM Mono',monospace;font-size:.8rem;${strike}">${chip}${value}</span>`;
+  return `<span style="display:inline-flex;align-items:center;font-family:'DM Mono',monospace;font-size:.8rem;${strike}">${chip}${strValue}${platformLabels}</span>`;
 }
 
 function badge(meta: KindMeta): string {

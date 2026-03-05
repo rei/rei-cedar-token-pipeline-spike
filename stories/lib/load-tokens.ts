@@ -6,7 +6,7 @@
  */
 
 interface TokenLeaf {
-  $value: string;
+  $value: string | { web: string; ios: string };
   $type: string;
 }
 
@@ -107,7 +107,8 @@ function flattenTokens(
     const path = `${prefix}.${key}`;
     if (isLeaf(value)) {
       const leaf = value as TokenLeaf;
-      out.push({ name: path, value: leaf.$value });
+      const tokenValue = typeof leaf.$value === 'string' ? leaf.$value : leaf.$value.web;
+      out.push({ name: path, value: tokenValue });
     } else if (typeof value === "object" && value !== null) {
       flattenTokens(value as Record<string, unknown>, path, out);
     }
@@ -118,7 +119,6 @@ function resolveAlias(
   alias: string,
   colorSection: Record<string, unknown>,
 ): string | null {
-  // Extract the token path from {color.neutral-palette.blue.600} or {neutral-palette.blue.600}
   const match = alias.match(/^{(?:color\.)?(.+)}$/);
   if (!match) return null;
 
@@ -134,7 +134,8 @@ function resolveAlias(
   }
 
   if (isLeaf(node)) {
-    return node.$value;
+    const leafValue = (node as TokenLeaf).$value;
+    return typeof leafValue === 'string' ? leafValue : leafValue.web;
   }
 
   return null;

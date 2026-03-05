@@ -25,7 +25,7 @@ export type DiffKind =
   | "group-removed";
 
 export interface TokenLeaf {
-  $value: string;
+  $value: string | { web: string; ios: string };
   $type: string;
 }
 
@@ -48,8 +48,13 @@ function isLeaf(node: unknown): node is TokenLeaf {
   );
 }
 
-function isAlias(value: string): boolean {
+function isAlias(value: string | { web: string; ios: string }): boolean {
+  if (typeof value !== 'string') return false;
   return value.trimStart().startsWith("{") && value.trimEnd().endsWith("}");
+}
+
+function getStringValue(value: string | { web: string; ios: string }): string {
+  return typeof value === 'string' ? value : value.web;
 }
 
 /**
@@ -122,7 +127,10 @@ export function computeDiff(
     } else if (b !== null && c === null) {
       entries.push({ path, kind: "removed", baseline: b, current: null });
     } else if (b !== null && c !== null) {
-      if (b.$value === c.$value) continue; // unchanged
+      const bStrValue = getStringValue(b.$value);
+      const cStrValue = getStringValue(c.$value);
+      
+      if (bStrValue === cStrValue) continue; // unchanged
 
       const bIsAlias = isAlias(b.$value);
       const cIsAlias = isAlias(c.$value);
