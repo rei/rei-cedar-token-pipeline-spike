@@ -7,7 +7,7 @@
   "scripts": {
     "sd:normalize": "npx tsx ./src/normalization/normalize.ts",
     "sd:compile": "tsc -p ./tsconfig.json",
-    "sd:build": "npm run sd:normalize && npm run sd:compile && node sd.build.js",
+    "sd:build": "npm run sd:normalize && npm run sd:compile && npx tsx sd.build.js",
     "test": "vitest run"
   },
   "repository": {
