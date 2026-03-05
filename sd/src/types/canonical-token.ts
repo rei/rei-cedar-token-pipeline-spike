@@ -1,23 +1,10 @@
-export interface CanonicalColorPlatformToken {
-  $value: {
-    web: string;
-    ios: string;
-  };
-  $type: "color";
-}
-
 export interface CanonicalToken {
-  $value: string | number | boolean;
+  $value: string | number | boolean | { web: string; ios: string };
   $type: string;
 }
 
-export interface CanonicalColorToken {
-  $value: string;
-  $type: "color";
-}
-
 export interface CanonicalTokenGroup {
-  [tokenName: string]: CanonicalToken | CanonicalColorPlatformToken | CanonicalColorToken | CanonicalTokenGroup;
+  [tokenName: string]: CanonicalToken | CanonicalTokenGroup;
 }
 
 /** The canonical token root — any number of top-level sections (color, spacing, typography, …) */
