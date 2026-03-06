@@ -2,7 +2,7 @@
   "color": {
     "surface": {
       "base": {
-        "$value": "{color.neutral-palette.base-neutrals.white}",
+        "$value": "{color.brand-palette.red.400}",
         "$type": "color"
       },
       "raised": {
@@ -97,16 +97,6 @@
           "$type": "color"
         }
       },
-      "red": {
-        "400": {
-          "$value": "#be342d",
-          "$type": "color"
-        },
-        "600": {
-          "$value": "#610a0a",
-          "$type": "color"
-        }
-      },
       "green": {
         "400": {
           "$value": "#3b8349",
@@ -116,6 +106,88 @@
           "$value": "#1f513f",
           "$type": "color"
         }
+      },
+      "red": {
+        "400": {
+          "$value": "#c7370f",
+          "$type": "color"
+        },
+        "600": {
+          "$value": "#610a0a",
+          "$type": "color"
+        }
+      }
+    }
+  },
+  "spacing": {
+    "scale": {
+      "-50": {
+        "$value": "3.48799991607666",
+        "$type": "number"
+      },
+      "-100": {
+        "$value": "6.480000019073486",
+        "$type": "number"
+      },
+      "-150": {
+        "$value": "9.472000122070312",
+        "$type": "number"
+      },
+      "-200": {
+        "$value": "12.46399974822998",
+        "$type": "number"
+      },
+      "-250": {
+        "$value": "15.456000328063965",
+        "$type": "number"
+      },
+      "-300": {
+        "$value": "18.447999954223633",
+        "$type": "number"
+      },
+      "-400": {
+        "$value": "23.440000534057617",
+        "$type": "number"
+      },
+      "-500": {
+        "$value": "28.43199920654297",
+        "$type": "number"
+      }
+    },
+    "component": {
+      "xs": {
+        "$value": "{spacing.scale.-50}",
+        "$type": "number"
+      },
+      "sm": {
+        "$value": "{spacing.scale.-100}",
+        "$type": "number"
+      },
+      "md": {
+        "$value": "{spacing.scale.-150}",
+        "$type": "number"
+      },
+      "lg": {
+        "$value": "{spacing.scale.-200}",
+        "$type": "number"
+      }
+    },
+    "layout": {
+      "sm": {
+        "$value": "{spacing.scale.-250}",
+        "$type": "number"
+      },
+      "md": {
+        "$value": "{spacing.scale.-300}",
+        "$type": "number"
+      },
+      "lg": {
+        "$value": "{spacing.scale.-400}",
+        "$type": "number"
+      },
+      "xl": {
+        "$value": "{spacing.scale.-500}",
+        "$type": "number"
       }
     }
   }
