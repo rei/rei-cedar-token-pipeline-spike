@@ -1,9 +1,9 @@
 {
-  "color": {
-    "surface": {
-      "base": {
-        "$type": "color",
-        "$value": "{neutral-palette.base-neutrals.white}",
+  "spacing": {
+    "scale": {
+      "-50": {
+        "$type": "number",
+        "$value": 3.486999988555908,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -15,25 +15,9 @@
           }
         }
       },
-      "raised": {
-        "$type": "color",
-        "$value": "{neutral-palette.warm-grey.100}",
-        "$description": "",
-        "$extensions": {
-          "com.figma": {
-            "hiddenFromPublishing": false,
-            "scopes": [
-              "ALL_SCOPES"
-            ],
-            "codeSyntax": {}
-          }
-        }
-      }
-    },
-    "text": {
-      "base": {
-        "$type": "color",
-        "$value": "{neutral-palette.warm-grey.900}",
+      "-100": {
+        "$type": "number",
+        "$value": 6.4770002365112305,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -45,9 +29,9 @@
           }
         }
       },
-      "subtle": {
-        "$type": "color",
-        "$value": "{neutral-palette.warm-grey.600}",
+      "-150": {
+        "$type": "number",
+        "$value": 9.468000411987305,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -59,9 +43,9 @@
           }
         }
       },
-      "link": {
-        "$type": "color",
-        "$value": "{brand-palette.blue.600}",
+      "-200": {
+        "$type": "number",
+        "$value": 12.460000038146973,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -73,25 +57,9 @@
           }
         }
       },
-      "link-hover": {
-        "$type": "color",
-        "$value": "{brand-palette.blue.400}",
-        "$description": "",
-        "$extensions": {
-          "com.figma": {
-            "hiddenFromPublishing": false,
-            "scopes": [
-              "ALL_SCOPES"
-            ],
-            "codeSyntax": {}
-          }
-        }
-      }
-    },
-    "border": {
-      "base": {
-        "$type": "color",
-        "$value": "{neutral-palette.warm-grey.300}",
+      "-250": {
+        "$type": "number",
+        "$value": 15.451000213623047,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -103,9 +71,37 @@
           }
         }
       },
-      "subtle": {
-        "$type": "color",
-        "$value": "{neutral-palette.warm-grey.100}",
+      "-300": {
+        "$type": "number",
+        "$value": 18.441999435424805,
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "-400": {
+        "$type": "number",
+        "$value": 23.43199920654297,
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "-500": {
+        "$type": "number",
+        "$value": 28.42300033569336,
         "$description": "",
         "$extensions": {
           "com.figma": {

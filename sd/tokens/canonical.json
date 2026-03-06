@@ -1,43 +1,165 @@
 {
+  "spacing": {
+    "component": {
+      "xs": {
+        "$value": "{spacing.scale.-50}",
+        "$type": "number"
+      },
+      "sm": {
+        "$value": "{spacing.scale.-100}",
+        "$type": "number"
+      },
+      "md": {
+        "$value": "{spacing.scale.-150}",
+        "$type": "number"
+      },
+      "lg": {
+        "$value": "{spacing.scale.-200}",
+        "$type": "number"
+      }
+    },
+    "layout": {
+      "sm": {
+        "$value": "{spacing.scale.-250}",
+        "$type": "number"
+      },
+      "md": {
+        "$value": "{spacing.scale.-300}",
+        "$type": "number"
+      },
+      "lg": {
+        "$value": "{spacing.scale.-400}",
+        "$type": "number"
+      },
+      "xl": {
+        "$value": "{spacing.scale.-500}",
+        "$type": "number"
+      }
+    },
+    "scale": {
+      "-50": {
+        "$type": "dimension",
+        "$value": {
+          "min": "2px",
+          "ideal": "2px + 0.0798cqi",
+          "max": "4px"
+        },
+        "$description": "Fluid spacing scale token",
+        "$extensions": {
+          "cedar": {
+            "source": "figma",
+            "figmaCollection": "spacing/scale"
+          }
+        }
+      },
+      "-100": {
+        "$type": "dimension",
+        "$value": {
+          "min": "4px",
+          "ideal": "4px + 0.1737cqi",
+          "max": "8px"
+        },
+        "$description": "Fluid spacing scale token",
+        "$extensions": {
+          "cedar": {
+            "source": "figma",
+            "figmaCollection": "spacing/scale"
+          }
+        }
+      },
+      "-150": {
+        "$type": "dimension",
+        "$value": {
+          "min": "7px",
+          "ideal": "6px + 0.2628cqi",
+          "max": "12px"
+        },
+        "$description": "Fluid spacing scale token",
+        "$extensions": {
+          "cedar": {
+            "source": "figma",
+            "figmaCollection": "spacing/scale"
+          }
+        }
+      },
+      "-200": {
+        "$type": "dimension",
+        "$value": {
+          "min": "9px",
+          "ideal": "8px + 0.3521cqi",
+          "max": "16px"
+        },
+        "$description": "Fluid spacing scale token",
+        "$extensions": {
+          "cedar": {
+            "source": "figma",
+            "figmaCollection": "spacing/scale"
+          }
+        }
+      },
+      "-250": {
+        "$type": "dimension",
+        "$value": {
+          "min": "11px",
+          "ideal": "10px + 0.4405cqi",
+          "max": "20px"
+        },
+        "$description": "Fluid spacing scale token",
+        "$extensions": {
+          "cedar": {
+            "source": "figma",
+            "figmaCollection": "spacing/scale"
+          }
+        }
+      },
+      "-300": {
+        "$type": "dimension",
+        "$value": {
+          "min": "14px",
+          "ideal": "13px + 0.5276cqi",
+          "max": "24px"
+        },
+        "$description": "Fluid spacing scale token",
+        "$extensions": {
+          "cedar": {
+            "source": "figma",
+            "figmaCollection": "spacing/scale"
+          }
+        }
+      },
+      "-400": {
+        "$type": "dimension",
+        "$value": {
+          "min": "18px",
+          "ideal": "16px + 0.6701cqi",
+          "max": "32px"
+        },
+        "$description": "Fluid spacing scale token",
+        "$extensions": {
+          "cedar": {
+            "source": "figma",
+            "figmaCollection": "spacing/scale"
+          }
+        }
+      },
+      "-500": {
+        "$type": "dimension",
+        "$value": {
+          "min": "22px",
+          "ideal": "20px + 0.813cqi",
+          "max": "40px"
+        },
+        "$description": "Fluid spacing scale token",
+        "$extensions": {
+          "cedar": {
+            "source": "figma",
+            "figmaCollection": "spacing/scale"
+          }
+        }
+      }
+    }
+  },
   "color": {
-    "surface": {
-      "base": {
-        "$value": "{color.neutral-palette.base-neutrals.white}",
-        "$type": "color"
-      },
-      "raised": {
-        "$value": "{color.neutral-palette.warm-grey.100}",
-        "$type": "color"
-      }
-    },
-    "text": {
-      "base": {
-        "$value": "{color.neutral-palette.warm-grey.900}",
-        "$type": "color"
-      },
-      "subtle": {
-        "$value": "{color.neutral-palette.warm-grey.600}",
-        "$type": "color"
-      },
-      "link": {
-        "$value": "{color.brand-palette.blue.600}",
-        "$type": "color"
-      },
-      "link-hover": {
-        "$value": "{color.brand-palette.blue.400}",
-        "$type": "color"
-      }
-    },
-    "border": {
-      "base": {
-        "$value": "{color.neutral-palette.warm-grey.300}",
-        "$type": "color"
-      },
-      "subtle": {
-        "$value": "{color.neutral-palette.warm-grey.100}",
-        "$type": "color"
-      }
-    },
     "neutral-palette": {
       "warm-grey": {
         "100": {
@@ -99,7 +221,7 @@
       },
       "red": {
         "400": {
-          "$value": "#be342d",
+          "$value": "#c7370f",
           "$type": "color"
         },
         "600": {

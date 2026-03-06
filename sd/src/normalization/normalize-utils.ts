@@ -13,11 +13,39 @@ export type TokenNode =
 
 export type ParsedFile = { file: string; data: Record<string, unknown> };
 
+type SpacingEntry = {
+  $type: string;
+  $value: number;
+  $description?: string;
+  $extensions?: unknown;
+};
+
+type ClampInput = {
+  breakpoint: number;
+  value: number;
+};
+
+type ClampData = {
+  min: number;
+  max: number;
+  ideal: string;
+};
+
+export type SpacingClampMap = Map<string, ClampData>;
+
+type IdealValue = {
+  slope: number; // coefficient for the fluid unit (cqi/vw), e.g. 0.25
+  intercept: number; // base px offset, e.g. 4
+  formatted: string; // ready-to-use string: "4px + 0.25cqi"
+};
+
 // ─── isLeaf ───────────────────────────────────────────────────────────────────
 
-export function isLeaf(
-  node: unknown,
-): node is { $value: string | number | boolean; $type: string; [k: string]: unknown } {
+export function isLeaf(node: unknown): node is {
+  $value: string | number | boolean;
+  $type: string;
+  [k: string]: unknown;
+} {
   return typeof node === "object" && node !== null && "$value" in node;
 }
 
@@ -39,7 +67,9 @@ export function isLeaf(
  *   - Otherwise the top-level key is a bare collection → map it to the
  *     filename-derived section.
  */
-export function buildCollectionToSection(parsed: ParsedFile[]): Map<string, string> {
+export function buildCollectionToSection(
+  parsed: ParsedFile[]
+): Map<string, string> {
   const map = new Map<string, string>();
 
   for (const { file, data } of parsed) {
@@ -96,7 +126,7 @@ export function buildCollectionToSection(parsed: ParsedFile[]): Map<string, stri
  */
 export function clean(
   node: Record<string, unknown>,
-  collectionToSection: Map<string, string>,
+  collectionToSection: Map<string, string>
 ): TokenNode {
   const out: Record<string, unknown> = {};
 
@@ -165,7 +195,7 @@ export function clean(
  */
 export function nestUnderSections(
   cleaned: Record<string, unknown>,
-  collectionToSection: Map<string, string>,
+  collectionToSection: Map<string, string>
 ): Record<string, unknown> {
   const out: Record<string, unknown> = {};
 
@@ -178,7 +208,10 @@ export function nestUnderSections(
       if (out[key] === undefined) {
         out[key] = value;
       } else {
-        deepMerge(out[key] as Record<string, unknown>, value as Record<string, unknown>);
+        deepMerge(
+          out[key] as Record<string, unknown>,
+          value as Record<string, unknown>
+        );
       }
     } else {
       // Bare collection: "neutral-palette", "brand-palette", etc.
@@ -198,7 +231,7 @@ export function nestUnderSections(
 /** Deep-merge src into dest (dest is mutated). Later files win on conflicts. */
 export function deepMerge(
   dest: Record<string, unknown>,
-  src: Record<string, unknown>,
+  src: Record<string, unknown>
 ): void {
   for (const [key, value] of Object.entries(src)) {
     if (
@@ -209,9 +242,77 @@ export function deepMerge(
       dest[key] !== null &&
       !isLeaf(dest[key])
     ) {
-      deepMerge(dest[key] as Record<string, unknown>, value as Record<string, unknown>);
+      deepMerge(
+        dest[key] as Record<string, unknown>,
+        value as Record<string, unknown>
+      );
     } else {
       dest[key] = value;
     }
   }
+}
+
+/**
+ * Ordinary least squares linear regression.
+ * x = breakpoint (px), y = spacing value (px)
+ * Returns slope as a % of container width (cqi) and intercept as px.
+ */
+function linearRegression(steps: ClampInput[]): IdealValue {
+  const n = steps.length;
+  const sumX = steps.reduce((acc, s) => acc + s.breakpoint, 0);
+  const sumY = steps.reduce((acc, s) => acc + s.value, 0);
+  const sumXY = steps.reduce((acc, s) => acc + s.breakpoint * s.value, 0);
+  const sumX2 = steps.reduce((acc, s) => acc + s.breakpoint * s.breakpoint, 0);
+
+  // slope in px/px → multiply by 100 to get cqi (1cqi = 1% of container width)
+  const slopeRaw = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+  const slope = Math.round(slopeRaw * 100 * 10000) / 10000; // 4 decimal places, in cqi
+
+  const interceptRaw = (sumY - slopeRaw * sumX) / n;
+  const intercept = Math.floor(Math.round(interceptRaw * 100) / 100); // 2 decimal places, in px
+
+  const sign = slope >= 0 ? "+" : "-";
+  const formatted = `${intercept}px ${sign} ${Math.abs(slope)}cqi`;
+
+  return { slope, intercept, formatted };
+}
+
+export function buildSpacingClampData(
+  spacingFiles: ParsedFile[]
+): SpacingClampMap {
+  const withBreakpoints = spacingFiles.map(({ file, data }) => {
+    const match = file.match(/spacing\.(\d+)\.json$/);
+    if (!match)
+      throw new Error(`Cannot extract breakpoint from filename: ${file}`);
+    const breakpoint = parseInt(match[1], 10);
+    const scale = (data as { spacing: { scale: Record<string, SpacingEntry> } })
+      .spacing.scale;
+    return { breakpoint, scale };
+  });
+
+  withBreakpoints.sort((a, b) => a.breakpoint - b.breakpoint);
+
+  const map: SpacingClampMap = new Map();
+  const allKeys = new Set(
+    withBreakpoints.flatMap(({ scale }) => Object.keys(scale))
+  );
+
+  for (const key of allKeys) {
+    const steps: ClampInput[] = withBreakpoints
+      .filter(({ scale }) => key in scale)
+      .map(({ breakpoint, scale }) => ({
+        breakpoint,
+        value: scale[key].$value,
+      }));
+
+    if (steps.length < 2) continue;
+
+    map.set(key, {
+      min: Math.floor(steps[0].value),
+      max: Math.floor(steps[steps.length - 1].value),
+      ideal: linearRegression(steps).formatted,
+    });
+  }
+
+  return map;
 }
