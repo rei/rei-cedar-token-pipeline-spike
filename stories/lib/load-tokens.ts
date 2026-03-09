@@ -2,7 +2,19 @@
  * load-tokens.ts
  *
  * Utility to fetch and extract token data from snapshots at runtime.
- * This allows color stories to display the latest token values dynamically.
+ * This allows color and spacing stories to display the latest token values dynamically.
+ *
+ * Color token structure (multi-mode canonical format):
+ *   color.modes.<mode>.surface.base
+ *   color.modes.<mode>.text.link
+ *   color.modes.<mode>.border.subtle
+ *   color.neutral-palette.warm-grey.100
+ *   color.brand-palette.blue.600
+ *
+ * Spacing token structure:
+ *   spacing.scale.-50   → { $value: "clamp(...)", $type: "fluid" }
+ *   spacing.component.xs → { $value: "{spacing.scale.-50}", $type: "number" }  (alias)
+ *   spacing.layout.sm    → { $value: "{spacing.scale.-250}", $type: "number" } (alias)
  */
 
 interface TokenLeaf {
@@ -11,8 +23,9 @@ interface TokenLeaf {
 }
 
 /**
- * Fetch the current token snapshot and extract color tokens.
- * Returns a map of token paths to their hex values.
+ * Fetch the current token snapshot and extract color tokens for all modes.
+ * Returns a map of token paths to their hex values, keyed as
+ * "color.modes.<mode>.<category>.<token>".
  */
 export async function loadColorTokens(): Promise<
   Map<string, { hex: string; ref: string }>
@@ -27,25 +40,46 @@ export async function loadColorTokens(): Promise<
   const tree = (await res.json()) as Record<string, unknown>;
   const result = new Map<string, { hex: string; ref: string }>();
 
-  // Extract semantic color tokens (color.text.*, color.surface.*, color.border.*)
   const colorSection = tree["color"] as Record<string, unknown> | undefined;
-  if (colorSection) {
-    // Process semantic tokens (text, surface, border)
-    const semanticCategories = ["text", "surface", "border"];
-    for (const category of semanticCategories) {
-      const group = colorSection[category] as Record<string, unknown> | undefined;
-      if (group) {
+  if (!colorSection) return result;
+
+  const modesSection = colorSection["modes"] as Record<string, unknown> | undefined;
+  if (modesSection) {
+    // Multi-mode: color.modes.<mode>.<category>.<token>
+    for (const [mode, modeTokens] of Object.entries(modesSection)) {
+      if (typeof modeTokens !== "object" || modeTokens === null) continue;
+      const semanticCategories = ["text", "surface", "border"];
+      for (const category of semanticCategories) {
+        const group = (modeTokens as Record<string, unknown>)[category] as
+          | Record<string, unknown>
+          | undefined;
+        if (!group) continue;
         for (const [key, value] of Object.entries(group)) {
           if (isLeaf(value)) {
             const leaf = value as TokenLeaf;
-            // For semantic tokens, the $value is an alias like {color.neutral-palette.blue.600}
-            // Extract the target path and resolve to the primitive value
             const resolvedHex = resolveAlias(leaf.$value, colorSection);
-            result.set(`color.${category}.${key}`, {
+            result.set(`color.modes.${mode}.${category}.${key}`, {
               hex: resolvedHex || leaf.$value,
               ref: buildRef(leaf.$value),
             });
           }
+        }
+      }
+    }
+  } else {
+    // Fallback: legacy flat structure (color.text.*, color.surface.*, color.border.*)
+    const semanticCategories = ["text", "surface", "border"];
+    for (const category of semanticCategories) {
+      const group = colorSection[category] as Record<string, unknown> | undefined;
+      if (!group) continue;
+      for (const [key, value] of Object.entries(group)) {
+        if (isLeaf(value)) {
+          const leaf = value as TokenLeaf;
+          const resolvedHex = resolveAlias(leaf.$value, colorSection);
+          result.set(`color.${category}.${key}`, {
+            hex: resolvedHex || leaf.$value,
+            ref: buildRef(leaf.$value),
+          });
         }
       }
     }
@@ -96,6 +130,82 @@ function isLeaf(node: unknown): node is TokenLeaf {
     "$value" in node &&
     "$type" in node
   );
+}
+
+// ─── Spacing loader ───────────────────────────────────────────────────────────
+
+export interface SpacingToken {
+  /** Dot-separated token path, e.g. "spacing.scale.-100" */
+  path: string;
+  /**
+   * CSS value:
+   *   - scale tokens:     CSS clamp() string  (type = "fluid")
+   *   - component/layout: resolved clamp() string via alias lookup (type = "fluid")
+   */
+  value: string;
+  /** "fluid" for scale tokens; "alias" for component/layout resolved tokens */
+  kind: "fluid" | "alias";
+  /** The alias ref if this is a component/layout token, e.g. "spacing.scale.-50" */
+  aliasRef?: string;
+  /** The scale key this alias resolves to, e.g. "-50" */
+  scaleKey?: string;
+}
+
+/**
+ * Fetch the current token snapshot and extract spacing tokens.
+ * Returns scale tokens with their fluid clamp() values, plus component/layout
+ * alias tokens resolved to their underlying clamp() values.
+ *
+ * Fluid tokens (type="fluid") are intended for web CSS only.
+ * Non-web platforms should ignore $type="fluid" tokens entirely.
+ */
+export async function loadSpacingTokens(): Promise<SpacingToken[]> {
+  const base = window.location.pathname.replace(/\/[^/]*$/, "/");
+  const res = await fetch(`${base}normalized/current.json`);
+  if (!res.ok) throw new Error(`Failed to fetch current.json: ${res.status}`);
+
+  const tree = (await res.json()) as Record<string, unknown>;
+  const spacingSection = tree["spacing"] as Record<string, unknown> | undefined;
+  if (!spacingSection) return [];
+
+  const result: SpacingToken[] = [];
+
+  // Build a scale lookup: key → clamp() string
+  const scaleMap = new Map<string, string>();
+  const scale = spacingSection["scale"] as Record<string, unknown> | undefined;
+  if (scale) {
+    for (const [key, val] of Object.entries(scale)) {
+      if (isLeaf(val) && val.$type === "fluid") {
+        scaleMap.set(key, val.$value as string);
+        result.push({ path: `spacing.scale.${key}`, value: val.$value as string, kind: "fluid" });
+      }
+    }
+  }
+
+  // Resolve alias groups: component and layout
+  for (const groupName of ["component", "layout"] as const) {
+    const group = spacingSection[groupName] as Record<string, unknown> | undefined;
+    if (!group) continue;
+    for (const [key, val] of Object.entries(group)) {
+      if (!isLeaf(val)) continue;
+      const raw = val.$value as string;
+      // Extract alias ref: "{spacing.scale.-100}" → "spacing.scale.-100"
+      const aliasMatch = raw.match(/^\{(.+)\}$/);
+      if (!aliasMatch) continue;
+      const ref = aliasMatch[1]; // "spacing.scale.-100"
+      const scaleKey = ref.split(".").pop() ?? "";
+      const resolved = scaleMap.get(scaleKey);
+      result.push({
+        path: `spacing.${groupName}.${key}`,
+        value: resolved ?? raw,
+        kind: "alias",
+        aliasRef: ref,
+        scaleKey,
+      });
+    }
+  }
+
+  return result;
 }
 
 function flattenTokens(
