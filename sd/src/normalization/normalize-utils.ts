@@ -13,6 +13,29 @@ export type TokenNode =
 
 export type ParsedFile = { file: string; data: Record<string, unknown> };
 
+/**
+ * Extract the mode name from a token filename.
+ *
+ * For alias color files the convention is `alias.color.<mode>.json`.
+ * The mode is the third segment (index 2). If the file has fewer than
+ * three segments (e.g. `spacing.default.json`) this returns null.
+ *
+ * Examples:
+ *   alias.color.light.json   → "light"
+ *   alias.color.default.json → "default"
+ *   alias.color.sale.json    → "sale"
+ *   options.color.light.json → null  (options files are not alias files)
+ *   spacing.default.json     → null
+ */
+export function extractColorMode(file: string): string | null {
+  const parts = file.replace(/\.json$/, "").split(".");
+  // Only alias.color.<mode> files carry mode information for colors
+  if (parts[0] === "alias" && parts[1] === "color" && parts.length >= 3) {
+    return parts[2];
+  }
+  return null;
+}
+
 // ─── isLeaf ───────────────────────────────────────────────────────────────────
 
 export function isLeaf(
@@ -156,16 +179,28 @@ export function clean(
  * and alias.color.* nest under "color"), so top-level keys that map to the
  * same section are merged together via deepMerge.
  *
- * Example results:
+ * Color mode nesting:
+ *   When colorMode is provided (for alias.color.<mode>.json files), the
+ *   semantic children of the "color" wrapper (e.g. "surface", "text",
+ *   "border") are placed under color.modes.<mode> rather than directly
+ *   under "color". This allows multiple modes to coexist in the canonical
+ *   tree without overwriting each other.
+ *
+ * Example results (no mode):
  *   Input:  { "neutral-palette": {...}, "brand-palette": {...} } (bare collections)
  *   Output: { "color": { "neutral-palette": {...}, "brand-palette": {...} } }
  *
  *   Input:  { "color": { "surface": {...}, "text": {...} } } (section wrapper)
  *   Output: { "color": { "surface": {...}, "text": {...} } } (unchanged)
+ *
+ * Example results (with mode = "sale"):
+ *   Input:  { "color": { "surface": {...}, "text": {...} } }
+ *   Output: { "color": { "modes": { "sale": { "surface": {...}, "text": {...} } } } }
  */
 export function nestUnderSections(
   cleaned: Record<string, unknown>,
   collectionToSection: Map<string, string>,
+  colorMode?: string | null,
 ): Record<string, unknown> {
   const out: Record<string, unknown> = {};
 
@@ -173,12 +208,24 @@ export function nestUnderSections(
     const section = collectionToSection.get(key);
 
     if (!section || section === key) {
-      // Section wrapper: "color", "spacing", etc. Keep at top level.
-      // If multiple files contribute to the same section, merge them.
-      if (out[key] === undefined) {
-        out[key] = value;
+      // Section wrapper: "color", "spacing", etc.
+      if (colorMode && key === "color" && typeof value === "object" && value !== null) {
+        // Nest semantic children under color.modes.<mode>
+        const modesWrapper: Record<string, unknown> = {
+          modes: { [colorMode]: value },
+        };
+        if (out["color"] === undefined) {
+          out["color"] = modesWrapper;
+        } else {
+          deepMerge(out["color"] as Record<string, unknown>, modesWrapper);
+        }
       } else {
-        deepMerge(out[key] as Record<string, unknown>, value as Record<string, unknown>);
+        // Keep at top level as-is (no mode or not a color section wrapper)
+        if (out[key] === undefined) {
+          out[key] = value;
+        } else {
+          deepMerge(out[key] as Record<string, unknown>, value as Record<string, unknown>);
+        }
       }
     } else {
       // Bare collection: "neutral-palette", "brand-palette", etc.
@@ -194,6 +241,115 @@ export function nestUnderSections(
 }
 
 // ─── deepMerge ────────────────────────────────────────────────────────────────
+
+// ─── buildSpacingClamp ────────────────────────────────────────────────────────
+
+/**
+ * Given multiple per-breakpoint spacing token files (e.g. spacing.320.json,
+ * spacing.1440.json, spacing.2560.json), produce a single canonical spacing
+ * tree where every `spacing.scale.*` leaf has a CSS `clamp()` string as its
+ * $value, and $type is "fluid".
+ *
+ * The non-scale collections (spacing.component.*, spacing.layout.*) come from
+ * the alias file and keep their alias references unchanged.
+ *
+ * CSS clamp formula:
+ *   clamp(<min>px, <slope>vw + <intercept>px, <max>px)
+ *
+ * Derivation (per token):
+ *   - min breakpoint (bp_min = 320px): value = v_min
+ *   - max (saturation) breakpoint (bp_max): value = v_max
+ *   - 1vw = viewport_width / 100 px, so:
+ *       slope = (v_max - v_min) / (bp_max/100 - bp_min/100)   [units: px/vw]
+ *       intercept = v_min - slope * (bp_min / 100)             [units: px]
+ *   clamp(v_min px, slope vw + intercept px, v_max px)
+ *
+ * The saturation breakpoint is the smallest breakpoint at which the token
+ * value first equals the global maximum across all breakpoints.
+ *
+ * @param parsedSpacingFiles  Array of { breakpoint: number, data: RawSpacingFile }
+ *   where breakpoint is the viewport width from the filename (e.g. 320 for spacing.320.json)
+ *   and data is the parsed JSON (null-safe: alias file is excluded by the caller).
+ */
+export function buildSpacingClamp(
+  parsedSpacingFiles: Array<{ breakpoint: number; data: Record<string, unknown> }>,
+): Record<string, unknown> {
+  if (parsedSpacingFiles.length === 0) return {};
+
+  // Sort ascending by breakpoint
+  const sorted = [...parsedSpacingFiles].sort((a, b) => a.breakpoint - b.breakpoint);
+  const minBp = sorted[0].breakpoint;
+
+  // Collect all token keys from the scale group
+  const scaleKeys = new Set<string>();
+  for (const { data } of sorted) {
+    const scale = getScale(data);
+    if (scale) Object.keys(scale).forEach((k) => scaleKeys.add(k));
+  }
+
+  const scaleOut: Record<string, unknown> = {};
+
+  for (const tokenKey of scaleKeys) {
+    // Gather (breakpoint, value) pairs for this token
+    const pairs: Array<{ bp: number; val: number }> = [];
+    for (const { breakpoint, data } of sorted) {
+      const scale = getScale(data);
+      if (!scale) continue;
+      const leaf = scale[tokenKey];
+      if (isLeaf(leaf) && typeof leaf.$value === "number") {
+        pairs.push({ bp: breakpoint, val: leaf.$value });
+      } else if (isLeaf(leaf) && typeof leaf.$value === "string") {
+        const n = parseFloat(leaf.$value);
+        if (!isNaN(n)) pairs.push({ bp: breakpoint, val: n });
+      }
+    }
+
+    if (pairs.length < 2) {
+      // Not enough data for a fluid formula — keep raw px value
+      const v = pairs[0]?.val ?? 0;
+      scaleOut[tokenKey] = { $value: `${roundPx(v)}px`, $type: "dimension" };
+      continue;
+    }
+
+    const vMin = pairs[0].val;
+    const vMax = Math.max(...pairs.map((p) => p.val));
+
+    // Find saturation breakpoint: first bp where value == vMax (within float tolerance)
+    const satPair = pairs.find((p) => Math.abs(p.val - vMax) < 0.05);
+    const maxBp = satPair?.bp ?? sorted[sorted.length - 1].breakpoint;
+
+    // Compute slope (px per vw) and intercept
+    const bpMinVw = minBp / 100; // bp in vw units (1vw = viewport/100)
+    const bpMaxVw = maxBp / 100;
+    const slope = (vMax - vMin) / (bpMaxVw - bpMinVw); // px / vw
+    const intercept = vMin - slope * bpMinVw; // px
+
+    const clampValue = `clamp(${roundPx(vMin)}px, ${roundSlope(slope)}vw + ${roundPx(intercept)}px, ${roundPx(vMax)}px)`;
+    scaleOut[tokenKey] = { $value: clampValue, $type: "fluid" };
+  }
+
+  return { spacing: { scale: scaleOut } };
+}
+
+/** Extract the spacing.scale object from a raw spacing file, if present. */
+function getScale(data: Record<string, unknown>): Record<string, unknown> | null {
+  const spacingSection = data["spacing"];
+  if (typeof spacingSection !== "object" || spacingSection === null) return null;
+  const scale = (spacingSection as Record<string, unknown>)["scale"];
+  if (typeof scale !== "object" || scale === null) return null;
+  return scale as Record<string, unknown>;
+}
+
+/** Round a px value to 4 significant decimal places. */
+function roundPx(v: number): string {
+  // Use up to 4 decimal places but strip trailing zeros
+  return parseFloat(v.toFixed(4)).toString();
+}
+
+/** Round a vw slope coefficient to 4 decimal places. */
+function roundSlope(v: number): string {
+  return parseFloat(v.toFixed(4)).toString();
+}
 
 /** Deep-merge src into dest (dest is mutated). Later files win on conflicts. */
 export function deepMerge(

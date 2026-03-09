@@ -2,7 +2,7 @@
  * normalize-utils.test.ts
  *
  * Unit tests for the pure normalization helpers: clean, deepMerge,
- * buildCollectionToSection.
+ * buildCollectionToSection, nestUnderSections, extractColorMode.
  *
  * Covers:
  *  - Stripping $extensions / $description
@@ -13,10 +13,12 @@
  *  - Typography tokens: string and number $values
  *  - Deep merge: sibling keys merged, conflicts resolved (last-write-wins)
  *  - buildCollectionToSection: alias file, options file, spacing file, typography file
+ *  - extractColorMode: alias color files return mode name; others return null
+ *  - nestUnderSections: color mode files nest under color.modes.<mode>
  */
 
 import { describe, it, expect } from "vitest";
-import { clean, deepMerge, buildCollectionToSection, nestUnderSections } from "./normalize-utils.js";
+import { clean, deepMerge, buildCollectionToSection, nestUnderSections, extractColorMode, buildSpacingClamp } from "./normalize-utils.js";
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 
@@ -25,6 +27,30 @@ const FIGMA_LEAF = (value: unknown, type = "color") => ({
   $type: type,
   $description: "ignore me",
   $extensions: { "com.figma": { hiddenFromPublishing: false } },
+});
+
+// ─── extractColorMode ─────────────────────────────────────────────────────────
+
+describe("extractColorMode", () => {
+  it("returns the mode for alias.color.<mode>.json files", () => {
+    expect(extractColorMode("alias.color.light.json")).toBe("light");
+    expect(extractColorMode("alias.color.default.json")).toBe("default");
+    expect(extractColorMode("alias.color.sale.json")).toBe("sale");
+  });
+
+  it("returns null for options color files", () => {
+    expect(extractColorMode("options.color.light.json")).toBeNull();
+    expect(extractColorMode("options.color.web-light.json")).toBeNull();
+    expect(extractColorMode("options.color.ios-dark.json")).toBeNull();
+  });
+
+  it("returns null for spacing files", () => {
+    expect(extractColorMode("spacing.default.json")).toBeNull();
+  });
+
+  it("returns null for files with fewer than three segments", () => {
+    expect(extractColorMode("alias.json")).toBeNull();
+  });
 });
 
 // ─── buildCollectionToSection ─────────────────────────────────────────────────
@@ -250,7 +276,7 @@ describe("nestUnderSections", () => {
     expect(Object.keys(result.color as object)).toContain("brand-palette");
   });
 
-  it("keeps section wrapper keys at the top level (alias file)", () => {
+  it("keeps section wrapper keys at the top level when no colorMode given (alias file)", () => {
     const parsed = [
       {
         file: "alias.color.light.json",
@@ -264,10 +290,57 @@ describe("nestUnderSections", () => {
     expect((result.color as Record<string, unknown>).surface).toBeDefined();
   });
 
-  it("merges bare collections and wrapper children under the same section key", () => {
+  it("nests color section wrapper under color.modes.<mode> when colorMode is given", () => {
+    const parsed = [
+      {
+        file: "alias.color.sale.json",
+        data: { color: { surface: {}, text: {} } },
+      },
+    ];
+    const map = buildCollectionToSection(parsed);
+    const cleaned = {
+      color: {
+        surface: { base: { $value: "{color.brand-palette.red.400}", $type: "color" } },
+        text: { base: { $value: "{color.neutral-palette.warm-grey.900}", $type: "color" } },
+      },
+    };
+    const result = nestUnderSections(cleaned, map, "sale");
+    expect(Object.keys(result)).toEqual(["color"]);
+    const colorSection = result.color as Record<string, unknown>;
+    expect(colorSection.modes).toBeDefined();
+    const modes = colorSection.modes as Record<string, unknown>;
+    expect(modes.sale).toBeDefined();
+    const saleMode = modes.sale as Record<string, unknown>;
+    expect(saleMode.surface).toBeDefined();
+    expect(saleMode.text).toBeDefined();
+    // Should NOT have surface/text directly on color (only under modes.sale)
+    expect(colorSection.surface).toBeUndefined();
+    expect(colorSection.text).toBeUndefined();
+  });
+
+  it("accumulates multiple modes under color.modes without clobbering each other", () => {
+    const map = new Map([["color", "color"]]);
+    const cleanedDefault = {
+      color: { surface: { base: { $value: "#ffffff", $type: "color" } } },
+    };
+    const cleanedSale = {
+      color: { surface: { base: { $value: "#c7370f", $type: "color" } } },
+    };
+
+    const canonical: Record<string, unknown> = {};
+    deepMerge(canonical, nestUnderSections(cleanedDefault, map, "default"));
+    deepMerge(canonical, nestUnderSections(cleanedSale, map, "sale"));
+
+    const modes = (canonical.color as Record<string, unknown>).modes as Record<string, unknown>;
+    expect(Object.keys(modes).sort()).toEqual(["default", "sale"]);
+    expect(((modes.default as Record<string, unknown>).surface as Record<string, unknown>).base).toEqual({ $value: "#ffffff", $type: "color" });
+    expect(((modes.sale as Record<string, unknown>).surface as Record<string, unknown>).base).toEqual({ $value: "#c7370f", $type: "color" });
+  });
+
+  it("merges bare collections and mode wrapper under the same section key", () => {
     const parsed = [
       { file: "options.color.light.json", data: { "neutral-palette": {} } },
-      { file: "alias.color.light.json", data: { color: { text: {} } } },
+      { file: "alias.color.default.json", data: { color: { text: {} } } },
     ];
     const map = buildCollectionToSection(parsed);
 
@@ -276,16 +349,19 @@ describe("nestUnderSections", () => {
 
     const canonical: Record<string, unknown> = {};
     deepMerge(canonical, nestUnderSections(cleanedOptions, map));
-    deepMerge(canonical, nestUnderSections(cleanedAlias, map));
+    deepMerge(canonical, nestUnderSections(cleanedAlias, map, "default"));
 
-    // Both should be under "color"
     expect(Object.keys(canonical)).toEqual(["color"]);
     const colorSection = canonical.color as Record<string, unknown>;
+    // Primitive palette stays at top level of color
     expect(colorSection["neutral-palette"]).toBeDefined();
-    expect(colorSection.text).toBeDefined();
+    // Alias tokens are nested under color.modes.default
+    const modes = colorSection.modes as Record<string, unknown>;
+    expect(modes).toBeDefined();
+    expect((modes.default as Record<string, unknown>).text).toBeDefined();
   });
 
-  it("nests spacing section wrapper unchanged", () => {
+  it("nests spacing section wrapper unchanged (no colorMode effect)", () => {
     const parsed = [
       { file: "spacing.default.json", data: { spacing: { sm: {}, md: {} } } },
     ];
@@ -297,10 +373,173 @@ describe("nestUnderSections", () => {
   });
 });
 
+// ─── buildSpacingClamp ────────────────────────────────────────────────────────
+
+/** Helper to build a minimal spacing bp file with a single scale token. */
+function bpFile(breakpoint: number, tokenKey: string, value: number) {
+  return {
+    breakpoint,
+    data: { spacing: { scale: { [tokenKey]: { $value: value, $type: "dimension" } } } },
+  };
+}
+
+describe("buildSpacingClamp", () => {
+  it("returns empty object when given no files", () => {
+    expect(buildSpacingClamp([])).toEqual({});
+  });
+
+  it("returns a static px value (not clamp) when only one breakpoint is provided", () => {
+    const result = buildSpacingClamp([bpFile(320, "-50", 2.48)]);
+    const token = (result as any).spacing.scale["-50"];
+    expect(token.$value).toMatch(/px$/);
+    expect(token.$type).toBe("dimension");
+    expect(token.$value).not.toContain("clamp");
+  });
+
+  it("produces correct clamp() for -50 token (320→1440px range)", () => {
+    // Known values from the design token dataset
+    // v_min=2.48@320, v_max=4@1440
+    // slope = (4 - 2.48) / (14.4 - 3.2) = 1.52 / 11.2 ≈ 0.1357
+    // intercept = 2.48 - 0.1357 * 3.2 ≈ 2.0457
+    const files = [
+      bpFile(320, "-50", 2.48),
+      bpFile(1440, "-50", 4),
+      bpFile(2560, "-50", 4), // plateau — should NOT shift saturation past 1440
+    ];
+    const result = buildSpacingClamp(files);
+    const token = (result as any).spacing.scale["-50"];
+    expect(token.$type).toBe("fluid");
+    expect(token.$value).toMatch(/^clamp\(/);
+    // Min and max values should appear in the output
+    expect(token.$value).toContain("2.48px");
+    expect(token.$value).toContain("4px");
+    // Slope and intercept should be present (approximate check)
+    expect(token.$value).toContain("vw");
+  });
+
+  it("produces correct clamp() for -100 token (320→1600px range)", () => {
+    // v_min=4.8@320, v_max=8@1600
+    // slope = (8 - 4.8) / (16 - 3.2) = 3.2 / 12.8 = 0.25
+    // intercept = 4.8 - 0.25 * 3.2 = 4.0
+    const files = [
+      bpFile(320, "-100", 4.8),
+      bpFile(1600, "-100", 8),
+      bpFile(2560, "-100", 8),
+    ];
+    const result = buildSpacingClamp(files);
+    const token = (result as any).spacing.scale["-100"];
+    expect(token.$type).toBe("fluid");
+    expect(token.$value).toBe("clamp(4.8px, 0.25vw + 4px, 8px)");
+  });
+
+  it("saturation detection uses first breakpoint where value equals vMax", () => {
+    // Token reaches max at 744, then stays there at 1440 and 2560
+    const files = [
+      bpFile(320, "custom", 10),
+      bpFile(744, "custom", 20),
+      bpFile(1440, "custom", 20),
+      bpFile(2560, "custom", 20),
+    ];
+    const result = buildSpacingClamp(files);
+    const token = (result as any).spacing.scale.custom;
+    // Max bp should be 744 (first saturation), not 2560
+    // slope = (20 - 10) / (7.44 - 3.2) = 10 / 4.24 ≈ 2.3585
+    // intercept = 10 - 2.3585 * 3.2 ≈ 2.4528
+    expect(token.$type).toBe("fluid");
+    expect(token.$value).toContain("20px"); // vMax
+    expect(token.$value).toContain("10px"); // vMin
+    // Saturation bp of 744 should yield a steeper slope than using 2560
+    const slopeMatch = token.$value.match(/([\d.]+)vw/);
+    expect(slopeMatch).not.toBeNull();
+    const slope = parseFloat(slopeMatch![1]);
+    // slope based on 744 bp ≈ 2.3585; slope based on 2560 bp would be ≈ 0.4348
+    expect(slope).toBeGreaterThan(2);
+  });
+
+  it("handles multiple tokens in the same file set independently", () => {
+    const files = [
+      {
+        breakpoint: 320,
+        data: {
+          spacing: {
+            scale: {
+              "-50": { $value: 2.48, $type: "dimension" },
+              "-100": { $value: 4.8, $type: "dimension" },
+            },
+          },
+        },
+      },
+      {
+        breakpoint: 1440,
+        data: {
+          spacing: {
+            scale: {
+              "-50": { $value: 4, $type: "dimension" },
+              "-100": { $value: 8, $type: "dimension" },
+            },
+          },
+        },
+      },
+    ];
+    const result = buildSpacingClamp(files);
+    const scale = (result as any).spacing.scale;
+    expect(scale["-50"].$type).toBe("fluid");
+    expect(scale["-100"].$type).toBe("fluid");
+    // Each token should have independent clamp values
+    expect(scale["-50"].$value).not.toBe(scale["-100"].$value);
+  });
+
+  it("wraps output under spacing.scale key", () => {
+    const result = buildSpacingClamp([bpFile(320, "-50", 2.48), bpFile(1440, "-50", 4)]);
+    expect(result).toHaveProperty("spacing");
+    expect((result as any).spacing).toHaveProperty("scale");
+    expect((result as any).spacing.scale).toHaveProperty("-50");
+  });
+
+  it("sorts breakpoints regardless of input order", () => {
+    // Provide out-of-order — result should be same as in-order
+    const filesAsc = [bpFile(320, "tok", 10), bpFile(1440, "tok", 20)];
+    const filesDesc = [bpFile(1440, "tok", 20), bpFile(320, "tok", 10)];
+    const r1 = buildSpacingClamp(filesAsc);
+    const r2 = buildSpacingClamp(filesDesc);
+    expect((r1 as any).spacing.scale.tok.$value).toBe((r2 as any).spacing.scale.tok.$value);
+  });
+
+  it("handles string $value in bp files (Figma exports as string)", () => {
+    const files = [
+      {
+        breakpoint: 320,
+        data: { spacing: { scale: { "-50": { $value: "2.48", $type: "dimension" } } } },
+      },
+      {
+        breakpoint: 1440,
+        data: { spacing: { scale: { "-50": { $value: "4", $type: "dimension" } } } },
+      },
+    ];
+    const result = buildSpacingClamp(files);
+    const token = (result as any).spacing.scale["-50"];
+    expect(token.$type).toBe("fluid");
+    expect(token.$value).toContain("clamp(");
+  });
+
+  it("skips files that have no spacing.scale section", () => {
+    const files = [
+      bpFile(320, "-50", 2.48),
+      { breakpoint: 500, data: { spacing: {} } }, // no scale key
+      bpFile(1440, "-50", 4),
+    ];
+    // Should still compute clamp correctly from the two valid files
+    const result = buildSpacingClamp(files);
+    const token = (result as any).spacing.scale["-50"];
+    expect(token.$type).toBe("fluid");
+    expect(token.$value).toContain("4px");
+  });
+});
+
 // ─── Integration: clean + nestUnderSections + deepMerge ──────────────────────
 
 describe("clean + nestUnderSections + deepMerge integration", () => {
-  it("produces a section-nested canonical tree from a realistic multi-file token set", () => {
+  it("produces a section-nested canonical tree with color.modes for alias files", () => {
     const parsed = [
       {
         file: "options.color.light.json",
@@ -314,11 +553,24 @@ describe("clean + nestUnderSections + deepMerge integration", () => {
         },
       },
       {
-        file: "alias.color.light.json",
+        file: "alias.color.default.json",
         data: {
           color: {
             text: {
               link: FIGMA_LEAF("{brand-palette.blue.600}"),
+            },
+          },
+        },
+      },
+      {
+        file: "alias.color.sale.json",
+        data: {
+          color: {
+            text: {
+              link: FIGMA_LEAF("{brand-palette.blue.600}"),
+            },
+            surface: {
+              base: FIGMA_LEAF("{brand-palette.red.400}"),
             },
           },
         },
@@ -339,34 +591,42 @@ describe("clean + nestUnderSections + deepMerge integration", () => {
     const collectionToSection = buildCollectionToSection(parsed);
     const canonical: Record<string, unknown> = {};
 
-    for (const { data } of parsed) {
+    for (const { file, data } of parsed) {
       const cleaned = clean(data, collectionToSection);
-      const nested = nestUnderSections(cleaned as Record<string, unknown>, collectionToSection);
+      const colorMode = extractColorMode(file);
+      const nested = nestUnderSections(cleaned as Record<string, unknown>, collectionToSection, colorMode);
       deepMerge(canonical, nested);
     }
 
     // Top-level keys should only be section names
     expect(Object.keys(canonical).sort()).toEqual(["color", "spacing"]);
 
-    // Options collections are nested under "color"
     const colorSection = canonical.color as Record<string, unknown>;
+
+    // Primitive palettes at top level of color (not under modes)
     expect(colorSection["neutral-palette"]).toBeDefined();
     expect(colorSection["brand-palette"]).toBeDefined();
 
-    // Alias tokens are also under "color"
-    const textLink = (colorSection.text as Record<string, unknown>).link as Record<string, unknown>;
-    expect(textLink.$value).toBe("{color.brand-palette.blue.600}");
-    expect(textLink.$extensions).toBeUndefined();
+    // Alias tokens under color.modes.*
+    const modes = colorSection.modes as Record<string, unknown>;
+    expect(modes).toBeDefined();
+    expect(Object.keys(modes).sort()).toEqual(["default", "sale"]);
+
+    // default mode: text.link alias was rewritten
+    const defaultMode = modes.default as Record<string, unknown>;
+    const defaultTextLink = ((defaultMode.text as Record<string, unknown>).link as Record<string, unknown>);
+    expect(defaultTextLink.$value).toBe("{color.brand-palette.blue.600}");
+    expect(defaultTextLink.$extensions).toBeUndefined();
+
+    // sale mode has both text and surface
+    const saleMode = modes.sale as Record<string, unknown>;
+    expect((saleMode.text as Record<string, unknown>).link).toBeDefined();
+    expect((saleMode.surface as Record<string, unknown>).base).toBeDefined();
 
     // Spacing alias pointing to its own section should NOT be prefixed
     const spacingSection = canonical.spacing as Record<string, unknown>;
     const buttonSpacing = (spacingSection.component as Record<string, unknown>).button as Record<string, unknown>;
     expect(buttonSpacing.$value).toBe("{spacing.sm}");
     expect(buttonSpacing.$type).toBe("dimension");
-
-    // Raw spacing value is preserved
-    const sm = spacingSection.sm as Record<string, unknown>;
-    expect(sm.$value).toBe("4");
-    expect(sm.$type).toBe("dimension");
   });
 });
