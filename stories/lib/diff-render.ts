@@ -104,8 +104,11 @@ function valueCell(value: string | null, strikethrough = false): string {
   const strike = strikethrough
     ? `text-decoration:line-through;opacity:.55;`
     : "";
+  const isFluid = value.trimStart().startsWith("clamp(");
   const chip = isHex(value)
     ? `<span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${value};border:1px solid ${COLOR.chip};vertical-align:middle;margin-right:6px;flex-shrink:0"></span>`
+    : isFluid
+    ? `<span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:linear-gradient(90deg,#b2ab9f 0%,#2e2e2b 100%);border:1px solid ${COLOR.chip};vertical-align:middle;margin-right:6px;flex-shrink:0" title="fluid"></span>`
     : "";
   return `<span style="display:inline-flex;align-items:center;font-family:'DM Mono',monospace;font-size:.8rem;${strike}">${chip}${value}</span>`;
 }
@@ -156,7 +159,24 @@ function tokenRow(entry: DiffEntry): string {
 
 function sectionBlock(section: string, entries: DiffEntry[]): string {
   const rows = entries.map(tokenRow).join("");
-  const label = section.split(".").slice(1).join(" › ") || section;
+  const parts = section.split(".");
+
+  // Build a human-readable label for the section header.
+  // "color.modes.default"  → "default  [color mode]"
+  // "color.text"           → "text"
+  // "color.neutral-palette"→ "neutral-palette"
+  // "spacing.component"    → "component"
+  // "spacing.scale"        → "scale  [fluid]"
+  let label: string;
+  if (parts[0] === "color" && parts[1] === "modes" && parts[2]) {
+    label = `${parts[2]} <span style="font-weight:400;font-size:.7rem;opacity:.6;text-transform:none;letter-spacing:0">[color mode]</span>`;
+  } else if (parts[0] === "spacing" && parts[1] === "scale") {
+    label = `scale <span style="font-weight:400;font-size:.7rem;opacity:.6;text-transform:none;letter-spacing:0">[fluid]</span>`;
+  } else {
+    const tail = parts.slice(1).join(" › ") || section;
+    label = tail;
+  }
+
   const countBadge = `<span style="margin-left:8px;font-size:.7rem;font-family:'DM Mono',monospace;color:${COLOR.inkFaint}">${entries.length} change${entries.length !== 1 ? "s" : ""}</span>`;
 
   return `

@@ -12,6 +12,13 @@
  *   removed         — token exists in baseline but not current
  *   group-added     — a whole group path is new in current
  *   group-removed   — a whole group path was removed in current
+ *
+ * Multi-mode color tokens:
+ *   Color alias tokens are stored under color.modes.<mode>.<category>.<token>
+ *   (e.g. color.modes.default.surface.base, color.modes.sale.text.link).
+ *   The diff engine treats these like any other path — no special logic is
+ *   needed. groupBySectionPath uses depth=3 when the path starts with
+ *   "color.modes." so that each mode gets its own section block in the UI.
  */
 
 export type DiffKind =
@@ -190,8 +197,19 @@ export function computeDiff(
 }
 
 /**
- * Group diff entries by their top-level section path (e.g. "color.text").
- * Returns an ordered map: section → entries.
+ * Group diff entries by their section path for display.
+ *
+ * The default depth is 2 (e.g. "color.text", "spacing.component").
+ *
+ * Special cases:
+ *   - "color.modes.*" paths are grouped at depth 3 so that each mode gets its
+ *     own section block (e.g. "color.modes.default", "color.modes.sale").
+ *   - "spacing.scale" paths are grouped at depth 3 so individual scale tokens
+ *     each get their own row rather than collapsing into one "spacing.scale" block.
+ *     However since spacing.scale tokens are leaves (not groups), depth 3 just
+ *     means we group them all under "spacing.scale" at depth 2 — which is fine.
+ *
+ * Returns an ordered map: section path → entries.
  */
 export function groupBySectionPath(
   entries: DiffEntry[],
@@ -200,7 +218,10 @@ export function groupBySectionPath(
   const map = new Map<string, DiffEntry[]>();
   for (const entry of entries) {
     const parts = entry.path.split(".");
-    const section = parts.slice(0, depth).join(".");
+    // Use depth 3 for color.modes.* so each mode is its own section block
+    const effectiveDepth =
+      parts[0] === "color" && parts[1] === "modes" ? 3 : depth;
+    const section = parts.slice(0, effectiveDepth).join(".");
     if (!map.has(section)) map.set(section, []);
     map.get(section)!.push(entry);
   }
