@@ -101,44 +101,6 @@ const NOT_FOUND_HTML = `
   </div>
 </div>`;
 
-/**
- * Fetches both JSON snapshots from the static server at runtime.
- * Requires `dist/normalized/baseline.json` and `dist/normalized/current.json`
- * to exist. Always shows the latest token changes (dynamic/live data).
- */
-export const FullDiff: StoryObj = {
-  name: "Full Diff",
-  render: asyncStory(async () => {
-    // Derive the base URL from the current page so this works both locally
-    // (served from /) and on GH Pages (served from a sub-path like
-    // /rei-cedar-token-pipeline-spike/pr/update-tokens/).
-    // window.location.pathname inside the Storybook iframe is something like
-    // /rei-cedar-token-pipeline-spike/pr/update-tokens/iframe.html so stripping
-    // the filename gives us the correct base to resolve normalized/ against.
-    const base = window.location.pathname.replace(/\/[^/]*$/, "/");
-    const [baseRes, currRes] = await Promise.all([
-      fetch(`${base}normalized/baseline.json`),
-      fetch(`${base}normalized/current.json`),
-    ]);
-
-    if (baseRes.status === 404 || currRes.status === 404) {
-      return NOT_FOUND_HTML;
-    }
-
-    if (!baseRes.ok) throw new Error(`baseline.json: ${baseRes.status} ${baseRes.statusText}`);
-    if (!currRes.ok) throw new Error(`current.json: ${currRes.status} ${currRes.statusText}`);
-
-    const baseline = (await baseRes.json()) as Record<string, unknown>;
-    const current = (await currRes.json()) as Record<string, unknown>;
-
-    const entries = computeDiff(baseline, current);
-    return renderDiffPage(entries, {
-      baselineLabel: "baseline.json",
-      currentLabel: "current.json",
-    });
-  }),
-};
-
 // ─── Story: NoChanges ─────────────────────────────────────────────────────────
 
 export const NoChanges: StoryObj = {
