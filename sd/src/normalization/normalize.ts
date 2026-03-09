@@ -62,7 +62,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
-import { buildCollectionToSection, clean, nestUnderSections, deepMerge, extractColorMode, buildSpacingClamp } from "./normalize-utils.js";
+import { buildCollectionToSection, clean, nestUnderSections, deepMerge, extractColorMode, extractPrimitiveMode, buildSpacingClamp } from "./normalize-utils.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const tokensDir = path.resolve(__dirname, "../../../tokens");
@@ -114,11 +114,14 @@ try {
     // Step 2: Nest all collections under their section keys.
     // For alias.color.<mode>.json files, semantic tokens are nested under
     // color.modes.<mode> so multiple modes coexist without overwriting each other.
+    // For options.color.<mode>.json files, primitive palettes are nested under
+    // color.primitives.<mode> so all platform variants coexist.
     const colorMode = extractColorMode(file);
-    const nested = nestUnderSections(cleaned as Record<string, unknown>, collectionToSection, colorMode);
+    const primitiveMode = extractPrimitiveMode(file);
+    const nested = nestUnderSections(cleaned as Record<string, unknown>, collectionToSection, colorMode, primitiveMode);
 
     // Step 3: Merge into the growing canonical tree
-    const modeLabel = colorMode ? ` [mode: ${colorMode}]` : "";
+    const modeLabel = colorMode ? ` [mode: ${colorMode}]` : primitiveMode ? ` [primitives: ${primitiveMode}]` : "";
     console.log(`  ✓ ${file}${modeLabel} (${Object.keys(data).join(", ")})`);
     deepMerge(canonical, nested);
   }

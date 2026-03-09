@@ -18,7 +18,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { clean, deepMerge, buildCollectionToSection, nestUnderSections, extractColorMode, buildSpacingClamp } from "./normalize-utils.js";
+import { clean, deepMerge, buildCollectionToSection, nestUnderSections, extractColorMode, extractPrimitiveMode, buildSpacingClamp } from "./normalize-utils.js";
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 
@@ -50,6 +50,31 @@ describe("extractColorMode", () => {
 
   it("returns null for files with fewer than three segments", () => {
     expect(extractColorMode("alias.json")).toBeNull();
+  });
+});
+
+// ─── extractPrimitiveMode ─────────────────────────────────────────────────────
+
+describe("extractPrimitiveMode", () => {
+  it("returns the mode for options.color.<mode>.json files", () => {
+    expect(extractPrimitiveMode("options.color.light.json")).toBe("light");
+    expect(extractPrimitiveMode("options.color.web-light.json")).toBe("web-light");
+    expect(extractPrimitiveMode("options.color.web-dark.json")).toBe("web-dark");
+    expect(extractPrimitiveMode("options.color.ios-light.json")).toBe("ios-light");
+    expect(extractPrimitiveMode("options.color.ios-dark.json")).toBe("ios-dark");
+  });
+
+  it("returns null for alias color files", () => {
+    expect(extractPrimitiveMode("alias.color.default.json")).toBeNull();
+    expect(extractPrimitiveMode("alias.color.light.json")).toBeNull();
+  });
+
+  it("returns null for spacing files", () => {
+    expect(extractPrimitiveMode("spacing.default.json")).toBeNull();
+  });
+
+  it("returns null for files with fewer than three segments", () => {
+    expect(extractPrimitiveMode("options.json")).toBeNull();
   });
 });
 

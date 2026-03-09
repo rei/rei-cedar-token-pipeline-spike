@@ -14,7 +14,7 @@ export type TokenNode =
 export type ParsedFile = { file: string; data: Record<string, unknown> };
 
 /**
- * Extract the mode name from a token filename.
+ * Extract the semantic color mode name from a token filename.
  *
  * For alias color files the convention is `alias.color.<mode>.json`.
  * The mode is the third segment (index 2). If the file has fewer than
@@ -24,14 +24,36 @@ export type ParsedFile = { file: string; data: Record<string, unknown> };
  *   alias.color.light.json   → "light"
  *   alias.color.default.json → "default"
  *   alias.color.sale.json    → "sale"
- *   options.color.light.json → null  (options files are not alias files)
+ *   options.color.light.json → null  (options files are primitive, not semantic)
  *   spacing.default.json     → null
  */
 export function extractColorMode(file: string): string | null {
   const parts = file.replace(/\.json$/, "").split(".");
-  // Only alias.color.<mode> files carry mode information for colors
+  // Only alias.color.<mode> files carry semantic mode information for colors
   if (parts[0] === "alias" && parts[1] === "color" && parts.length >= 3) {
     return parts[2];
+  }
+  return null;
+}
+
+/**
+ * Extract the primitive platform mode from a token filename.
+ *
+ * For options color files the convention is `options.color.<mode>.json`.
+ * The mode is the third segment (index 2). Returns null for all other files.
+ *
+ * Examples:
+ *   options.color.light.json    → "light"
+ *   options.color.web-dark.json → "web-dark"
+ *   options.color.ios-light.json → "ios-light"
+ *   alias.color.default.json    → null  (alias files are semantic, not primitive)
+ *   spacing.default.json        → null
+ */
+export function extractPrimitiveMode(file: string): string | null {
+  const parts = file.replace(/\.json$/, "").split(".");
+  // Only options.color.<mode> files carry platform mode information for primitives
+  if (parts[0] === "options" && parts[1] === "color" && parts.length >= 3) {
+    return parts[2]; // e.g. "light", "web-dark", "ios-light"
   }
   return null;
 }
@@ -193,14 +215,19 @@ export function clean(
  *   Input:  { "color": { "surface": {...}, "text": {...} } } (section wrapper)
  *   Output: { "color": { "surface": {...}, "text": {...} } } (unchanged)
  *
- * Example results (with mode = "sale"):
+ * Example results (with colorMode = "sale"):
  *   Input:  { "color": { "surface": {...}, "text": {...} } }
  *   Output: { "color": { "modes": { "sale": { "surface": {...}, "text": {...} } } } }
+ *
+ * Example results (with primitiveMode = "web-dark"):
+ *   Input:  { "neutral-palette": {...}, "brand-palette": {...} } (bare collections)
+ *   Output: { "color": { "primitives": { "web-dark": { "neutral-palette": {...}, "brand-palette": {...} } } } }
  */
 export function nestUnderSections(
   cleaned: Record<string, unknown>,
   collectionToSection: Map<string, string>,
   colorMode?: string | null,
+  primitiveMode?: string | null,
 ): Record<string, unknown> {
   const out: Record<string, unknown> = {};
 
@@ -229,11 +256,25 @@ export function nestUnderSections(
       }
     } else {
       // Bare collection: "neutral-palette", "brand-palette", etc.
-      // Nest it under its section so it's accessible via section.key.
+      // If we have a primitiveMode, nest under color.primitives.<mode>;
+      // otherwise nest flat under color (legacy / no-mode behaviour).
       if (out[section] === undefined) {
         out[section] = {};
       }
-      (out[section] as Record<string, unknown>)[key] = value;
+      if (primitiveMode && section === "color") {
+        // color.primitives.<mode>.<palette>  ← per-mode storage for Storybook display
+        const colorSection = out[section] as Record<string, unknown>;
+        if (!colorSection["primitives"]) colorSection["primitives"] = {};
+        const primitivesSection = colorSection["primitives"] as Record<string, unknown>;
+        if (!primitivesSection[primitiveMode]) primitivesSection[primitiveMode] = {};
+        (primitivesSection[primitiveMode] as Record<string, unknown>)[key] = value;
+        // Also write flat: color.<palette>  ← for semantic alias resolution.
+        // Multiple options files deep-merge; last file wins (web-light is processed last
+        // alphabetically, which is a good default for web/light-mode alias resolution).
+        (out[section] as Record<string, unknown>)[key] = value;
+      } else {
+        (out[section] as Record<string, unknown>)[key] = value;
+      }
     }
   }
 
