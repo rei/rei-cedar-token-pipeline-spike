@@ -295,7 +295,7 @@ function strip(swatches: Swatch[]): string {
         return `
           <div class="strip-segment" style="background:${s.value};">
             <div class="strip-label" style="color:${dark ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.8)"}; background:${dark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.2)"};">
-              ${s.value.slice(0, 7).toUpperCase()}
+              ${s.value.slice(0, 9).toUpperCase()}
             </div>
           </div>
         `;
@@ -321,7 +321,7 @@ function table(swatches: Swatch[]): string {
               <span class="swatch-chip" style="background:${s.value};"></span>
             </td>
             <td class="td-token">${s.name}</td>
-            <td class="td-hex">${s.value.slice(0, 7).toUpperCase()}</td>
+            <td class="td-hex">${s.value.slice(0, 9).toUpperCase()}</td>
           </tr>
         `).join("")}
       </tbody>
