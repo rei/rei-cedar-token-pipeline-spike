@@ -6,9 +6,10 @@
  * at runtime, so they always reflect the latest token changes.
  *
  * Stories:
- *   FullDiff     — shows all changes between baseline and current
- *   NoChanges    — demonstrates the empty-state UI (no diff entries)
- *   LiveDiff     — same as FullDiff; name indicates it's live/dynamic
+ *   FullDiff      — shows all changes between baseline and current
+ *   NoChanges     — demonstrates the empty-state UI (no diff entries)
+ *   LiveDiff      — same as FullDiff; name indicates it's live/dynamic
+ *   AllDiffCases  — purely static synthetic fixtures showing all 8 diff kinds
  */
 
 import type { StoryObj } from "@storybook/html";
@@ -209,4 +210,144 @@ export const LiveDiff: StoryObj = {
       currentLabel: "current.json",
     });
   }),
+};
+
+// ─── Story: AllDiffCases ─────────────────────────────────────────────────────
+
+/**
+ * Purely static story using hardcoded synthetic token trees.
+ * Demonstrates every possible DiffKind side-by-side so the diff UI can be
+ * reviewed without needing real snapshot files.
+ *
+ * Covered kinds (all 8):
+ *   added          — token exists only in current
+ *   removed        — token exists only in baseline
+ *   changed-value  — primitive hex or fluid value changed
+ *   changed-alias  — alias target reference changed
+ *   alias-to-value — was an alias, now a raw value
+ *   value-to-alias — was a raw value, now an alias
+ *   group-added    — entire subtree is new in current
+ *   group-removed  — entire subtree gone from current
+ *
+ * Value types covered:
+ *   hex colors (#RRGGBB / #RRGGBBAA)
+ *   fluid spacing clamp() values
+ *   alias references {path.to.token}
+ */
+export const AllDiffCases: StoryObj = {
+  name: "All Diff Cases",
+  render: () => {
+    // ── Synthetic baseline token tree ────────────────────────────────────────
+    //
+    // Organised so that:
+    //   • color.modes.default.*  → semantic color aliases (depth-3 section)
+    //   • color.neutral-palette.* → primitive hex colors (depth-2 section)
+    //   • spacing.scale.*        → fluid clamp() values  (depth-2 section)
+    //   • spacing.component.*    → raw px values          (depth-2 section)
+    //   • legacy.*               → entire group to be removed
+    //
+    const baseline: Record<string, unknown> = {
+      color: {
+        modes: {
+          default: {
+            text: {
+              // changed-alias: alias target will change
+              link:    { $value: "{color.neutral-palette.blue.600}", $type: "color" },
+              // alias-to-value: was alias, becomes raw hex
+              heading: { $value: "{color.neutral-palette.warm-grey.900}", $type: "color" },
+              // removed: will disappear in current
+              inverse: { $value: "{color.neutral-palette.warm-grey.50}", $type: "color" },
+            },
+            surface: {
+              // changed-value: hex will change to a different hex
+              base:    { $value: "#f5f2eb", $type: "color" },
+              // value-to-alias: was raw hex, becomes alias
+              overlay: { $value: "#2e2e2b33", $type: "color" },
+            },
+          },
+        },
+        "neutral-palette": {
+          "warm-grey": {
+            // changed-value: hex lightness shift
+            "100": { $value: "#edeae3", $type: "color" },
+            // unchanged — should not appear in diff
+            "50":  { $value: "#f5f2eb", $type: "color" },
+          },
+        },
+      },
+      spacing: {
+        scale: {
+          // changed-value: fluid clamp expression will change
+          "-50": { $value: "clamp(4px, 0.3571vw + 2.857px, 8px)",  $type: "spacing" },
+          // unchanged
+          "0":   { $value: "clamp(8px, 0.7143vw + 5.714px, 16px)", $type: "spacing" },
+        },
+        component: {
+          // removed: will disappear in current
+          "button-padding-x": { $value: "16px", $type: "spacing" },
+        },
+      },
+      // group-removed: this entire subtree is absent in current
+      legacy: {
+        "icon-size": { $value: "20px", $type: "sizing" },
+        "icon-size-lg": { $value: "28px", $type: "sizing" },
+      },
+    };
+
+    // ── Synthetic current token tree ─────────────────────────────────────────
+    const current: Record<string, unknown> = {
+      color: {
+        modes: {
+          default: {
+            text: {
+              // changed-alias: target changed from blue.600 → blue.700
+              link:    { $value: "{color.neutral-palette.blue.700}", $type: "color" },
+              // alias-to-value: now a raw hex instead of alias
+              heading: { $value: "#1a1a18", $type: "color" },
+              // added: brand-new token in current
+              muted:   { $value: "{color.neutral-palette.warm-grey.500}", $type: "color" },
+              // (inverse is gone → removed)
+            },
+            surface: {
+              // changed-value: hex changed
+              base:    { $value: "#f8f6f0", $type: "color" },
+              // value-to-alias: now an alias
+              overlay: { $value: "{color.neutral-palette.warm-grey.900}", $type: "color" },
+            },
+          },
+        },
+        "neutral-palette": {
+          "warm-grey": {
+            // changed-value
+            "100": { $value: "#e8e4dc", $type: "color" },
+            // unchanged
+            "50":  { $value: "#f5f2eb", $type: "color" },
+          },
+        },
+      },
+      spacing: {
+        scale: {
+          // changed-value: fluid expression tightened
+          "-50": { $value: "clamp(2px, 0.2232vw + 1.786px, 6px)",  $type: "spacing" },
+          // unchanged
+          "0":   { $value: "clamp(8px, 0.7143vw + 5.714px, 16px)", $type: "spacing" },
+        },
+        component: {
+          // (button-padding-x removed)
+        },
+        // group-added: entirely new subtree
+        layout: {
+          "content-max-width": { $value: "1280px", $type: "sizing" },
+          "sidebar-width":     { $value: "280px",  $type: "sizing" },
+        },
+      },
+      // (legacy group is gone → group-removed)
+    };
+
+    const entries = computeDiff(baseline, current);
+    return renderDiffPage(entries, {
+      baselineLabel: "v2.0.0 (synthetic)",
+      currentLabel:  "v2.1.0 (synthetic)",
+    });
+  },
 };
