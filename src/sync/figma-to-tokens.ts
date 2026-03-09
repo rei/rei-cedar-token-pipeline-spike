@@ -56,18 +56,6 @@ async function syncFileToTokens(
     throw new Error(`No token files generated from Figma file: ${fileKey}`);
   }
 
-  // Create output directory with error handling
-  try {
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
-      console.log(`Created output directory: ${outputDir}`);
-    }
-  } catch (error) {
-    throw new Error(
-      `Failed to create output directory "${outputDir}": ${error instanceof Error ? error.message : String(error)}`,
-    );
-  }
-
   // Validate and write each token file
   let filesWritten = 0;
   for (const [fileName, fileContent] of Object.entries(tokensFiles)) {
@@ -124,6 +112,24 @@ async function main() {
 
     const api = new FigmaApi(process.env.PERSONAL_ACCESS_TOKEN);
     let totalFilesWritten = 0;
+
+    // Clear the output directory before fetching so that files removed from
+    // Figma (deleted modes, renamed collections, etc.) don't linger and
+    // corrupt the diff.  We delete-and-recreate rather than selectively
+    // removing files so every run starts from a clean slate regardless of
+    // what collection types are present.
+    try {
+      if (fs.existsSync(baseOutputDir)) {
+        fs.rmSync(baseOutputDir, { recursive: true });
+        console.log(`Cleared output directory: ${baseOutputDir}`);
+      }
+      fs.mkdirSync(baseOutputDir, { recursive: true });
+      console.log(`Created output directory: ${baseOutputDir}`);
+    } catch (error) {
+      throw new Error(
+        `Failed to reset output directory "${baseOutputDir}": ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
 
     for (const fileKey of fileKeys) {
       const filesWritten = await syncFileToTokens(api, fileKey, baseOutputDir);
