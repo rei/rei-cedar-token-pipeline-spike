@@ -89,11 +89,16 @@ export async function loadColorTokens(): Promise<
 }
 
 /**
- * Fetch the current token snapshot and extract primitive color tokens.
- * Returns an array of { name, value } objects.
+ * Fetch the current token snapshot and extract primitive color tokens per platform mode.
+ * Returns a map of mode name → array of { name, value } objects.
+ *
+ * Mode names match the options.color.<mode>.json filenames:
+ *   "light", "web-light", "web-dark", "ios-light", "ios-dark"
+ *
+ * Falls back to reading from flat color.<palette> if no per-mode structure is present.
  */
 export async function loadPrimitiveColors(): Promise<
-  Array<{ name: string; value: string }>
+  Map<string, Array<{ name: string; value: string }>>
 > {
   const base = window.location.pathname.replace(/\/[^/]*$/, "/");
   const res = await fetch(`${base}normalized/current.json`);
@@ -103,19 +108,32 @@ export async function loadPrimitiveColors(): Promise<
   }
 
   const tree = (await res.json()) as Record<string, unknown>;
-  const result: Array<{ name: string; value: string }> = [];
+  const result = new Map<string, Array<{ name: string; value: string }>>();
 
-  // Extract primitive color tokens
   const colorSection = tree["color"] as Record<string, unknown> | undefined;
-  if (colorSection) {
-    // Process primitive palettes: neutral-palette, brand-palette
-    const primitives = ["neutral-palette", "brand-palette"];
-    for (const palette of primitives) {
-      const group = colorSection[palette] as Record<string, unknown> | undefined;
-      if (group) {
-        flattenTokens(group, palette, result);
+  if (!colorSection) return result;
+
+  const primitivesSection = colorSection["primitives"] as Record<string, unknown> | undefined;
+
+  if (primitivesSection) {
+    // Multi-mode: color.primitives.<mode>.<palette>.<shade>
+    for (const [mode, modeData] of Object.entries(primitivesSection)) {
+      if (typeof modeData !== "object" || modeData === null) continue;
+      const tokens: Array<{ name: string; value: string }> = [];
+      for (const palette of ["neutral-palette", "brand-palette"]) {
+        const group = (modeData as Record<string, unknown>)[palette] as Record<string, unknown> | undefined;
+        if (group) flattenTokens(group, palette, tokens);
       }
+      result.set(mode, tokens);
     }
+  } else {
+    // Fallback: flat color.<palette> (legacy structure)
+    const tokens: Array<{ name: string; value: string }> = [];
+    for (const palette of ["neutral-palette", "brand-palette"]) {
+      const group = colorSection[palette] as Record<string, unknown> | undefined;
+      if (group) flattenTokens(group, palette, tokens);
+    }
+    result.set("default", tokens);
   }
 
   return result;
