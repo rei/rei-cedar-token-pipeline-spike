@@ -35,7 +35,14 @@ function validateTokensFile(tokensFile: TokensFile): void {
  * Reads local variables from a Figma file using the Figma REST API and converts them
  * into design token JSON files following the W3C Design Tokens specification.
  *
- * @throws {Error} If PERSONAL_ACCESS_TOKEN or FILE_KEY environment variables are missing
+ * Usage:
+ *   pnpm run sync:figma-to-tokens -- --token <figma-token> --file-key <file-key> --output tokens
+ *   pnpm run sync:figma-to-tokens -- --token <figma-token> --file-keys <key1>,<key2> --output tokens
+ *
+ * Alternatively, set environment variables:
+ *   PERSONAL_ACCESS_TOKEN=<figma-token> FILE_KEYS=<file-key> pnpm run sync:figma-to-tokens -- --output tokens
+ *
+ * @throws {Error} If token or file key is missing
  */
 async function syncFileToTokens(
   api: FigmaApi,
@@ -79,16 +86,33 @@ async function syncFileToTokens(
   return filesWritten;
 }
 
+function getCliArg(index: number): string | undefined {
+  return process.argv[index];
+}
+
 async function main() {
   try {
-    if (!process.env.PERSONAL_ACCESS_TOKEN) {
-      throw new Error("PERSONAL_ACCESS_TOKEN environment variable is required");
+    // Support CLI flags: --token and --file-key (or --file-keys)
+    const tokenArgIdx = process.argv.indexOf("--token");
+    const token =
+      tokenArgIdx !== -1 ? getCliArg(tokenArgIdx + 1) : process.env.PERSONAL_ACCESS_TOKEN;
+    if (!token) {
+      throw new Error("PERSONAL_ACCESS_TOKEN env var or --token <token> CLI flag is required");
     }
 
-    // Support both FILE_KEYS (comma-separated) and legacy FILE_KEY (single)
-    const rawKeys = process.env.FILE_KEYS || process.env.FILE_KEY;
+    // Support both FILE_KEYS (comma-separated) and legacy FILE_KEY (single), or --file-key / --file-keys
+    const fileKeysArgIdx = process.argv.indexOf("--file-keys");
+    const fileKeysArgIdxLegacy = process.argv.indexOf("--file-key");
+    let rawKeys: string | undefined;
+    if (fileKeysArgIdx !== -1) {
+      rawKeys = getCliArg(fileKeysArgIdx + 1);
+    } else if (fileKeysArgIdxLegacy !== -1) {
+      rawKeys = getCliArg(fileKeysArgIdxLegacy + 1);
+    } else {
+      rawKeys = process.env.FILE_KEYS || process.env.FILE_KEY;
+    }
     if (!rawKeys) {
-      throw new Error("FILE_KEYS or FILE_KEY environment variable is required");
+      throw new Error("FILE_KEYS/FILE_KEY env var or --file-key <key> CLI flag is required");
     }
 
     const fileKeys = rawKeys
@@ -110,7 +134,7 @@ async function main() {
       baseOutputDir = providedDir;
     }
 
-    const api = new FigmaApi(process.env.PERSONAL_ACCESS_TOKEN);
+    const api = new FigmaApi(token);
     let totalFilesWritten = 0;
 
     // Clear the output directory before fetching so that files removed from
