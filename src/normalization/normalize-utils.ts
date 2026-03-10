@@ -393,10 +393,7 @@ function roundSlope(v: number): string {
 }
 
 /** Deep-merge src into dest (dest is mutated). Later files win on conflicts. */
-export function deepMerge(
-  dest: Record<string, unknown>,
-  src: Record<string, unknown>,
-): void {
+export function deepMerge(dest: Record<string, unknown>, src: Record<string, unknown>): void {
   for (const [key, value] of Object.entries(src)) {
     if (
       typeof value === "object" &&

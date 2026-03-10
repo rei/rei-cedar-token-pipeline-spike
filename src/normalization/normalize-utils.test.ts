@@ -18,7 +18,15 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { clean, deepMerge, buildCollectionToSection, nestUnderSections, extractColorMode, extractPrimitiveMode, buildSpacingClamp } from "./normalize-utils.js";
+import {
+  clean,
+  deepMerge,
+  buildCollectionToSection,
+  nestUnderSections,
+  extractColorMode,
+  extractPrimitiveMode,
+  buildSpacingClamp,
+} from "./normalize-utils.js";
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 
@@ -240,7 +248,10 @@ describe("clean", () => {
     const input = {
       a: { b: { c: { d: FIGMA_LEAF("#123456") } } },
     };
-    const result = clean(input, map) as Record<string, Record<string, Record<string, Record<string, unknown>>>>;
+    const result = clean(input, map) as Record<
+      string,
+      Record<string, Record<string, Record<string, unknown>>>
+    >;
     expect(result.a.b.c.d).toEqual({ $value: "#123456", $type: "color" });
   });
 });
@@ -256,8 +267,11 @@ describe("deepMerge", () => {
 
   it("deep-merges overlapping group keys without clobbering siblings", () => {
     const dest = { color: { surface: { base: "#fff" } } };
-    deepMerge(dest as Record<string, unknown>, { color: { text: { base: "#000" } } } as Record<string, unknown>);
-    expect((dest.color as Record<string, unknown>)).toEqual({
+    deepMerge(
+      dest as Record<string, unknown>,
+      { color: { text: { base: "#000" } } } as Record<string, unknown>,
+    );
+    expect(dest.color as Record<string, unknown>).toEqual({
       surface: { base: "#fff" },
       text: { base: "#000" },
     });
@@ -294,7 +308,10 @@ describe("nestUnderSections", () => {
       },
     ];
     const map = buildCollectionToSection(parsed);
-    const cleaned = { "neutral-palette": { white: { $value: "#fff", $type: "color" } }, "brand-palette": {} };
+    const cleaned = {
+      "neutral-palette": { white: { $value: "#fff", $type: "color" } },
+      "brand-palette": {},
+    };
     const result = nestUnderSections(cleaned, map);
     expect(Object.keys(result)).toEqual(["color"]);
     expect(Object.keys(result.color as object)).toContain("neutral-palette");
@@ -358,8 +375,12 @@ describe("nestUnderSections", () => {
 
     const modes = (canonical.color as Record<string, unknown>).modes as Record<string, unknown>;
     expect(Object.keys(modes).sort()).toEqual(["default", "sale"]);
-    expect(((modes.default as Record<string, unknown>).surface as Record<string, unknown>).base).toEqual({ $value: "#ffffff", $type: "color" });
-    expect(((modes.sale as Record<string, unknown>).surface as Record<string, unknown>).base).toEqual({ $value: "#c7370f", $type: "color" });
+    expect(
+      ((modes.default as Record<string, unknown>).surface as Record<string, unknown>).base,
+    ).toEqual({ $value: "#ffffff", $type: "color" });
+    expect(
+      ((modes.sale as Record<string, unknown>).surface as Record<string, unknown>).base,
+    ).toEqual({ $value: "#c7370f", $type: "color" });
   });
 
   it("merges bare collections and mode wrapper under the same section key", () => {
@@ -370,7 +391,9 @@ describe("nestUnderSections", () => {
     const map = buildCollectionToSection(parsed);
 
     const cleanedOptions = { "neutral-palette": { white: { $value: "#fff", $type: "color" } } };
-    const cleanedAlias = { color: { text: { link: { $value: "{color.neutral-palette.white}", $type: "color" } } } };
+    const cleanedAlias = {
+      color: { text: { link: { $value: "{color.neutral-palette.white}", $type: "color" } } },
+    };
 
     const canonical: Record<string, unknown> = {};
     deepMerge(canonical, nestUnderSections(cleanedOptions, map));
@@ -387,9 +410,7 @@ describe("nestUnderSections", () => {
   });
 
   it("nests spacing section wrapper unchanged (no colorMode effect)", () => {
-    const parsed = [
-      { file: "spacing.default.json", data: { spacing: { sm: {}, md: {} } } },
-    ];
+    const parsed = [{ file: "spacing.default.json", data: { spacing: { sm: {}, md: {} } } }];
     const map = buildCollectionToSection(parsed);
     const cleaned = { spacing: { sm: { $value: "4", $type: "dimension" } } };
     const result = nestUnderSections(cleaned, map);
@@ -446,11 +467,7 @@ describe("buildSpacingClamp", () => {
     // v_min=4.8@320, v_max=8@1600
     // slope = (8 - 4.8) / (16 - 3.2) = 3.2 / 12.8 = 0.25
     // intercept = 4.8 - 0.25 * 3.2 = 4.0
-    const files = [
-      bpFile(320, "-100", 4.8),
-      bpFile(1600, "-100", 8),
-      bpFile(2560, "-100", 8),
-    ];
+    const files = [bpFile(320, "-100", 4.8), bpFile(1600, "-100", 8), bpFile(2560, "-100", 8)];
     const result = buildSpacingClamp(files);
     const token = (result as any).spacing.scale["-100"];
     expect(token.$type).toBe("fluid");
@@ -619,7 +636,11 @@ describe("clean + nestUnderSections + deepMerge integration", () => {
     for (const { file, data } of parsed) {
       const cleaned = clean(data, collectionToSection);
       const colorMode = extractColorMode(file);
-      const nested = nestUnderSections(cleaned as Record<string, unknown>, collectionToSection, colorMode);
+      const nested = nestUnderSections(
+        cleaned as Record<string, unknown>,
+        collectionToSection,
+        colorMode,
+      );
       deepMerge(canonical, nested);
     }
 
@@ -639,7 +660,10 @@ describe("clean + nestUnderSections + deepMerge integration", () => {
 
     // default mode: text.link alias was rewritten
     const defaultMode = modes.default as Record<string, unknown>;
-    const defaultTextLink = ((defaultMode.text as Record<string, unknown>).link as Record<string, unknown>);
+    const defaultTextLink = (defaultMode.text as Record<string, unknown>).link as Record<
+      string,
+      unknown
+    >;
     expect(defaultTextLink.$value).toBe("{color.brand-palette.blue.600}");
     expect(defaultTextLink.$extensions).toBeUndefined();
 
@@ -650,7 +674,10 @@ describe("clean + nestUnderSections + deepMerge integration", () => {
 
     // Spacing alias pointing to its own section should NOT be prefixed
     const spacingSection = canonical.spacing as Record<string, unknown>;
-    const buttonSpacing = (spacingSection.component as Record<string, unknown>).button as Record<string, unknown>;
+    const buttonSpacing = (spacingSection.component as Record<string, unknown>).button as Record<
+      string,
+      unknown
+    >;
     expect(buttonSpacing.$value).toBe("{spacing.sm}");
     expect(buttonSpacing.$type).toBe("dimension");
   });
