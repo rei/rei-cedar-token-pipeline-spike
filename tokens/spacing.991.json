@@ -1,0 +1,118 @@
+{
+  "spacing": {
+    "scale": {
+      "-50": {
+        "$type": "number",
+        "$value": 3.486999988555908,
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "-100": {
+        "$type": "number",
+        "$value": 6.4770002365112305,
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "-150": {
+        "$type": "number",
+        "$value": 9.468000411987305,
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "-200": {
+        "$type": "number",
+        "$value": 12.460000038146973,
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "-250": {
+        "$type": "number",
+        "$value": 15.451000213623047,
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "-300": {
+        "$type": "number",
+        "$value": 18.441999435424805,
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "-400": {
+        "$type": "number",
+        "$value": 23.43199920654297,
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "-500": {
+        "$type": "number",
+        "$value": 28.42300033569336,
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      }
+    }
+  }
+}

@@ -35,79 +35,135 @@ function validateTokensFile(tokensFile: TokensFile): void {
  * Reads local variables from a Figma file using the Figma REST API and converts them
  * into design token JSON files following the W3C Design Tokens specification.
  *
- * @throws {Error} If PERSONAL_ACCESS_TOKEN or FILE_KEY environment variables are missing
+ * Usage:
+ *   pnpm run sync:figma-to-tokens -- --token <figma-token> --file-key <file-key> --output tokens
+ *   pnpm run sync:figma-to-tokens -- --token <figma-token> --file-keys <key1>,<key2> --output tokens
+ *
+ * Alternatively, set environment variables:
+ *   PERSONAL_ACCESS_TOKEN=<figma-token> FILE_KEYS=<file-key> pnpm run sync:figma-to-tokens -- --output tokens
+ *
+ * @throws {Error} If token or file key is missing
  */
+async function syncFileToTokens(
+  api: FigmaApi,
+  fileKey: string,
+  outputDir: string,
+): Promise<number> {
+  console.log(`\nFetching variables from Figma file: ${fileKey}...`);
+  const localVariables = await api.getLocalVariables(fileKey);
+
+  if (!localVariables.meta?.variables || Object.keys(localVariables.meta.variables).length === 0) {
+    throw new Error(`No local variables found in Figma file: ${fileKey}`);
+  }
+
+  console.log(`Found ${Object.keys(localVariables.meta.variables).length} variables in ${fileKey}`);
+  const tokensFiles = tokenFilesFromLocalVariables(localVariables);
+
+  if (Object.keys(tokensFiles).length === 0) {
+    throw new Error(`No token files generated from Figma file: ${fileKey}`);
+  }
+
+  // Validate and write each token file
+  let filesWritten = 0;
+  for (const [fileName, fileContent] of Object.entries(tokensFiles)) {
+    try {
+      validateTokensFile(fileContent);
+
+      const filePath = `${outputDir}/${fileName}`;
+      const jsonContent = JSON.stringify(fileContent, null, 2);
+      fs.writeFileSync(filePath, jsonContent, "utf-8");
+
+      console.log(`✓ Wrote ${fileName}`);
+      filesWritten++;
+    } catch (error) {
+      console.error(
+        `✗ Failed to write ${fileName}: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  return filesWritten;
+}
+
+function getCliArg(index: number): string | undefined {
+  return process.argv[index];
+}
+
 async function main() {
   try {
-    if (!process.env.PERSONAL_ACCESS_TOKEN || !process.env.FILE_KEY) {
-      throw new Error("PERSONAL_ACCESS_TOKEN and FILE_KEY environment variables are required");
-    }
-    const fileKey = process.env.FILE_KEY;
-
-    console.log(`Fetching variables from Figma file: ${fileKey}...`);
-    const api = new FigmaApi(process.env.PERSONAL_ACCESS_TOKEN);
-    const localVariables = await api.getLocalVariables(fileKey);
-
-    if (
-      !localVariables.meta?.variables ||
-      Object.keys(localVariables.meta.variables).length === 0
-    ) {
-      throw new Error("No local variables found in the Figma file");
+    // Support CLI flags: --token and --file-key (or --file-keys)
+    const tokenArgIdx = process.argv.indexOf("--token");
+    const token =
+      tokenArgIdx !== -1 ? getCliArg(tokenArgIdx + 1) : process.env.PERSONAL_ACCESS_TOKEN;
+    if (!token) {
+      throw new Error("PERSONAL_ACCESS_TOKEN env var or --token <token> CLI flag is required");
     }
 
-    console.log(`Found ${Object.keys(localVariables.meta.variables).length} variables`);
-    const tokensFiles = tokenFilesFromLocalVariables(localVariables);
-
-    if (Object.keys(tokensFiles).length === 0) {
-      throw new Error("No token files generated from Figma variables");
+    // Support both FILE_KEYS (comma-separated) and legacy FILE_KEY (single), or --file-key / --file-keys
+    const fileKeysArgIdx = process.argv.indexOf("--file-keys");
+    const fileKeysArgIdxLegacy = process.argv.indexOf("--file-key");
+    let rawKeys: string | undefined;
+    if (fileKeysArgIdx !== -1) {
+      rawKeys = getCliArg(fileKeysArgIdx + 1);
+    } else if (fileKeysArgIdxLegacy !== -1) {
+      rawKeys = getCliArg(fileKeysArgIdxLegacy + 1);
+    } else {
+      rawKeys = process.env.FILE_KEYS || process.env.FILE_KEY;
+    }
+    if (!rawKeys) {
+      throw new Error("FILE_KEYS/FILE_KEY env var or --file-key <key> CLI flag is required");
     }
 
-    let outputDir = "tokens_new";
+    const fileKeys = rawKeys
+      .split(",")
+      .map((k) => k.trim())
+      .filter(Boolean);
+
+    if (fileKeys.length === 0) {
+      throw new Error("No valid file keys provided");
+    }
+
+    let baseOutputDir = "tokens_new";
     const outputArgIdx = process.argv.indexOf("--output");
     if (outputArgIdx !== -1) {
       const providedDir = process.argv[outputArgIdx + 1];
       if (!providedDir) {
         throw new Error("--output flag requires a directory path");
       }
-      outputDir = providedDir;
+      baseOutputDir = providedDir;
     }
 
-    // Create output directory with error handling
+    const api = new FigmaApi(token);
+    let totalFilesWritten = 0;
+
+    // Clear the output directory before fetching so that files removed from
+    // Figma (deleted modes, renamed collections, etc.) don't linger and
+    // corrupt the diff.  We delete-and-recreate rather than selectively
+    // removing files so every run starts from a clean slate regardless of
+    // what collection types are present.
     try {
-      if (!fs.existsSync(outputDir)) {
-        fs.mkdirSync(outputDir, { recursive: true });
-        console.log(`Created output directory: ${outputDir}`);
+      if (fs.existsSync(baseOutputDir)) {
+        fs.rmSync(baseOutputDir, { recursive: true });
+        console.log(`Cleared output directory: ${baseOutputDir}`);
       }
+      fs.mkdirSync(baseOutputDir, { recursive: true });
+      console.log(`Created output directory: ${baseOutputDir}`);
     } catch (error) {
       throw new Error(
-        `Failed to create output directory "${outputDir}": ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to reset output directory "${baseOutputDir}": ${error instanceof Error ? error.message : String(error)}`,
       );
     }
 
-    // Validate and write each token file
-    let filesWritten = 0;
-    for (const [fileName, fileContent] of Object.entries(tokensFiles)) {
-      try {
-        // Validate token file structure
-        validateTokensFile(fileContent);
-
-        // Write file with error handling
-        const filePath = `${outputDir}/${fileName}`;
-        const jsonContent = JSON.stringify(fileContent, null, 2);
-        fs.writeFileSync(filePath, jsonContent, "utf-8");
-
-        console.log(`✓ Wrote ${fileName}`);
-        filesWritten++;
-      } catch (error) {
-        console.error(
-          `✗ Failed to write ${fileName}: ${error instanceof Error ? error.message : String(error)}`,
-        );
-        throw error;
-      }
+    for (const fileKey of fileKeys) {
+      const filesWritten = await syncFileToTokens(api, fileKey, baseOutputDir);
+      totalFilesWritten += filesWritten;
     }
 
     console.log(
-      green(`\n✅ Successfully wrote ${filesWritten} token file(s) to the ${outputDir} directory`),
+      green(
+        `\n✅ Successfully wrote ${totalFilesWritten} token file(s) from ${fileKeys.length} Figma file(s) to the ${baseOutputDir} directory`,
+      ),
     );
   } catch (error) {
     console.error("\n❌ Error:", error instanceof Error ? error.message : String(error));
