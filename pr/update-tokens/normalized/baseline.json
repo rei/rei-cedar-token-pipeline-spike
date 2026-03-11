@@ -71,541 +71,129 @@
       }
     }
   },
-  "canonical": {
-    "color": {
-      "surface": {
-        "base": {
-          "$value": "{color.brand-palette.red.400}",
-          "$type": "color"
-        },
-        "raised": {
-          "$value": "{color.neutral-palette.warm-grey.100}",
-          "$type": "color"
-        }
-      },
-      "text": {
-        "base": {
-          "$value": "{color.neutral-palette.warm-grey.900}",
-          "$type": "color"
-        },
-        "subtle": {
-          "$value": "{color.neutral-palette.warm-grey.600}",
-          "$type": "color"
-        },
-        "link": {
-          "$value": "{color.brand-palette.blue.600}",
-          "$type": "color"
-        },
-        "link-hover": {
-          "$value": "{color.brand-palette.blue.400}",
-          "$type": "color"
-        }
-      },
-      "border": {
-        "base": {
-          "$value": "{color.neutral-palette.warm-grey.300}",
-          "$type": "color"
-        },
-        "subtle": {
-          "$value": "{color.neutral-palette.warm-grey.100}",
-          "$type": "color"
-        }
-      },
-      "primitives": {
-        "ios-dark": {
-          "neutral-palette": {
-            "warm-grey": {
-              "100": {
-                "$value": "#edeae3",
-                "$type": "color"
-              },
-              "300": {
-                "$value": "#b2ab9f",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#736e65",
-                "$type": "color"
-              },
-              "900": {
-                "$value": "#2e2e2b",
-                "$type": "color"
-              }
-            },
-            "base-neutrals": {
-              "black": {
-                "$value": "#000000",
-                "$type": "color"
-              },
-              "white": {
-                "$value": "#ffffff",
-                "$type": "color"
-              },
-              "white-85": {
-                "$value": "#ffffffd9",
-                "$type": "color"
-              },
-              "white-75": {
-                "$value": "#ffffffbf",
-                "$type": "color"
-              }
-            }
-          },
-          "brand-palette": {
-            "blue": {
-              "400": {
-                "$value": "#406eb5",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#0b2d60",
-                "$type": "color"
-              }
-            },
-            "yellow": {
-              "400": {
-                "$value": "#ffbf59",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#ffe7b3",
-                "$type": "color"
-              }
-            },
-            "green": {
-              "400": {
-                "$value": "#3b8349",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#1f513f",
-                "$type": "color"
-              }
-            },
-            "red": {
-              "400": {
-                "$value": "#c7370f",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#610a0a",
-                "$type": "color"
-              }
-            }
-          }
-        },
-        "ios-light": {
-          "neutral-palette": {
-            "warm-grey": {
-              "100": {
-                "$value": "#edeae3",
-                "$type": "color"
-              },
-              "300": {
-                "$value": "#b2ab9f",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#736e65",
-                "$type": "color"
-              },
-              "900": {
-                "$value": "#1c1c1c",
-                "$type": "color"
-              }
-            },
-            "base-neutrals": {
-              "black": {
-                "$value": "#000000",
-                "$type": "color"
-              },
-              "white": {
-                "$value": "#ffffff",
-                "$type": "color"
-              },
-              "white-85": {
-                "$value": "#ffffffd9",
-                "$type": "color"
-              },
-              "white-75": {
-                "$value": "#ffffffbf",
-                "$type": "color"
-              }
-            }
-          },
-          "brand-palette": {
-            "blue": {
-              "400": {
-                "$value": "#0a84ff",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#0040dd",
-                "$type": "color"
-              }
-            },
-            "yellow": {
-              "400": {
-                "$value": "#ffbf59",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#ffe7b3",
-                "$type": "color"
-              }
-            },
-            "green": {
-              "400": {
-                "$value": "#3b8349",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#1f513f",
-                "$type": "color"
-              }
-            },
-            "red": {
-              "400": {
-                "$value": "#c7370f",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#610a0a",
-                "$type": "color"
-              }
-            }
-          }
-        },
-        "light": {
-          "neutral-palette": {
-            "warm-grey": {
-              "100": {
-                "$value": "#edeae3",
-                "$type": "color"
-              },
-              "300": {
-                "$value": "#b2ab9f",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#736e65",
-                "$type": "color"
-              },
-              "900": {
-                "$value": "#2e2e2b",
-                "$type": "color"
-              }
-            },
-            "base-neutrals": {
-              "black": {
-                "$value": "#000000",
-                "$type": "color"
-              },
-              "white": {
-                "$value": "#ffffff",
-                "$type": "color"
-              },
-              "white-85": {
-                "$value": "#ffffffd9",
-                "$type": "color"
-              },
-              "white-75": {
-                "$value": "#ffffffbf",
-                "$type": "color"
-              }
-            }
-          },
-          "brand-palette": {
-            "blue": {
-              "400": {
-                "$value": "#406eb5",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#0b2d60",
-                "$type": "color"
-              }
-            },
-            "yellow": {
-              "400": {
-                "$value": "#ffbf59",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#ffe7b3",
-                "$type": "color"
-              }
-            },
-            "red": {
-              "400": {
-                "$value": "#be342d",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#610a0a",
-                "$type": "color"
-              }
-            },
-            "green": {
-              "400": {
-                "$value": "#3b8349",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#1f513f",
-                "$type": "color"
-              }
-            }
-          }
-        },
-        "web-dark": {
-          "neutral-palette": {
-            "warm-grey": {
-              "100": {
-                "$value": "#2e2e2b",
-                "$type": "color"
-              },
-              "300": {
-                "$value": "#736e65",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#b2ab9f",
-                "$type": "color"
-              },
-              "900": {
-                "$value": "#edeae3",
-                "$type": "color"
-              }
-            },
-            "base-neutrals": {
-              "black": {
-                "$value": "#000000",
-                "$type": "color"
-              },
-              "white": {
-                "$value": "#ffffff",
-                "$type": "color"
-              },
-              "white-85": {
-                "$value": "#ffffffd9",
-                "$type": "color"
-              },
-              "white-75": {
-                "$value": "#ffffffbf",
-                "$type": "color"
-              }
-            }
-          },
-          "brand-palette": {
-            "blue": {
-              "400": {
-                "$value": "#0b2d60",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#406eb5",
-                "$type": "color"
-              }
-            },
-            "yellow": {
-              "400": {
-                "$value": "#ffe7b3",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#ffbf59",
-                "$type": "color"
-              }
-            },
-            "green": {
-              "400": {
-                "$value": "#1f513f",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#3b8349",
-                "$type": "color"
-              }
-            },
-            "red": {
-              "400": {
-                "$value": "#610a0a",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#c7370f",
-                "$type": "color"
-              }
-            }
-          }
-        },
-        "web-light": {
-          "neutral-palette": {
-            "warm-grey": {
-              "100": {
-                "$value": "#edeae3",
-                "$type": "color"
-              },
-              "300": {
-                "$value": "#b2ab9f",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#736e65",
-                "$type": "color"
-              },
-              "900": {
-                "$value": "#2e2e2b",
-                "$type": "color"
-              }
-            },
-            "base-neutrals": {
-              "black": {
-                "$value": "#000000",
-                "$type": "color"
-              },
-              "white": {
-                "$value": "#ffffff",
-                "$type": "color"
-              },
-              "white-85": {
-                "$value": "#ffffffd9",
-                "$type": "color"
-              },
-              "white-75": {
-                "$value": "#ffffffbf",
-                "$type": "color"
-              }
-            }
-          },
-          "brand-palette": {
-            "blue": {
-              "400": {
-                "$value": "#406eb5",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#0b2d60",
-                "$type": "color"
-              }
-            },
-            "yellow": {
-              "400": {
-                "$value": "#ffbf59",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#ffe7b3",
-                "$type": "color"
-              }
-            },
-            "green": {
-              "400": {
-                "$value": "#3b8349",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#1f513f",
-                "$type": "color"
-              }
-            },
-            "red": {
-              "400": {
-                "$value": "#c7370f",
-                "$type": "color"
-              },
-              "600": {
-                "$value": "#610a0a",
-                "$type": "color"
-              }
-            }
-          }
-        }
-      },
-      "neutral-palette": {
-        "warm-grey": {
-          "100": {
-            "$value": "#edeae3",
+  "color": {
+    "modes": {
+      "default": {
+        "surface": {
+          "base": {
+            "$value": "{color.neutral-palette.base-neutrals.white}",
             "$type": "color"
           },
-          "300": {
-            "$value": "#b2ab9f",
-            "$type": "color"
-          },
-          "600": {
-            "$value": "#736e65",
-            "$type": "color"
-          },
-          "900": {
-            "$value": "#2e2e2b",
+          "raised": {
+            "$value": "{color.neutral-palette.warm-grey.100}",
             "$type": "color"
           }
         },
-        "base-neutrals": {
-          "black": {
-            "$value": "#000000",
+        "text": {
+          "base": {
+            "$value": "{color.neutral-palette.warm-grey.900}",
             "$type": "color"
           },
-          "white": {
-            "$value": "#ffffff",
+          "subtle": {
+            "$value": "{color.neutral-palette.warm-grey.600}",
             "$type": "color"
           },
-          "white-85": {
-            "$value": "#ffffffd9",
+          "link": {
+            "$value": "{color.brand-palette.blue.600}",
             "$type": "color"
           },
-          "white-75": {
-            "$value": "#ffffffbf",
+          "link-hover": {
+            "$value": "{color.brand-palette.blue.400}",
+            "$type": "color"
+          }
+        },
+        "border": {
+          "base": {
+            "$value": "{color.neutral-palette.warm-grey.300}",
+            "$type": "color"
+          },
+          "subtle": {
+            "$value": "{color.neutral-palette.warm-grey.100}",
             "$type": "color"
           }
         }
       },
-      "brand-palette": {
-        "blue": {
-          "400": {
-            "$value": "#406eb5",
+      "light": {
+        "surface": {
+          "base": {
+            "$value": "{color.neutral-palette.base-neutrals.white}",
             "$type": "color"
           },
-          "600": {
-            "$value": "#0b2d60",
+          "raised": {
+            "$value": "{color.neutral-palette.warm-grey.100}",
             "$type": "color"
           }
         },
-        "yellow": {
-          "400": {
-            "$value": "#ffbf59",
+        "text": {
+          "base": {
+            "$value": "{color.neutral-palette.warm-grey.900}",
             "$type": "color"
           },
-          "600": {
-            "$value": "#ffe7b3",
+          "subtle": {
+            "$value": "{color.neutral-palette.warm-grey.600}",
+            "$type": "color"
+          },
+          "link": {
+            "$value": "{color.brand-palette.blue.600}",
+            "$type": "color"
+          },
+          "link-hover": {
+            "$value": "{color.brand-palette.blue.400}",
             "$type": "color"
           }
         },
-        "green": {
-          "400": {
-            "$value": "#3b8349",
+        "border": {
+          "base": {
+            "$value": "{color.neutral-palette.warm-grey.300}",
             "$type": "color"
           },
-          "600": {
-            "$value": "#1f513f",
+          "subtle": {
+            "$value": "{color.neutral-palette.warm-grey.100}",
+            "$type": "color"
+          }
+        }
+      },
+      "sale": {
+        "surface": {
+          "base": {
+            "$value": "{color.brand-palette.red.400}",
+            "$type": "color"
+          },
+          "raised": {
+            "$value": "{color.neutral-palette.warm-grey.100}",
             "$type": "color"
           }
         },
-        "red": {
-          "400": {
-            "$value": "#c7370f",
+        "text": {
+          "base": {
+            "$value": "{color.neutral-palette.warm-grey.900}",
             "$type": "color"
           },
-          "600": {
-            "$value": "#610a0a",
+          "subtle": {
+            "$value": "{color.neutral-palette.warm-grey.600}",
+            "$type": "color"
+          },
+          "link": {
+            "$value": "{color.brand-palette.blue.600}",
+            "$type": "color"
+          },
+          "link-hover": {
+            "$value": "{color.brand-palette.blue.400}",
+            "$type": "color"
+          }
+        },
+        "border": {
+          "base": {
+            "$value": "{color.neutral-palette.warm-grey.300}",
+            "$type": "color"
+          },
+          "subtle": {
+            "$value": "{color.neutral-palette.warm-grey.100}",
             "$type": "color"
           }
         }
       }
-    }
-  },
-  "color": {
+    },
     "primitives": {
       "ios-dark": {
         "neutral-palette": {
