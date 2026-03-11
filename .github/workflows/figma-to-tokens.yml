@@ -35,12 +35,8 @@ jobs:
           node-version: '24'
           cache: 'pnpm'
 
-      - name: Install root dependencies
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Install sd dependencies
-        run: npm install
-        working-directory: sd
 
       # ── 3. Baseline snapshot (BEFORE Figma sync) ─────────────────────────────
       - name: Build baseline snapshot
