@@ -2,7 +2,7 @@
  * normalize.ts
  *
  * Reads every *.json file from tokens/, normalizes them into a canonical tree,
- * and writes the result to sd/tokens/canonical.json.
+ * and writes the result to tokens/canonical.json.
  *
  * Normalization pipeline:
  *   1. Parse all JSON files from the tokens/ directory
@@ -62,14 +62,24 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
-import { buildCollectionToSection, clean, nestUnderSections, deepMerge, extractColorMode, extractPrimitiveMode, buildSpacingClamp } from "./normalize-utils.js";
+import {
+  buildCollectionToSection,
+  clean,
+  nestUnderSections,
+  deepMerge,
+  extractColorMode,
+  extractPrimitiveMode,
+  buildSpacingClamp,
+} from "./normalize-utils.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const tokensDir = path.resolve(__dirname, "../../../tokens");
+const tokensDir = path.resolve(__dirname, "../../tokens");
 const outFile = path.resolve(__dirname, "../../tokens/canonical.json");
 
 try {
-  const files = fs.readdirSync(tokensDir).filter((f) => f.endsWith(".json"));
+  const files = fs
+    .readdirSync(tokensDir)
+    .filter((f) => f.endsWith(".json") && f !== "canonical.json");
 
   if (files.length === 0) {
     throw new Error(`No JSON files found in ${tokensDir}. Run the Figma sync first.`);
@@ -78,7 +88,10 @@ try {
   // Parse all token files
   const parsed = files.map((file) => ({
     file,
-    data: JSON.parse(fs.readFileSync(path.join(tokensDir, file), "utf-8")) as Record<string, unknown>,
+    data: JSON.parse(fs.readFileSync(path.join(tokensDir, file), "utf-8")) as Record<
+      string,
+      unknown
+    >,
   }));
 
   // ── Fluid spacing pre-processing ──────────────────────────────────────────
@@ -99,8 +112,13 @@ try {
     }));
     const fluidSpacing = buildSpacingClamp(parsedBps);
     deepMerge(canonical, fluidSpacing);
-    const bpList = parsedBps.map((p) => p.breakpoint).sort((a, b) => a - b).join(", ");
-    console.log(`  ✓ spacing.[${bpList}].json → fluid clamp() values (${spacingBpFiles.length} breakpoints)`);
+    const bpList = parsedBps
+      .map((p) => p.breakpoint)
+      .sort((a, b) => a - b)
+      .join(", ");
+    console.log(
+      `  ✓ spacing.[${bpList}].json → fluid clamp() values (${spacingBpFiles.length} breakpoints)`,
+    );
   }
 
   // Build collection → section mapping by analyzing filenames and file content
@@ -118,10 +136,19 @@ try {
     // color.primitives.<mode> so all platform variants coexist.
     const colorMode = extractColorMode(file);
     const primitiveMode = extractPrimitiveMode(file);
-    const nested = nestUnderSections(cleaned as Record<string, unknown>, collectionToSection, colorMode, primitiveMode);
+    const nested = nestUnderSections(
+      cleaned as Record<string, unknown>,
+      collectionToSection,
+      colorMode,
+      primitiveMode,
+    );
 
     // Step 3: Merge into the growing canonical tree
-    const modeLabel = colorMode ? ` [mode: ${colorMode}]` : primitiveMode ? ` [primitives: ${primitiveMode}]` : "";
+    const modeLabel = colorMode
+      ? ` [mode: ${colorMode}]`
+      : primitiveMode
+        ? ` [primitives: ${primitiveMode}]`
+        : "";
     console.log(`  ✓ ${file}${modeLabel} (${Object.keys(data).join(", ")})`);
     deepMerge(canonical, nested);
   }

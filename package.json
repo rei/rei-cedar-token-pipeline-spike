@@ -12,8 +12,8 @@
     "sync:tokens-to-figma": "tsx src/sync/tokens-to-figma.ts",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",
+    "tokens:normalize": "tsx src/normalization/normalize.ts",
     "tokens:snapshot": "tsx src/snapshot.ts",
-    "tokens:normalize": "npm run sd:normalize --prefix sd",
     "diff:baseline": "pnpm tokens:normalize && pnpm tokens:snapshot baseline",
     "diff:current": "pnpm tokens:normalize && pnpm tokens:snapshot current",
     "test": "vitest run --reporter=verbose"

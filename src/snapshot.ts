@@ -8,7 +8,7 @@
  *   pnpm tokens:snapshot baseline   # save as dist/normalized/baseline.json
  *   pnpm tokens:snapshot current    # save as dist/normalized/current.json
  *
- * Source: sd/tokens/canonical.json  (produced by `cd sd && npm run sd:normalize`)
+ * Source: tokens/canonical.json  (produced by `pnpm tokens:normalize`)
  * Dest:   dist/normalized/<slot>.json
  *
  * The script is intentionally minimal — it reads canonical.json verbatim and
@@ -40,7 +40,7 @@ if (slot !== "baseline" && slot !== "current") {
 
 // ─── Paths ────────────────────────────────────────────────────────────────────
 
-const src = path.join(root, "sd/tokens/canonical.json");
+const src = path.join(root, "tokens/canonical.json");
 const destDir = path.join(root, "dist/normalized");
 const dest = path.join(destDir, `${slot}.json`);
 

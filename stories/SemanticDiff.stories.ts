@@ -42,7 +42,7 @@ function asyncStory(
 
     // Loading placeholder
     container.innerHTML = `
-      <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:.85rem;color:#736e65">
+      <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:1rem;color:#736e65">
         Loading token diff…
       </div>`;
 
@@ -53,7 +53,7 @@ function asyncStory(
       .catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : String(err);
         container.innerHTML = `
-          <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:.85rem;color:#be342d">
+          <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:1rem;color:#be342d">
             Error loading diff: ${msg}
           </div>`;
       });

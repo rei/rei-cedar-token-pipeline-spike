@@ -78,22 +78,22 @@ const BASE_STYLES = `
 
   /* ── Breadcrumb ── */
   .breadcrumb { display: flex; align-items: center; gap: 0.375rem; margin-bottom: 2.5rem; }
-  .bc-segment { font-family: var(--font-sans); font-size: 0.5625rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
-  .bc-sep { color: var(--rule-heavy); font-size: 0.625rem; }
+  .bc-segment { font-family: var(--font-sans); font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+  .bc-sep { color: var(--rule-heavy); font-size: 0.75rem; }
   .bc-current { color: var(--ink-muted); }
 
   /* ── Page title ── */
   .page-title-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: 0; }
-  .page-eyebrow { font-family: var(--font-sans); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 0.25rem; }
-  .page-title { font-family: var(--font-sans); font-size: 2rem; font-weight: 800; color: var(--ink); letter-spacing: -0.04em; line-height: 1; }
+  .page-eyebrow { font-family: var(--font-sans); font-size: 0.625rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 0.25rem; }
+  .page-title { font-family: var(--font-sans); font-size: 2.25rem; font-weight: 800; color: var(--ink); letter-spacing: -0.04em; line-height: 1; }
   .page-meta { text-align: right; }
   .page-meta-count { font-family: var(--font-mono); font-size: 3.5rem; font-weight: 800; color: rgba(46,46,43,0.06); line-height: 1; letter-spacing: -0.06em; }
-  .page-meta-label { font-family: var(--font-sans); font-size: 0.5rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-top: 0.15rem; }
+  .page-meta-label { font-family: var(--font-sans); font-size: 0.625rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-top: 0.15rem; }
 
   /* ── Mode tabs ── */
   .mode-tabs { display: flex; gap: 0; border-bottom: 1.5px solid var(--rule-heavy); margin: 2.5rem 0 2rem; }
   .mode-tab {
-    font-family: var(--font-sans); font-size: 0.5625rem; font-weight: 700;
+    font-family: var(--font-sans); font-size: 0.6875rem; font-weight: 700;
     letter-spacing: 0.18em; text-transform: uppercase;
     padding: 0.625rem 1.125rem 0.5625rem;
     color: var(--ink-faint); border: none; background: none; cursor: pointer;
@@ -106,34 +106,34 @@ const BASE_STYLES = `
 
   /* ── Section header ── */
   .section-header { display: flex; align-items: baseline; gap: 1.5rem; margin-bottom: 0.625rem; padding-bottom: 0.5rem; border-bottom: 1.5px solid var(--rule-heavy); }
-  .section-label  { font-family: var(--font-sans); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); }
-  .section-title  { font-family: var(--font-sans); font-size: 1rem; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
-  .section-count  { font-family: var(--font-mono); font-size: 0.5625rem; color: var(--ink-faint); margin-left: auto; }
+  .section-label  { font-family: var(--font-sans); font-size: 0.625rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); }
+  .section-title  { font-family: var(--font-sans); font-size: 1.125rem; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+  .section-count  { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--ink-faint); margin-left: auto; }
 
   /* ── Category header ── */
   .cat-header { display: flex; align-items: center; gap: 0.625rem; margin: 2.25rem 0 0.875rem; }
   .cat-pip { width: 4px; height: 4px; border-radius: 50%; background: var(--ink-muted); flex-shrink: 0; }
-  .cat-name { font-family: var(--font-sans); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-muted); }
+  .cat-name { font-family: var(--font-sans); font-size: 0.625rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-muted); }
   .cat-rule { flex: 1; height: 1px; background: var(--rule); }
 
   /* ── Token grid (single-mode) ── */
   .token-grid { display: grid; grid-template-columns: 44px 1fr 1fr auto; align-items: center; gap: 0 1.25rem; }
   .token-grid-header {
     grid-column: 1 / -1; display: grid; grid-template-columns: 44px 1fr 1fr auto; gap: 0 1.25rem;
-    font-family: var(--font-sans); font-size: 0.5rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+    font-family: var(--font-sans); font-size: 0.625rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
     color: var(--ink-faint); padding-bottom: 0.5rem; border-bottom: 1px solid var(--rule-heavy);
   }
   .trow-chip-wrap { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); }
   .trow-chip { width: 32px; height: 32px; border-radius: 3px; border: 1px solid var(--rule-heavy); display: block; }
-  .trow-token { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
-  .trow-ref { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.5625rem; font-style: italic; color: var(--ink-muted); display: flex; align-items: center; gap: 0.25rem; }
-  .trow-ref::before { content: '→'; font-style: normal; color: var(--ink-faint); font-size: 0.5rem; }
-  .trow-hex { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.625rem; color: var(--ink-muted); letter-spacing: 0.04em; text-align: right; }
+  .trow-token { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+  .trow-ref { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.6875rem; font-style: italic; color: var(--ink-muted); display: flex; align-items: center; gap: 0.25rem; }
+  .trow-ref::before { content: '→'; font-style: normal; color: var(--ink-faint); font-size: 0.625rem; }
+  .trow-hex { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-muted); letter-spacing: 0.04em; text-align: right; }
 
   /* ── Multi-mode comparison table ── */
-  .compare-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.6875rem; }
+  .compare-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.8125rem; }
   .compare-table th {
-    font-family: var(--font-sans); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+    font-family: var(--font-sans); font-size: 0.625rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
     color: var(--ink-faint); text-align: left; padding: 0.5rem 0.75rem 0.5rem 0;
     border-bottom: 1.5px solid var(--rule-heavy); white-space: nowrap;
   }
@@ -141,13 +141,13 @@ const BASE_STYLES = `
   .compare-table td { padding: 0.5rem 0.75rem 0.5rem 0; border-bottom: 1px solid var(--rule); vertical-align: middle; }
   .compare-table td.mode-val { text-align: center; padding: 0.5rem 0.875rem; }
   .compare-table tr:hover td { background: rgba(46,46,43,0.025); }
-  .cmp-token-name { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; color: var(--ink); }
+  .cmp-token-name { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 500; color: var(--ink); }
   .cmp-chip-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
   .cmp-chip { width: 30px; height: 30px; border-radius: 3px; border: 1px solid var(--rule-heavy); display: block; flex-shrink: 0; }
-  .cmp-hex { font-family: var(--font-mono); font-size: 0.5rem; color: var(--ink-faint); letter-spacing: 0.03em; }
+  .cmp-hex { font-family: var(--font-mono); font-size: 0.625rem; color: var(--ink-faint); letter-spacing: 0.03em; }
   .cmp-mode-header { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; }
   .cmp-mode-badge {
-    display: inline-block; font-family: var(--font-sans); font-size: 0.4375rem; font-weight: 700;
+    display: inline-block; font-family: var(--font-sans); font-size: 0.5625rem; font-weight: 700;
     letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-muted);
     border: 1px solid var(--rule-heavy); border-radius: 2px; padding: 0.125rem 0.375rem;
     background: rgba(46,46,43,0.04);
@@ -156,39 +156,39 @@ const BASE_STYLES = `
   /* ── Demo surfaces ── */
   .demo-card { border-radius: 4px; overflow: hidden; border: 1px solid var(--rule); margin-top: 0.5rem; }
   .demo-layer { padding: 1.125rem 1.375rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-  .demo-layer-label { font-family: var(--font-mono); font-size: 0.5625rem; font-weight: 500; letter-spacing: 0.06em; opacity: 0.55; }
-  .demo-layer-desc { font-family: var(--font-sans); font-size: 0.625rem; opacity: 0.45; letter-spacing: 0.04em; }
+  .demo-layer-label { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.06em; opacity: 0.55; }
+  .demo-layer-desc { font-family: var(--font-sans); font-size: 0.75rem; opacity: 0.45; letter-spacing: 0.04em; }
   .demo-divider { height: 1px; }
 
   /* ── Text demo ── */
   .text-demo { background: #ffffff; border: 1px solid #b2ab9f; border-radius: 4px; padding: 1.75rem 2rem 1.5rem; margin-top: 0.5rem; }
-  .text-demo-headline { font-family: var(--font-sans); font-size: 1.125rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.5rem; line-height: 1.2; }
-  .text-demo-body { font-family: var(--font-sans); font-size: 0.8125rem; line-height: 1.6; margin-bottom: 0.875rem; }
-  .text-demo-link { font-family: var(--font-mono); font-size: 0.75rem; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  .text-demo-headline { font-family: var(--font-sans); font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.5rem; line-height: 1.2; }
+  .text-demo-body { font-family: var(--font-sans); font-size: 1rem; line-height: 1.6; margin-bottom: 0.875rem; }
+  .text-demo-link { font-family: var(--font-mono); font-size: 0.875rem; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
   .text-demo-divider { height: 1px; margin: 1rem 0; }
 
   /* ── Border demo ── */
   .border-demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem; }
   .border-demo-cell { background: var(--paper); border-radius: 4px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
-  .border-demo-label { font-family: var(--font-mono); font-size: 0.5rem; color: var(--ink-faint); letter-spacing: 0.06em; }
-  .border-demo-desc { font-family: var(--font-sans); font-size: 0.75rem; color: var(--ink-muted); font-weight: 500; }
+  .border-demo-label { font-family: var(--font-mono); font-size: 0.625rem; color: var(--ink-faint); letter-spacing: 0.06em; }
+  .border-demo-desc { font-family: var(--font-sans); font-size: 0.875rem; color: var(--ink-muted); font-weight: 500; }
 
   /* ── AllSemantic mode section ── */
   .mode-section { margin-bottom: 0; }
   .mode-section + .mode-section { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 2px solid var(--rule-heavy); }
   .mode-section-title-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
   .mode-section-badge {
-    font-family: var(--font-sans); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.18em;
+    font-family: var(--font-sans); font-size: 0.625rem; font-weight: 700; letter-spacing: 0.18em;
     text-transform: uppercase; color: white; background: var(--ink-mid);
     border-radius: 2px; padding: 0.2rem 0.5rem;
   }
-  .mode-section-name { font-family: var(--font-sans); font-size: 1.5rem; font-weight: 800; color: var(--ink); letter-spacing: -0.03em; }
+  .mode-section-name { font-family: var(--font-sans); font-size: 1.75rem; font-weight: 800; color: var(--ink); letter-spacing: -0.03em; }
   .mode-section-rule { flex: 1; height: 1px; background: var(--rule); }
-  .mode-section-index { font-family: var(--font-sans); font-size: 4.5rem; font-weight: 800; color: rgba(46,46,43,0.04); line-height: 1; letter-spacing: -0.05em; }
+  .mode-section-index { font-family: var(--font-sans); font-size: 5rem; font-weight: 800; color: rgba(46,46,43,0.04); line-height: 1; letter-spacing: -0.05em; }
 
   /* ── Overview compare table ── */
   .overview-compare { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-  .overview-compare th { font-family: var(--font-sans); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-faint); padding: 0.5rem 0.875rem 0.5rem 0; border-bottom: 1.5px solid var(--rule-heavy); text-align: left; white-space: nowrap; }
+  .overview-compare th { font-family: var(--font-sans); font-size: 0.625rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-faint); padding: 0.5rem 0.875rem 0.5rem 0; border-bottom: 1.5px solid var(--rule-heavy); text-align: left; white-space: nowrap; }
   .overview-compare th.mode-th { text-align: center; padding: 0.5rem 0.75rem; }
   .overview-compare td { padding: 0.5rem 0.875rem 0.5rem 0; border-bottom: 1px solid var(--rule); vertical-align: middle; }
   .overview-compare td.mode-td { text-align: center; padding: 0.5rem 0.75rem; }
@@ -279,7 +279,7 @@ function modeCompareTable(
       const key = `color.modes.${mode}.${category}.${tok}`;
       const legacyKey = `color.${category}.${tok}`;
       const data = tokens.get(key) ?? tokens.get(legacyKey);
-      if (!data) return `<td class="mode-val"><span style="color:var(--ink-faint);font-size:0.5rem;">—</span></td>`;
+      if (!data) return `<td class="mode-val"><span style="color:var(--ink-faint);font-size:0.625rem;">—</span></td>`;
       return `
         <td class="mode-val">
           <div class="cmp-chip-wrap">
@@ -458,13 +458,13 @@ export const Text: Story = {
               <div class="text-demo-body" style="color:${textSubtle?.hex};">From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside.</div>
               <div>
                 <a class="text-demo-link" href="#" style="color:${textLink?.hex};">View all collections</a>
-                <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.5rem;color:${textLinkHover?.hex};letter-spacing:0.04em;">hover → ${textLinkHover?.hex?.slice(0, 9).toUpperCase() ?? ""}</span>
+                <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.625rem;color:${textLinkHover?.hex};letter-spacing:0.04em;">hover → ${textLinkHover?.hex?.slice(0, 9).toUpperCase() ?? ""}</span>
               </div>
               <div class="text-demo-divider" style="background:${borderBase?.hex};"></div>
               <div style="display:flex;gap:1.25rem;flex-wrap:wrap;">
                 ${keys.map((key) => {
                   const d = tokens.get(key);
-                  return `<div style="display:flex;align-items:center;gap:0.35rem;"><span style="width:7px;height:7px;border-radius:50%;border:1px solid var(--rule-heavy);flex-shrink:0;background:${d?.hex};"></span><span style="font-family:var(--font-mono);font-size:0.5rem;color:var(--ink-faint);">${key}</span></div>`;
+                  return `<div style="display:flex;align-items:center;gap:0.35rem;"><span style="width:7px;height:7px;border-radius:50%;border:1px solid var(--rule-heavy);flex-shrink:0;background:${d?.hex};"></span><span style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);">${key}</span></div>`;
                 }).join("")}
               </div>
             </div>
@@ -497,7 +497,7 @@ export const Text: Story = {
           <div class="text-demo-body" style="color:${textSubtle?.hex};">From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside.</div>
           <div>
             <a class="text-demo-link" href="#" style="color:${textLink?.hex};">View all collections</a>
-            <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.5rem;color:${textLinkHover?.hex};letter-spacing:0.04em;">hover → ${textLinkHover?.hex?.slice(0, 9).toUpperCase() ?? ""}</span>
+            <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.625rem;color:${textLinkHover?.hex};letter-spacing:0.04em;">hover → ${textLinkHover?.hex?.slice(0, 9).toUpperCase() ?? ""}</span>
           </div>
           <div class="text-demo-divider" style="background:${borderBase?.hex};"></div>
         </div>
@@ -544,17 +544,17 @@ export const Border: Story = {
                 <div class="border-demo-label">${p}border.base</div>
                 <div class="border-demo-desc" style="color:${textSubtle?.hex};">Default — cards, inputs, containers</div>
                 <div style="margin-top:0.75rem;height:1px;background:${borderBase?.hex};"></div>
-                <div style="font-family:var(--font-mono);font-size:0.5rem;color:var(--ink-faint);letter-spacing:0.06em;margin-top:0.25rem;">${borderBase?.hex?.slice(0, 9).toUpperCase()}</div>
+                <div style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);letter-spacing:0.06em;margin-top:0.25rem;">${borderBase?.hex?.slice(0, 9).toUpperCase()}</div>
               </div>
               <div class="border-demo-cell" style="border:1.5px solid ${borderSubtle?.hex};">
                 <div class="border-demo-label">${p}border.subtle</div>
                 <div class="border-demo-desc" style="color:${textSubtle?.hex};">Subtle — dividers, section separators</div>
                 <div style="margin-top:0.75rem;height:1px;background:${borderSubtle?.hex};"></div>
-                <div style="font-family:var(--font-mono);font-size:0.5rem;color:var(--ink-faint);letter-spacing:0.06em;margin-top:0.25rem;">${borderSubtle?.hex?.slice(0, 9).toUpperCase()}</div>
+                <div style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);letter-spacing:0.06em;margin-top:0.25rem;">${borderSubtle?.hex?.slice(0, 9).toUpperCase()}</div>
               </div>
             </div>
             <div style="margin-top:1rem;padding:1.25rem;background:${surfaceRaised?.hex};border-radius:4px;border-top:3px solid ${borderBase?.hex};">
-              <div style="font-family:var(--font-sans);font-size:0.5rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:0.375rem;">Usage note</div>
+              <div style="font-family:var(--font-sans);font-size:0.625rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:0.375rem;">Usage note</div>
               <div style="font-family:var(--font-sans);font-size:0.75rem;color:${textSubtle?.hex};line-height:1.6;">
                 Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${textBase?.hex};">border.base</code> for interactive and structural boundaries.
                 Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${textBase?.hex};">border.subtle</code> for low-emphasis visual separators.
@@ -594,7 +594,7 @@ export const Border: Story = {
           </div>
         </div>
         <div style="margin-top:1rem;padding:1.25rem;background:${surfaceRaised?.hex};border-radius:4px;border-top:3px solid ${borderBase?.hex};">
-          <div style="font-family:var(--font-sans);font-size:0.5rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:0.375rem;">Usage note</div>
+          <div style="font-family:var(--font-sans);font-size:0.625rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:0.375rem;">Usage note</div>
           <div style="font-family:var(--font-sans);font-size:0.75rem;color:${textSubtle?.hex};line-height:1.6;">
             Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${textBase?.hex};">border.base</code> for interactive and structural boundaries.
             Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${textBase?.hex};">border.subtle</code> for low-emphasis visual separators.
@@ -636,7 +636,7 @@ export const AllSemantic: Story = {
           const key = `color.modes.${mode}.${cat}.${tok}`;
           const legacyKey = `color.${cat}.${tok}`;
           const data = tokens.get(key) ?? tokens.get(legacyKey);
-          if (!data) return `<td class="mode-td"><span style="color:var(--ink-faint);font-size:0.5rem">—</span></td>`;
+          if (!data) return `<td class="mode-td"><span style="color:var(--ink-faint);font-size:0.625rem">—</span></td>`;
           return `
             <td class="mode-td">
               <div class="cmp-chip-wrap">
