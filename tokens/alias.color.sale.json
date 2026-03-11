@@ -3,7 +3,7 @@
     "surface": {
       "base": {
         "$type": "color",
-        "$value": "{brand-palette.red.400}",
+        "$value": "{neutral-palette.base-neutrals.white}",
         "$description": "",
         "$extensions": {
           "com.figma": {
