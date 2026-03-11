@@ -60,34 +60,34 @@ const BASE_STYLES = `
 
   /* Breadcrumb */
   .breadcrumb { display: flex; align-items: center; gap: 0.375rem; margin-bottom: 2.5rem; }
-  .bc-seg { font-family: var(--font-sans); font-size: 0.5625rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
-  .bc-sep { color: var(--rule-heavy); font-size: 0.625rem; }
+  .bc-seg { font-family: var(--font-sans); font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+  .bc-sep { color: var(--rule-heavy); font-size: 0.75rem; }
   .bc-cur { color: var(--ink-muted); }
 
   /* Page title */
   .page-title-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: 0; }
-  .page-eyebrow { font-family: var(--font-sans); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 0.25rem; }
-  .page-title { font-family: var(--font-sans); font-size: 2rem; font-weight: 800; color: var(--ink); letter-spacing: -0.04em; line-height: 1; }
+  .page-eyebrow { font-family: var(--font-sans); font-size: 0.625rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 0.25rem; }
+  .page-title { font-family: var(--font-sans); font-size: 2.25rem; font-weight: 800; color: var(--ink); letter-spacing: -0.04em; line-height: 1; }
   .page-meta-count { font-family: var(--font-mono); font-size: 3.5rem; font-weight: 800; color: rgba(46,46,43,0.06); line-height: 1; letter-spacing: -0.06em; }
-  .page-meta-label { font-family: var(--font-sans); font-size: 0.5rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-top: 0.15rem; text-align: right; }
+  .page-meta-label { font-family: var(--font-sans); font-size: 0.625rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-top: 0.15rem; text-align: right; }
 
   /* Section header */
   .section-header { display: flex; align-items: baseline; gap: 1.5rem; margin-bottom: 0.625rem; padding-bottom: 0.5rem; border-bottom: 1.5px solid var(--rule-heavy); }
-  .section-label  { font-family: var(--font-sans); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); }
-  .section-title  { font-family: var(--font-sans); font-size: 1rem; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
-  .section-count  { font-family: var(--font-mono); font-size: 0.5625rem; color: var(--ink-faint); margin-left: auto; }
+  .section-label  { font-family: var(--font-sans); font-size: 0.625rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); }
+  .section-title  { font-family: var(--font-sans); font-size: 1.125rem; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+  .section-count  { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--ink-faint); margin-left: auto; }
 
   /* Cat header */
   .cat-header { display: flex; align-items: center; gap: 0.625rem; margin: 2.25rem 0 0.875rem; }
   .cat-pip { width: 4px; height: 4px; border-radius: 50%; background: var(--ink-muted); flex-shrink: 0; }
-  .cat-name { font-family: var(--font-sans); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-muted); }
+  .cat-name { font-family: var(--font-sans); font-size: 0.625rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-muted); }
   .cat-rule { flex: 1; height: 1px; background: var(--rule); }
 
   /* Fluid token grid */
   .fluid-grid { display: grid; grid-template-columns: auto 1fr 1fr auto; align-items: center; gap: 0 1.25rem; }
   .fluid-grid-header {
     grid-column: 1 / -1; display: grid; grid-template-columns: auto 1fr 1fr auto; gap: 0 1.25rem;
-    font-family: var(--font-sans); font-size: 0.5rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+    font-family: var(--font-sans); font-size: 0.625rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
     color: var(--ink-faint); padding-bottom: 0.5rem; border-bottom: 1px solid var(--rule-heavy);
   }
   .frow-bar-wrap { padding: 0.75rem 0 0.625rem; border-bottom: 1px solid var(--rule); min-width: 120px; }
@@ -104,13 +104,13 @@ const BASE_STYLES = `
   /* Labels below the bar, flush left/right of the fill */
   .frow-bar-labels {
     display: flex; justify-content: space-between; margin-top: 4px; max-width: 240px;
-    font-family: var(--font-mono); font-size: 0.45rem; color: var(--ink-faint); white-space: nowrap;
+    font-family: var(--font-mono); font-size: 0.5625rem; color: var(--ink-faint); white-space: nowrap;
   }
-  .frow-name  { padding: 0.625rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; color: var(--ink); }
-  .frow-clamp { padding: 0.625rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.5625rem; color: var(--ink-muted); word-break: break-all; }
+  .frow-name  { padding: 0.625rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 500; color: var(--ink); }
+  .frow-clamp { padding: 0.625rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.6875rem; color: var(--ink-muted); word-break: break-all; }
   .frow-kind  { padding: 0.625rem 0; border-bottom: 1px solid var(--rule); text-align: right; }
   .frow-badge {
-    display: inline-block; font-family: var(--font-sans); font-size: 0.4375rem; font-weight: 700;
+    display: inline-block; font-family: var(--font-sans); font-size: 0.5625rem; font-weight: 700;
     letter-spacing: 0.16em; text-transform: uppercase;
     border: 1px solid var(--rule-heavy); border-radius: 2px; padding: 0.125rem 0.375rem;
     background: rgba(46,46,43,0.04); color: var(--ink-muted);
@@ -119,12 +119,12 @@ const BASE_STYLES = `
 
   /* Live demo bar */
   .demo-section { margin-top: 2.5rem; }
-  .demo-label { font-family: var(--font-sans); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 0.875rem; }
+  .demo-label { font-family: var(--font-sans); font-size: 0.625rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 0.875rem; }
   .demo-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.625rem; }
   .demo-bar { height: 20px; border-radius: 3px; background: var(--ink-mid); flex-shrink: 0; transition: width 0.3s ease; }
-  .demo-row-label { font-family: var(--font-mono); font-size: 0.5625rem; color: var(--ink-muted); white-space: nowrap; }
+  .demo-row-label { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--ink-muted); white-space: nowrap; }
   .demo-note {
-    font-family: var(--font-sans); font-size: 0.6875rem; color: var(--ink-muted); line-height: 1.6;
+    font-family: var(--font-sans); font-size: 0.8125rem; color: var(--ink-muted); line-height: 1.6;
     border-left: 2px solid var(--rule-heavy); padding-left: 1rem; margin-top: 1.5rem;
   }
 
@@ -132,11 +132,11 @@ const BASE_STYLES = `
   .alias-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center; gap: 0 1.25rem; }
   .alias-grid-header {
     grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 1.25rem;
-    font-family: var(--font-sans); font-size: 0.5rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+    font-family: var(--font-sans); font-size: 0.625rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
     color: var(--ink-faint); padding-bottom: 0.5rem; border-bottom: 1px solid var(--rule-heavy);
   }
-  .arow-cell { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.5625rem; color: var(--ink-muted); }
-  .arow-name { color: var(--ink); font-weight: 500; font-size: 0.6875rem; }
+  .arow-cell { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.6875rem; color: var(--ink-muted); }
+  .arow-name { color: var(--ink); font-weight: 500; font-size: 0.8125rem; }
   .arow-ref { font-style: italic; }
   .arow-ref::before { content: '→ '; color: var(--ink-faint); font-style: normal; }
 

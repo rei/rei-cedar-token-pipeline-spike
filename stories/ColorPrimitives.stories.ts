@@ -34,7 +34,7 @@ function asyncStory(fn: () => Promise<string>): () => HTMLElement {
     const container = document.createElement("div");
     container.style.cssText = "min-height:200px;background:#f5f2eb;";
     container.innerHTML = `
-      <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:.85rem;color:#736e65">
+      <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:1rem;color:#736e65">
         Loading token data…
       </div>`;
     fn()
@@ -45,7 +45,7 @@ function asyncStory(fn: () => Promise<string>): () => HTMLElement {
       .catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : String(err);
         container.innerHTML = `
-          <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:.85rem;color:#be342d">
+          <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:1rem;color:#be342d">
             Error loading tokens: ${msg}
           </div>`;
       });
@@ -86,22 +86,22 @@ const BASE_STYLES = `
 
   /* ── Breadcrumb ── */
   .breadcrumb { display: flex; align-items: center; gap: 0.375rem; margin-bottom: 2.5rem; }
-  .bc-segment { font-family: var(--font-sans); font-size: 0.5625rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
-  .bc-sep { color: var(--rule-heavy); font-size: 0.625rem; }
+  .bc-segment { font-family: var(--font-sans); font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+  .bc-sep { color: var(--rule-heavy); font-size: 0.75rem; }
   .bc-current { color: var(--ink-muted); }
 
   /* ── Page title ── */
   .page-title-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; }
-  .page-eyebrow { font-family: var(--font-sans); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 0.25rem; }
-  .page-title { font-family: var(--font-sans); font-size: 2rem; font-weight: 800; color: var(--ink); letter-spacing: -0.04em; line-height: 1; }
+  .page-eyebrow { font-family: var(--font-sans); font-size: 0.625rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 0.25rem; }
+  .page-title { font-family: var(--font-sans); font-size: 2.25rem; font-weight: 800; color: var(--ink); letter-spacing: -0.04em; line-height: 1; }
   .page-meta { text-align: right; }
   .page-meta-count { font-family: var(--font-mono); font-size: 3.5rem; font-weight: 800; color: rgba(46,46,43,0.06); line-height: 1; letter-spacing: -0.06em; }
-  .page-meta-label { font-family: var(--font-sans); font-size: 0.5rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-top: 0.15rem; }
+  .page-meta-label { font-family: var(--font-sans); font-size: 0.625rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-top: 0.15rem; }
 
   /* ── Mode tabs ── */
   .mode-tabs { display: flex; gap: 0; border-bottom: 1.5px solid var(--rule-heavy); margin: 2.5rem 0 2rem; }
   .mode-tab {
-    font-family: var(--font-sans); font-size: 0.5625rem; font-weight: 700;
+    font-family: var(--font-sans); font-size: 0.6875rem; font-weight: 700;
     letter-spacing: 0.18em; text-transform: uppercase;
     padding: 0.625rem 1.125rem 0.5625rem;
     color: var(--ink-faint); border: none; background: none; cursor: pointer;
@@ -118,14 +118,14 @@ const BASE_STYLES = `
     margin-bottom: 0.5rem; padding-bottom: 0.5rem;
     border-bottom: 1.5px solid var(--rule-heavy);
   }
-  .section-label { font-family: var(--font-sans); font-size: 0.625rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); }
-  .section-title { font-family: var(--font-sans); font-size: 1.125rem; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
-  .section-count { font-family: var(--font-mono); font-size: 0.625rem; color: var(--ink-faint); margin-left: auto; }
+  .section-label { font-family: var(--font-sans); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); }
+  .section-title { font-family: var(--font-sans); font-size: 1.25rem; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+  .section-count { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-faint); margin-left: auto; }
 
   /* ── Group header ── */
   .group-header { display: flex; align-items: center; gap: 0.625rem; margin: 2rem 0 1rem; }
   .group-pip { width: 4px; height: 4px; border-radius: 50%; background: var(--ink-muted); }
-  .group-name { font-family: var(--font-sans); font-size: 0.625rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-muted); }
+  .group-name { font-family: var(--font-sans); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-muted); }
   .group-rule { flex: 1; height: 1px; background: var(--rule); }
 
   /* ── Swatch panorama strip ── */
@@ -141,7 +141,7 @@ const BASE_STYLES = `
   .strip-segment:not(:last-child) { border-right: 1px solid rgba(255,255,255,0.18); }
   .strip-label {
     position: absolute; bottom: 0; left: 0; right: 0;
-    padding: 0.3rem 0.5rem; font-family: var(--font-mono); font-size: 0.5625rem; font-weight: 500;
+    padding: 0.3rem 0.5rem; font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500;
     white-space: nowrap; overflow: hidden; opacity: 0;
     transition: opacity 0.2s ease; pointer-events: none;
   }
@@ -151,7 +151,7 @@ const BASE_STYLES = `
   .token-table { width: 100%; border-collapse: collapse; margin-top: 0.75rem; }
   .token-table thead tr { border-bottom: 1px solid var(--rule-heavy); }
   .token-table th {
-    font-family: var(--font-sans); font-size: 0.5625rem; font-weight: 600;
+    font-family: var(--font-sans); font-size: 0.6875rem; font-weight: 600;
     letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint);
     text-align: left; padding: 0 0 0.5rem;
   }
@@ -162,8 +162,8 @@ const BASE_STYLES = `
   .token-table td { padding: 0.625rem 0; vertical-align: middle; }
   .td-swatch { width: 36px; padding-right: 0.75rem !important; }
   .swatch-chip { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--rule-heavy); display: inline-block; }
-  .td-token { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
-  .td-hex { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--ink-muted); text-align: right; letter-spacing: 0.04em; }
+  .td-token { font-family: var(--font-mono); font-size: 0.875rem; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+  .td-hex { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--ink-muted); text-align: right; letter-spacing: 0.04em; }
 
   /* ── Section spacing ── */
   .token-section { margin-bottom: 3.5rem; }
@@ -179,9 +179,9 @@ const BASE_STYLES = `
   .primitives-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem 4rem; }
 
   /* ── Cross-mode comparison ── */
-  .compare-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.6875rem; }
+  .compare-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.8125rem; }
   .compare-table th {
-    font-family: var(--font-sans); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+    font-family: var(--font-sans); font-size: 0.625rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
     color: var(--ink-faint); text-align: left; padding: 0.5rem 0.75rem 0.5rem 0;
     border-bottom: 1.5px solid var(--rule-heavy); white-space: nowrap;
   }
@@ -191,7 +191,7 @@ const BASE_STYLES = `
   .compare-table tr:hover td { background: rgba(46,46,43,0.025); }
   .cmp-chip-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
   .cmp-chip { width: 30px; height: 30px; border-radius: 3px; border: 1px solid var(--rule-heavy); display: block; flex-shrink: 0; }
-  .cmp-hex { font-family: var(--font-mono); font-size: 0.5rem; color: var(--ink-faint); letter-spacing: 0.03em; }
+  .cmp-hex { font-family: var(--font-mono); font-size: 0.625rem; color: var(--ink-faint); letter-spacing: 0.03em; }
   .cmp-mode-badge {
     display: inline-block; font-family: var(--font-sans); font-size: 0.4375rem; font-weight: 700;
     letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-muted);
