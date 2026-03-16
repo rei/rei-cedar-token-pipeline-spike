@@ -59,6 +59,20 @@ function escapeHtml(value: string): string {
 }
 
 function formatSnapshotLabel(entry: SnapshotManifestEntry): string {
+  if (entry.label && entry.slot === "current") {
+    const date = new Date(entry.label);
+    if (!Number.isNaN(date.getTime())) {
+      return date.toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+    }
+  }
+
   const date = new Date(entry.createdAt);
   const formatted = Number.isNaN(date.getTime())
     ? entry.createdAt
@@ -70,7 +84,7 @@ function formatSnapshotLabel(entry: SnapshotManifestEntry): string {
         minute: "2-digit",
         second: "2-digit",
       });
-  return `${formatted} (${entry.slot})`;
+  return entry.slot === "current" ? formatted : `${formatted} (${entry.slot})`;
 }
 
 function optionMarkup(
