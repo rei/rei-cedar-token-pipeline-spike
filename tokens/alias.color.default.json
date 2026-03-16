@@ -86,6 +86,20 @@
             "codeSyntax": {}
           }
         }
+      },
+      "sale": {
+        "$type": "color",
+        "$value": "{brand-palette.red.400}",
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
       }
     },
     "border": {
