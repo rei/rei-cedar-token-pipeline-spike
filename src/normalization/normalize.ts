@@ -2,7 +2,7 @@
  * normalize.ts
  *
  * Reads every *.json file from tokens/, normalizes them into a canonical tree,
- * and writes the result to tokens/canonical.json.
+ * and writes the result to canonical/tokens.json.
  *
  * Normalization pipeline:
  *   1. Parse all JSON files from the tokens/ directory
@@ -14,7 +14,7 @@
  *         - For alias.color.<mode>.json files, semantic tokens are nested under
  *           color.modes.<mode> to preserve per-mode values
  *      c. deepMerge         → accumulate into the canonical tree
- *   4. Write canonical.json with section-nested structure
+ *   4. Write canonical/tokens.json with section-nested structure
  *
  * Input file naming convention (from Figma sync):
  *   {collection}.{section}.{mode}.json
@@ -26,7 +26,7 @@
  *   - spacing.default.json       → spacing dimensions
  *   - typography.font.regular.json → typography tokens
  *
- * Output canonical.json structure:
+ * Output canonical/tokens.json structure:
  *   {
  *     "color": {
  *       "modes": {
@@ -74,12 +74,10 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const tokensDir = path.resolve(__dirname, "../../tokens");
-const outFile = path.resolve(__dirname, "../../tokens/canonical.json");
+const outFile = path.resolve(__dirname, "../../canonical/tokens.json");
 
 try {
-  const files = fs
-    .readdirSync(tokensDir)
-    .filter((f) => f.endsWith(".json") && f !== "canonical.json");
+  const files = fs.readdirSync(tokensDir).filter((f) => f.endsWith(".json"));
 
   if (files.length === 0) {
     throw new Error(`No JSON files found in ${tokensDir}. Run the Figma sync first.`);
@@ -162,6 +160,6 @@ try {
     `  ${files.length} file(s) merged, ${Object.keys(canonical).length} top-level section(s): ${Object.keys(canonical).join(", ")}`,
   );
 } catch (error) {
-  console.error("Error creating canonical.json:", error);
+  console.error("Error creating canonical/tokens.json:", error);
   process.exit(1);
 }
