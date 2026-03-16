@@ -3,7 +3,7 @@
     "surface": {
       "base": {
         "$type": "color",
-        "$value": "{brand-palette.red.400}",
+        "$value": "{neutral-palette.base-neutrals.white}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -76,6 +76,20 @@
       "link-hover": {
         "$type": "color",
         "$value": "{brand-palette.blue.400}",
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "sale": {
+        "$type": "color",
+        "$value": "{brand-palette.red.600}",
         "$description": "",
         "$extensions": {
           "com.figma": {
