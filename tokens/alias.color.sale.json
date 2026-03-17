@@ -3,7 +3,7 @@
     "surface": {
       "base": {
         "$type": "color",
-        "$value": "{neutral-palette.base-neutrals.white}",
+        "$value": "{brand-palette.red.400}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -17,7 +17,7 @@
       },
       "raised": {
         "$type": "color",
-        "$value": "{neutral-palette.warm-grey.100}",
+        "$value": "{neutral-palette.warm-grey.600}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -33,7 +33,7 @@
     "text": {
       "base": {
         "$type": "color",
-        "$value": "{neutral-palette.warm-grey.900}",
+        "$value": "{brand-palette.yellow.600}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -47,7 +47,7 @@
       },
       "subtle": {
         "$type": "color",
-        "$value": "{neutral-palette.warm-grey.600}",
+        "$value": "{brand-palette.yellow.400}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -61,7 +61,7 @@
       },
       "link": {
         "$type": "color",
-        "$value": "{brand-palette.blue.600}",
+        "$value": "{brand-palette.red.600}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -75,7 +75,7 @@
       },
       "link-hover": {
         "$type": "color",
-        "$value": "{brand-palette.blue.400}",
+        "$value": "{neutral-palette.warm-grey.300}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -89,7 +89,7 @@
       },
       "sale": {
         "$type": "color",
-        "$value": "{brand-palette.red.600}",
+        "$value": "{brand-palette.green.400}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -105,7 +105,7 @@
     "border": {
       "base": {
         "$type": "color",
-        "$value": "{neutral-palette.warm-grey.300}",
+        "$value": "{neutral-palette.warm-grey.100}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -119,7 +119,7 @@
       },
       "subtle": {
         "$type": "color",
-        "$value": "{neutral-palette.warm-grey.100}",
+        "$value": "{neutral-palette.warm-grey.900}",
         "$description": "",
         "$extensions": {
           "com.figma": {
