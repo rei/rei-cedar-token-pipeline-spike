@@ -77,7 +77,10 @@ const tokensDir = path.resolve(__dirname, "../../tokens");
 const outFile = path.resolve(__dirname, "../../canonical/tokens.json");
 
 try {
-  const files = fs.readdirSync(tokensDir).filter((f) => f.endsWith(".json"));
+  const files = fs
+    .readdirSync(tokensDir)
+    .filter((f) => f.endsWith(".json"))
+    .sort((left, right) => left.localeCompare(right));
 
   if (files.length === 0) {
     throw new Error(`No JSON files found in ${tokensDir}. Run the Figma sync first.`);
