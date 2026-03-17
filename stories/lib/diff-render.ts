@@ -257,11 +257,15 @@ const FONTS = `<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">`;
 
-export function renderDiffPage(
+function renderDiffContent(
   entries: DiffEntry[],
-  opts: { baselineLabel?: string; currentLabel?: string } = {},
+  opts: { baselineLabel?: string; currentLabel?: string; title?: string } = {},
 ): string {
-  const { baselineLabel = "baseline", currentLabel = "current" } = opts;
+  const {
+    baselineLabel = "baseline",
+    currentLabel = "current",
+    title = "Token Diff",
+  } = opts;
 
   const sections = groupBySectionPath(entries);
   const sectionBlocks = [...sections.entries()]
@@ -270,6 +274,50 @@ export function renderDiffPage(
 
   const noChanges = entries.length === 0;
 
+  return `
+  <div style="margin-bottom:32px;border-bottom:2px solid ${COLOR.ink};padding-bottom:16px">
+    <div style="font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${COLOR.inkFaint};margin-bottom:6px">Cedar Design Tokens</div>
+    <h1 style="margin:0;font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-.02em;line-height:1.1">${title}</h1>
+    <div style="margin-top:8px;font-size:.78rem;color:${COLOR.inkFaint}">
+      Comparing <code style="background:${COLOR.removedBorder}22;padding:1px 5px;border-radius:3px">${baselineLabel}</code>
+      → <code style="background:${COLOR.addedBorder}22;padding:1px 5px;border-radius:3px">${currentLabel}</code>
+    </div>
+  </div>
+
+  ${summaryBar(entries)}
+
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;font-size:.72rem;font-family:'Syne',sans-serif;letter-spacing:.04em;color:${COLOR.inkFaint}">
+    <span>● Sections are expanded by default — click to collapse</span>
+    <span>● Unchanged tokens are not shown</span>
+  </div>
+
+  ${noChanges
+    ? `<p style="font-size:.9rem;color:${COLOR.inkFaint}">Baseline and current are identical.</p>`
+    : sectionBlocks}`;
+}
+
+export function renderDiffPanel(
+  entries: DiffEntry[],
+  opts: { baselineLabel?: string; currentLabel?: string; title?: string } = {},
+): string {
+  return `
+  <section style="
+    background:${COLOR.paper};
+    color:${COLOR.ink};
+    border:1px solid ${COLOR.rule};
+    border-radius:10px;
+    padding:28px 24px;
+    box-sizing:border-box;
+    overflow:hidden;
+  ">
+    ${renderDiffContent(entries, opts)}
+  </section>`;
+}
+
+export function renderDiffPage(
+  entries: DiffEntry[],
+  opts: { baselineLabel?: string; currentLabel?: string; title?: string } = {},
+): string {
   return `
 ${FONTS}
 <div style="
@@ -280,27 +328,6 @@ ${FONTS}
   padding:40px 32px;
   box-sizing:border-box;
 ">
-  <!-- Header -->
-  <div style="margin-bottom:32px;border-bottom:2px solid ${COLOR.ink};padding-bottom:16px">
-    <div style="font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${COLOR.inkFaint};margin-bottom:6px">Cedar Design Tokens</div>
-    <h1 style="margin:0;font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-.02em;line-height:1.1">Token Diff</h1>
-    <div style="margin-top:8px;font-size:.78rem;color:${COLOR.inkFaint}">
-      Comparing <code style="background:${COLOR.removedBorder}22;padding:1px 5px;border-radius:3px">${baselineLabel}</code>
-      → <code style="background:${COLOR.addedBorder}22;padding:1px 5px;border-radius:3px">${currentLabel}</code>
-    </div>
-  </div>
-
-  <!-- Summary pills -->
-  ${summaryBar(entries)}
-
-  <!-- Legend row -->
-  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;font-size:.72rem;font-family:'Syne',sans-serif;letter-spacing:.04em;color:${COLOR.inkFaint}">
-    <span>● Sections are expanded by default — click to collapse</span>
-    <span>● Unchanged tokens are not shown</span>
-  </div>
-
-  ${noChanges
-    ? `<p style="font-size:.9rem;color:${COLOR.inkFaint}">Baseline and current are identical.</p>`
-    : sectionBlocks}
+  ${renderDiffContent(entries, opts)}
 </div>`;
 }
