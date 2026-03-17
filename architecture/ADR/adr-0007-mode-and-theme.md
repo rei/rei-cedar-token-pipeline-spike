@@ -23,6 +23,37 @@ This ADR defines Cedar's mode architecture, palette architecture, and cross-plat
 
 ---
 
+## Spike Findings
+
+The V0 spike revealed an important architectural reality about how appearances (light/dark) are handled in the pipeline that differs from the model described in this ADR.
+
+### How appearances actually work in the spike
+
+This ADR defines three Figma modes (`light`, `dark`, `high-contrast`) as the mode axis, with mode values stored on alias tokens as `$extensions.cedar.modes.{light, dark}`.
+
+The spike found a different, validated model:
+
+1. **Figma exports four separate files** for platform × appearance combinations — there is no single "dark mode" file for all platforms
+2. **Appearances are encoded on option tokens** as `$extensions.cedar.appearances.dark`, not on alias tokens
+3. **Alias tokens do not carry mode values** — they carry option token references per platform (`$extensions.cedar.ios/web`)
+4. **The Transform Layer resolves appearances** by reading option token appearance data at build time
+
+This means the CSS Transform does not receive a "dark mode alias file" from Figma — it reads the dark hex from `color.option.*` directly.
+
+### Impact on high-contrast mode
+
+High-contrast mode has no implementation path in the current architecture. The four Figma platform files encode only light and dark. High-contrast would require either:
+- Two additional Figma files (`options.color.web-high-contrast.json`, etc.) under the four-file convention
+- A computed approach where high-contrast values are derived algorithmically from the option palette
+
+This is an open architectural question that must be resolved before high-contrast is scoped.
+
+### Impact on the mode model described in Section 7
+
+Section 7's canonical model representation (storing mode values as `$extensions.cedar.modes.*` on alias tokens) is **not implemented in the spike**. The validated model uses option token appearances instead. Section 7 should be treated as aspirational until a future ADR reconciles these two approaches.
+
+---
+
 ## Decision
 
 Cedar adopts a separation of concerns approach:

@@ -1,163 +1,208 @@
-# V0 Architecture — Cedar Token Pipeline Spike
+# V0 Architecture — Cedar Token Pipeline Spike (Actual)
 
-This document describes the **V0 architecture** for Cedar’s token pipeline spike.  
-V0 is intentionally **one‑directional (Figma → Canonical → Style Dictionary)** and is designed to validate feasibility, reduce manual effort, and establish a stable foundation for future automation.
-
-Although V0 is limited in scope, the architecture includes **explicit future ports** that enable bidirectional sync and automated governance in V1+ without re‑architecture.
+This document describes the **V0 architecture as built and validated** during the Cedar token pipeline spike.
+It has been updated from the original plan to reflect what was actually implemented.
 
 ---
 
-# Architectural Goals
+## What Changed from the Original Plan
 
-- Support PM’s requirement that **design originates token changes**
-- Validate a **manual, one‑directional pipeline** from Figma → Canonical → SD
-- Establish a **normalized token contract** as the canonical interface
-- Demonstrate **diffing**, **impact detection**, and **manual governance**
-- Produce **SD‑ready outputs** (CSS + optional Figma‑shaped JSON)
-- Ensure the architecture is **future‑proof** for reverse‑sync and automation
+The original V0 plan described:
+- Mock data and mock components
+- A Diff Layer producing `diff.json`
+- An Impact Detection layer producing `impact.json`
+- Manual governance via `governance.md`
+- Single-mode (light only)
 
----
-
-# Architecture Diagrams
-
-### Production Pipeline Overview
-
-![V0 Architecture](../../assets/v0-architecture.png)
-
-### Notes
-- **Port A (future sync‑back):** SD → Figma using a Figma‑shaped JSON payload  
-- **Port B (future proposal intake):** External design‑side proposal sources → Normalized Contract  
-- V0 implements only the **downward flow**, but the architecture is shaped to support both ports later.
+**What the spike actually produced:**
+- Real REI Figma exports (not mock data)
+- No Diff Layer (started in PR #4, not merged)
+- No Impact Detection
+- Automated governance via `token-mapping.json` build-fail
+- Multi-appearance (light and dark) via four platform files
 
 ---
 
-# Layer‑by‑Layer Breakdown
+## Architectural Goals — Status
 
-## 1. Figma (Proposal Environment)
-- Designers originate token changes.
-- Figma Variables API provides raw JSON.
-- Figma is **not** the canonical source of truth — only the **originating environment**.
-
-**Output:** `raw-figma-variables.json`
-
----
-
-## 2. Ingestion Layer
-- Raw Figma JSON is exported manually.
-- No transformation occurs here.
-
-**Output:** `raw-figma-variables.json`
+| Goal | Status |
+|---|---|
+| Design originates token changes | ✓ Figma Variables API → normalization pipeline |
+| One-directional pipeline validated | ✓ Figma → Canonical → SD → Platform outputs |
+| Normalized token contract established | ✓ `canonical.json` with DTCG structure |
+| Produce SD-ready platform outputs | ✓ CSS (light + dark) and iOS colorsets |
+| Future-proof for reverse-sync | ○ Port A not implemented — canonical structure supports it |
 
 ---
 
-## 3. Normalization Layer
-Transforms raw Figma variables into the **V0 canonical shape**.
+## Architecture Overview
 
-In V0, normalization:
-- Converts Figma variable IDs → canonical token paths  
-- Applies DTCG structure (`$type`, `$value`)  
-- Preserves metadata in `$extensions.cedar`  
-- Processes **color tokens only**  
-- Ignores local styles, composite tokens, multi‑mode, multi‑collection  
-
-**Output:** `canonical.json` (pre‑validation)
-
----
-
-## 4. Diff Layer
-Compares two canonical snapshots.
-
-Detects:
-- added tokens  
-- modified tokens  
-- removed tokens  
-
-**Output:** `diff.json`
-
----
-
-## 5. Impact Detection
-Maps variable changes to affected components.
-
-In V0, this is lightweight and mock‑based.
-
-**Output:** `impact.json`
-
----
-
-## 6. Governance Layer
-Applies **V0 canonical shape validation** (derived from ADR‑0001).
-
-In V0:
-- Only color tokens are allowed  
-- Only canonical shape is validated  
-- No naming grammar or semantic grammar enforcement  
-
-**Output:** `governance.md` (manual notes)
+```
+┌─────────────────────────────────────────────────────┐
+│                    FIGMA                            │
+│  Variables API → eight JSON files in tokens/        │
+└──────────────────────┬──────────────────────────────┘
+                       │ (GitHub Action)
+                       ▼
+┌─────────────────────────────────────────────────────┐
+│              NORMALIZATION LAYER                    │
+│                                                     │
+│  token-mapping.json ──→ normalize.ts                │
+│  (governance contract)   (TypeScript)               │
+│         │                    │                      │
+│         │    ┌───────────────┘                      │
+│         ▼    ▼                                      │
+│      canonical.json                                 │
+│      (single source of truth)                       │
+└──────────────────────┬──────────────────────────────┘
+                       │
+                       ▼
+┌─────────────────────────────────────────────────────┐
+│              STYLE DICTIONARY                       │
+│                                                     │
+│  cedar/ios platform          cedar/web platform     │
+│  ├── name/ios-camel          ├── name/camel          │
+│  └── ios-colorset action     └── web-css action     │
+│        │                           │                │
+│        ▼                           ▼                │
+│  Colors.xcassets/           light.css + dark.css    │
+└─────────────────────────────────────────────────────┘
+```
 
 ---
 
-## 7. Style Dictionary (Transform Layer)
-Consumes the **validated canonical model** and produces platform‑specific outputs.
+## Layer-by-Layer Breakdown
 
-In V0:
-- CSS variables  
-- JS/TS token exports  
-- Optional Figma‑shaped JSON for future sync‑back  
-- No publishing or versioning  
+### 1. Figma (Proposal Environment)
 
-**Output:** `dist/`
+Designers originate token changes in Figma. The pipeline consumes Figma Variables via the REST API.
 
----
+Figma is the **originating environment**, not the canonical source of truth.
 
-## 8. Output Layer
-V0 produces:
-
-- **CSS variables** for consumers  
-- **JS/TS token exports**  
-- **Figma‑shaped JSON** (future sync‑back placeholder)
-
-**Artifacts:**
-- `sd-output-css.txt`
-- `sd-output-figma.json`
-- `dist/`
+**Output:** Eight or more JSON files in `tokens/` (populated by GitHub Action)
 
 ---
 
-# Future‑Ready Ports
+### 2. Normalization Layer
 
-## Port A — Sync Back to Figma
-- Uses SD’s Figma‑shaped JSON output.
-- Enables SD → Figma updates.
-- Prevents drift between design and code.
-- Not implemented in V0.
+`normalize.ts` transforms all Figma input files into `canonical.json`.
 
-## Port B — Design Proposal Intake
-- Allows proposals from:
-  - Figma plugins  
-  - design tools  
-  - external proposal systems  
-- Normalizes proposals into the token contract.
-- Not implemented in V0.
+**Governance mechanism:** `token-mapping.json` is the explicit, version-controlled mapping from Figma collection paths to canonical `color.option.*` paths. The build fails immediately if any Figma token path is not in the mapping. This is the primary governance mechanism — not a separate validation step.
 
----
+**Inputs:**
+- `tokens/*.json` — Figma exports
+- `tokens/token-mapping.json` — governance contract
 
-# Why This Architecture Is Future‑Proof
+**Output:** `tokens/canonical.json`
 
-- The **normalized token contract** is the backbone of both directions.
-- Governance sits **between** proposal and canonical truth.
-- SD outputs include a **Figma‑shaped JSON** payload for future sync‑back.
-- Diffing and impact detection are **direction‑agnostic**.
-- No layer needs to be rewritten when bidirectional sync is added.
-- V0 constraints (color‑only, single‑mode) do not affect V1 extensibility.
+**What normalization does NOT do:**
+- Infer canonical paths from Figma names (all mappings are explicit)
+- Apply naming grammar enforcement (V1)
+- Validate alias cycles (V1)
+- Publish or version
 
 ---
 
-# Related Files
+### 3. ~~Diff Layer~~ (Not implemented — V1)
 
-- `/README.md` — Architecture index  
-- `/spike/v0-spike-plan.md` — Full V0 scope and implementation plan  
-- `/artifacts/` — JSON artifacts for each layer  
-- `/notes/` — governance, risks, learnings  
+The original plan described a diff layer comparing canonical snapshots and producing `diff.json`.
+
+PR #4 started a diff engine and Storybook token browser. This work is not merged and is scoped for V1.
 
 ---
+
+### 4. ~~Impact Detection~~ (Not implemented — V1)
+
+The original plan described mapping token changes to affected components. Not implemented.
+
+---
+
+### 5. Governance Layer
+
+**Original plan:** Manual canonical shape validation.
+
+**Actual implementation:** `token-mapping.json` build-fail. Any unmapped Figma path fails the build with a specific error naming the path. This is automatic, not manual.
+
+Manual governance notes are still maintained in `notes/governance.md` for cases where judgment is required (e.g. deciding whether a value difference warrants a `platformOverride` vs a new option token).
+
+---
+
+### 6. Style Dictionary (Transform Layer)
+
+Consumes `canonical.json` and produces platform outputs via custom actions.
+
+**Two platforms validated:**
+
+**`cedar/ios`** — produces `Colors.xcassets/`
+- Name transform: `name/ios-camel` (drops structural path segments, produces camelCase)
+- Action: `ios-colorset` — resolves option token references, applies iOS platform overrides, converts to Display P3, writes `.colorset` files
+
+**`cedar/web`** — produces `light.css` and `dark.css`
+- Action: `web-css` — resolves option token references, reads web light `$value` and dark `appearances.dark`, writes CSS custom properties
+
+**Key SD v5 constraints discovered:**
+- Value transforms don't run before actions when `files: []` — all resolution happens in actions
+- SD resolves `{ref}` syntax in `$extensions` — path strings must be stored without braces
+- Built-in SD transform groups (`ios`, `css`) must not be used — namespace as `cedar/ios`, `cedar/web`
+
+See ADR-0005 Addendum for full constraint documentation.
+
+---
+
+### 7. Output Layer
+
+**Validated outputs:**
+
+| Output | Description |
+|---|---|
+| `dist/css/light.css` | CSS custom properties, web-light values |
+| `dist/css/dark.css` | CSS custom properties, web-dark values |
+| `dist/ios/Colors.xcassets/` | Xcode color asset catalog, iOS Display P3 light/dark |
+
+**Not yet implemented (V1):**
+
+| Output | Description |
+|---|---|
+| `dist/ios/ColorTokens.swift` | Swift constants |
+| `dist/android/colors.xml` | Android color resources |
+| `@rei/tokens` NPM package | Distribution |
+
+---
+
+## Future-Ready Ports
+
+### Port A — Sync Back to Figma
+
+SD → Figma using a Figma-shaped JSON payload. Not implemented in V0. The canonical structure supports it — the `color.option.*` tree and alias token structure provide enough information to reconstruct Figma variable values.
+
+### Port B — Design Proposal Intake
+
+External proposal sources → normalized contract. Not implemented in V0.
+
+---
+
+## V1 Work Remaining
+
+Derived from spike findings:
+
+- `color.modes` → `color.palettes` path rename
+- TypeScript canonical token types
+- Diff engine and Storybook token browser (PR #4 work)
+- Naming grammar enforcement in normalization
+- Alias cycle detection
+- High-contrast mode implementation path
+- Android output
+- Swift constants output
+- `@rei/tokens` NPM publishing
+- `$extensions.cedar` staleness CI check
+- CODEOWNERS on `token-mapping.json`
+
+---
+
+## Related Files
+
+- `/README.md` — Architecture index
+- `/notes/governance.md` — Governance validation
+- `/notes/risks.md` — Risk matrix
+- `/pipeline-dictionary.md` — Function reference
+- `/canonical-breaking-changes.md` — Breaking changes for consumers

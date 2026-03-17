@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "lint": "oxlint src",
     "format": "oxfmt --write src",
@@ -12,6 +13,7 @@
     "sync:tokens-to-figma": "tsx src/sync/tokens-to-figma.ts",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",
+    "tokens:build": "pnpm tokens:normalize && tsx style-dictionary/build.ts",
     "tokens:normalize": "tsx src/normalization/normalize.ts",
     "tokens:snapshot": "tsx src/snapshot.ts",
     "diff:baseline": "pnpm tokens:normalize && pnpm tokens:snapshot baseline",
@@ -47,6 +49,7 @@
     "oxfmt": "^0.36.0",
     "oxlint": "^1.51.0",
     "storybook": "^10.2.15",
+    "style-dictionary": "^5.3.3",
     "tsx": "^4.21.0",
     "vitest": "^4.0.18"
   }

@@ -26,6 +26,9 @@ import {
   extractColorMode,
   extractPrimitiveMode,
   buildSpacingClamp,
+  applyTokenMapping,
+  buildOptionTree,
+  type TokenMapping,
 } from "./normalize-utils.js";
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
@@ -409,7 +412,22 @@ describe("nestUnderSections", () => {
     expect((modes.default as Record<string, unknown>).text).toBeDefined();
   });
 
-  it("nests spacing section wrapper unchanged (no colorMode effect)", () => {
+  it("does not accept bare collections — options files must go through applyTokenMapping", () => {
+    // nestUnderSections no longer handles options.color.*.json files.
+    // They are processed upstream via applyTokenMapping + buildOptionTree.
+    // A bare color collection reaching nestUnderSections is a pipeline error.
+    const map = new Map([["neutral-palette", "color"]]);
+    const cleaned = { "neutral-palette": { white: { $value: "#fff", $type: "color" } } };
+    // With no primitiveMode param, bare color collections fall through to the
+    // "section !== color" guard and are silently skipped (they have no place
+    // in the alias file processing path). The option tree comes from buildOptionTree.
+    const result = nestUnderSections(cleaned, map);
+    // color section may or may not exist; what matters is no "primitives" key
+    const colorSection = result.color as Record<string, unknown> | undefined;
+    expect(colorSection?.["primitives"]).toBeUndefined();
+  });
+
+  it("nests spacing section wrapper unchanged (no colorMode effect) (no colorMode effect)", () => {
     const parsed = [{ file: "spacing.default.json", data: { spacing: { sm: {}, md: {} } } }];
     const map = buildCollectionToSection(parsed);
     const cleaned = { spacing: { sm: { $value: "4", $type: "dimension" } } };
@@ -578,6 +596,114 @@ describe("buildSpacingClamp", () => {
   });
 });
 
+// ─── applyTokenMapping ────────────────────────────────────────────────────────
+
+describe("applyTokenMapping", () => {
+  const entry = {
+    canonicalPrefix: "color.option.neutral",
+    tokens: {
+      "warm-grey.900": "warm.grey.900",
+      "warm-grey.600": "warm.grey.600",
+      "base-neutrals.white": "white",
+      "base-neutrals.white-85": "overlay.light",
+    },
+  };
+
+  it("maps known Figma token paths to canonical color.option.* paths", () => {
+    const data = {
+      "warm-grey": {
+        "900": { $value: "#2e2e2b", $type: "color" },
+        "600": { $value: "#736e65", $type: "color" },
+      },
+      "base-neutrals": {
+        white: { $value: "#ffffff", $type: "color" },
+      },
+    };
+    const results = applyTokenMapping("neutral-palette", data, entry, "web-light");
+    const paths = results.map((r) => r.canonicalPath);
+    expect(paths).toContain("color.option.neutral.warm.grey.900");
+    expect(paths).toContain("color.option.neutral.warm.grey.600");
+    expect(paths).toContain("color.option.neutral.white");
+  });
+
+  it("applies semantic renames (white-85 → overlay.light)", () => {
+    const data = {
+      "base-neutrals": {
+        "white-85": { $value: "#ffffffd9", $type: "color" },
+      },
+    };
+    const results = applyTokenMapping("neutral-palette", data, entry, "web-light");
+    expect(results[0].canonicalPath).toBe("color.option.neutral.overlay.light");
+    expect(results[0].token.$value).toBe("#ffffffd9");
+  });
+
+  it("throws for unmapped Figma token paths", () => {
+    const data = {
+      "warm-grey": {
+        "999": { $value: "#abcdef", $type: "color" }, // not in mapping
+      },
+    };
+    expect(() => applyTokenMapping("neutral-palette", data, entry, "web-light")).toThrow(
+      /warm-grey\.999/,
+    );
+    expect(() => applyTokenMapping("neutral-palette", data, entry, "web-light")).toThrow(
+      /token-mapping/,
+    );
+  });
+
+  it("preserves $type from the token", () => {
+    const data = {
+      "warm-grey": {
+        "900": { $value: "#2e2e2b", $type: "color" },
+      },
+    };
+    const results = applyTokenMapping("neutral-palette", data, entry, "web-light");
+    expect(results[0].token.$type).toBe("color");
+  });
+});
+
+// ─── buildOptionTree ──────────────────────────────────────────────────────────
+
+describe("buildOptionTree", () => {
+  it("builds a nested object from flat canonical path entries", () => {
+    const entries = [
+      {
+        canonicalPath: "color.option.neutral.warm.grey.900",
+        token: { $type: "color", $value: "#2e2e2b" },
+      },
+      { canonicalPath: "color.option.neutral.white", token: { $type: "color", $value: "#ffffff" } },
+      {
+        canonicalPath: "color.option.brand.blue.400",
+        token: { $type: "color", $value: "#406eb5" },
+      },
+    ];
+    const tree = buildOptionTree(entries) as any;
+    expect(tree.color.option.neutral.warm.grey["900"].$value).toBe("#2e2e2b");
+    expect(tree.color.option.neutral.white.$value).toBe("#ffffff");
+    expect(tree.color.option.brand.blue["400"].$value).toBe("#406eb5");
+  });
+
+  it("does not clobber sibling paths", () => {
+    const entries = [
+      {
+        canonicalPath: "color.option.neutral.warm.grey.900",
+        token: { $type: "color", $value: "#aaa" },
+      },
+      {
+        canonicalPath: "color.option.neutral.warm.grey.600",
+        token: { $type: "color", $value: "#bbb" },
+      },
+    ];
+    const tree = buildOptionTree(entries) as any;
+    expect(tree.color.option.neutral.warm.grey["900"].$value).toBe("#aaa");
+    expect(tree.color.option.neutral.warm.grey["600"].$value).toBe("#bbb");
+  });
+
+  it("returns an empty object for empty input", () => {
+    expect(buildOptionTree([])).toEqual({});
+  });
+});
+
 // ─── Integration: clean + nestUnderSections + deepMerge ──────────────────────
 
 describe("clean + nestUnderSections + deepMerge integration", () => {
@@ -649,7 +775,11 @@ describe("clean + nestUnderSections + deepMerge integration", () => {
 
     const colorSection = canonical.color as Record<string, unknown>;
 
-    // Primitive palettes at top level of color (not under modes)
+    // NOTE: the integration test fixture uses "options.color.light.json" (no
+    // platform prefix) so primitiveMode is null and collections fall through
+    // to the top level of color. Real pipeline files use "options.color.web-light.json"
+    // which nests under color.primitives.web.light — covered by the dedicated
+    // nestUnderSections primitive tests above.
     expect(colorSection["neutral-palette"]).toBeDefined();
     expect(colorSection["brand-palette"]).toBeDefined();
 

@@ -7,6 +7,14 @@ Planned
 > V0 implements only a minimal subset of this ADR for pipeline validation.  
 > Full multi‑category semantic implementation begins in V1.
 
+> **Spike Findings**  
+> The V0 spike validated the option → alias token relationship for color tokens end-to-end.  
+> Key findings that update this ADR:  
+> - Option token paths use `color.option.*` prefix (not `options.color.*` as shown in early examples)  
+> - Platform differences between iOS and web are modeled as `$extensions.cedar.platformOverrides` on option tokens, not as separate token trees  
+> - The rule for when a value difference warrants a `platformOverride` vs a new option token is now defined (see Platform Override Governance below)  
+> - Token names with hyphens in semantic paths (e.g. `link-hover`) are permitted in Figma but the canonical path must use dot-notation; the name transform handles the conversion
+
 ## Context  
 Cedar’s current token set is heavily component‑specific and lacks a unified semantic abstraction layer. As a result:
 
@@ -67,13 +75,6 @@ Specifically, this ADR establishes:
 - a minimal, stable approach to component tokens  
 - the V0/V1 design workflow and Figma library structure that supports this architecture  
 
-This semantic layer is the connective tissue between:
-
-- **ADR‑0001** (Canonical Token Model)  
-- **ADR‑0002** (Normalization Layer)  
-- **ADR‑0003** (Figma Input Contract)  
-
-and the platform‑specific outputs consumed by Web, iOS, Android, and future platforms.
 
 The goals of this architecture are to:
 
@@ -83,8 +84,6 @@ The goals of this architecture are to:
 - enable automated validation, linting, and contrast checks  
 - support theming, modes, and platform overrides  
 - create a predictable, inspectable design‑to‑code pipeline  
-
-This ADR defines the **semantic system Cedar will use for all token categories**, ensuring long‑term scalability, governance, and cross‑platform consistency.
 
 ---
 
@@ -119,17 +118,17 @@ This three‑tier model ensures:
 
 ### Categories Covered by This Architecture
 
-This ADR applies the three‑tier model to **all token categories**, including:
-
-- **Color**  
-- **Typography** (font families, sizes, weights, line heights, letter spacing)  
-- **Spacing** (scale, layout spacing, component spacing)  
-- **Radius** (corner radii, shape tokens)  
-- **Border** (widths, styles)  
-- **Shadow** (elevation, depth)  
-- **Opacity**  
-- **Motion** (durations, easings)  
-- **Grid & Layout** (columns, gutters, breakpoints)  
+This ADR applies the three‑tier model to **all** token categories**, including:
+- **Border** (widths, styles)
+- **Color**
+- **Grid & Layout** (columns, gutters, breakpoints) 
+- **Motion** (durations, easings)
+- **Opacity** 
+- **Prominence** (hierarchy, emphasis levels)
+- **Radius** (corner radii, shape tokens)
+- **Shadow** (elevation, depth)
+- **Spacing** (scale, layout spacing, component spacing)
+- **Typography** (font families, sizes, weights, line heights, letter spacing) 
 
 Each category defines:
 
@@ -152,6 +151,26 @@ The semantic architecture governs the transformation pipeline:
 This ADR defines the **semantic layer**, which is the backbone of the entire pipeline.
 
 ---
+
+
+## Platform Override Governance
+
+When the spike validated the four Figma platform files, it discovered that iOS and web use intentionally different color values for the same scale steps (e.g. `warm-grey.900` is `#1c1c1c` on iOS light but `#2e2e2b` on web light).
+
+The canonical model expresses this via `$extensions.cedar.platformOverrides` on option tokens. The following rules govern when this mechanism applies:
+
+### Use `platformOverrides` when:
+- The same semantic concept (e.g. "darkest neutral") resolves to a different hex on a specific platform **by deliberate design decision**
+- The difference is a platform palette decision reviewed and approved by both design and engineering
+- The semantic role of the token is identical across platforms
+
+### Create a new option token when:
+- The platform uses a fundamentally different concept (e.g. iOS system colors like `UIColor.label` that adapt automatically to accessibility settings)
+- The semantic meaning differs across platforms, not just the hex value
+- The token exists on one platform but has no equivalent on another
+
+### Governance Process
+Every `platformOverride` entry in `canonical.json` MUST be traceable to a deliberate design decision documented in `token-mapping.json` or an ADR amendment. The Normalization Layer MUST NOT infer platform overrides — they must arise from genuine differences between the Figma platform files that have been reviewed and accepted.
 
 ## Tier 1 — Foundations (Options)
 
@@ -441,7 +460,7 @@ Violations MUST fail normalization.
   "color": {
     "action": {
       "accent": {
-        "$value": "{options.color.blue.spruce.1000}"
+        "$value": "{color.option.brand.blue.600}"
       }
     }
   }

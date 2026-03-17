@@ -1,0 +1,33 @@
+{
+  "$description": "Figma Input Contract — maps every Figma collection token path to its canonical color.option path. This file is the formal boundary between design and engineering (ADR-0003). Changing a Figma group or variable name requires a deliberate PR that updates this mapping. The normalizer throws a build error for any Figma token path not present here.",
+  "$version": "0.1.0",
+
+  "collections": {
+    "neutral-palette": {
+      "canonicalPrefix": "color.option.neutral",
+      "tokens": {
+        "warm-grey.100":          "warm.grey.100",
+        "warm-grey.300":          "warm.grey.300",
+        "warm-grey.600":          "warm.grey.600",
+        "warm-grey.900":          "warm.grey.900",
+        "base-neutrals.black":    "black",
+        "base-neutrals.white":    "white",
+        "base-neutrals.white-85": "overlay.light",
+        "base-neutrals.white-75": "overlay.subtle"
+      }
+    },
+    "brand-palette": {
+      "canonicalPrefix": "color.option.brand",
+      "tokens": {
+        "blue.400":   "blue.400",
+        "blue.600":   "blue.600",
+        "red.400":    "red.400",
+        "red.600":    "red.600",
+        "yellow.400": "yellow.400",
+        "yellow.600": "yellow.600",
+        "green.400":  "green.400",
+        "green.600":  "green.600"
+      }
+    }
+  }
+}
