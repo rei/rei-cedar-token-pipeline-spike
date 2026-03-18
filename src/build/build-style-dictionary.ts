@@ -76,6 +76,7 @@ async function main() {
     platforms: {
       typescript: {
         buildPath: "dist/",
+        transforms: ["name/camel"],
         files: modules.flatMap((moduleDefinition) => [
           {
             destination: `${moduleDefinition.theme}/types/${moduleDefinition.responsibility}/${moduleDefinition.moduleFileName}.names.d.ts`,

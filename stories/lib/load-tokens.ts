@@ -126,6 +126,10 @@ export async function loadPrimitiveColors(): Promise<
       }
       result.set(mode, tokens);
     }
+  } else if (colorSection["option"] && typeof colorSection["option"] === "object") {
+    // Canonical fallback: color.option.<neutral|brand>.*
+    const tokens = flattenOptionPrimitives(colorSection["option"] as Record<string, unknown>);
+    result.set("default", tokens);
   } else {
     // Fallback: flat color.<palette> (legacy structure)
     const tokens: Array<{ name: string; value: string }> = [];
@@ -137,6 +141,59 @@ export async function loadPrimitiveColors(): Promise<
   }
 
   return result;
+}
+
+function flattenOptionPrimitives(
+  optionSection: Record<string, unknown>,
+): Array<{ name: string; value: string }> {
+  const out: Array<{ name: string; value: string }> = [];
+
+  const neutral = optionSection["neutral"] as Record<string, unknown> | undefined;
+  if (neutral) {
+    // warm grey scale -> neutral-palette.warm-grey.*
+    const warmGrey = (((neutral["warm"] as Record<string, unknown> | undefined)?.["grey"]) as
+      | Record<string, unknown>
+      | undefined);
+    if (warmGrey) {
+      for (const [shade, node] of Object.entries(warmGrey)) {
+        if (isLeaf(node)) {
+          out.push({ name: `neutral-palette.warm-grey.${shade}`, value: node.$value });
+        }
+      }
+    }
+
+    // black/white/overlay -> neutral-palette.base-neutrals.*
+    for (const key of ["black", "white"] as const) {
+      const node = neutral[key];
+      if (isLeaf(node)) {
+        out.push({ name: `neutral-palette.base-neutrals.${key}`, value: node.$value });
+      }
+    }
+
+    const overlay = neutral["overlay"] as Record<string, unknown> | undefined;
+    if (overlay) {
+      for (const [key, node] of Object.entries(overlay)) {
+        if (isLeaf(node)) {
+          out.push({ name: `neutral-palette.base-neutrals.overlay-${key}`, value: node.$value });
+        }
+      }
+    }
+  }
+
+  // brand scale -> brand-palette.<color>.*
+  const brand = optionSection["brand"] as Record<string, unknown> | undefined;
+  if (brand) {
+    for (const [colorName, scaleNode] of Object.entries(brand)) {
+      if (typeof scaleNode !== "object" || scaleNode === null) continue;
+      for (const [shade, leaf] of Object.entries(scaleNode as Record<string, unknown>)) {
+        if (isLeaf(leaf)) {
+          out.push({ name: `brand-palette.${colorName}.${shade}`, value: leaf.$value });
+        }
+      }
+    }
+  }
+
+  return out;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
