@@ -111,13 +111,13 @@ export const iosColorsetAction: Action = {
       if (!lightOptionNode) {
         throw new Error(
           `Token ${token.name}: could not find light option token at "${lightRefPath}". ` +
-          `Check canonical.json was built correctly.`
+          `Check canonical/tokens.json was built correctly.`
         );
       }
       if (!darkOptionNode) {
         throw new Error(
           `Token ${token.name}: could not find dark option token at "${darkRefPath}". ` +
-          `Check canonical.json was built correctly.`
+          `Check canonical/tokens.json was built correctly.`
         );
       }
 

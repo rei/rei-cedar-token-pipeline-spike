@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rei.com/cedar/token-schema.json",
+  "title": "TokenSchema",
+  "description": "Canonical Cedar design token schema used for generated TypeScript base types.",
+  "type": "object",
+  "additionalProperties": {
+    "$ref": "#/$defs/TokenNode"
+  },
+  "$defs": {
+    "TokenType": {
+      "description": "Supported Cedar token types.",
+      "enum": ["color", "number", "string", "boolean", "fluid"],
+      "type": "string"
+    },
+    "TokenValue": {
+      "description": "Primitive token value.",
+      "type": ["string", "number", "boolean"]
+    },
+    "FigmaTokenExtension": {
+      "description": "Optional Figma-specific token metadata.",
+      "type": "object",
+      "properties": {
+        "hiddenFromPublishing": {
+          "type": "boolean"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "codeSyntax": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "TokenExtensions": {
+      "description": "Optional extension namespaces for a token.",
+      "type": "object",
+      "properties": {
+        "com.figma": {
+          "$ref": "#/$defs/FigmaTokenExtension"
+        }
+      },
+      "additionalProperties": true
+    },
+    "TokenAttributes": {
+      "description": "Core properties shared by all tokens.",
+      "type": "object",
+      "properties": {
+        "$type": {
+          "$ref": "#/$defs/TokenType"
+        },
+        "$value": {
+          "$ref": "#/$defs/TokenValue"
+        },
+        "$description": {
+          "type": "string"
+        },
+        "$extensions": {
+          "$ref": "#/$defs/TokenExtensions"
+        }
+      },
+      "required": ["$type", "$value"],
+      "additionalProperties": false
+    },
+    "Token": {
+      "description": "A leaf design token.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/TokenAttributes"
+        }
+      ]
+    },
+    "TokenGroup": {
+      "description": "A recursive token group containing child groups or leaf tokens.",
+      "type": "object",
+      "propertyNames": {
+        "not": {
+          "pattern": "^\\$"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/TokenNode"
+      }
+    },
+    "TokenNode": {
+      "description": "A token leaf or recursive token group.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Token"
+        },
+        {
+          "$ref": "#/$defs/TokenGroup"
+        }
+      ]
+    }
+  }
+}

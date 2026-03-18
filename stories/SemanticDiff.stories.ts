@@ -2,19 +2,20 @@
  * SemanticDiff.stories.ts
  *
  * Storybook stories for the Cedar token semantic diff feature.
- * All stories fetch dist/normalized/baseline.json and dist/normalized/current.json
- * at runtime, so they always reflect the latest token changes.
+ *
+ * Stories can compare the latest baseline/current snapshots from dist/normalized/
+ * and browse archived timestamped snapshots from canonical/snapshots/.
  *
  * Stories:
- *   FullDiff      — shows all changes between baseline and current
  *   NoChanges     — demonstrates the empty-state UI (no diff entries)
  *   LiveDiff      — same as FullDiff; name indicates it's live/dynamic
+ *   SnapshotCompare — choose one base snapshot and compare against up to 3 others
  *   AllDiffCases  — purely static synthetic fixtures showing all 8 diff kinds
  */
 
 import type { StoryObj } from "@storybook/html";
 import { computeDiff } from "./lib/diff-engine.js";
-import { renderDiffPage } from "./lib/diff-render.js";
+import { renderDiffPage, renderDiffPanel } from "./lib/diff-render.js";
 
 // ─── Type shim ───────────────────────────────────────────────────────────────
 
@@ -30,7 +31,85 @@ const meta: Meta = {
 
 export default meta;
 
+interface SnapshotManifestEntry {
+  id: string;
+  createdAt: string;
+  slot: "baseline" | "current";
+  label: string;
+  file: string;
+}
+
+const FONTS = `<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">`;
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function storyBase(): string {
+  return window.location.pathname.replace(/\/[^/]*$/, "/");
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function formatSnapshotLabel(entry: SnapshotManifestEntry): string {
+  if (entry.label && entry.slot === "current") {
+    const date = new Date(entry.label);
+    if (!Number.isNaN(date.getTime())) {
+      return date.toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+    }
+  }
+
+  const date = new Date(entry.createdAt);
+  const formatted = Number.isNaN(date.getTime())
+    ? entry.createdAt
+    : date.toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+  return entry.slot === "current" ? formatted : `${formatted} (${entry.slot})`;
+}
+
+function optionMarkup(
+  manifest: SnapshotManifestEntry[],
+  selectedId: string,
+  opts: { allowBlank?: boolean } = {},
+): string {
+  const blank = opts.allowBlank
+    ? '<option value="">No comparison</option>'
+    : "";
+  return `${blank}${manifest
+    .map((entry) => {
+      const selected = entry.id === selectedId ? " selected" : "";
+      return `<option value="${escapeHtml(entry.id)}"${selected}>${escapeHtml(formatSnapshotLabel(entry))}</option>`;
+    })
+    .join("")}`;
+}
+
+async function fetchJson<T>(relativePath: string): Promise<T> {
+  const res = await fetch(`${storyBase()}${relativePath}`);
+  if (!res.ok) {
+    throw new Error(`${relativePath}: ${res.status} ${res.statusText}`);
+  }
+  return (await res.json()) as T;
+}
 
 /** Wrap a promise-based render so Storybook receives an HTMLElement. */
 function asyncStory(
@@ -79,9 +158,10 @@ const NOT_FOUND_HTML = `
       Snapshot files not found
     </h1>
     <p style="line-height:1.6;margin:0 0 16px">
-      <code style="background:#be342d22;padding:1px 5px;border-radius:3px">dist/normalized/baseline.json</code>
-      and/or
+      <code style="background:#be342d22;padding:1px 5px;border-radius:3px">dist/normalized/baseline.json</code>,
       <code style="background:#be342d22;padding:1px 5px;border-radius:3px">dist/normalized/current.json</code>
+      and/or
+      <code style="background:#be342d22;padding:1px 5px;border-radius:3px">canonical/snapshots/index.json</code>
       could not be fetched. The files must exist before the story can load.
     </p>
     <p style="font-size:.8rem;color:#736e65;margin:0 0 20px;line-height:1.6">
@@ -144,17 +224,8 @@ export const NoChanges: StoryObj = {
 export const LiveDiff: StoryObj = {
   name: "Live Diff (fetched)",
   render: asyncStory(async () => {
-    // Derive the base URL from the current page so this works both locally
-    // (served from /) and on GH Pages (served from a sub-path like
-    // /rei-cedar-token-pipeline-spike/pr/update-tokens/).
-    // window.location.pathname inside the Storybook iframe is something like
-    // /rei-cedar-token-pipeline-spike/pr/update-tokens/iframe.html so stripping
-    // the filename gives us the correct base to resolve normalized/ against.
-    const base = window.location.pathname.replace(/\/[^/]*$/, "/");
-    const [baseRes, currRes] = await Promise.all([
-      fetch(`${base}normalized/baseline.json`),
-      fetch(`${base}normalized/current.json`),
-    ]);
+    const base = storyBase();
+    const [baseRes, currRes] = await Promise.all([fetch(`${base}normalized/baseline.json`), fetch(`${base}normalized/current.json`)]);
 
     if (baseRes.status === 404 || currRes.status === 404) {
       return NOT_FOUND_HTML;
@@ -172,6 +243,202 @@ export const LiveDiff: StoryObj = {
       currentLabel: "current.json",
     });
   }),
+};
+
+function renderSnapshotCompareShell(
+  manifest: SnapshotManifestEntry[],
+  baseId: string,
+  compareIds: string[],
+): string {
+  const rows = manifest
+    .slice(0, 12)
+    .map(
+      (entry) => `
+        <tr>
+          <td style="padding:8px 10px;border-bottom:1px solid #ccc9c1;font-family:'DM Mono',monospace;font-size:.8rem">${escapeHtml(formatSnapshotLabel(entry))}</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #ccc9c1;font-family:'Syne',sans-serif;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:#736e65">${escapeHtml(entry.slot)}</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #ccc9c1;font-family:'DM Mono',monospace;font-size:.72rem;color:#736e65">${escapeHtml(entry.id)}</td>
+        </tr>`,
+    )
+    .join("");
+
+  return `
+${FONTS}
+<div style="background:#f5f2eb;color:#2e2e2b;font-family:'DM Mono',monospace;min-height:100vh;padding:40px 32px;box-sizing:border-box;">
+  <div style="max-width:1320px;margin:0 auto;display:grid;gap:24px;">
+    <section style="background:#fbf9f4;border:1px solid #ccc9c1;border-radius:10px;padding:24px;display:grid;gap:18px;">
+      <div style="display:flex;justify-content:space-between;gap:20px;align-items:flex-end;flex-wrap:wrap;">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#736e65;margin-bottom:6px;">Cedar Design Tokens</div>
+          <h1 style="margin:0;font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-.02em;line-height:1.05;">Snapshot Compare</h1>
+          <p style="margin:10px 0 0;font-size:.92rem;line-height:1.6;color:#736e65;max-width:760px;">Pick one base snapshot and compare it against up to three archived snapshots. Each PR run adds timestamped entries to the snapshot archive.</p>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:.8rem;color:#736e65;">${manifest.length} archived snapshot${manifest.length === 1 ? "" : "s"}</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:14px;">
+        <label style="display:grid;gap:6px;">
+          <span style="font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#736e65;">Base snapshot</span>
+          <select data-base-select style="width:100%;padding:10px 12px;border:1px solid #b2ab9f;border-radius:6px;background:#fffdf8;color:#2e2e2b;font-family:'DM Mono',monospace;font-size:.78rem;">
+            ${optionMarkup(manifest, baseId)}
+          </select>
+        </label>
+        <label style="display:grid;gap:6px;">
+          <span style="font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#736e65;">Compare 1</span>
+          <select data-compare-select="0" style="width:100%;padding:10px 12px;border:1px solid #b2ab9f;border-radius:6px;background:#fffdf8;color:#2e2e2b;font-family:'DM Mono',monospace;font-size:.78rem;">
+            ${optionMarkup(manifest, compareIds[0] ?? "", { allowBlank: true })}
+          </select>
+        </label>
+        <label style="display:grid;gap:6px;">
+          <span style="font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#736e65;">Compare 2</span>
+          <select data-compare-select="1" style="width:100%;padding:10px 12px;border:1px solid #b2ab9f;border-radius:6px;background:#fffdf8;color:#2e2e2b;font-family:'DM Mono',monospace;font-size:.78rem;">
+            ${optionMarkup(manifest, compareIds[1] ?? "", { allowBlank: true })}
+          </select>
+        </label>
+        <label style="display:grid;gap:6px;">
+          <span style="font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#736e65;">Compare 3</span>
+          <select data-compare-select="2" style="width:100%;padding:10px 12px;border:1px solid #b2ab9f;border-radius:6px;background:#fffdf8;color:#2e2e2b;font-family:'DM Mono',monospace;font-size:.78rem;">
+            ${optionMarkup(manifest, compareIds[2] ?? "", { allowBlank: true })}
+          </select>
+        </label>
+      </div>
+
+      <div data-compare-status style="font-size:.82rem;color:#736e65;"></div>
+    </section>
+
+    <section style="background:#fbf9f4;border:1px solid #ccc9c1;border-radius:10px;padding:20px;overflow:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:10px;">
+        <h2 style="margin:0;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#2e2e2b;">Stored snapshots</h2>
+        <div style="font-size:.75rem;color:#736e65;">Newest first</div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;min-width:720px;">
+        <thead>
+          <tr>
+            <th style="padding:0 10px 8px 10px;text-align:left;font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#736e65;border-bottom:1px solid #b2ab9f;">Timestamp</th>
+            <th style="padding:0 10px 8px 10px;text-align:left;font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#736e65;border-bottom:1px solid #b2ab9f;">Slot</th>
+            <th style="padding:0 10px 8px 10px;text-align:left;font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#736e65;border-bottom:1px solid #b2ab9f;">Id</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </section>
+
+    <div data-compare-results style="display:grid;gap:20px;"></div>
+  </div>
+</div>`;
+}
+
+export const SnapshotCompare: StoryObj = {
+  name: "Snapshot Compare",
+  render: () => {
+    const container = document.createElement("div");
+    container.style.cssText = "min-height:200px;background:#f5f2eb;";
+    container.innerHTML = `
+      <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:1rem;color:#736e65">
+        Loading snapshot archive…
+      </div>`;
+
+    void (async () => {
+      try {
+        const manifest = await fetchJson<SnapshotManifestEntry[]>("canonical/snapshots/index.json");
+
+        if (manifest.length < 2) {
+          container.innerHTML = NOT_FOUND_HTML;
+          return;
+        }
+
+        const baseId = manifest[0]?.id ?? "";
+        const compareIds = manifest.slice(1, 4).map((entry) => entry.id);
+        container.innerHTML = renderSnapshotCompareShell(manifest, baseId, compareIds);
+
+        const root = container;
+        const baseSelect = root.querySelector<HTMLSelectElement>("[data-base-select]");
+        const compareSelects = [...root.querySelectorAll<HTMLSelectElement>("[data-compare-select]")];
+        const statusEl = root.querySelector<HTMLElement>("[data-compare-status]");
+        const resultsEl = root.querySelector<HTMLElement>("[data-compare-results]");
+
+        if (!baseSelect || compareSelects.length === 0 || !statusEl || !resultsEl) {
+          throw new Error("Snapshot comparison controls failed to render.");
+        }
+
+        const manifestById = new Map(manifest.map((entry) => [entry.id, entry]));
+        const cache = new Map<string, Promise<Record<string, unknown>>>();
+
+        const loadSnapshot = (id: string): Promise<Record<string, unknown>> => {
+          if (!cache.has(id)) {
+            const entry = manifestById.get(id);
+            if (!entry) throw new Error(`Unknown snapshot id: ${id}`);
+            cache.set(id, fetchJson<Record<string, unknown>>(`canonical/${entry.file}`));
+          }
+          return cache.get(id)!;
+        };
+
+        const renderComparisons = async (): Promise<void> => {
+          const selectedBase = baseSelect.value;
+          const selectedTargets: string[] = [];
+
+          for (const select of compareSelects) {
+            const id = select.value;
+            if (!id || id === selectedBase || selectedTargets.includes(id)) continue;
+            selectedTargets.push(id);
+            if (selectedTargets.length === 3) break;
+          }
+
+          if (!selectedBase) {
+            statusEl.innerHTML = "Choose a base snapshot to start comparing.";
+            resultsEl.innerHTML = "";
+            return;
+          }
+
+          if (selectedTargets.length === 0) {
+            statusEl.innerHTML = "Pick at least one comparison snapshot. Duplicate selections and the base snapshot are ignored.";
+            resultsEl.innerHTML = "";
+            return;
+          }
+
+          statusEl.innerHTML = `Comparing <strong>${selectedTargets.length}</strong> snapshot${selectedTargets.length === 1 ? "" : "s"} against the selected base.`;
+          resultsEl.innerHTML = `<div style="padding:20px 0;color:#736e65;font-family:'DM Mono',monospace;">Computing diffs…</div>`;
+
+          const baseTree = await loadSnapshot(selectedBase);
+          const baseEntry = manifestById.get(selectedBase)!;
+
+          const panels = await Promise.all(
+            selectedTargets.map(async (targetId, index) => {
+              const targetTree = await loadSnapshot(targetId);
+              const targetEntry = manifestById.get(targetId)!;
+              const entries = computeDiff(baseTree, targetTree);
+              return renderDiffPanel(entries, {
+                title: `Comparison ${index + 1}`,
+                baselineLabel: formatSnapshotLabel(baseEntry),
+                currentLabel: formatSnapshotLabel(targetEntry),
+              });
+            }),
+          );
+
+          resultsEl.innerHTML = panels.join("");
+        };
+
+        baseSelect.addEventListener("change", () => {
+          void renderComparisons();
+        });
+        compareSelects.forEach((select) => {
+          select.addEventListener("change", () => {
+            void renderComparisons();
+          });
+        });
+
+        await renderComparisons();
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        container.innerHTML = `
+          <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:1rem;color:#be342d;background:#f5f2eb;">
+            Error loading snapshot archive: ${escapeHtml(msg)}
+          </div>`;
+      }
+    })();
+
+    return container;
+  },
 };
 
 // ─── Story: AllDiffCases ─────────────────────────────────────────────────────

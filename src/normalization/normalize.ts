@@ -2,7 +2,7 @@
  * normalize.ts
  *
  * Reads every *.json file from tokens/, normalizes them into a canonical tree,
- * and writes the result to tokens/canonical.json.
+ * and writes the result to canonical/tokens.json.
  *
  * Normalization pipeline:
  *   1. Load token-mapping.json (ADR-0003 Figma Input Contract)
@@ -15,14 +15,14 @@
  *      c. Build color.option tree from web-light (canonical $value source)
  *      d. mergeColorVariants writes appearance values + platform overrides
  *         onto option tokens; writes option references into alias $extensions.cedar
- *      color.primitives is NOT written to canonical.json
+ *      color.primitives is NOT written to canonical/tokens.json
  *   5. Alias and other files:
  *      a. clean()           → strip Figma metadata; rewrite alias refs to color.option.*
  *      b. nestUnderSections → nest under section keys; color.modes.<palette>
  *      c. deepMerge         → accumulate into canonical tree
  *   6. mergeColorVariants → write option references into alias $extensions.cedar;
  *      write appearance values + platformOverrides onto option tokens; stamp $meta
- *   7. Write canonical.json
+ *   7. Write canonical/tokens.json
  *
  * Input file naming convention (from Figma sync):
  *   {collection}.{section}.{mode}.json
@@ -32,7 +32,7 @@
  *   - alias.color.sale.json         → semantic color tokens for "sale" palette
  *   - spacing.default.json          → spacing dimensions
  *
- * Output canonical.json structure:
+ * Output canonical/tokens.json structure:
  *   {
  *     "color": {
  *       "modes": {
@@ -67,7 +67,7 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const tokensDir = path.resolve(__dirname, "../../tokens");
-const outFile = path.resolve(__dirname, "../../tokens/canonical.json");
+const outFile = path.resolve(__dirname, "../../canonical/tokens.json");
 const mappingFile = path.resolve(__dirname, "../../tokens/token-mapping.json");
 
 // ─── walkSemanticTree ─────────────────────────────────────────────────────────
@@ -325,7 +325,7 @@ try {
   // per ADR-0001). The other three files contribute only to the platformLookup
   // table, which mergeColorVariants uses to build $resolved on alias tokens.
   //
-  // color.primitives is NOT written to canonical.json — it was a spike artifact.
+  // color.primitives is NOT written to canonical/tokens.json — it was a spike artifact.
   // The four platform files are normalization input only.
 
   // platformLookup: "web-light" → { "color.option.neutral.warm.grey.900": "#hex", ... }
@@ -394,7 +394,7 @@ try {
   // ── 4. Attach $resolved and $meta to all alias color tokens ─────────────────
   mergeColorVariants(canonical, platformLookup);
 
-  // ── 5. Write canonical.json ─────────────────────────────────────────────────
+  // ── 5. Write canonical/tokens.json ─────────────────────────────────────────────
   fs.mkdirSync(path.dirname(outFile), { recursive: true });
   fs.writeFileSync(outFile, JSON.stringify(canonical, null, 2), "utf-8");
 
@@ -403,6 +403,6 @@ try {
     `  ${files.length} file(s) merged, ${Object.keys(canonical).length} top-level section(s): ${Object.keys(canonical).join(", ")}`,
   );
 } catch (error) {
-  console.error("Error creating canonical.json:", error);
+  console.error("Error creating canonical/tokens.json:", error);
   process.exit(1);
 }

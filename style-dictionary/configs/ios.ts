@@ -2,7 +2,7 @@ import type { Config } from 'style-dictionary';
 import type { TransformedToken } from 'style-dictionary';
 
 export const iosConfig: Config = {
-  source: ['tokens/canonical.json'],
+  source: ['canonical/tokens.json'],
   log: { verbosity: 'verbose' },
   platforms: {
     ios: {
