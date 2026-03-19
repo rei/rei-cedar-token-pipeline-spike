@@ -49,6 +49,7 @@ It serves as the single entry point for diagrams, ADRs, and technical notes that
 
 | Document | Description |
 |---|---|
+| **[File Dictionary](./notes/file-dictionary.md)** | Governance map of repository files, grouped by contract, build logic, artifacts, tests, and tooling tiers. |
 | **[ADR‑0011](./ADR/adr-0011-hybrid-alias-resolution.md)** | Documents the hybrid alias-reference plus resolved-value model used by the current prototype. |
 | **[Normalization Notes](./notes/governance.md)** | Current governance notes for the normalization contract and alias/platform resolution behavior. |
 
