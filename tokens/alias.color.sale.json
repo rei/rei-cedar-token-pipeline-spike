@@ -3,8 +3,8 @@
     "surface": {
       "base": {
         "$type": "color",
-        "$value": "{neutral-palette.base-neutrals.white}",
-        "$description": "",
+        "$value": "{brand-palette.red.400}",
+        "$description": "Default page and container background.\nusage: Use as the background for the primary content area, cards, modals, and any surface that sits at the base elevation. Do not use for text or interactive elements.\ndesign: First step in the surface elevation scale. Anchors the layering system — raised surfaces sit above this token, not below.",
         "$extensions": {
           "com.figma": {
             "hiddenFromPublishing": false,
@@ -17,8 +17,8 @@
       },
       "raised": {
         "$type": "color",
-        "$value": "{neutral-palette.warm-grey.100}",
-        "$description": "",
+        "$value": "{neutral-palette.warm-grey.600}",
+        "$description": "Elevated surface background, one step above the base layer.\nusage: Use for cards, panels, and drawers that sit above the base page surface. Do not use for the root page background or inline content areas.\ndesign: Second step in the surface elevation scale. Creates visual separation from surface-base through a subtle warm-grey tint.",
         "$extensions": {
           "com.figma": {
             "hiddenFromPublishing": false,
@@ -33,8 +33,8 @@
     "text": {
       "base": {
         "$type": "color",
-        "$value": "{neutral-palette.warm-grey.900}",
-        "$description": "",
+        "$value": "{brand-palette.yellow.600}",
+        "$description": "Primary text color for body content and headings.\nusage: Use for all default body copy, headings, and labels. Do not use for decorative text, disabled states, or secondary information — use text-subtle for those.\ndesign: Anchors the text scale at maximum legibility. Darkest step in the warm-grey text ramp.",
         "$extensions": {
           "com.figma": {
             "hiddenFromPublishing": false,
@@ -47,8 +47,8 @@
       },
       "subtle": {
         "$type": "color",
-        "$value": "{neutral-palette.warm-grey.600}",
-        "$description": "",
+        "$value": "{brand-palette.yellow.400}",
+        "$description": "Secondary text color for supporting and supplementary content.\nusage: Use for captions, helper text, metadata, and secondary labels. Do not use for primary body copy or anything requiring full legibility — use text-base for those.\ndesign: Mid-point in the text scale. Reduced contrast signals secondary importance while remaining accessible.",
         "$extensions": {
           "com.figma": {
             "hiddenFromPublishing": false,
@@ -61,8 +61,8 @@
       },
       "link": {
         "$type": "color",
-        "$value": "{brand-palette.blue.600}",
-        "$description": "",
+        "$value": "{neutral-palette.warm-grey.100}",
+        "$description": "Text color for interactive links and inline navigation.\nusage: Use for hyperlinks, inline anchors, and any text that navigates or triggers an action. Do not use for non-interactive text — use text-base or text-subtle instead.\ndesign: Draws from the blue brand scale to signal interactivity. Paired with text-link-hover to form the link interaction ramp.",
         "$extensions": {
           "com.figma": {
             "hiddenFromPublishing": false,
@@ -75,8 +75,8 @@
       },
       "link-hover": {
         "$type": "color",
-        "$value": "{brand-palette.blue.400}",
-        "$description": "",
+        "$value": "{neutral-palette.warm-grey.300}",
+        "$description": "Text color for links in their hovered state.\nusage: Use only as the hover state for text-link. Do not use for default link text or any non-interactive element.\ndesign: Lighter step in the blue brand scale, creating a visible but controlled shift from text-link on hover.",
         "$extensions": {
           "com.figma": {
             "hiddenFromPublishing": false,
@@ -89,8 +89,8 @@
       },
       "sale": {
         "$type": "color",
-        "$value": "{brand-palette.red.600}",
-        "$description": "",
+        "$value": "{brand-palette.green.400}",
+        "$description": "Text color for sale prices and promotional messaging.\nusage: Use exclusively for sale price labels and discount indicators. Do not use for error states, alerts, or general emphasis — those have dedicated tokens.\ndesign: Draws from the red brand scale. Reserved solely for commerce pricing contexts to preserve its signal strength.",
         "$extensions": {
           "com.figma": {
             "hiddenFromPublishing": false,
@@ -105,8 +105,8 @@
     "border": {
       "base": {
         "$type": "color",
-        "$value": "{neutral-palette.warm-grey.300}",
-        "$description": "",
+        "$value": "{neutral-palette.warm-grey.100}",
+        "$description": "Default border color for containers, inputs, and dividers.\nusage: Use for input field borders, card outlines, and structural dividers. Do not use for decorative separators or low-emphasis boundaries — use border-subtle for those.\ndesign: Mid-light step in the warm-grey scale, providing enough contrast to define structure without competing with content.",
         "$extensions": {
           "com.figma": {
             "hiddenFromPublishing": false,
@@ -119,8 +119,8 @@
       },
       "subtle": {
         "$type": "color",
-        "$value": "{neutral-palette.warm-grey.100}",
-        "$description": "",
+        "$value": "{neutral-palette.warm-grey.900}",
+        "$description": "Low-emphasis border for decorative separators and understated boundaries.\nusage: Use for dividers between list items, section rules, and subtle layout separators. Do not use where a border needs to define a structure or interactive boundary — use border-base for those.\ndesign: Lightest step in the border scale. Provides just enough separation to guide the eye without drawing attention.",
         "$extensions": {
           "com.figma": {
             "hiddenFromPublishing": false,
