@@ -11,10 +11,11 @@ export const webConfig: Config = {
       actions: ['web-css'],
       files: [],
       filter: (token: TransformedToken) =>
-        token.path[0] === 'color' &&
-        token.path[1] === 'modes' &&
-        token.path[2] === 'default' &&
-        token.$type === 'color',
+        (token.path[0] === 'color' &&
+          token.path[1] === 'modes' &&
+          token.path[2] === 'default' &&
+          token.$type === 'color') ||
+        token.path[0] === 'spacing',
     },
   },
 };

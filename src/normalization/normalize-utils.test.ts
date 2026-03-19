@@ -28,6 +28,7 @@ import {
   buildSpacingClamp,
   applyTokenMapping,
   buildOptionTree,
+  parseTokenDescription,
   type TokenMapping,
 } from "./normalize-utils.js";
 
@@ -701,6 +702,79 @@ describe("buildOptionTree", () => {
 
   it("returns an empty object for empty input", () => {
     expect(buildOptionTree([])).toEqual({});
+  });
+
+  it("writes docs into $extensions.cedar.docs when token has a docs field", () => {
+    const entries = [
+      {
+        canonicalPath: "color.option.neutral.warm.grey.100",
+        token: { $type: "color", $value: "#edeae3", docs: { summary: "Warm neutral base" } },
+      },
+      {
+        canonicalPath: "color.option.neutral.white",
+        token: { $type: "color", $value: "#ffffff" },
+      },
+    ];
+    const tree = buildOptionTree(entries) as any;
+    expect(tree.color.option.neutral.warm.grey["100"].$extensions.cedar.docs.summary).toBe(
+      "Warm neutral base",
+    );
+    expect(tree.color.option.neutral.white.$extensions).toBeUndefined();
+  });
+});
+
+// ─── parseTokenDescription ───────────────────────────────────────────────────
+
+describe("parseTokenDescription", () => {
+  it("returns undefined for empty string", () => {
+    expect(parseTokenDescription("")).toBeUndefined();
+    expect(parseTokenDescription("   ")).toBeUndefined();
+  });
+
+  it("returns summary-only for plain text with no recognised keys", () => {
+    expect(parseTokenDescription("Warm neutral base.")).toEqual({ summary: "Warm neutral base." });
+  });
+
+  it("parses all four fields", () => {
+    const raw = [
+      "Warm neutral, used for backgrounds.",
+      "usage: Use for page and container backgrounds, never for text.",
+      "design: Anchors the warm grey scale; the lightest neutral step.",
+      "aliases: surface-default, surface-subtle",
+    ].join("\n");
+    expect(parseTokenDescription(raw)).toEqual({
+      summary: "Warm neutral, used for backgrounds.",
+      usage: "Use for page and container backgrounds, never for text.",
+      design: "Anchors the warm grey scale; the lightest neutral step.",
+      aliases: ["surface-default", "surface-subtle"],
+    });
+  });
+
+  it("parses usage and design without a summary", () => {
+    const raw = "usage: Use for borders.\ndesign: Part of the neutral scale.";
+    expect(parseTokenDescription(raw)).toEqual({
+      usage: "Use for borders.",
+      design: "Part of the neutral scale.",
+    });
+  });
+
+  it("handles aliases with a single value", () => {
+    const raw = "Light surface.\naliases: surface-default";
+    expect(parseTokenDescription(raw)).toEqual({
+      summary: "Light surface.",
+      aliases: ["surface-default"],
+    });
+  });
+
+  it("ignores unrecognised keys — folds them into summary", () => {
+    const raw = "A colour token.\nunknown: some value";
+    expect(parseTokenDescription(raw)).toEqual({ summary: "A colour token. unknown: some value" });
+  });
+
+  it("treats whitespace-only aliases as absent", () => {
+    const raw = "Summary.\naliases:  ,  ";
+    const result = parseTokenDescription(raw)!;
+    expect(result.aliases).toBeUndefined();
   });
 });
 

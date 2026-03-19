@@ -228,6 +228,91 @@ The CSS transform reads `$extensions.cedar.$meta.scope` to determine whether to 
 
 ---
 
+## Token Documentation
+
+### Purpose
+
+Token descriptions provide developer-facing documentation about the purpose and usage of design tokens. These descriptions are captured from Figma during sync, preserved through normalization, and surfaced in generated TypeScript type definitions as JSDoc comments.
+
+### Structure
+
+Token documentation is stored in `$extensions.cedar.docs` with the following structure:
+
+```json
+{
+  "$type": "color",
+  "$value": "#edeae3",
+  "$extensions": {
+    "cedar": {
+      "docs": {
+        "summary": "Warm neutral base, used for backgrounds"
+      }
+    }
+  }
+}
+```
+
+The `docs` object contains:
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| `summary` | string | Brief description of the token's purpose (5-12 words, one sentence) |
+| `usage` | string | Optional guidance on when/how to use this token (future) |
+| `design` | string | Optional design rationale (future) |
+| `aliases` | string[] | Optional list of related semantic token names (future) |
+
+Currently, only `summary` is populated from Figma descriptions.
+
+### Figma Input Contract
+
+Designers add descriptions in Figma's **Local Variables** UI:
+
+```
+Collection:  neutral-palette
+Variable:    warm-grey / 100
+Description: "Warm neutral base, used for backgrounds"
+```
+
+Requirements:
+- Descriptions MUST be 5-12 words and describe semantic purpose
+- Descriptions MUST NOT include technical details (hex values, implementation notes)
+- Empty descriptions are treated as missing and NOT included in the canonical model
+- Only non-empty, trimmed descriptions are preserved through normalization
+
+### Scope
+
+Token documentation is available for:
+- ✅ **Option tokens** (primitives) — descriptions come from Figma
+- ❌ **Semantic tokens** (aliases) — descriptions come from Cedar component documentation, NOT from Figma
+
+Rationale: Semantic tokens represent Cedar component responsibilities and surface areas. Their documentation should live in component docs, not in the token system.
+
+### Usage in Generated Types
+
+During TypeScript type generation, `docs.summary` is extracted and formatted as JSDoc:
+
+```typescript
+export interface CdrColorOptionTokens {
+  /** Warm neutral base, used for backgrounds */
+  "color_option_neutral_warm_grey_100": string;
+  
+  "color_option_neutral_warm_grey_300": string;
+}
+```
+
+This allows developers to see token documentation in their IDE without leaving their code.
+
+### Constraints
+
+- `docs` MUST NOT affect token semantics or `$value` resolution
+- `docs` is reference/development documentation only — NOT runtime data
+- `docs` MUST live in `$extensions.cedar`, never in `$value` or elsewhere
+- `docs.summary` MUST be a plain string, no inline formatting or Markdown
+
+See [ADR-0010: Token Documentation Architecture](./adr-0010-token-documentation-architecture.md) for full pipeline details.
+
+---
+
 ## Alias Token Platform References
 
 ### Purpose

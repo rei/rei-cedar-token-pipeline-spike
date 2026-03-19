@@ -5,7 +5,7 @@
  * and writes the result to canonical/tokens.json.
  *
  * Normalization pipeline:
- *   1. Load token-mapping.json (ADR-0003 Figma Input Contract)
+ *   1. Load schema with Figma Input Contract (ADR-0003, src/schema/token-schema.json)
  *   2. Parse all JSON files from tokens/
  *   3. Fluid spacing: build clamp() values from per-breakpoint files
  *   4. Option color files (options.color.*.json):
@@ -68,7 +68,7 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const tokensDir = path.resolve(__dirname, "../../tokens");
 const outFile = path.resolve(__dirname, "../../canonical/tokens.json");
-const mappingFile = path.resolve(__dirname, "../../tokens/token-mapping.json");
+const schemaFile = path.resolve(__dirname, "../../src/schema/token-schema.json");
 
 // ─── walkSemanticTree ─────────────────────────────────────────────────────────
 
@@ -244,7 +244,7 @@ function mergeColorVariants(
       if (Object.keys(platformRefs).length === 0) {
         console.warn(
           `[mergeColorVariants] No platform references found for "${canonicalPath}". ` +
-            `Check token-mapping.json and options.color.*.json files.`,
+            `Check src/schema/token-schema.json (inputs.figma.collections) and options.color.*.json files.`,
         );
         return;
       }
@@ -259,19 +259,20 @@ function mergeColorVariants(
 // ─── main ─────────────────────────────────────────────────────────────────────
 
 try {
-  // ── Load token mapping (Figma Input Contract, ADR-0003) ─────────────────────
-  if (!fs.existsSync(mappingFile)) {
+  // ── Load schema with Figma Input Contract (ADR-0003) ────────────────────────
+  if (!fs.existsSync(schemaFile)) {
     throw new Error(
-      `token-mapping.json not found at ${mappingFile}. ` +
+      `Token schema not found at ${schemaFile}. ` +
         `This file is required — see ADR-0003 (Figma Input Contract).`,
     );
   }
-  const tokenMapping: TokenMapping = JSON.parse(fs.readFileSync(mappingFile, "utf-8"));
+  const schema = JSON.parse(fs.readFileSync(schemaFile, "utf-8"));
+  const tokenMapping: TokenMapping = schema.inputs.figma;
 
   // ── Read all token files ─────────────────────────────────────────────────────
   const files = fs
     .readdirSync(tokensDir)
-    .filter((f) => f.endsWith(".json") && f !== "canonical.json" && f !== "token-mapping.json");
+    .filter((f) => f.endsWith(".json") && f !== "canonical.json");
 
   if (files.length === 0) {
     throw new Error(`No JSON files found in ${tokensDir}. Run the Figma sync first.`);

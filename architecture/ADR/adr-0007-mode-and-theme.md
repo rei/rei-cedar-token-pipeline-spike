@@ -52,6 +52,26 @@ This is an open architectural question that must be resolved before high-contras
 
 Section 7's canonical model representation (storing mode values as `$extensions.cedar.modes.*` on alias tokens) is **not implemented in the spike**. The validated model uses option token appearances instead. Section 7 should be treated as aspirational until a future ADR reconciles these two approaches.
 
+### TypeScript Mode-Specific Type Generation (V0 Implementation)
+
+The V0 spike implements mode-specific types for color alias tokens to support theme-aware TypeScript consumption:
+
+- **Mode-agnostic types** (e.g., `CdrColorTextTokenName`) export all tokens available across all modes
+- **Mode-specific types** (e.g., `CdrColorTextDefaultTokenName`, `CdrColorTextSaleTokenName`) export only tokens valid in that mode
+- **CedarMode union type** (`"default" | "sale"`) is exported from `foundations/modes/index.d.ts`
+
+Structure:
+```
+dist/rei-dot-com/types/foundations/
+├── cdr-color-text.names.d.ts           # all text colors across all modes
+├── modes/
+│   ├── index.d.ts                      # CedarMode union
+│   ├── default/cdr-color-text.names.d.ts  # tokens valid in default mode
+│   └── sale/cdr-color-text.names.d.ts     # tokens valid in sale mode
+```
+
+This allows component authors to optionally enforce mode-specific typing or use the unified types, depending on their needs.
+
 ---
 
 ## Decision

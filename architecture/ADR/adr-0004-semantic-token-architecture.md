@@ -14,6 +14,7 @@ Planned
 > - Platform differences between iOS and web are modeled as `$extensions.cedar.platformOverrides` on option tokens, not as separate token trees  
 > - The rule for when a value difference warrants a `platformOverride` vs a new option token is now defined (see Platform Override Governance below)  
 > - Token names with hyphens in semantic paths (e.g. `link-hover`) are permitted in Figma but the canonical path must use dot-notation; the name transform handles the conversion
+> - TypeScript and CSS outputs are organized by semantic category, not superficial type: `cdr-color-surface`, `cdr-color-text`, `cdr-color-border` for colors; `cdr-spacing-scale`, `cdr-spacing-component`, `cdr-spacing-layout` for spacing (see ADR-0005 Platform Outputs)
 
 ## Context  
 Cedar’s current token set is heavily component‑specific and lacks a unified semantic abstraction layer. As a result:

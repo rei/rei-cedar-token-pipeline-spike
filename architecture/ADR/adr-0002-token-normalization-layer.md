@@ -22,7 +22,7 @@ The Normalization Layer transforms these raw inputs into the Canonical Token Mod
 
 The Normalization Layer is a TypeScript script (`normalize.ts`) that:
 
-1. Reads `token-mapping.json` — the governed Figma Input Contract (ADR‑0003)
+1. Reads `src/schema/token-schema.json` — which contains the governed Figma Input Contract (ADR‑0003) in the `inputs.figma.collections` section
 2. Processes option files via explicit path mapping (never string inference)
 3. Produces a single `canonical.json` with the canonical structure
 4. Fails loudly if any Figma token path is not declared in the mapping
@@ -31,9 +31,9 @@ The Normalization Layer is a TypeScript script (`normalize.ts`) that:
 
 ## Pipeline Steps
 
-### 1. Load token-mapping.json
+### 1. Load schema with Figma Input Contract
 
-`token-mapping.json` maps every Figma collection path to its canonical `color.option.*` path. The normalizer throws a build error if this file is missing.
+`src/schema/token-schema.json` contains the Figma-to-canonical mapping in the `inputs.figma` section. This single schema file serves as the authoritative source for both token structure validation AND Figma path transformation (see ADR-0003 for details). The normalizer throws a build error if this file is missing.
 
 ### 2. Partition input files
 
@@ -65,7 +65,7 @@ Per-breakpoint spacing files are combined using the `clamp()` formula to produce
 
 Each `options.color.*.json` file is processed through `applyTokenMapping`:
 
-- Every Figma token path is looked up in `token-mapping.json`
+- Every Figma token path is looked up in `src/schema/token-schema.json` under `inputs.figma.collections`
 - If found, the token is written to its canonical `color.option.*` path
 - If not found, the build **throws immediately** — this is the designer rename guard
 
@@ -77,7 +77,7 @@ The `web-light` snapshot is used as the authoritative `$value` source for `color
 
 ### 5. Alias files
 
-Alias files are cleaned (Figma metadata stripped) and alias references rewritten from Figma collection paths to canonical `color.option.*` paths using `token-mapping.json`. The clean step throws if an alias references an unmapped collection path.
+Alias files are cleaned (Figma metadata stripped) and alias references rewritten from Figma collection paths to canonical `color.option.*` paths using the mapping in `src/schema/token-schema.json`. The clean step throws if an alias references an unmapped collection path.
 
 Semantic tokens are nested under `color.modes.<palette>`.
 

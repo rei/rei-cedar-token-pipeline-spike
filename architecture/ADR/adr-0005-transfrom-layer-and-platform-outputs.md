@@ -3,6 +3,13 @@
 ## Status  
 Planned
 
+> **V0 Implementation Note**
+> The V0/V1 spike implements modular output organization by semantic category, not superficial type grouping:
+> - **CSS** organized by semantic intent: `color-surface.css`, `color-text.css`, `color-border.css`, `spacing-scale.css`, `spacing-component.css`, `spacing-layout.css`  
+>   Each theme (light/dark) includes `@import` statements to combine these modular files
+> - **TypeScript Types** generated per semantic category with barrel exports and mode-specific variants: `cdr-color-surface.names.d.ts`, `cdr-color-text.d.ts`, plus `foundations/modes/{default,sale}/` for mode-specific types
+> - Index files (`light.css`, `dist/rei-dot-com/types/index.d.ts`) provide unified entry points for simplicity; consumers can import granularly by category for tree-shaking
+
 ## Context  
 The Canonical Token Model (ADR‑0001) defines a governed, platform‑agnostic representation of design tokens. However, this canonical shape cannot be consumed directly by:
 

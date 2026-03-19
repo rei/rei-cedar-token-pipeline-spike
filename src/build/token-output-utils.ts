@@ -50,32 +50,49 @@ function createModuleDefinition(
 }
 
 const MODULE_DEFINITIONS: ModuleDefinition[] = [
-  createModuleDefinition("cdr-color-alias", (token) => {
-    if (token.path[0] !== "color" || token.path[1] !== "modes" || token.path.length < 4) {
+  // Color semantic categories
+  createModuleDefinition("cdr-color-surface", (token) => {
+    if (token.path[0] !== "color" || token.path[1] !== "modes" || token.path[3] !== "surface") {
       return [];
     }
-
-    return token.path.slice(3);
+    // token path: color.modes.default.surface.base → return ["base"]
+    return token.path.slice(4);
   }),
-  createModuleDefinition("cdr-color-options", (token) => {
-    if (token.path[0] !== "color" || token.path[1] !== "primitives" || token.path.length < 4) {
+  createModuleDefinition("cdr-color-text", (token) => {
+    if (token.path[0] !== "color" || token.path[1] !== "modes" || token.path[3] !== "text") {
       return [];
     }
-
-    return token.path.slice(3);
+    // token path: color.modes.default.text.base → return ["base"]
+    return token.path.slice(4);
   }),
-  createModuleDefinition("cdr-spacing-alias", (token) => {
-    if (token.path[0] !== "spacing" || token.path[1] === "scale" || token.path.length < 3) {
+  createModuleDefinition("cdr-color-border", (token) => {
+    if (token.path[0] !== "color" || token.path[1] !== "modes" || token.path[3] !== "border") {
       return [];
     }
-
-    return token.path.slice(1);
+    // token path: color.modes.default.border.base → return ["base"]
+    return token.path.slice(4);
   }),
-  createModuleDefinition("cdr-spacing-fluid", (token) => {
+
+  // Spacing semantic categories
+  createModuleDefinition("cdr-spacing-scale", (token) => {
     if (token.path[0] !== "spacing" || token.path[1] !== "scale" || token.path.length < 3) {
       return [];
     }
-
+    // token path: spacing.scale.-50 → return ["-50"]
+    return token.path.slice(2);
+  }),
+  createModuleDefinition("cdr-spacing-component", (token) => {
+    if (token.path[0] !== "spacing" || token.path[1] !== "component" || token.path.length < 3) {
+      return [];
+    }
+    // token path: spacing.component.sm → return ["sm"]
+    return token.path.slice(2);
+  }),
+  createModuleDefinition("cdr-spacing-layout", (token) => {
+    if (token.path[0] !== "spacing" || token.path[1] !== "layout" || token.path.length < 3) {
+      return [];
+    }
+    // token path: spacing.layout.sm → return ["sm"]
     return token.path.slice(2);
   }),
 ];
