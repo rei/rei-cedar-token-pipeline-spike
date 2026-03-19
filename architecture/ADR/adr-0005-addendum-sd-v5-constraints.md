@@ -73,7 +73,7 @@ SD v5 preserves `$extensions` through the pipeline because it is a DTCG-spec key
 The combination of constraints 1, 2, and 4 produces a consistent pattern for native platform outputs:
 
 ```
-canonical.json
+canonical/tokens.json
   ↓ SD parses tokens, resolves $value aliases natively
   ↓ name/cedar-ios transform: produces token.name (camelCase)
   ↓ Action runs with dictionary access:

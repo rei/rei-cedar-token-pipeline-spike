@@ -171,7 +171,7 @@ The canonical model expresses this via `$extensions.cedar.platformOverrides` on 
 - The token exists on one platform but has no equivalent on another
 
 ### Governance Process
-Every `platformOverride` entry in `canonical.json` MUST be traceable to a deliberate design decision documented in `token-mapping.json` or an ADR amendment. The Normalization Layer MUST NOT infer platform overrides — they must arise from genuine differences between the Figma platform files that have been reviewed and accepted.
+Every `platformOverride` entry in `canonical/tokens.json` MUST be traceable to a deliberate design decision documented in the schema mapping contract (`src/schema/token-schema.json`) or an ADR amendment. The Normalization Layer MUST NOT infer platform overrides — they must arise from genuine differences between the Figma platform files that have been reviewed and accepted.
 
 ## Tier 1 — Foundations (Options)
 

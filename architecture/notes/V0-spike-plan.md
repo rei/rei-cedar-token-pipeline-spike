@@ -54,7 +54,7 @@ The mock Figma file must contain:
 - **Mock components** — 1–2 components using alias tokens only
 
 ### V0 Figma Exports
-V0 exports only `raw-figma-variables.json` containing mock options + mock alias tokens.
+V0 originally planned to export a single `raw-figma-variables.json` containing mock options + mock alias tokens.
 
 ---
 
@@ -122,7 +122,7 @@ The spike is successful if:
 
 # Deliverables
 
-- `canonical.json` (V0)
+- `canonical/tokens.json` (V0)
 - `schema.json` (canonical schema)
 - `dist/css/color.css`
 - `dist/ios/ColorTokens.swift`
@@ -158,7 +158,7 @@ The spike is successful if:
 | `spacing.alias.json` | Spacing alias tokens |
 | `spacing.<bp>.json` ×17 | Per-breakpoint spacing values |
 
-**New mandatory artifact: `token-mapping.json`.** The planned "preserve Figma names as-is" approach was replaced with an explicit mapping contract. Every Figma collection path must be declared in `token-mapping.json`. Build fails on unmapped paths. This is the primary governance mechanism.
+**New mandatory artifact: `src/schema/token-schema.json`.** The planned "preserve Figma names as-is" approach was replaced with an explicit mapping contract. Every Figma collection path must be declared in the schema's Figma input contract. Build fails on unmapped paths. This is the primary governance mechanism.
 
 ## Canonical Model Changes
 
@@ -170,11 +170,11 @@ The canonical `$value` on alias tokens is now a DTCG alias reference (`{color.op
 - `$extensions.cedar.platformOverrides.ios` on option tokens where iOS differs from web
 - `$extensions.cedar.ios/web` path references on alias tokens
 
-`$resolved` was not implemented. The planned hex cache on alias tokens was replaced by the option token platform data model above.
+`$extensions.cedar.resolved` is now implemented as an additive optimization on alias tokens. Alias `$value` remains the source-of-truth DTCG reference.
 
 ## Normalization Changes
 
-The planned "preserve Figma names as-is" normalization became an explicit mapping step via `token-mapping.json`. Semantic renames (e.g. `base-neutrals.white-85` → `overlay.light`) are declared in the mapping, not inferred in code.
+The planned "preserve Figma names as-is" normalization became an explicit mapping step via the Figma input contract in `src/schema/token-schema.json`. Semantic renames (e.g. `base-neutrals.white-85` → `overlay.light`) are declared in the schema, not inferred in code.
 
 ## Transform Layer Changes
 
@@ -190,8 +190,8 @@ Custom transform groups use the `cedar/` namespace (`cedar/ios`, `cedar/web`).
 
 | Planned Deliverable | Status |
 |---|---|
-| `canonical.json` (V0) | ✓ Complete — real REI tokens, not mock |
-| `token-mapping.json` | ✓ Complete — new artifact not in original plan |
+| `canonical/tokens.json` (V0) | ✓ Complete — real REI tokens, not mock |
+| `src/schema/token-schema.json` | ✓ Complete — contract artifact not in original plan |
 | `dist/css/light.css` | ✓ Complete — validated with correct values |
 | `dist/css/dark.css` | ✓ Complete — validated with correct values |
 | `dist/ios/Colors.xcassets/` | ✓ Complete — validated with correct iOS P3 values |
@@ -223,7 +223,7 @@ Custom transform groups use the `cedar/` namespace (`cedar/ios`, `cedar/web`).
 
 2. **SD v5 has five specific constraints** that affect architecture decisions. All are documented in the ADR-0005 Addendum. Anyone building new transforms must read it first.
 
-3. **`token-mapping.json` is more valuable than schema validation** — it surfaces designer renames as build errors immediately, with specific error messages, without requiring a separate validation tool.
+3. **The Figma input contract in `src/schema/token-schema.json` is more valuable than separate schema validation** — it surfaces designer renames as build errors immediately, with specific error messages, without requiring a separate validation tool.
 
 4. **iOS and web use intentionally different palettes** — `warm-grey.900` is `#1c1c1c` on iOS light but `#2e2e2b` on web light. This is a design decision, modeled via `platformOverrides`.
 

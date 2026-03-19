@@ -14,24 +14,10 @@ Draft
 Cedar's design token pipeline requires a stable, governed, platform‑agnostic representation of design intent.
 This representation — the **Canonical Token Model** — is the single source of truth for all downstream transformations.
 
-It serves as:
-
-- normalization output
-- Style Dictionary input
-- semantic token resolution
-- lifecycle validation
-- governance and breaking‑change rules
-- future bi‑directional sync with Figma
+It serves as the normalization output, the Style Dictionary input, and the governance boundary for token changes.
 
 The canonical model is produced by the Normalization Layer (ADR‑0002) from raw Figma inputs (ADR‑0003).
-It must be:
-
-- semantically meaningful
-- structurally consistent
-- free of platform assumptions
-- stable across versions
-- diff‑friendly
-- machine‑validatable
+It must remain semantically meaningful, structurally consistent, platform-agnostic, and machine-validatable.
 
 ---
 
@@ -39,16 +25,12 @@ It must be:
 
 The Canonical Token Model defines:
 
-- the allowed token types
-- the structure of `$value` for each type
-- how primitive, alias, and semantic tiers relate
-- how references (aliases) are represented
-- how pre‑resolved platform lookup caches are attached without affecting semantics
-- how composite tokens (typography, shadows, etc.) are modeled
-- how palettes and their surface scope are expressed
-- how platform overrides are expressed (future‑facing)
-- how metadata is preserved
-- how validation is enforced
+- allowed token types and `$value` structure
+- how option, alias, and semantic tiers relate
+- how alias references are represented
+- how platform metadata is attached without changing semantics
+- how composite tokens are modeled
+- validation boundaries for canonical data
 
 This model is the **only** format consumed by Style Dictionary and other platform transformers.
 
@@ -97,7 +79,7 @@ Canonical tokens MUST NOT contain:
 
 - `$value` MUST be either a structured value (for option tokens) or a DTCG‑style alias reference.
 - `$extensions.cedar` MUST NOT affect `$value` or token resolution.
-- `$resolved` MUST NOT affect `$value` or token resolution (see `$resolved` Rules).
+- `$extensions.cedar.resolved` MUST NOT affect `$value` or token resolution (see resolved-value rules).
 - Composite tokens MUST use structured objects, never strings.
 - All canonical tokens MUST be valid according to the canonical JSON Schema.
 
@@ -196,7 +178,7 @@ A new option token is appropriate when:
 - The platform uses a genuinely different concept (e.g. a system color like `UIColor.label` on iOS that has no web equivalent)
 - The semantic meaning differs, not just the hex value
 
-This distinction must be reviewed and approved during normalization. The Normalization Layer MUST NOT infer which case applies — it must be declared in `token-mapping.json`.
+This distinction must be reviewed and approved during normalization. The Normalization Layer MUST NOT infer which case applies — it must be declared in the schema mapping contract (`src/schema/token-schema.json`).
 
 ---
 
@@ -383,9 +365,13 @@ Palettes are stored under `color.palettes`:
           "base": {
             "$type": "color",
             "$value": "{color.option.neutral.warm.grey.900}",
-            "$resolved": {
-              "ios": { "light": "#1c1c1c", "dark": "#edeae3" },
-              "web": { "light": "#2e2e2b", "dark": "#edeae3" }
+            "$extensions": {
+              "cedar": {
+                "resolved": {
+                  "ios": { "light": "#1c1c1c", "dark": "#edeae3" },
+                  "web": { "light": "#2e2e2b", "dark": "#edeae3" }
+                }
+              }
             }
           }
         }
@@ -400,9 +386,13 @@ Palettes are stored under `color.palettes`:
           "base": {
             "$type": "color",
             "$value": "{color.option.brand.red.600}",
-            "$resolved": {
-              "ios": { "light": "#c7370f", "dark": "#610a0a" },
-              "web": { "light": "#c7370f", "dark": "#610a0a" }
+            "$extensions": {
+              "cedar": {
+                "resolved": {
+                  "ios": { "light": "#c7370f", "dark": "#610a0a" },
+                  "web": { "light": "#c7370f", "dark": "#610a0a" }
+                }
+              }
             }
           }
         }
@@ -665,7 +655,7 @@ Canonical tokens may reference other canonical tokens using DTCG alias syntax:
 ```
 
 Aliases in `$value` MUST NOT be resolved, flattened, or replaced during normalization or canonicalization.
-Pre‑computed resolved values belong in `$resolved`, not in `$value` (see `$resolved` Rules).
+Pre‑computed resolved values belong in `$extensions.cedar.resolved`, not in `$value`.
 
 ### Requirements
 
@@ -948,7 +938,7 @@ The Transform Layer MAY choose to consume overrides per platform.
 
 The canonical model MUST be a deeply nested JSON object representing semantic hierarchy.
 
-Top‑level keys reflect token categories. Color tokens are organised under `color.option` (foundational option values) and `color.modes` (semantic alias tokens per palette). `color.primitives` MUST NOT appear in the canonical output — the four Figma platform files are normalization input only, consumed via `token-mapping.json` to build `color.option`.
+Top‑level keys reflect token categories. Color tokens are organised under `color.option` (foundational option values) and `color.modes` (semantic alias tokens per palette). `color.primitives` MUST NOT appear in the canonical output — the four Figma platform files are normalization input only, consumed via the schema mapping contract (`src/schema/token-schema.json`) to build `color.option`.
 
 ```json
 {

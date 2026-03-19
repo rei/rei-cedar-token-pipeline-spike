@@ -24,7 +24,7 @@ The Normalization Layer is a TypeScript script (`normalize.ts`) that:
 
 1. Reads `src/schema/token-schema.json` — which contains the governed Figma Input Contract (ADR‑0003) in the `inputs.figma.collections` section
 2. Processes option files via explicit path mapping (never string inference)
-3. Produces a single `canonical.json` with the canonical structure
+3. Produces a single `canonical/tokens.json` with the canonical structure
 4. Fails loudly if any Figma token path is not declared in the mapping
 
 ---
@@ -73,7 +73,7 @@ The four platform files produce a **platformLookup table** mapping `"web-light"`
 
 The `web-light` snapshot is used as the authoritative `$value` source for `color.option`. The other three files contribute only to the lookup table.
 
-**`color.primitives` is NOT written to `canonical.json`.** The four platform files are normalization input only.
+**`color.primitives` is NOT written to `canonical/tokens.json`.** The four platform files are normalization input only.
 
 ### 5. Alias files
 
@@ -108,7 +108,7 @@ Stamps `$extensions.cedar.$meta` on each palette root so the CSS transform knows
 
 ### 7. Output
 
-`canonical.json` is written with the structure defined in ADR‑0001:
+`canonical/tokens.json` is written with the structure defined in ADR‑0001:
 
 ```
 color.option.*  — option tokens with $value (web-light hex), $extensions.cedar.appearances, platformOverrides
@@ -122,12 +122,12 @@ spacing.*       — spacing tokens
 
 ## Governed Invariants
 
-- `token-mapping.json` is required — missing file fails the build
-- Any Figma token path not in `token-mapping.json` fails the build
+- `src/schema/token-schema.json` is required — missing file fails the build
+- Any Figma token path not in the schema mapping fails the build
 - Any alias reference to an unmapped collection fails the build
 - `color.primitives` MUST NOT appear in the canonical output
 - Option tokens MUST have concrete `$value` (no aliases)
-- Option tokens MUST NOT have `$resolved` — platform data lives in `$extensions.cedar`
+- Option tokens MUST NOT have top-level `$resolved` — platform data lives in `$extensions.cedar`
 - Alias tokens MUST have `$extensions.cedar.ios` and `$extensions.cedar.web` populated
 - `$extensions.cedar` path strings MUST NOT use `{ref}` brace syntax (SD resolves them)
 
@@ -135,11 +135,11 @@ spacing.*       — spacing tokens
 
 - Build MUST fail if any Figma token path is unmapped
 - CI MUST warn if `$extensions.cedar.appearances` or `platformOverrides` on option tokens are inconsistent with the current Figma platform files (staleness detection)
-- `token-mapping.json` MUST require review from both design and engineering leads before merge
+- `src/schema/token-schema.json` MUST require review from both design and engineering leads before merge
 
-### `token-mapping.json` Governance
+### Schema Mapping Governance
 
-`token-mapping.json` is the formal boundary between design and engineering. Changes require:
+The schema mapping in `src/schema/token-schema.json` is the formal boundary between design and engineering. Changes require:
 - A PR with both a design approver and an engineering approver
 - The build MUST fail before the PR if the mapping is inconsistent with the current Figma files
 - CODEOWNERS MUST list both a design lead and an engineering lead as required reviewers
@@ -153,7 +153,7 @@ The Normalization Layer does NOT:
 - infer canonical paths from Figma names (all mappings are explicit)
 - generate platform-specific output (handled by the Transform Layer, ADR‑0005)
 - validate semantic token relationships (handled by ADR‑0004 rules)
-- publish or version canonical.json
+- publish or version `canonical/tokens.json`
 
 ---
 

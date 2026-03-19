@@ -9,8 +9,8 @@ It has been updated from the original plan to reflect what was built and validat
 
 The V0 spike produced a working pipeline with the following principles:
 
-- **Eight input files → one canonical.json → platform outputs**
-- **`token-mapping.json` is the governance contract between Figma and the canonical model**
+- **Eight input files → one canonical/tokens.json → platform outputs**
+- **`src/schema/token-schema.json` is the governance contract between Figma and the canonical model**
 - **The canonical model is the single source of truth**
 - **Platform outputs are produced by custom SD actions, not standard formatters**
 
@@ -33,18 +33,18 @@ tokens/ directory (8+ JSON files)
   └── spacing.<bp>.json (×17 breakpoint files)
          │
          ▼
-token-mapping.json ──────────────────────┐
+token-schema.json ───────────────────────┐
 (Figma path → canonical path contract)   │
                                          ▼
 normalize.ts (Normalization Layer)
-  1. Load token-mapping.json
+  1. Load src/schema/token-schema.json
   2. Process platform files → color.option.* + platformLookup table
   3. Process alias files → color.modes.* with $extensions.cedar
   4. Write appearance + platformOverrides onto option tokens
   5. Write alias token platform references ($extensions.cedar.ios/web)
          │
          ▼
-canonical.json (Single Source of Truth)
+canonical/tokens.json (Single Source of Truth)
   ├── color.option.*    — option tokens with platform data
   ├── color.modes.*     — alias tokens with platform references
   └── spacing.*         — fluid clamp() spacing tokens
@@ -96,7 +96,7 @@ The appearance dimension (light/dark) is encoded in the filename because Figma's
 
 ---
 
-### 2. `token-mapping.json` (Governance Contract)
+### 2. `src/schema/token-schema.json` (Governance Contract)
 
 The explicit, version-controlled mapping from every Figma collection path to its canonical `color.option.*` path.
 
@@ -110,17 +110,17 @@ The explicit, version-controlled mapping from every Figma collection path to its
 
 ### 3. Normalization Layer (GitHub Environment)
 
-`normalize.ts` transforms all input files into a single `canonical.json`.
+`normalize.ts` transforms all input files into a single `canonical/tokens.json`.
 
 Key steps:
-- Applies `token-mapping.json` to translate Figma paths to canonical paths
+- Applies schema mapping to translate Figma paths to canonical paths
 - Builds `color.option.*` tree from `web-light` as the canonical `$value` source
 - Builds `platformLookup` table from all four platform files
 - Writes `$extensions.cedar.appearances.dark` on option tokens where web-dark differs from web-light
 - Writes `$extensions.cedar.platformOverrides.ios` on option tokens where iOS differs from web
 - Writes `$extensions.cedar.ios/web` path references on alias tokens
 
-**Artifact:** `canonical.json` — there is no separate validation step. The build fails on invalid input during normalization.
+**Artifact:** `canonical/tokens.json` — there is no separate validation step. The build fails on invalid input during normalization.
 
 ---
 
@@ -141,7 +141,7 @@ spacing.*        — spacing tokens (fluid clamp() values)
 
 ### 5. Style Dictionary Transform Layer (Build Environment)
 
-Consumes `canonical.json` and produces platform outputs via custom actions.
+Consumes `canonical/tokens.json` and produces platform outputs via custom actions.
 
 **Platform: `cedar/ios`**
 - Action: `ios-colorset`
@@ -182,7 +182,7 @@ Consumes `canonical.json` and produces platform outputs via custom actions.
 |---|---|
 | **Figma** | Design origination — variables, collections, modes |
 | **GitHub Action** | Exports Figma variables to `tokens/` JSON files |
-| **GitHub / CI** | Normalization, canonical.json production, build-fail governance |
+| **GitHub / CI** | Normalization, canonical/tokens.json production, build-fail governance |
 | **Style Dictionary** | Platform-specific output generation |
 | **NPM** | Distribution (V1) |
 
@@ -192,6 +192,6 @@ Consumes `canonical.json` and produces platform outputs via custom actions.
 
 - **ADR‑0001** defines the Canonical Token Model and `$extensions.cedar` shape
 - **ADR‑0002** defines the Normalization Layer and four-file convention
-- **ADR‑0003** defines the Figma Input Contract and `token-mapping.json`
+- **ADR‑0003** defines the Figma Input Contract and schema-backed mapping contract
 - **ADR‑0005** defines the Transform Layer and platform outputs
 - **ADR‑0005 Addendum** documents SD v5 constraints discovered in the spike
