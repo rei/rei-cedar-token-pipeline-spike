@@ -3,6 +3,27 @@ import path from 'node:path';
 import type { Action } from 'style-dictionary/types';
 import { iosColorsetFormatter } from '../../formats/ios/ios-colorset';
 
+type CedarOptionNode = {
+  value?: unknown;
+  $value?: unknown;
+  $extensions?: {
+    cedar?: {
+      appearances?: Record<string, string>;
+      platformOverrides?: Record<string, Record<string, string>>;
+    };
+  };
+};
+
+type CedarResolvedPlatform = {
+  light: string;
+  dark: string;
+};
+
+type CedarPlatformRefs = {
+  light: string;
+  dark: string;
+};
+
 /**
  * Resolve an option token node to its final hex for a given platform
  * and appearance, applying platform overrides and appearance values.
@@ -13,7 +34,7 @@ import { iosColorsetFormatter } from '../../formats/ios/ios-colorset';
  *   3. $value                                                        (web-light fallback)
  */
 function resolveOptionHex(
-  optionNode: any,
+  optionNode: CedarOptionNode | undefined,
   platform: 'ios' | 'web',
   appearance: 'light' | 'dark',
 ): string | undefined {
@@ -49,6 +70,12 @@ function hexToP3(hex: string) {
   return { 'color-space': 'display-p3', components: hexToP3Components(hex) };
 }
 
+function hasLightDarkStrings(value: unknown): value is { light: string; dark: string } {
+  return !!value && typeof value === 'object'
+    && typeof (value as { light?: unknown }).light === 'string'
+    && typeof (value as { dark?: unknown }).dark === 'string';
+}
+
 /**
  * Navigate dictionary.tokens by a dot-separated path.
  * SD v5 stores tokens as a nested object matching the source JSON structure.
@@ -56,10 +83,32 @@ function hexToP3(hex: string) {
  * they're filtered out of allTokens by the platform filter.
  */
 function getTokenAtPath(tokens: any, dotPath: string): any {
-  return dotPath.split('.').reduce((node: any, seg: string) => {
-    if (node == null) return undefined;
-    return node[seg];
+  return dotPath.split('.').reduce<unknown>((node, seg) => {
+    if (!node || typeof node !== 'object') return undefined;
+    return (node as Record<string, unknown>)[seg];
   }, tokens);
+}
+
+function writeColorset(
+  assetRoot: string,
+  token: { name: string },
+  lightHex: string,
+  darkHex: string,
+) {
+  const transformedToken = {
+    ...token,
+    value: {
+      light: hexToP3(lightHex),
+      dark: hexToP3(darkHex),
+    },
+  };
+
+  const folderPath = path.join(assetRoot, `${token.name}.colorset`);
+  fs.mkdirSync(folderPath, { recursive: true });
+  fs.writeFileSync(
+    path.join(folderPath, 'Contents.json'),
+    iosColorsetFormatter(transformedToken)
+  );
 }
 
 export const iosColorsetAction: Action = {
@@ -85,15 +134,22 @@ export const iosColorsetAction: Action = {
     );
 
     colorTokens.forEach((token) => {
+      const resolved = (token.$extensions as { cedar?: { resolved?: { ios?: unknown } } } | undefined)
+        ?.cedar?.resolved?.ios;
+
+      if (hasLightDarkStrings(resolved)) {
+        writeColorset(assetRoot, token, resolved.light, resolved.dark);
+        return;
+      }
+
       // Read the iOS option token paths from $extensions.cedar.ios.
       // Shape: { light: "color.option.*", dark: "color.option.*" }
       // Stored as plain dot-path strings (no braces) — SD resolves any {ref} syntax
       // it finds in $extensions eagerly, replacing the string with resolved hex.
       // Plain strings bypass SD's resolver; the action looks them up directly.
-      const iosCedar = (token.$extensions as any)?.cedar?.ios;
+      const iosCedar = (token.$extensions as { cedar?: { ios?: unknown } } | undefined)?.cedar?.ios;
 
-      if (!iosCedar || typeof iosCedar !== 'object' ||
-          typeof iosCedar.light !== 'string' || typeof iosCedar.dark !== 'string') {
+      if (!hasLightDarkStrings(iosCedar)) {
         throw new Error(
           `Token ${token.name}: $extensions.cedar.ios must be { light, dark } path strings. ` +
           `Got: ${JSON.stringify(iosCedar)}. ` +
@@ -101,12 +157,12 @@ export const iosColorsetAction: Action = {
         );
       }
 
-      const lightRefPath = iosCedar.light;
-      const darkRefPath  = iosCedar.dark;
+      const lightRefPath = (iosCedar as CedarPlatformRefs).light;
+      const darkRefPath  = (iosCedar as CedarPlatformRefs).dark;
 
       // Look up the option token in dictionary.tokens (the full nested tree)
-      const lightOptionNode = getTokenAtPath(dictionary.tokens, lightRefPath);
-      const darkOptionNode  = getTokenAtPath(dictionary.tokens, darkRefPath);
+      const lightOptionNode = getTokenAtPath(dictionary.tokens, lightRefPath) as CedarOptionNode | undefined;
+      const darkOptionNode  = getTokenAtPath(dictionary.tokens, darkRefPath) as CedarOptionNode | undefined;
 
       if (!lightOptionNode) {
         throw new Error(
@@ -132,20 +188,7 @@ export const iosColorsetAction: Action = {
         );
       }
 
-      const transformedToken = {
-        ...token,
-        value: {
-          light: hexToP3(lightHex),
-          dark:  hexToP3(darkHex),
-        },
-      };
-
-      const folderPath = path.join(assetRoot, `${token.name}.colorset`);
-      fs.mkdirSync(folderPath, { recursive: true });
-      fs.writeFileSync(
-        path.join(folderPath, 'Contents.json'),
-        iosColorsetFormatter(transformedToken)
-      );
+      writeColorset(assetRoot, token, lightHex, darkHex);
     });
   },
 

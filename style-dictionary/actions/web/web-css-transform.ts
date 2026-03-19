@@ -69,6 +69,30 @@ export const webCssAction: Action = {
     const spacingComponent = { light: [] as string[], dark: [] as string[] };
     const spacingLayout = { light: [] as string[], dark: [] as string[] };
 
+    function pushColorByCategory(token: any, line: string, darkLine: string): boolean {
+      const category = token.path[3];
+      if (category === 'surface') {
+        colorSurface.light.push(line);
+        colorSurface.dark.push(darkLine);
+        return true;
+      }
+      if (category === 'text') {
+        colorText.light.push(line);
+        colorText.dark.push(darkLine);
+        return true;
+      }
+      if (category === 'border') {
+        colorBorder.light.push(line);
+        colorBorder.dark.push(darkLine);
+        return true;
+      }
+
+      console.warn(
+        `[web-css] Token ${token.name}: unknown semantic color category "${String(category)}" at path "${token.path.join('.')}"`
+      );
+      return false;
+    }
+
     // Categorize color tokens
     const colorTokens = dictionary.allTokens.filter(
       (t) =>
@@ -79,6 +103,16 @@ export const webCssAction: Action = {
     );
 
     colorTokens.forEach((token) => {
+      const resolved = (token.$extensions as any)?.cedar?.resolved?.web;
+      if (resolved && typeof resolved.light === 'string' && typeof resolved.dark === 'string') {
+        const cssVar = toCssVar(token.path);
+        const line = `  ${cssVar}: ${resolved.light};`;
+        const darkLine = `  ${cssVar}: ${resolved.dark};`;
+
+        pushColorByCategory(token, line, darkLine);
+        return;
+      }
+
       const webCedar = (token.$extensions as any)?.cedar?.web;
 
       if (!webCedar?.light || !webCedar?.dark) {
@@ -104,18 +138,7 @@ export const webCssAction: Action = {
       const line = `  ${cssVar}: ${lightHex};`;
       const darkLine = `  ${cssVar}: ${darkHex};`;
 
-      // Organize by semantic category (path[3] is the category: surface, text, border)
-      const category = token.path[3];
-      if (category === 'surface') {
-        colorSurface.light.push(line);
-        colorSurface.dark.push(darkLine);
-      } else if (category === 'text') {
-        colorText.light.push(line);
-        colorText.dark.push(darkLine);
-      } else if (category === 'border') {
-        colorBorder.light.push(line);
-        colorBorder.dark.push(darkLine);
-      }
+      pushColorByCategory(token, line, darkLine);
     });
 
     // Categorize spacing tokens

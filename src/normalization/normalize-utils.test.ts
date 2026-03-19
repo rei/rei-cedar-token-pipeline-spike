@@ -29,7 +29,6 @@ import {
   applyTokenMapping,
   buildOptionTree,
   parseTokenDescription,
-  type TokenMapping,
 } from "./normalize-utils.js";
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
