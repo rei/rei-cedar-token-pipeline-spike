@@ -194,4 +194,4 @@ Consumes `canonical/tokens.json` and produces platform outputs via custom action
 - **ADR‑0002** defines the Normalization Layer and four-file convention
 - **ADR‑0003** defines the Figma Input Contract and schema-backed mapping contract
 - **ADR‑0005** defines the Transform Layer and platform outputs
-- **ADR‑0005 Addendum** documents SD v5 constraints discovered in the spike
+- **ADR‑0005** documents SD v5 constraints discovered in the spike

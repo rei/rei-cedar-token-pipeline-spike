@@ -221,7 +221,7 @@ Custom transform groups use the `cedar/` namespace (`cedar/ios`, `cedar/web`).
 
 1. **The four-file Figma structure is load-bearing** — the appearance dimension is in the filename, not the file. This must be formally documented as a governed contract (done in ADR-0003).
 
-2. **SD v5 has five specific constraints** that affect architecture decisions. All are documented in the ADR-0005 Addendum. Anyone building new transforms must read it first.
+2. **SD v5 has five specific constraints** that affect architecture decisions. These are documented in ADR-0005 (constraints section). Anyone building new transforms must read it first.
 
 3. **The Figma input contract in `src/schema/token-schema.json` is more valuable than separate schema validation** — it surfaces designer renames as build errors immediately, with specific error messages, without requiring a separate validation tool.
 

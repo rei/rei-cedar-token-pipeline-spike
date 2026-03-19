@@ -131,7 +131,7 @@ Consumes `canonical/tokens.json` and produces platform outputs via custom action
 - SD resolves `{ref}` syntax in `$extensions` — path strings must be stored without braces
 - Built-in SD transform groups (`ios`, `css`) must not be used — namespace as `cedar/ios`, `cedar/web`
 
-See ADR-0005 Addendum for full constraint documentation.
+See ADR-0005 (SD v5 constraints section) for full constraint documentation.
 
 ---
 
