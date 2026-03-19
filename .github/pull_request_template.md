@@ -3,6 +3,18 @@
 - Describe what changed.
 - Include why the change is needed.
 
+## Scope Lock
+
+- Primary intent (one sentence):
+- In scope:
+- Out of scope (non-goals):
+
+## Change Budget
+
+- Estimated changed files:
+- Estimated changed lines:
+- If this exceeds normal scope, justify why it should remain a single PR:
+
 ## Governance Tier Classification
 
 List the files changed in this PR by tier from `architecture/notes/file-dictionary.md`.
@@ -25,6 +37,11 @@ List the files changed in this PR by tier from `architecture/notes/file-dictiona
 - Behavior impact:
 - Contract impact:
 - Rollback plan:
+
+## Architecture Safety Check
+
+- [ ] This PR does not unintentionally combine runtime and architecture scope.
+- [ ] If both architecture docs and runtime code changed, I explicitly documented why they must ship together.
 
 ## Validation Evidence
 

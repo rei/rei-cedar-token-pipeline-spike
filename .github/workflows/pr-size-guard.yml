@@ -1,0 +1,61 @@
+name: PR size guard
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+jobs:
+  pr-size-guard:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+
+    steps:
+      - name: Enforce PR size budget
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const MAX_FILES = 10;
+            const MAX_LINES = 300;
+            const BYPASS_LABELS = new Set(["scope:large", "migration"]);
+
+            const pr = context.payload.pull_request;
+            if (!pr) {
+              core.info("No pull_request payload found; skipping.");
+              return;
+            }
+
+            const labels = new Set((pr.labels || []).map((l) => l.name));
+            const bypass = [...BYPASS_LABELS].find((l) => labels.has(l));
+
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              per_page: 100,
+            });
+
+            const changedFiles = files.length;
+            const changedLines = files.reduce((sum, f) => sum + (f.changes || 0), 0);
+
+            core.info(`PR #${pr.number}: files=${changedFiles}, lines=${changedLines}`);
+
+            if (bypass) {
+              core.notice(`PR size checks bypassed by label: ${bypass}`);
+              return;
+            }
+
+            const failures = [];
+            if (changedFiles > MAX_FILES) {
+              failures.push(`changed files ${changedFiles} exceeds max ${MAX_FILES}`);
+            }
+            if (changedLines > MAX_LINES) {
+              failures.push(`changed lines ${changedLines} exceeds max ${MAX_LINES}`);
+            }
+
+            if (failures.length > 0) {
+              core.setFailed(
+                `PR exceeds size budget: ${failures.join("; ")}. ` +
+                `Split into smaller PRs or apply label 'scope:large' with justification.`
+              );
+            }
