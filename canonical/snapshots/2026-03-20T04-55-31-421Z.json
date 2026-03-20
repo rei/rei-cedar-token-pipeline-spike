@@ -188,30 +188,6 @@
             }
           }
         },
-        "green": {
-          "400": {
-            "$type": "color",
-            "$value": "#3b8349",
-            "$extensions": {
-              "cedar": {
-                "appearances": {
-                  "dark": "#1f513f"
-                }
-              }
-            }
-          },
-          "600": {
-            "$type": "color",
-            "$value": "#1f513f",
-            "$extensions": {
-              "cedar": {
-                "appearances": {
-                  "dark": "#3b8349"
-                }
-              }
-            }
-          }
-        },
         "yellow": {
           "400": {
             "$type": "color",
@@ -271,6 +247,30 @@
               }
             }
           }
+        },
+        "green": {
+          "400": {
+            "$type": "color",
+            "$value": "#3b8349",
+            "$extensions": {
+              "cedar": {
+                "appearances": {
+                  "dark": "#1f513f"
+                }
+              }
+            }
+          },
+          "600": {
+            "$type": "color",
+            "$value": "#1f513f",
+            "$extensions": {
+              "cedar": {
+                "appearances": {
+                  "dark": "#3b8349"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -282,6 +282,11 @@
             "$type": "color",
             "$extensions": {
               "cedar": {
+                "docs": {
+                  "summary": "Default page and container background.",
+                  "design": "First step in the surface elevation scale. Anchors the layering system — raised surfaces sit above this token, not below.",
+                  "usage": "Use as the background for the primary content area, cards, modals, and any surface that sits at the base elevation. Do not use for text or interactive elements."
+                },
                 "ios": {
                   "dark": "color.option.neutral.white",
                   "light": "color.option.neutral.white"
@@ -308,6 +313,11 @@
             "$type": "color",
             "$extensions": {
               "cedar": {
+                "docs": {
+                  "summary": "Elevated surface background, one step above the base layer.",
+                  "design": "Second step in the surface elevation scale. Creates visual separation from surface-base through a subtle warm-grey tint.",
+                  "usage": "Use for cards, panels, and drawers that sit above the base page surface. Do not use for the root page background or inline content areas."
+                },
                 "ios": {
                   "dark": "color.option.neutral.warm.grey.100",
                   "light": "color.option.neutral.warm.grey.100"
@@ -336,6 +346,11 @@
             "$type": "color",
             "$extensions": {
               "cedar": {
+                "docs": {
+                  "summary": "Primary text color for body content and headings.",
+                  "design": "Anchors the text scale at maximum legibility. Darkest step in the warm-grey text ramp.",
+                  "usage": "Use for all default body copy, headings, and labels. Do not use for decorative text, disabled states, or secondary information — use text-subtle for those."
+                },
                 "ios": {
                   "dark": "color.option.neutral.warm.grey.900",
                   "light": "color.option.neutral.warm.grey.900"
@@ -362,6 +377,11 @@
             "$type": "color",
             "$extensions": {
               "cedar": {
+                "docs": {
+                  "summary": "Secondary text color for supporting and supplementary content.",
+                  "design": "Mid-point in the text scale. Reduced contrast signals secondary importance while remaining accessible.",
+                  "usage": "Use for captions, helper text, metadata, and secondary labels. Do not use for primary body copy or anything requiring full legibility — use text-base for those."
+                },
                 "ios": {
                   "dark": "color.option.neutral.warm.grey.600",
                   "light": "color.option.neutral.warm.grey.600"
@@ -388,6 +408,11 @@
             "$type": "color",
             "$extensions": {
               "cedar": {
+                "docs": {
+                  "summary": "Text color for interactive links and inline navigation.",
+                  "design": "Draws from the blue brand scale to signal interactivity. Paired with text-link-hover to form the link interaction ramp.",
+                  "usage": "Use for hyperlinks, inline anchors, and any text that navigates or triggers an action. Do not use for non-interactive text — use text-base or text-subtle instead."
+                },
                 "ios": {
                   "dark": "color.option.brand.blue.600",
                   "light": "color.option.brand.blue.600"
@@ -414,6 +439,11 @@
             "$type": "color",
             "$extensions": {
               "cedar": {
+                "docs": {
+                  "summary": "Text color for links in their hovered state.",
+                  "design": "Lighter step in the blue brand scale, creating a visible but controlled shift from text-link on hover.",
+                  "usage": "Use only as the hover state for text-link. Do not use for default link text or any non-interactive element."
+                },
                 "ios": {
                   "dark": "color.option.brand.blue.400",
                   "light": "color.option.brand.blue.400"
@@ -440,6 +470,11 @@
             "$type": "color",
             "$extensions": {
               "cedar": {
+                "docs": {
+                  "summary": "Text color for sale prices and promotional messaging.",
+                  "design": "Draws from the red brand scale. Reserved solely for commerce pricing contexts to preserve its signal strength.",
+                  "usage": "Use exclusively for sale price labels and discount indicators. Do not use for error states, alerts, or general emphasis — those have dedicated tokens."
+                },
                 "ios": {
                   "dark": "color.option.brand.red.400",
                   "light": "color.option.brand.red.400"
@@ -468,6 +503,11 @@
             "$type": "color",
             "$extensions": {
               "cedar": {
+                "docs": {
+                  "summary": "Default border color for containers, inputs, and dividers.",
+                  "design": "Mid-light step in the warm-grey scale, providing enough contrast to define structure without competing with content.",
+                  "usage": "Use for input field borders, card outlines, and structural dividers. Do not use for decorative separators or low-emphasis boundaries — use border-subtle for those."
+                },
                 "ios": {
                   "dark": "color.option.neutral.warm.grey.300",
                   "light": "color.option.neutral.warm.grey.300"
@@ -494,6 +534,11 @@
             "$type": "color",
             "$extensions": {
               "cedar": {
+                "docs": {
+                  "summary": "Low-emphasis border for decorative separators and understated boundaries.",
+                  "design": "Lightest step in the border scale. Provides just enough separation to guide the eye without drawing attention.",
+                  "usage": "Use for dividers between list items, section rules, and subtle layout separators. Do not use where a border needs to define a structure or interactive boundary — use border-base for those."
+                },
                 "ios": {
                   "dark": "color.option.neutral.warm.grey.100",
                   "light": "color.option.neutral.warm.grey.100"
@@ -532,6 +577,11 @@
             "$type": "color",
             "$extensions": {
               "cedar": {
+                "docs": {
+                  "summary": "Default page and container background.",
+                  "design": "First step in the surface elevation scale. Anchors the layering system — raised surfaces sit above this token, not below.",
+                  "usage": "Use as the background for the primary content area, cards, modals, and any surface that sits at the base elevation. Do not use for text or interactive elements."
+                },
                 "ios": {
                   "dark": "color.option.brand.red.400",
                   "light": "color.option.brand.red.400"
@@ -558,6 +608,11 @@
             "$type": "color",
             "$extensions": {
               "cedar": {
+                "docs": {
+                  "summary": "Elevated surface background, one step above the base layer.",
+                  "design": "Second step in the surface elevation scale. Creates visual separation from surface-base through a subtle warm-grey tint.",
+                  "usage": "Use for cards, panels, and drawers that sit above the base page surface. Do not use for the root page background or inline content areas."
+                },
                 "ios": {
                   "dark": "color.option.neutral.warm.grey.600",
                   "light": "color.option.neutral.warm.grey.600"
@@ -586,6 +641,11 @@
             "$type": "color",
             "$extensions": {
               "cedar": {
+                "docs": {
+                  "summary": "Primary text color for body content and headings.",
+                  "design": "Anchors the text scale at maximum legibility. Darkest step in the warm-grey text ramp.",
+                  "usage": "Use for all default body copy, headings, and labels. Do not use for decorative text, disabled states, or secondary information — use text-subtle for those."
+                },
                 "ios": {
                   "dark": "color.option.brand.yellow.600",
                   "light": "color.option.brand.yellow.600"
@@ -612,6 +672,11 @@
             "$type": "color",
             "$extensions": {
               "cedar": {
+                "docs": {
+                  "summary": "Secondary text color for supporting and supplementary content.",
+                  "design": "Mid-point in the text scale. Reduced contrast signals secondary importance while remaining accessible.",
+                  "usage": "Use for captions, helper text, metadata, and secondary labels. Do not use for primary body copy or anything requiring full legibility — use text-base for those."
+                },
                 "ios": {
                   "dark": "color.option.brand.yellow.400",
                   "light": "color.option.brand.yellow.400"
@@ -634,26 +699,31 @@
             }
           },
           "link": {
-            "$value": "{color.option.neutral.warm.grey.100}",
+            "$value": "{color.option.neutral.white}",
             "$type": "color",
             "$extensions": {
               "cedar": {
+                "docs": {
+                  "summary": "Text color for interactive links and inline navigation.",
+                  "design": "Draws from the blue brand scale to signal interactivity. Paired with text-link-hover to form the link interaction ramp.",
+                  "usage": "Use for hyperlinks, inline anchors, and any text that navigates or triggers an action. Do not use for non-interactive text — use text-base or text-subtle instead."
+                },
                 "ios": {
-                  "dark": "color.option.neutral.warm.grey.100",
-                  "light": "color.option.neutral.warm.grey.100"
+                  "dark": "color.option.neutral.white",
+                  "light": "color.option.neutral.white"
                 },
                 "web": {
-                  "dark": "color.option.neutral.warm.grey.100",
-                  "light": "color.option.neutral.warm.grey.100"
+                  "dark": "color.option.neutral.white",
+                  "light": "color.option.neutral.white"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#1c1c1c",
-                    "light": "#edeae3"
+                    "dark": "#ffffff",
+                    "light": "#ffffff"
                   },
                   "web": {
-                    "dark": "#2e2e2b",
-                    "light": "#edeae3"
+                    "dark": "#ffffff",
+                    "light": "#ffffff"
                   }
                 }
               }
@@ -664,6 +734,11 @@
             "$type": "color",
             "$extensions": {
               "cedar": {
+                "docs": {
+                  "summary": "Text color for links in their hovered state.",
+                  "design": "Lighter step in the blue brand scale, creating a visible but controlled shift from text-link on hover.",
+                  "usage": "Use only as the hover state for text-link. Do not use for default link text or any non-interactive element."
+                },
                 "ios": {
                   "dark": "color.option.neutral.warm.grey.300",
                   "light": "color.option.neutral.warm.grey.300"
@@ -690,6 +765,11 @@
             "$type": "color",
             "$extensions": {
               "cedar": {
+                "docs": {
+                  "summary": "Text color for sale prices and promotional messaging.",
+                  "design": "Draws from the red brand scale. Reserved solely for commerce pricing contexts to preserve its signal strength.",
+                  "usage": "Use exclusively for sale price labels and discount indicators. Do not use for error states, alerts, or general emphasis — those have dedicated tokens."
+                },
                 "ios": {
                   "dark": "color.option.brand.green.400",
                   "light": "color.option.brand.green.400"
@@ -718,6 +798,11 @@
             "$type": "color",
             "$extensions": {
               "cedar": {
+                "docs": {
+                  "summary": "Default border color for containers, inputs, and dividers.",
+                  "design": "Mid-light step in the warm-grey scale, providing enough contrast to define structure without competing with content.",
+                  "usage": "Use for input field borders, card outlines, and structural dividers. Do not use for decorative separators or low-emphasis boundaries — use border-subtle for those."
+                },
                 "ios": {
                   "dark": "color.option.neutral.warm.grey.100",
                   "light": "color.option.neutral.warm.grey.100"
@@ -744,6 +829,11 @@
             "$type": "color",
             "$extensions": {
               "cedar": {
+                "docs": {
+                  "summary": "Low-emphasis border for decorative separators and understated boundaries.",
+                  "design": "Lightest step in the border scale. Provides just enough separation to guide the eye without drawing attention.",
+                  "usage": "Use for dividers between list items, section rules, and subtle layout separators. Do not use where a border needs to define a structure or interactive boundary — use border-base for those."
+                },
                 "ios": {
                   "dark": "color.option.neutral.warm.grey.900",
                   "light": "color.option.neutral.warm.grey.900"

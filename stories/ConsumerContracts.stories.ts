@@ -28,7 +28,7 @@ function asyncStory(fn: () => Promise<string>): () => HTMLElement {
         const msg = err instanceof Error ? err.message : String(err);
         container.innerHTML = `
           <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:0.85rem;color:#be342d">
-            Error loading contract reference: ${msg}
+            Error loading contract reference: ${escapeHtml(msg)}
           </div>`;
       });
 

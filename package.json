@@ -6,9 +6,12 @@
   "types": "dist/types/index.d.ts",
   "type": "module",
   "exports": {
-    "./types": {
+    ".": {
       "types": "./dist/types/index.d.ts",
-      "default": "./dist/types/index.d.ts"
+      "default": "./index.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts"
     },
     "./meta/*": "./dist/themes/rei-dot-com/meta/*",
     "./package.json": "./package.json"
