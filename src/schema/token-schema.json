@@ -4,11 +4,6 @@
   "title": "Cedar Token Schema",
   "description": "Authoritative schema defining token structure, validation, and Figma Input Contract (ADR-0003). Single source of truth for design-to-engineering token governance.",
   "type": "object",
-  "properties": {
-    "inputs": {
-      "$ref": "#/$defs/InputsContract"
-    }
-  },
   "additionalProperties": {
     "$ref": "#/$defs/TokenNode"
   },

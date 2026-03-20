@@ -85,7 +85,21 @@ try {
     );
   }
   const schema = JSON.parse(fs.readFileSync(schemaFile, "utf-8"));
-  const tokenMapping: TokenMapping = schema.inputs.figma;
+  const figmaInputs = schema?.inputs?.figma;
+  if (
+    typeof figmaInputs !== "object" ||
+    figmaInputs === null ||
+    typeof figmaInputs.collections !== "object" ||
+    figmaInputs.collections === null
+  ) {
+    throw new Error(
+      `Invalid Figma input contract in ${schemaFile}. ` +
+        `Expected inputs.figma.collections to be an object. ` +
+        `Fix src/schema/token-schema.json to match ADR-0003.`,
+    );
+  }
+
+  const tokenMapping: TokenMapping = figmaInputs as TokenMapping;
 
   // ── Read all token files ─────────────────────────────────────────────────────
   const files = fs
