@@ -136,9 +136,13 @@ export const webCssAction: Action = {
 
       const webCedar = (token.$extensions as any)?.cedar?.web;
 
-      if (!webCedar?.light || !webCedar?.dark) {
+      if (
+        typeof webCedar?.light !== 'string' ||
+        typeof webCedar?.dark !== 'string'
+      ) {
         throw new Error(
           `[web-css] Token ${token.name}: missing $extensions.cedar.web { light, dark }. ` +
+          `Expected string refs but got light=${typeof webCedar?.light}, dark=${typeof webCedar?.dark}. ` +
           `Ensure normalize.ts mergeColorVariants generated web option refs.`
         );
       }

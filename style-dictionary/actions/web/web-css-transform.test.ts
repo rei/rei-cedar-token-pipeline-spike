@@ -105,6 +105,36 @@ describe("webCssAction", () => {
     );
   });
 
+  it("throws when web option refs are not strings", () => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const buildPath = fs.mkdtempSync(path.join(os.tmpdir(), "web-css-action-"));
+    tempDirs.push(buildPath);
+
+    const dictionary = {
+      allTokens: [
+        {
+          name: "textBase",
+          path: ["color", "modes", "default", "text", "base"],
+          $type: "color",
+          $extensions: {
+            cedar: {
+              web: {
+                light: { bad: true },
+                dark: "color.option.brand.blue.600",
+              },
+            },
+          },
+        },
+      ],
+      tokens: {},
+    };
+
+    expect(() => webCssAction.do?.(dictionary as any, { buildPath } as any)).toThrow(
+      "Expected string refs but got light=object, dark=string",
+    );
+  });
+
   it("resolves dark values from the dark option node", () => {
     vi.spyOn(console, "log").mockImplementation(() => {});
     vi.spyOn(console, "warn").mockImplementation(() => {});

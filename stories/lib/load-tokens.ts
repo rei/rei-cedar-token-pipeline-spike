@@ -130,7 +130,7 @@ export async function loadPrimitiveColors(): Promise<
       }
       result.set(mode, tokens);
     }
-  } else if (colorSection["option"] && typeof colorSection["option"] === "object") {
+  } else if (isRecord(colorSection["option"])) {
     // Canonical fallback: color.option.<neutral|brand>.*
     const tokens = flattenOptionPrimitives(colorSection["option"] as Record<string, unknown>);
     result.set("default", tokens);
