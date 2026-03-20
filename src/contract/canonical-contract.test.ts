@@ -6,9 +6,85 @@ type JsonObject = Record<string, unknown>;
 type Violation = {
   tokenPath: string;
   ruleId: string;
-  adr: string;
   expected: string;
   actual: string;
+};
+
+type RuleDocMeta = {
+  adr: string;
+  source: string;
+};
+
+const RULE_DOCS: Record<string, RuleDocMeta> = {
+  ROOT_COLOR_OBJECT: {
+    adr: "ADR-0001",
+    source: "architecture/ADR/adr-0001-token-canonical-model.md#canonical-json-structure",
+  },
+  FORBID_COLOR_PRIMITIVES: {
+    adr: "ADR-0001/ADR-0002",
+    source: "architecture/ADR/adr-0001-token-canonical-model.md#canonical-json-structure",
+  },
+  MISSING_COLOR_OPTION: {
+    adr: "ADR-0001",
+    source: "architecture/ADR/adr-0001-token-canonical-model.md#canonical-json-structure",
+  },
+  MISSING_COLOR_MODES: {
+    adr: "ADR-0001/ADR-0002",
+    source: "architecture/ADR/adr-0001-token-canonical-model.md#canonical-json-structure",
+  },
+  OPTION_TYPE_COLOR: {
+    adr: "ADR-0001",
+    source: "architecture/ADR/adr-0001-token-canonical-model.md#validation-requirements",
+  },
+  OPTION_VALUE_HEX: {
+    adr: "ADR-0001",
+    source: "architecture/ADR/adr-0001-token-canonical-model.md#validation-requirements",
+  },
+  NO_TOP_LEVEL_RESOLVED: {
+    adr: "ADR-0001",
+    source: "architecture/ADR/adr-0001-token-canonical-model.md#metadata-rules",
+  },
+  APPEARANCE_HEX: {
+    adr: "ADR-0001",
+    source: "architecture/ADR/adr-0001-token-canonical-model.md#option-token-platform-data",
+  },
+  PLATFORM_OVERRIDES_OBJECT: {
+    adr: "ADR-0001",
+    source: "architecture/ADR/adr-0001-token-canonical-model.md#option-token-platform-data",
+  },
+  PLATFORM_OVERRIDE_HEX: {
+    adr: "ADR-0001",
+    source: "architecture/ADR/adr-0001-token-canonical-model.md#option-token-platform-data",
+  },
+  ALIAS_TYPE_COLOR: {
+    adr: "ADR-0001",
+    source: "architecture/ADR/adr-0001-token-canonical-model.md#validation-requirements",
+  },
+  ALIAS_REFERENCE_FORMAT: {
+    adr: "ADR-0001/ADR-0002",
+    source: "architecture/ADR/adr-0001-token-canonical-model.md#alias-rules",
+  },
+  ALIAS_CEDAR_REQUIRED: {
+    adr: "ADR-0001",
+    source: "architecture/ADR/adr-0001-token-canonical-model.md#alias-token-platform-references",
+  },
+  ALIAS_PLATFORM_REQUIRED: {
+    adr: "ADR-0001/ADR-0005",
+    source: "architecture/ADR/adr-0001-token-canonical-model.md#alias-token-platform-references",
+  },
+  ALIAS_PLATFORM_PATH_PLAIN: {
+    adr: "ADR-0005",
+    source:
+      "architecture/ADR/adr-0005-transform-layer-and-platform-outputs.md#sd-v5-pipeline-constraints-normative",
+  },
+  RESOLVED_PLATFORM_OBJECT: {
+    adr: "ADR-0011",
+    source: "architecture/ADR/adr-0011-hybrid-alias-resolution.md#decision",
+  },
+  RESOLVED_HEX: {
+    adr: "ADR-0011",
+    source: "architecture/ADR/adr-0011-hybrid-alias-resolution.md#decision",
+  },
 };
 
 const canonicalPath = path.resolve(process.cwd(), "canonical/tokens.json");
@@ -62,14 +138,12 @@ function pushViolation(
   violations: Violation[],
   tokenPath: string,
   ruleId: string,
-  adr: string,
   expected: string,
   actual: unknown,
 ) {
   violations.push({
     tokenPath,
     ruleId,
-    adr,
     expected,
     actual: stringifyActual(actual),
   });
@@ -84,11 +158,18 @@ function formatViolationReport(violations: Violation[]): string {
   ];
 
   violations.forEach((v, index) => {
+    const doc = RULE_DOCS[v.ruleId] ?? {
+      adr: "ADR-unknown",
+      source: "architecture/README.md",
+    };
+
     lines.push(
       `${index + 1}. [${v.ruleId}] ${v.tokenPath}`,
-      `   ADR: ${v.adr}`,
+      `   ADR: ${doc.adr}`,
+      `   Source rule: ${doc.source}`,
       `   Expected: ${v.expected}`,
       `   Actual: ${v.actual}`,
+      "   If intended: update ADR rule text, file dictionary, and all cross-referenced docs/tests in the same PR",
       "",
     );
   });
@@ -106,7 +187,6 @@ describe("canonical contract invariants", () => {
         violations,
         "color",
         "ROOT_COLOR_OBJECT",
-        "ADR-0001",
         "canonical root contains a color object",
         canonical.color,
       );
@@ -119,7 +199,6 @@ describe("canonical contract invariants", () => {
         violations,
         "color.primitives",
         "FORBID_COLOR_PRIMITIVES",
-        "ADR-0001/ADR-0002",
         "color.primitives is absent in canonical output",
         color.primitives,
       );
@@ -130,7 +209,6 @@ describe("canonical contract invariants", () => {
         violations,
         "color.option",
         "MISSING_COLOR_OPTION",
-        "ADR-0001",
         "color.option exists as object",
         color.option,
       );
@@ -141,7 +219,6 @@ describe("canonical contract invariants", () => {
         violations,
         "color.modes",
         "MISSING_COLOR_MODES",
-        "ADR-0001/ADR-0002",
         "color.modes exists as object",
         color.modes,
       );
@@ -151,14 +228,7 @@ describe("canonical contract invariants", () => {
       const tokenPath = pathParts.join(".");
 
       if (leaf.$type !== "color") {
-        pushViolation(
-          violations,
-          tokenPath,
-          "OPTION_TYPE_COLOR",
-          "ADR-0001",
-          '$type is "color"',
-          leaf.$type,
-        );
+        pushViolation(violations, tokenPath, "OPTION_TYPE_COLOR", '$type is "color"', leaf.$type);
       }
 
       if (!isHexColor(leaf.$value)) {
@@ -166,7 +236,6 @@ describe("canonical contract invariants", () => {
           violations,
           tokenPath,
           "OPTION_VALUE_HEX",
-          "ADR-0001",
           "$value is hex color (#RRGGBB or #RRGGBBAA)",
           leaf.$value,
         );
@@ -177,7 +246,6 @@ describe("canonical contract invariants", () => {
           violations,
           tokenPath,
           "NO_TOP_LEVEL_RESOLVED",
-          "ADR-0001",
           "no top-level $resolved field",
           leaf.$resolved,
         );
@@ -194,7 +262,6 @@ describe("canonical contract invariants", () => {
               violations,
               `${tokenPath}.$extensions.cedar.appearances.${appearance}`,
               "APPEARANCE_HEX",
-              "ADR-0001",
               "appearance override is hex color",
               value,
             );
@@ -210,7 +277,6 @@ describe("canonical contract invariants", () => {
               violations,
               `${tokenPath}.$extensions.cedar.platformOverrides.${platform}`,
               "PLATFORM_OVERRIDES_OBJECT",
-              "ADR-0001",
               "platformOverrides.<platform> is object",
               overrides,
             );
@@ -223,7 +289,6 @@ describe("canonical contract invariants", () => {
                 violations,
                 `${tokenPath}.$extensions.cedar.platformOverrides.${platform}.${appearance}`,
                 "PLATFORM_OVERRIDE_HEX",
-                "ADR-0001",
                 "platform override is hex color",
                 value,
               );
@@ -237,14 +302,7 @@ describe("canonical contract invariants", () => {
       const tokenPath = pathParts.join(".");
 
       if (leaf.$type !== "color") {
-        pushViolation(
-          violations,
-          tokenPath,
-          "ALIAS_TYPE_COLOR",
-          "ADR-0001",
-          '$type is "color"',
-          leaf.$type,
-        );
+        pushViolation(violations, tokenPath, "ALIAS_TYPE_COLOR", '$type is "color"', leaf.$type);
       }
 
       if (!isColorOptionAlias(leaf.$value)) {
@@ -252,7 +310,6 @@ describe("canonical contract invariants", () => {
           violations,
           tokenPath,
           "ALIAS_REFERENCE_FORMAT",
-          "ADR-0001/ADR-0002",
           "$value references {color.option.*}",
           leaf.$value,
         );
@@ -264,7 +321,6 @@ describe("canonical contract invariants", () => {
           violations,
           `${tokenPath}.$extensions.cedar`,
           "ALIAS_CEDAR_REQUIRED",
-          "ADR-0001",
           "$extensions.cedar exists",
           cedar,
         );
@@ -278,7 +334,6 @@ describe("canonical contract invariants", () => {
             violations,
             `${tokenPath}.$extensions.cedar.${platform}`,
             "ALIAS_PLATFORM_REQUIRED",
-            "ADR-0001/ADR-0005",
             `${platform} object with light and dark keys`,
             platformValue,
           );
@@ -292,7 +347,6 @@ describe("canonical contract invariants", () => {
               violations,
               `${tokenPath}.$extensions.cedar.${platform}.${appearance}`,
               "ALIAS_PLATFORM_PATH_PLAIN",
-              "ADR-0005",
               "plain dot-path string without brace syntax",
               pathValue,
             );
@@ -308,7 +362,6 @@ describe("canonical contract invariants", () => {
               violations,
               `${tokenPath}.$extensions.cedar.resolved.${platform}`,
               "RESOLVED_PLATFORM_OBJECT",
-              "ADR-0011",
               "resolved.<platform> is object",
               appearances,
             );
@@ -321,7 +374,6 @@ describe("canonical contract invariants", () => {
                 violations,
                 `${tokenPath}.$extensions.cedar.resolved.${platform}.${appearance}`,
                 "RESOLVED_HEX",
-                "ADR-0011",
                 "resolved value is hex color",
                 value,
               );
