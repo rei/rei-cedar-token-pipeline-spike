@@ -845,11 +845,10 @@ describe("clean + nestUnderSections + deepMerge integration", () => {
 
     const colorSection = canonical.color as Record<string, unknown>;
 
-    // NOTE: the integration test fixture uses "options.color.light.json" (no
-    // platform prefix) so primitiveMode is null and collections fall through
-    // to the top level of color. Real pipeline files use "options.color.web-light.json"
-    // which nests under color.primitives.web.light — covered by the dedicated
-    // nestUnderSections primitive tests above.
+    // NOTE: this integration fixture keeps option collections at the top level
+    // of color to exercise the legacy nestUnderSections path in isolation.
+    // Real pipeline option files are handled upstream via applyTokenMapping +
+    // buildOptionTree, so they do not produce color.primitives.
     expect(colorSection["neutral-palette"]).toBeDefined();
     expect(colorSection["brand-palette"]).toBeDefined();
 
