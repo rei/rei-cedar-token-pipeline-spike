@@ -1,5 +1,5 @@
 import type { StoryObj, Meta } from "@storybook/html";
-import { loadPrimitiveColors } from "./lib/load-tokens.js";
+import { loadPrimitiveColors, type PrimitiveColorToken, type TokenDocs } from "./lib/load-tokens.js";
 
 type ColorSwatchArgs = Record<string, never>;
 
@@ -156,13 +156,22 @@ const BASE_STYLES = `
     text-align: left; padding: 0 0 0.5rem;
   }
   .token-table th:last-child { text-align: right; }
-  .token-table tbody tr { border-bottom: 1px solid var(--rule); transition: background 0.15s ease; }
-  .token-table tbody tr:last-child { border-bottom: none; }
-  .token-table tbody tr:hover { background: rgba(46,46,43,0.03); }
+  .token-table tbody tr { border-bottom: 1px solid var(--rule); }
+  .token-table tbody tr.token-row { transition: background 0.15s ease; }
+  .token-table tbody tr.token-row:hover { background: rgba(46,46,43,0.03); }
+  .token-table tbody tr.token-row.has-docs { border-bottom: none; }
+  .token-table tbody tr.token-doc-row:hover { background: transparent; }
   .token-table td { padding: 0.625rem 0; vertical-align: middle; }
   .td-swatch { width: 36px; padding-right: 0.75rem !important; }
   .swatch-chip { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--rule-heavy); display: inline-block; }
   .td-token { font-family: var(--font-mono); font-size: 0.875rem; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+  .td-doc-cell { padding: 0 0 0.85rem; }
+  .td-token-wrap { display: grid; gap: 0.3rem; }
+  .td-token-name { display: block; }
+  .td-token-docs { display: grid; gap: 0.28rem; }
+  .td-doc-summary { font-family: var(--font-sans); font-size: 0.75rem; line-height: 1.4; color: var(--ink-mid); }
+  .td-doc-meta { font-family: var(--font-sans); font-size: 0.6875rem; line-height: 1.45; color: var(--ink-muted); }
+  .td-doc-label { font-family: var(--font-sans); font-size: 0.56rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint); margin-right: 0.35rem; }
   .td-hex { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--ink-muted); text-align: right; letter-spacing: 0.04em; }
 
   /* ── Section spacing ── */
@@ -208,9 +217,32 @@ const BASE_STYLES = `
 
 // ─── Rendering helpers ────────────────────────────────────────────────────────
 
-interface Swatch {
-  name: string;
-  value: string;
+type Swatch = PrimitiveColorToken;
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function renderDocs(docs?: TokenDocs): string {
+  if (!docs) return "";
+
+  const parts: string[] = [];
+  if (docs.summary) {
+    parts.push(`<div class="td-doc-summary">${escapeHtml(docs.summary)}</div>`);
+  }
+  if (docs.usage) {
+    parts.push(`<div class="td-doc-meta"><span class="td-doc-label">Usage</span>${escapeHtml(docs.usage)}</div>`);
+  }
+  if (docs.design) {
+    parts.push(`<div class="td-doc-meta"><span class="td-doc-label">Design</span>${escapeHtml(docs.design)}</div>`);
+  }
+
+  return parts.length > 0 ? `<div class="td-token-docs">${parts.join("")}</div>` : "";
 }
 
 function needsDarkLabel(hex: string): boolean {
@@ -248,15 +280,23 @@ function table(swatches: Swatch[]): string {
         </tr>
       </thead>
       <tbody>
-        ${swatches.map((s) => `
-          <tr>
+        ${swatches.map((s) => {
+          const docsMarkup = renderDocs(s.docs);
+          return `
+          <tr class="token-row${docsMarkup ? " has-docs" : ""}">
             <td class="td-swatch">
               <span class="swatch-chip" style="background:${s.value};"></span>
             </td>
-            <td class="td-token">${s.name}</td>
+            <td class="td-token"><div class="td-token-wrap"><span class="td-token-name">${s.name}</span></div></td>
             <td class="td-hex">${s.value.slice(0, 9).toUpperCase()}</td>
           </tr>
-        `).join("")}
+          ${docsMarkup ? `
+          <tr class="token-doc-row">
+            <td></td>
+            <td colspan="2" class="td-doc-cell">${docsMarkup}</td>
+          </tr>` : ""}
+        `;
+        }).join("")}
       </tbody>
     </table>
   `;

@@ -103,7 +103,7 @@ function writeColorset(
     },
   };
 
-  const folderPath = path.join(assetRoot, `${token.name}.colorset`);
+  const folderPath = path.join(assetRoot, `cdr-${token.name}.colorset`);
   fs.mkdirSync(folderPath, { recursive: true });
   fs.writeFileSync(
     path.join(folderPath, 'Contents.json'),
@@ -115,8 +115,8 @@ export const iosColorsetAction: Action = {
   name: 'ios-colorset',
 
   do: (dictionary, config) => {
-    const buildPath = config.buildPath ?? 'dist/ios/';
-    const assetRoot = path.join(buildPath, 'Colors.xcassets');
+    const buildPath = config.buildPath ?? 'dist/themes/rei-dot-com/ios/';
+    const assetRoot = path.join(buildPath, 'CdrColors.xcassets');
 
     fs.mkdirSync(assetRoot, { recursive: true });
 
@@ -193,8 +193,8 @@ export const iosColorsetAction: Action = {
   },
 
   undo: (_dictionary, config) => {
-    const buildPath = config.buildPath ?? 'dist/ios/';
-    const assetRoot = path.join(buildPath, 'Colors.xcassets');
+    const buildPath = config.buildPath ?? 'dist/themes/rei-dot-com/ios/';
+    const assetRoot = path.join(buildPath, 'CdrColors.xcassets');
     if (fs.existsSync(assetRoot)) {
       fs.rmSync(assetRoot, { recursive: true, force: true });
     }

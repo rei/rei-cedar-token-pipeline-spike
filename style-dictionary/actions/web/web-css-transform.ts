@@ -4,15 +4,15 @@
  * Modular CSS output for the web platform organized by semantic category:
  *
  * Light theme:
- *   dist/css/light.css               — @import index for light theme
- *   dist/css/light/color-surface.css — Surface color tokens
- *   dist/css/light/color-text.css    — Text color tokens
- *   dist/css/light/color-border.css  — Border color tokens
- *   dist/css/light/spacing-scale.css — Responsive spacing scale
- *   dist/css/light/spacing-component.css — Component spacing aliases
- *   dist/css/light/spacing-layout.css  — Layout spacing aliases
+ *   dist/themes/rei-dot-com/css/cdr-light.css                     — @import index for light theme
+ *   dist/themes/rei-dot-com/css/light/cdr-color-surface.css       — Surface color tokens
+ *   dist/themes/rei-dot-com/css/light/cdr-color-text.css          — Text color tokens
+ *   dist/themes/rei-dot-com/css/light/cdr-color-border.css        — Border color tokens
+ *   dist/themes/rei-dot-com/css/light/cdr-spacing-scale.css       — Responsive spacing scale
+ *   dist/themes/rei-dot-com/css/light/cdr-spacing-component.css   — Component spacing aliases
+ *   dist/themes/rei-dot-com/css/light/cdr-spacing-layout.css      — Layout spacing aliases
  *
- * Dark theme: Same structure under dist/css/dark/
+ * Dark theme: Same structure under dist/themes/rei-dot-com/css/dark/
  *
  * Resolution order for color values:
  *   light: option.$value                           (web-light canonical)
@@ -75,7 +75,7 @@ export const webCssAction: Action = {
   name: 'web-css',
 
   do: (dictionary, config) => {
-    const buildPath = config.buildPath ?? 'dist/css/';
+    const buildPath = config.buildPath ?? 'dist/themes/rei-dot-com/css/';
     fs.mkdirSync(buildPath, { recursive: true });
     fs.mkdirSync(path.join(buildPath, 'light'), { recursive: true });
     fs.mkdirSync(path.join(buildPath, 'dark'), { recursive: true });
@@ -207,71 +207,71 @@ export const webCssAction: Action = {
       // Color files
       if (colorSurface[theme].length > 0) {
         const css = `:root {\n${colorSurface[theme].join('\n')}\n}\n`;
-        fs.writeFileSync(path.join(themeDir, 'color-surface.css'), css);
-        imports.push(`@import './${theme}/color-surface.css';`);
+        fs.writeFileSync(path.join(themeDir, 'cdr-color-surface.css'), css);
+        imports.push(`@import './${theme}/cdr-color-surface.css';`);
       }
       if (colorText[theme].length > 0) {
         const css = `:root {\n${colorText[theme].join('\n')}\n}\n`;
-        fs.writeFileSync(path.join(themeDir, 'color-text.css'), css);
-        imports.push(`@import './${theme}/color-text.css';`);
+        fs.writeFileSync(path.join(themeDir, 'cdr-color-text.css'), css);
+        imports.push(`@import './${theme}/cdr-color-text.css';`);
       }
       if (colorBorder[theme].length > 0) {
         const css = `:root {\n${colorBorder[theme].join('\n')}\n}\n`;
-        fs.writeFileSync(path.join(themeDir, 'color-border.css'), css);
-        imports.push(`@import './${theme}/color-border.css';`);
+        fs.writeFileSync(path.join(themeDir, 'cdr-color-border.css'), css);
+        imports.push(`@import './${theme}/cdr-color-border.css';`);
       }
 
       // Spacing files
       if (spacingScale[theme].length > 0) {
         const css = `:root {\n${spacingScale[theme].join('\n')}\n}\n`;
-        fs.writeFileSync(path.join(themeDir, 'spacing-scale.css'), css);
-        imports.push(`@import './${theme}/spacing-scale.css';`);
+        fs.writeFileSync(path.join(themeDir, 'cdr-spacing-scale.css'), css);
+        imports.push(`@import './${theme}/cdr-spacing-scale.css';`);
       }
       if (spacingComponent[theme].length > 0) {
         const css = `:root {\n${spacingComponent[theme].join('\n')}\n}\n`;
-        fs.writeFileSync(path.join(themeDir, 'spacing-component.css'), css);
-        imports.push(`@import './${theme}/spacing-component.css';`);
+        fs.writeFileSync(path.join(themeDir, 'cdr-spacing-component.css'), css);
+        imports.push(`@import './${theme}/cdr-spacing-component.css';`);
       }
       if (spacingLayout[theme].length > 0) {
         const css = `:root {\n${spacingLayout[theme].join('\n')}\n}\n`;
-        fs.writeFileSync(path.join(themeDir, 'spacing-layout.css'), css);
-        imports.push(`@import './${theme}/spacing-layout.css';`);
+        fs.writeFileSync(path.join(themeDir, 'cdr-spacing-layout.css'), css);
+        imports.push(`@import './${theme}/cdr-spacing-layout.css';`);
       }
 
       // Write index file
       const indexCss = imports.join('\n') + '\n';
-      fs.writeFileSync(path.join(buildPath, `${theme}.css`), indexCss);
+      fs.writeFileSync(path.join(buildPath, `cdr-${theme}.css`), indexCss);
     };
 
     writeThemeFiles('light');
     writeThemeFiles('dark');
 
     // Log generated files
-    console.log(`  ✓ dist/css/light.css (index)`);
-    if (colorSurface.light.length > 0) console.log(`    ✓ color-surface.css (${colorSurface.light.length} tokens)`);
-    if (colorText.light.length > 0) console.log(`    ✓ color-text.css (${colorText.light.length} tokens)`);
-    if (colorBorder.light.length > 0) console.log(`    ✓ color-border.css (${colorBorder.light.length} tokens)`);
-    if (spacingScale.light.length > 0) console.log(`    ✓ spacing-scale.css (${spacingScale.light.length} tokens)`);
-    if (spacingComponent.light.length > 0) console.log(`    ✓ spacing-component.css (${spacingComponent.light.length} tokens)`);
-    if (spacingLayout.light.length > 0) console.log(`    ✓ spacing-layout.css (${spacingLayout.light.length} tokens)`);
+    console.log(`  ✓ dist/themes/rei-dot-com/css/cdr-light.css (index)`);
+    if (colorSurface.light.length > 0) console.log(`    ✓ cdr-color-surface.css (${colorSurface.light.length} tokens)`);
+    if (colorText.light.length > 0) console.log(`    ✓ cdr-color-text.css (${colorText.light.length} tokens)`);
+    if (colorBorder.light.length > 0) console.log(`    ✓ cdr-color-border.css (${colorBorder.light.length} tokens)`);
+    if (spacingScale.light.length > 0) console.log(`    ✓ cdr-spacing-scale.css (${spacingScale.light.length} tokens)`);
+    if (spacingComponent.light.length > 0) console.log(`    ✓ cdr-spacing-component.css (${spacingComponent.light.length} tokens)`);
+    if (spacingLayout.light.length > 0) console.log(`    ✓ cdr-spacing-layout.css (${spacingLayout.light.length} tokens)`);
 
-    console.log(`  ✓ dist/css/dark.css (index)`);
-    if (colorSurface.dark.length > 0) console.log(`    ✓ color-surface.css (${colorSurface.dark.length} tokens)`);
-    if (colorText.dark.length > 0) console.log(`    ✓ color-text.css (${colorText.dark.length} tokens)`);
-    if (colorBorder.dark.length > 0) console.log(`    ✓ color-border.css (${colorBorder.dark.length} tokens)`);
-    if (spacingScale.dark.length > 0) console.log(`    ✓ spacing-scale.css (${spacingScale.dark.length} tokens)`);
-    if (spacingComponent.dark.length > 0) console.log(`    ✓ spacing-component.css (${spacingComponent.dark.length} tokens)`);
-    if (spacingLayout.dark.length > 0) console.log(`    ✓ spacing-layout.css (${spacingLayout.dark.length} tokens)`);
+    console.log(`  ✓ dist/themes/rei-dot-com/css/cdr-dark.css (index)`);
+    if (colorSurface.dark.length > 0) console.log(`    ✓ cdr-color-surface.css (${colorSurface.dark.length} tokens)`);
+    if (colorText.dark.length > 0) console.log(`    ✓ cdr-color-text.css (${colorText.dark.length} tokens)`);
+    if (colorBorder.dark.length > 0) console.log(`    ✓ cdr-color-border.css (${colorBorder.dark.length} tokens)`);
+    if (spacingScale.dark.length > 0) console.log(`    ✓ cdr-spacing-scale.css (${spacingScale.dark.length} tokens)`);
+    if (spacingComponent.dark.length > 0) console.log(`    ✓ cdr-spacing-component.css (${spacingComponent.dark.length} tokens)`);
+    if (spacingLayout.dark.length > 0) console.log(`    ✓ cdr-spacing-layout.css (${spacingLayout.dark.length} tokens)`);
   },
 
   undo: (_dictionary, config) => {
-    const buildPath = config.buildPath ?? 'dist/css/';
+    const buildPath = config.buildPath ?? 'dist/themes/rei-dot-com/css/';
     const filesToRemove = [
-      'light.css', 'dark.css',
-      'light/color-surface.css', 'light/color-text.css', 'light/color-border.css',
-      'light/spacing-scale.css', 'light/spacing-component.css', 'light/spacing-layout.css',
-      'dark/color-surface.css', 'dark/color-text.css', 'dark/color-border.css',
-      'dark/spacing-scale.css', 'dark/spacing-component.css', 'dark/spacing-layout.css',
+      'cdr-light.css', 'cdr-dark.css',
+      'light/cdr-color-surface.css', 'light/cdr-color-text.css', 'light/cdr-color-border.css',
+      'light/cdr-spacing-scale.css', 'light/cdr-spacing-component.css', 'light/cdr-spacing-layout.css',
+      'dark/cdr-color-surface.css', 'dark/cdr-color-text.css', 'dark/cdr-color-border.css',
+      'dark/cdr-spacing-scale.css', 'dark/cdr-spacing-component.css', 'dark/cdr-spacing-layout.css',
     ];
     filesToRemove.forEach((f) => {
       const p = path.join(buildPath, f);

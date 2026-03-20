@@ -41,9 +41,9 @@ It serves as the single entry point for diagrams, ADRs, and technical notes that
 |---|---|---|
 | `canonical/tokens.json` | `canonical/tokens.json` | The single source of truth. Produced by `normalize.ts`, consumed by Style Dictionary. |
 | `token-schema.json` | `src/schema/token-schema.json` | Governed Figma→canonical path mapping and contract source. Required for build. Requires design + engineering review to change. |
-| `dist/css/light.css` | `dist/css/light.css` | Web light appearance CSS custom properties. |
-| `dist/css/dark.css` | `dist/css/dark.css` | Web dark appearance CSS custom properties. |
-| `dist/ios/Colors.xcassets` | `dist/ios/` | Xcode color asset catalog with Display P3 light/dark pairs. |
+| `dist/themes/rei-dot-com/css/light.css` | `dist/themes/rei-dot-com/css/light.css` | Web light appearance CSS custom properties. |
+| `dist/themes/rei-dot-com/css/dark.css` | `dist/themes/rei-dot-com/css/dark.css` | Web dark appearance CSS custom properties. |
+| `dist/themes/rei-dot-com/ios/Colors.xcassets` | `dist/themes/rei-dot-com/ios/` | Xcode color asset catalog with Display P3 light/dark pairs. |
 
 ---
 
@@ -83,11 +83,11 @@ It serves as the single entry point for diagrams, ADRs, and technical notes that
 |---|---|
 | `canonical/tokens.json` (color tokens) | ✓ Complete |
 | `src/schema/token-schema.json` | ✓ Complete |
-| `dist/css/light.css` | ✓ Complete — validated with correct web light hex values |
-| `dist/css/dark.css` | ✓ Complete — validated with correct web dark hex values |
-| `dist/ios/Colors.xcassets` | ✓ Complete — validated with correct iOS Display P3 values |
+| `dist/themes/rei-dot-com/css/light.css` | ✓ Complete — validated with correct web light hex values |
+| `dist/themes/rei-dot-com/css/dark.css` | ✓ Complete — validated with correct web dark hex values |
+| `dist/themes/rei-dot-com/ios/Colors.xcassets` | ✓ Complete — validated with correct iOS Display P3 values |
 | Fluid spacing (`clamp()`) | ✓ Complete |
-| `dist/ios/ColorTokens.swift` | ○ Not started — V1 |
+| `dist/themes/rei-dot-com/ios/ColorTokens.swift` | ○ Not started — V1 |
 | `dist/android/colors.xml` | ○ Not started — V1 |
 | `@cedar/types` package | ○ Not started — V1 |
 | Diff engine | ○ Partial — PR #4 started, not merged |

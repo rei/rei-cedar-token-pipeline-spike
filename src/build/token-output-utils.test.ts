@@ -3,7 +3,7 @@ import type { Dictionary, TransformedToken } from "style-dictionary/types";
 import { getModuleTokensByName, type ModuleDefinition } from "./token-output-utils";
 
 describe("getModuleTokensByName", () => {
-  it("maps hyphenated module token names back to source tokens", () => {
+  it("maps full semantic module token names back to source tokens", () => {
     const moduleDefinition: ModuleDefinition = {
       theme: "rei-dot-com",
       responsibility: "foundations",
@@ -15,7 +15,7 @@ describe("getModuleTokensByName", () => {
         token.path[1] === "modes" &&
         token.path[3] === "text" &&
         token.path.length >= 5,
-      getTokenName: (token: TransformedToken) => token.path.slice(4).join("-"),
+      getTokenName: (token: TransformedToken) => ["color-text", ...token.path.slice(4)].join("-"),
     };
 
     const linkHoverToken = {
@@ -35,8 +35,8 @@ describe("getModuleTokensByName", () => {
 
     const tokensByName = getModuleTokensByName(dictionary, moduleDefinition);
 
-    expect(tokensByName.has("link-hover")).toBe(true);
-    expect((tokensByName.get("link-hover") as any).$extensions.cedar.docs.summary).toBe(
+    expect(tokensByName.has("color-text-link-hover")).toBe(true);
+    expect((tokensByName.get("color-text-link-hover") as any).$extensions.cedar.docs.summary).toBe(
       "Color used for hovered text links",
     );
   });

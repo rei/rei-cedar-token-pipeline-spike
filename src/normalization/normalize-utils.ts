@@ -404,7 +404,18 @@ export function clean(
         }
       }
 
-      out[key] = { $value, $type: value.$type };
+      const tokenNode: Record<string, unknown> = { $value, $type: value.$type };
+      const rawDescription = value.$description;
+      if (typeof rawDescription === "string") {
+        const docs = parseTokenDescription(rawDescription);
+        if (docs) {
+          tokenNode.$extensions = {
+            cedar: { docs },
+          };
+        }
+      }
+
+      out[key] = tokenNode;
     } else if (typeof value === "object" && value !== null) {
       // Recursively clean nested token groups
       out[key] = clean(value as Record<string, unknown>, collectionToSection, tokenMapping);

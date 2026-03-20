@@ -165,12 +165,12 @@ Consumes `canonical/tokens.json` and produces platform outputs via custom action
 ### 6. Platform Outputs
 
 **Validated in spike:**
-- `dist/css/light.css` — CSS custom properties, web-light values
-- `dist/css/dark.css` — CSS custom properties, web-dark values
-- `dist/ios/Colors.xcassets/` — Xcode color asset catalog, iOS Display P3 values
+- `dist/themes/rei-dot-com/css/light.css` — CSS custom properties, web-light values
+- `dist/themes/rei-dot-com/css/dark.css` — CSS custom properties, web-dark values
+- `dist/themes/rei-dot-com/ios/Colors.xcassets/` — Xcode color asset catalog, iOS Display P3 values
 
 **Not yet implemented (V1):**
-- `dist/ios/ColorTokens.swift` — Swift constants file
+- `dist/themes/rei-dot-com/ios/ColorTokens.swift` — Swift constants file
 - `dist/android/colors.xml` — Android color resources
 - `@rei/tokens` NPM package
 

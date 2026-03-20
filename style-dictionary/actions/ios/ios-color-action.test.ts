@@ -38,7 +38,7 @@ describe("iosColorsetAction", () => {
 
     iosColorsetAction.do?.(dictionary as never, { buildPath } as never);
 
-    const outputPath = path.join(buildPath, "Colors.xcassets", "textLink.colorset", "Contents.json");
+    const outputPath = path.join(buildPath, "CdrColors.xcassets", "cdr-textLink.colorset", "Contents.json");
     const contents = JSON.parse(fs.readFileSync(outputPath, "utf8")) as {
       colors: Array<{ color: { components: Record<string, string> } }>;
     };
@@ -92,7 +92,7 @@ describe("iosColorsetAction", () => {
 
     iosColorsetAction.do?.(dictionary as never, { buildPath } as never);
 
-    const outputPath = path.join(buildPath, "Colors.xcassets", "textLink.colorset", "Contents.json");
+    const outputPath = path.join(buildPath, "CdrColors.xcassets", "cdr-textLink.colorset", "Contents.json");
     const contents = JSON.parse(fs.readFileSync(outputPath, "utf8")) as {
       colors: Array<{ color: { components: Record<string, string> } }>;
     };

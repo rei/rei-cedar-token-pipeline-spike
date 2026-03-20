@@ -1,5 +1,5 @@
 import type { StoryObj, Meta } from "@storybook/html";
-import { loadColorTokens } from "./lib/load-tokens.js";
+import { loadColorTokens, type LoadedColorToken, type TokenDocs } from "./lib/load-tokens.js";
 
 type SemanticTokenArgs = Record<string, never>;
 
@@ -124,11 +124,22 @@ const BASE_STYLES = `
     color: var(--ink-faint); padding-bottom: 0.5rem; border-bottom: 1px solid var(--rule-heavy);
   }
   .trow-chip-wrap { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); }
+  .trow-chip-wrap.has-docs { border-bottom: none; }
   .trow-chip { width: 32px; height: 32px; border-radius: 3px; border: 1px solid var(--rule-heavy); display: block; }
-  .trow-token { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+  .trow-token { padding: 0.6rem 0; border-bottom: 1px solid var(--rule); }
+  .trow-token.has-docs { border-bottom: none; }
+  .trow-token-name { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+  .trow-doc-full { grid-column: 1 / -1; display: grid; grid-template-columns: 44px 1fr 1fr auto; gap: 0 1.25rem; border-bottom: 1px solid var(--rule); }
+  .trow-token-docs { display: grid; gap: 0.28rem; padding: 0.05rem 0 0.8rem; }
+  .trow-doc-summary { font-family: var(--font-sans); font-size: 0.75rem; line-height: 1.4; color: var(--ink-mid); }
+  .trow-doc-meta { font-family: var(--font-sans); font-size: 0.6875rem; line-height: 1.45; color: var(--ink-muted); }
+  .trow-doc-label { font-family: var(--font-sans); font-size: 0.56rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint); margin-right: 0.35rem; }
   .trow-ref { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.6875rem; font-style: italic; color: var(--ink-muted); display: flex; align-items: center; gap: 0.25rem; }
+  .trow-ref.has-docs { border-bottom: none; }
   .trow-ref::before { content: '→'; font-style: normal; color: var(--ink-faint); font-size: 0.625rem; }
   .trow-hex { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-muted); letter-spacing: 0.04em; text-align: right; }
+  .trow-hex.has-docs { border-bottom: none; }
+  .trow-doc-body { grid-column: 2 / -1; }
 
   /* ── Multi-mode comparison table ── */
   .compare-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.8125rem; }
@@ -196,6 +207,7 @@ const BASE_STYLES = `
   @media (max-width: 700px) {
     .page { padding: 2rem 1.25rem 3rem; }
     .token-grid, .token-grid-header { grid-template-columns: 40px 1fr auto; }
+    .trow-doc-full { grid-template-columns: 40px 1fr auto; }
     .trow-ref { display: none; }
     .border-demo-grid { grid-template-columns: 1fr; }
     .compare-table th.mode-col:nth-child(n+4), .compare-table td.mode-val:nth-child(n+4) { display: none; }
@@ -229,11 +241,42 @@ function catHeader(name: string): string {
   return `<div class="cat-header"><span class="cat-pip"></span><span class="cat-name">${name}</span><span class="cat-rule"></span></div>`;
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function renderDocs(docs?: TokenDocs): string {
+  if (!docs) return "";
+
+  const parts: string[] = [];
+  if (docs.summary) {
+    parts.push(`<div class="trow-doc-summary">${escapeHtml(docs.summary)}</div>`);
+  }
+  if (docs.usage) {
+    parts.push(`<div class="trow-doc-meta"><span class="trow-doc-label">Usage</span>${escapeHtml(docs.usage)}</div>`);
+  }
+  if (docs.design) {
+    parts.push(`<div class="trow-doc-meta"><span class="trow-doc-label">Design</span>${escapeHtml(docs.design)}</div>`);
+  }
+  if (docs.aliases && docs.aliases.length > 0) {
+    parts.push(
+      `<div class="trow-doc-meta"><span class="trow-doc-label">Aliases</span>${docs.aliases.map(escapeHtml).join(", ")}</div>`,
+    );
+  }
+
+  return parts.length > 0 ? `<div class="trow-token-docs">${parts.join("")}</div>` : "";
+}
+
 /**
  * Render a single-mode token list grid (chip · token name · ref alias · hex value).
  */
 function tokenGrid(
-  tokens: Map<string, { hex: string; ref: string }>,
+  tokens: Map<string, LoadedColorToken>,
   keys: string[],
 ): string {
   return `
@@ -244,12 +287,15 @@ function tokenGrid(
       ${keys.map((key) => {
         const data = tokens.get(key);
         if (!data) return "";
-        const { hex, ref } = data;
+        const { hex, ref, docs } = data;
+        const docsMarkup = renderDocs(docs);
+        const docsClass = docsMarkup ? " has-docs" : "";
         return `
-          <div class="trow-chip-wrap"><span class="trow-chip" style="background:${hex};"></span></div>
-          <div class="trow-token">${key}</div>
-          <div class="trow-ref">${ref}</div>
-          <div class="trow-hex">${hex.slice(0, 9).toUpperCase()}</div>
+          <div class="trow-chip-wrap${docsClass}"><span class="trow-chip" style="background:${hex};"></span></div>
+          <div class="trow-token${docsClass}"><div class="trow-token-name">${key}</div></div>
+          <div class="trow-ref${docsClass}">${ref}</div>
+          <div class="trow-hex${docsClass}">${hex.slice(0, 9).toUpperCase()}</div>
+          ${docsMarkup ? `<div class="trow-doc-full"><div></div><div class="trow-doc-body">${docsMarkup}</div></div>` : ""}
         `;
       }).join("")}
     </div>
@@ -261,7 +307,7 @@ function tokenGrid(
  * Rows = token names, columns = modes.
  */
 function modeCompareTable(
-  tokens: Map<string, { hex: string; ref: string }>,
+  tokens: Map<string, LoadedColorToken>,
   modes: string[],
   category: string,
   tokenNames: string[],
@@ -319,11 +365,11 @@ function modeCompareTable(
  * then falls back to "color.<category>.<token>" (legacy flat structure).
  */
 function resolveToken(
-  tokens: Map<string, { hex: string; ref: string }>,
+  tokens: Map<string, LoadedColorToken>,
   mode: string,
   category: string,
   token: string,
-): { hex: string; ref: string } | undefined {
+): LoadedColorToken | undefined {
   return (
     tokens.get(`color.modes.${mode}.${category}.${token}`) ??
     tokens.get(`color.${category}.${token}`)
@@ -334,7 +380,7 @@ function resolveToken(
  * Collect all modes present in the token map (from color.modes.*).
  * Falls back to a synthetic ["default"] if only the legacy flat structure is present.
  */
-function collectModes(tokens: Map<string, { hex: string; ref: string }>): string[] {
+function collectModes(tokens: Map<string, LoadedColorToken>): string[] {
   const modes = new Set<string>();
   for (const key of tokens.keys()) {
     const match = key.match(/^color\.modes\.([^.]+)\./);
