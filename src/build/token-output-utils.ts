@@ -140,3 +140,21 @@ export function getModuleTokenNames(
     ),
   ).sort((left, right) => left.localeCompare(right));
 }
+
+export function getModuleTokensByName(
+  dictionary: Dictionary,
+  moduleDefinition: ModuleDefinition,
+): Map<string, TransformedToken> {
+  const byName = new Map<string, TransformedToken>();
+
+  dictionary.allTokens
+    .filter((token) => moduleDefinition.matchesToken(token))
+    .forEach((token) => {
+      const tokenName = moduleDefinition.getTokenName(token);
+      if (!byName.has(tokenName)) {
+        byName.set(tokenName, token);
+      }
+    });
+
+  return byName;
+}

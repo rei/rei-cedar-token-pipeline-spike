@@ -5,6 +5,7 @@ import StyleDictionary from "style-dictionary";
 import type { DesignTokens, FormatFnArguments } from "style-dictionary/types";
 import {
   collectModuleDefinitions,
+  getModuleTokensByName,
   getModuleTokenNames,
   type ModuleDefinition,
 } from "./token-output-utils.js";
@@ -212,17 +213,13 @@ function renderTokenNameUnion({ dictionary, file }: FormatFnArguments): string {
 function renderModuleInterface({ dictionary, file }: FormatFnArguments): string {
   const { module, interfaceName } = (file.options ?? {}) as ModuleFileOptions;
   const tokenNames = getModuleTokenNames(dictionary, module);
+  const tokensByName = getModuleTokensByName(dictionary, module);
   const typeName = interfaceName ?? "ModuleTokens";
 
   // Build property lines with optional JSDoc comments from $extensions.cedar.docs
   const properties = tokenNames
     .map((tokenName) => {
-      // Find the token in the dictionary to get its metadata
-      const tokenPath = tokenName.split("_");
-      let token: any = dictionary;
-      for (const segment of tokenPath) {
-        token = token?.[segment];
-      }
+      const token = tokensByName.get(tokenName);
 
       // Render all populated doc fields as a JSDoc block:
       //   @summary   (rendered as the leading description, no tag)

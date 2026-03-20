@@ -167,7 +167,8 @@ try {
       if (!entry) {
         throw new Error(
           `[normalize] Figma collection "${collectionName}" (from ${file}) has no entry ` +
-            `in token-mapping.json. Add a "collections.${collectionName}" entry.`,
+            `in src/schema/token-schema.json (inputs.figma.collections). ` +
+            `Add an "inputs.figma.collections.${collectionName}" entry.`,
         );
       }
 

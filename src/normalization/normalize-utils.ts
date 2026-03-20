@@ -236,7 +236,7 @@ export function applyTokenMapping(
  * e.g. "color.option.neutral.warm.grey.900" with $value "#2e2e2b" and optional $description
  * becomes: { color: { option: { neutral: { warm: { grey: { "900": { $type, $value, $extensions: { cedar: { docs: ... } } } } } } } } }
  *
- * Descriptions from Figma tokens are wrappediato $extensions.cedar.docs.summary for use in
+ * Descriptions from Figma tokens are wrapped into $extensions.cedar.docs.summary for use in
  * generated TypeScript types and documentation.
  *
  * Used to build the color.option subtree from mapped Figma option tokens, preserving

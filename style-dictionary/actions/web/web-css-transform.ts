@@ -4,7 +4,7 @@
  * Modular CSS output for the web platform organized by semantic category:
  *
  * Light theme:
- *   dist/css/light.css              — @import index for light theme
+ *   dist/css/light.css               — @import index for light theme
  *   dist/css/light/color-surface.css — Surface color tokens
  *   dist/css/light/color-text.css    — Text color tokens
  *   dist/css/light/color-border.css  — Border color tokens
@@ -175,34 +175,34 @@ export const webCssAction: Action = {
       if (colorSurface[theme].length > 0) {
         const css = `:root {\n${colorSurface[theme].join('\n')}\n}\n`;
         fs.writeFileSync(path.join(themeDir, 'color-surface.css'), css);
-        imports.push(`@import './color-surface.css';`);
+        imports.push(`@import './${theme}/color-surface.css';`);
       }
       if (colorText[theme].length > 0) {
         const css = `:root {\n${colorText[theme].join('\n')}\n}\n`;
         fs.writeFileSync(path.join(themeDir, 'color-text.css'), css);
-        imports.push(`@import './color-text.css';`);
+        imports.push(`@import './${theme}/color-text.css';`);
       }
       if (colorBorder[theme].length > 0) {
         const css = `:root {\n${colorBorder[theme].join('\n')}\n}\n`;
         fs.writeFileSync(path.join(themeDir, 'color-border.css'), css);
-        imports.push(`@import './color-border.css';`);
+        imports.push(`@import './${theme}/color-border.css';`);
       }
 
       // Spacing files
       if (spacingScale[theme].length > 0) {
         const css = `:root {\n${spacingScale[theme].join('\n')}\n}\n`;
         fs.writeFileSync(path.join(themeDir, 'spacing-scale.css'), css);
-        imports.push(`@import './spacing-scale.css';`);
+        imports.push(`@import './${theme}/spacing-scale.css';`);
       }
       if (spacingComponent[theme].length > 0) {
         const css = `:root {\n${spacingComponent[theme].join('\n')}\n}\n`;
         fs.writeFileSync(path.join(themeDir, 'spacing-component.css'), css);
-        imports.push(`@import './spacing-component.css';`);
+        imports.push(`@import './${theme}/spacing-component.css';`);
       }
       if (spacingLayout[theme].length > 0) {
         const css = `:root {\n${spacingLayout[theme].join('\n')}\n}\n`;
         fs.writeFileSync(path.join(themeDir, 'spacing-layout.css'), css);
-        imports.push(`@import './spacing-layout.css';`);
+        imports.push(`@import './${theme}/spacing-layout.css';`);
       }
 
       // Write index file
