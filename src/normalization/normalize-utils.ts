@@ -103,7 +103,7 @@ export type TokenMapping = {
  *   - Lines before the first `key:` line are joined as `summary`.
  *   - Recognised keys: `usage`, `design`, `aliases`.
  *   - `aliases` is split on commas and trimmed into a string[].
- *   - Unrecognised keys are silently ignored.
+ *   - Unrecognised `key: value` lines before any recognised key are folded into `summary`.
  *   - Returns undefined when the raw string is empty or whitespace-only.
  */
 export function parseTokenDescription(

@@ -424,7 +424,7 @@ describe("nestUnderSections", () => {
     expect(colorSection?.["primitives"]).toBeUndefined();
   });
 
-  it("nests spacing section wrapper unchanged (no colorMode effect) (no colorMode effect)", () => {
+  it("nests spacing section wrapper unchanged (no colorMode effect)", () => {
     const parsed = [{ file: "spacing.default.json", data: { spacing: { sm: {}, md: {} } } }];
     const map = buildCollectionToSection(parsed);
     const cleaned = { spacing: { sm: { $value: "4", $type: "dimension" } } };
