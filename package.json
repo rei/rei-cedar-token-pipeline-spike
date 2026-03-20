@@ -10,7 +10,7 @@
       "types": "./dist/types/index.d.ts",
       "default": "./dist/types/index.d.ts"
     },
-    "./meta/*": "./dist/rei-dot-com/meta/*",
+    "./meta/*": "./dist/themes/rei-dot-com/meta/*",
     "./package.json": "./package.json"
   },
   "files": [

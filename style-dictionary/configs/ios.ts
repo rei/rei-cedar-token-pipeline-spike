@@ -7,7 +7,7 @@ export const iosConfig: Config = {
   platforms: {
     ios: {
       transformGroup: 'cedar/ios',
-      buildPath: 'dist/ios/',
+      buildPath: 'dist/themes/rei-dot-com/ios/',
       actions: ['ios-colorset'],
       files: [],
       filter: (token: TransformedToken) =>

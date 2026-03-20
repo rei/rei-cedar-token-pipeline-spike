@@ -14,8 +14,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, "../..");
 const canonicalTokensPath = path.join(rootDir, "canonical/tokens.json");
-const distTypesDir = path.join(rootDir, "dist/rei-dot-com/types");
-const distMetaDir = path.join(rootDir, "dist/rei-dot-com/meta");
+const distTypesDir = path.join(rootDir, "dist/themes/rei-dot-com/types");
+const distMetaDir = path.join(rootDir, "dist/themes/rei-dot-com/meta");
+const legacyThemeRootDir = path.join(rootDir, "dist/rei-dot-com");
 const distCoreTypesDir = path.join(rootDir, "dist/types/core");
 const distPublicTypesDir = path.join(rootDir, "dist/types");
 
@@ -396,7 +397,7 @@ function writeBarrelFiles(modules: ModuleDefinition[]): string[] {
       "",
       'export * from "./base/token-schema";',
       'export * from "./core";',
-      'export * from "../rei-dot-com/types";',
+      'export * from "../themes/rei-dot-com/types";',
       "",
     ].join("\n"),
   );
@@ -478,6 +479,7 @@ async function main() {
 
   fs.rmSync(distTypesDir, { recursive: true, force: true });
   fs.rmSync(distMetaDir, { recursive: true, force: true });
+  fs.rmSync(legacyThemeRootDir, { recursive: true, force: true });
   fs.rmSync(distCoreTypesDir, { recursive: true, force: true });
 
   const sd = new StyleDictionary({
@@ -491,7 +493,7 @@ async function main() {
     },
     platforms: {
       typescript: {
-        buildPath: "dist/",
+        buildPath: "dist/themes/",
         transforms: ["name/camel"],
         files: modules.flatMap((moduleDefinition) => [
           {

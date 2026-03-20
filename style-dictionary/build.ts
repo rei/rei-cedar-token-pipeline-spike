@@ -1,4 +1,5 @@
 // build.ts
+import fs from 'node:fs';
 import StyleDictionary from 'style-dictionary';
 import { iosConfig } from './configs/ios';
 import { webConfig } from './configs/web';
@@ -28,9 +29,20 @@ function toBuildError(message: string, err: unknown) {
     : new Error(`${message}: ${String(err)}`);
 }
 
+function removeLegacyOutputRoots() {
+  const legacyOutputRoots = ['dist/css', 'dist/ios', 'dist/rei-dot-com/css', 'dist/rei-dot-com/ios'];
+  legacyOutputRoots.forEach((legacyRoot) => {
+    if (fs.existsSync(legacyRoot)) {
+      fs.rmSync(legacyRoot, { recursive: true, force: true });
+    }
+  });
+}
+
 async function buildAll() {
   console.log('\n==============================================');
   console.log('Building platforms…');
+
+  removeLegacyOutputRoots();
 
   const iosSd = new StyleDictionary(iosConfig);
   const webSd = new StyleDictionary(webConfig);

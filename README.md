@@ -104,4 +104,4 @@ const docs: CdrColorTextTokenDocs = {
 
 Generated docs metadata JSON is available per module, for example:
 
-- `dist/rei-dot-com/meta/foundations/cdr-color-text.docs.json`
+- `dist/themes/rei-dot-com/meta/foundations/cdr-color-text.docs.json`

@@ -22,7 +22,7 @@ const config: StorybookConfig = {
       to: "/canonical",
     },
     {
-      from: path.resolve(__dirname, "../dist/rei-dot-com/meta"),
+      from: path.resolve(__dirname, "../dist/themes/rei-dot-com/meta"),
       to: "/meta",
     },
     {
