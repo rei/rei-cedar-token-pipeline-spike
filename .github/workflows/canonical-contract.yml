@@ -1,11 +1,11 @@
-name: ADR governance
+name: canonical contract
 
 on:
   pull_request:
   workflow_dispatch:
 
 jobs:
-  validate-adr-governance:
+  validate-canonical-contract:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,5 +27,5 @@ jobs:
       - name: Normalize tokens
         run: pnpm tokens:normalize
 
-      - name: Validate ADR governance
-        run: pnpm docs:validate:adr
+      - name: Validate canonical contract
+        run: pnpm test:contract

@@ -25,7 +25,7 @@
     "tokens:build": "pnpm tokens:normalize && pnpm tokens:types:base && pnpm tokens:sd && pnpm tokens:platforms && pnpm postbuild:normalized",
     "postbuild:normalized": "tsx scripts/postbuild-normalized.js",
     "tokens:validate:normalized": "tsx scripts/validate-normalized-json.ts",
-    "docs:validate:adr": "node scripts/validate-adr-governance.js",
+    "test:contract": "vitest run src/contract/canonical-contract.test.ts --reporter=verbose",
     "tokens:snapshot": "tsx src/snapshot.ts",
     "diff:baseline": "pnpm tokens:normalize && pnpm tokens:snapshot baseline",
     "diff:current": "pnpm tokens:normalize && pnpm tokens:snapshot current",
