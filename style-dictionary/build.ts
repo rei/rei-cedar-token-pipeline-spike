@@ -22,6 +22,12 @@ StyleDictionary.registerTransformGroup({
   transforms: ['name/camel'],
 });
 
+function toBuildError(message: string, err: unknown) {
+  return err instanceof Error
+    ? new Error(message, { cause: err })
+    : new Error(`${message}: ${String(err)}`);
+}
+
 async function buildAll() {
   console.log('\n==============================================');
   console.log('Building platforms…');
@@ -34,7 +40,7 @@ async function buildAll() {
     console.log('  ✓ iOS build complete');
   } catch (err) {
     console.error(err);
-    throw new Error('Error building iOS platform');
+    throw toBuildError('Error building iOS platform', err);
   }
 
   try {
@@ -42,7 +48,7 @@ async function buildAll() {
     console.log('  ✓ Web build complete');
   } catch (err) {
     console.error(err);
-    throw new Error('Error building Web platform');
+    throw toBuildError('Error building Web platform', err);
   }
 
   console.log('==============================================\n');

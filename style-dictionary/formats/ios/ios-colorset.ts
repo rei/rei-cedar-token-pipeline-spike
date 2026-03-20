@@ -1,4 +1,22 @@
-export const iosColorsetFormatter = (token: any): string => {
+type P3ColorValue = {
+  'color-space': 'display-p3';
+  components: {
+    red: string;
+    green: string;
+    blue: string;
+    alpha: string;
+  };
+};
+
+type IosColorsetToken = {
+  name: string;
+  value?: {
+    light?: P3ColorValue;
+    dark?: P3ColorValue;
+  };
+};
+
+export const iosColorsetFormatter = (token: IosColorsetToken): string => {
   if (!token.value || !token.value.light || !token.value.dark) {
     throw new Error(
       `Token ${token.name} is missing light/dark P3 values. ` +
