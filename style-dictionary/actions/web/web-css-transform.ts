@@ -24,6 +24,17 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { Action } from 'style-dictionary/types';
 
+type CedarOptionNode = {
+  value?: unknown;
+  $value?: unknown;
+  $extensions?: {
+    cedar?: {
+      appearances?: Record<string, string>;
+      platformOverrides?: Record<string, Record<string, string>>;
+    };
+  };
+};
+
 /** Navigate dictionary.tokens by dot-separated path */
 function getTokenAtPath(tokens: any, dotPath: string): any {
   return dotPath.split('.').reduce(
@@ -48,6 +59,16 @@ function toCssValue(value: string): string {
     const refSegments = refPath.split('.');
     return `var(${toCssVar(refSegments)})`;
   });
+}
+
+function resolveOptionHex(optionNode: CedarOptionNode | undefined, appearance: 'light' | 'dark') {
+  const cedar = optionNode?.$extensions?.cedar;
+  const platformOverride = cedar?.platformOverrides?.web?.[appearance];
+  if (platformOverride) return platformOverride;
+  if (appearance === 'dark' && cedar?.appearances?.dark) return cedar.appearances.dark;
+
+  const val = optionNode?.value ?? optionNode?.$value;
+  return typeof val === 'string' ? val : undefined;
 }
 
 export const webCssAction: Action = {
@@ -116,23 +137,31 @@ export const webCssAction: Action = {
       const webCedar = (token.$extensions as any)?.cedar?.web;
 
       if (!webCedar?.light || !webCedar?.dark) {
-        console.warn(`[web-css] Token ${token.name}: missing $extensions.cedar.web`);
-        return;
+        throw new Error(
+          `[web-css] Token ${token.name}: missing $extensions.cedar.web { light, dark }. ` +
+          `Ensure normalize.ts mergeColorVariants generated web option refs.`
+        );
       }
 
-      const lightOptionNode = getTokenAtPath(dictionary.tokens, webCedar.light);
-      const darkOptionNode  = getTokenAtPath(dictionary.tokens, webCedar.dark);
+      const lightOptionNode = getTokenAtPath(dictionary.tokens, webCedar.light) as CedarOptionNode | undefined;
+      const darkOptionNode = getTokenAtPath(dictionary.tokens, webCedar.dark) as CedarOptionNode | undefined;
 
       if (!lightOptionNode || !darkOptionNode) {
-        console.warn(`[web-css] Token ${token.name}: could not resolve option tokens`);
-        return;
+        throw new Error(
+          `[web-css] Token ${token.name}: could not resolve web option tokens. ` +
+          `light="${webCedar.light}", dark="${webCedar.dark}".`
+        );
       }
 
-      const lightHex = lightOptionNode.value ?? lightOptionNode.$value;
-      const darkHex =
-        lightOptionNode.$extensions?.cedar?.appearances?.dark ??
-        darkOptionNode.value ??
-        darkOptionNode.$value;
+      const lightHex = resolveOptionHex(lightOptionNode, 'light');
+      const darkHex = resolveOptionHex(darkOptionNode, 'dark');
+
+      if (!lightHex || !darkHex) {
+        throw new Error(
+          `[web-css] Token ${token.name}: could not resolve web hex values. ` +
+          `light="${webCedar.light}"→${lightHex}, dark="${webCedar.dark}"→${darkHex}.`
+        );
+      }
 
       const cssVar = toCssVar(token.path);
       const line = `  ${cssVar}: ${lightHex};`;

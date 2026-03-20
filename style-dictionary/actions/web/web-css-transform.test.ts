@@ -81,4 +81,88 @@ describe("webCssAction", () => {
     expect(lightIndex).not.toContain("@import './color-surface.css';");
     expect(darkIndex).not.toContain("@import './color-surface.css';");
   });
+
+  it("throws when web option refs are missing", () => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const buildPath = fs.mkdtempSync(path.join(os.tmpdir(), "web-css-action-"));
+    tempDirs.push(buildPath);
+
+    const dictionary = {
+      allTokens: [
+        {
+          name: "textBase",
+          path: ["color", "modes", "default", "text", "base"],
+          $type: "color",
+          $extensions: { cedar: {} },
+        },
+      ],
+      tokens: {},
+    };
+
+    expect(() => webCssAction.do?.(dictionary as any, { buildPath } as any)).toThrow(
+      "missing $extensions.cedar.web",
+    );
+  });
+
+  it("resolves dark values from the dark option node", () => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const buildPath = fs.mkdtempSync(path.join(os.tmpdir(), "web-css-action-"));
+    tempDirs.push(buildPath);
+
+    const dictionary = {
+      allTokens: [
+        {
+          name: "textLink",
+          path: ["color", "modes", "default", "text", "link"],
+          $type: "color",
+          $extensions: {
+            cedar: {
+              web: {
+                light: "color.option.brand.blue.400",
+                dark: "color.option.brand.blue.600",
+              },
+            },
+          },
+        },
+      ],
+      tokens: {
+        color: {
+          option: {
+            brand: {
+              blue: {
+                400: {
+                  $value: "#123456",
+                  $extensions: {
+                    cedar: {
+                      appearances: {
+                        dark: "#999999",
+                      },
+                    },
+                  },
+                },
+                600: {
+                  $value: "#222222",
+                  $extensions: {
+                    cedar: {
+                      appearances: {
+                        dark: "#abcdef",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    webCssAction.do?.(dictionary as any, { buildPath } as any);
+
+    const darkTextCss = fs.readFileSync(path.join(buildPath, "dark", "color-text.css"), "utf8");
+    expect(darkTextCss).toContain("--cdr-text-link: #abcdef;");
+    expect(darkTextCss).not.toContain("--cdr-text-link: #999999;");
+  });
 });
