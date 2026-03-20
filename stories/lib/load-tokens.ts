@@ -22,6 +22,10 @@ interface TokenLeaf {
   $type: string;
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
 /**
  * Fetch the current token snapshot and extract color tokens for all modes.
  * Returns a map of token paths to their hex values, keyed as
@@ -148,13 +152,14 @@ function flattenOptionPrimitives(
 ): Array<{ name: string; value: string }> {
   const out: Array<{ name: string; value: string }> = [];
 
-  const neutral = optionSection["neutral"] as Record<string, unknown> | undefined;
-  if (neutral) {
+  const neutralNode = optionSection["neutral"];
+  if (isRecord(neutralNode)) {
+    const neutral = neutralNode;
     // warm grey scale -> neutral-palette.warm-grey.*
-    const warmGrey = (((neutral["warm"] as Record<string, unknown> | undefined)?.["grey"]) as
-      | Record<string, unknown>
-      | undefined);
-    if (warmGrey) {
+    const warmNode = neutral["warm"];
+    const warmGreyNode = isRecord(warmNode) ? warmNode["grey"] : undefined;
+    if (isRecord(warmGreyNode)) {
+      const warmGrey = warmGreyNode;
       for (const [shade, node] of Object.entries(warmGrey)) {
         if (isLeaf(node)) {
           out.push({ name: `neutral-palette.warm-grey.${shade}`, value: node.$value });
@@ -170,8 +175,9 @@ function flattenOptionPrimitives(
       }
     }
 
-    const overlay = neutral["overlay"] as Record<string, unknown> | undefined;
-    if (overlay) {
+    const overlayNode = neutral["overlay"];
+    if (isRecord(overlayNode)) {
+      const overlay = overlayNode;
       for (const [key, node] of Object.entries(overlay)) {
         if (isLeaf(node)) {
           out.push({ name: `neutral-palette.base-neutrals.overlay-${key}`, value: node.$value });
@@ -181,11 +187,12 @@ function flattenOptionPrimitives(
   }
 
   // brand scale -> brand-palette.<color>.*
-  const brand = optionSection["brand"] as Record<string, unknown> | undefined;
-  if (brand) {
+  const brandNode = optionSection["brand"];
+  if (isRecord(brandNode)) {
+    const brand = brandNode;
     for (const [colorName, scaleNode] of Object.entries(brand)) {
-      if (typeof scaleNode !== "object" || scaleNode === null) continue;
-      for (const [shade, leaf] of Object.entries(scaleNode as Record<string, unknown>)) {
+      if (!isRecord(scaleNode)) continue;
+      for (const [shade, leaf] of Object.entries(scaleNode)) {
         if (isLeaf(leaf)) {
           out.push({ name: `brand-palette.${colorName}.${shade}`, value: leaf.$value });
         }

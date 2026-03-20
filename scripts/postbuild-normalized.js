@@ -1,8 +1,8 @@
 // postbuild-normalized.js
 // Copies canonical/tokens.json to dist/normalized/current.json and baseline.json for Storybook compatibility
 
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
 const canonical = path.resolve('canonical/tokens.json');
 const normalizedDir = path.resolve('dist/normalized');

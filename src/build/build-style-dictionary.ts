@@ -97,7 +97,7 @@ function collectModeColorAliasTokenNames(tokens: DesignTokens): Map<string, stri
     }
 
     for (const [key, child] of Object.entries(node)) {
-      if (key === "$extensions") continue;
+      if (key.startsWith("$")) continue;
       walk(child, [...currentPath, key], out);
     }
   };
@@ -119,6 +119,10 @@ function writeModeColorAliasTypes(tokens: DesignTokens): string[] {
   const modesDir = path.join(distTypesDir, "foundations/modes");
 
   const modeNames = [...modeTokenNames.keys()].sort((left, right) => left.localeCompare(right));
+  const cedarModeUnion =
+    modeNames.length === 0
+      ? "never"
+      : modeNames.map((modeName) => JSON.stringify(modeName)).join(" | ");
 
   for (const modeName of modeNames) {
     const tokenNames = modeTokenNames.get(modeName) ?? [];
@@ -144,7 +148,7 @@ function writeModeColorAliasTypes(tokens: DesignTokens): string[] {
       `export * from "./${modeName}/cdr-color-alias";`,
     ]),
     "",
-    `export type CedarMode = ${modeNames.map((modeName) => JSON.stringify(modeName)).join(" | ")};`,
+    `export type CedarMode = ${cedarModeUnion};`,
     "",
   ];
 

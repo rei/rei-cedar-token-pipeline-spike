@@ -54,11 +54,13 @@ export function validateFigmaInputs(params: {
   for (const baselineMode of ["web-light", "web-dark", "ios-light", "ios-dark"]) {
     if (!importedPrimitiveModes.includes(baselineMode)) {
       issues.push({
-        level: "warn",
+        level: baselineMode === "web-light" ? "error" : "warn",
         code: "MISSING_OPTION_PRIMITIVE_MODE",
         message:
           `No options.color.${baselineMode}.json file was found. ` +
-          `Normalization will proceed, but platform/appearance resolution may be incomplete.`,
+          (baselineMode === "web-light"
+            ? `Normalization cannot proceed without the canonical fallback mode.`
+            : `Normalization will proceed, but platform/appearance resolution may be incomplete.`),
       });
     }
   }
