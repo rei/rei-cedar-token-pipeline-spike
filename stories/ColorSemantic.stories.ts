@@ -1,5 +1,5 @@
 import type { StoryObj, Meta } from "@storybook/html";
-import { loadColorTokens } from "./lib/load-tokens.js";
+import { loadColorTokens, type LoadedColorToken, type TokenDocs } from "./lib/load-tokens.js";
 
 type SemanticTokenArgs = Record<string, never>;
 
@@ -125,7 +125,12 @@ const BASE_STYLES = `
   }
   .trow-chip-wrap { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); }
   .trow-chip { width: 32px; height: 32px; border-radius: 3px; border: 1px solid var(--rule-heavy); display: block; }
-  .trow-token { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+  .trow-token { padding: 0.6rem 0; border-bottom: 1px solid var(--rule); }
+  .trow-token-name { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+  .trow-token-docs { margin-top: 0.35rem; display: grid; gap: 0.3rem; }
+  .trow-doc-summary { font-family: var(--font-sans); font-size: 0.75rem; line-height: 1.4; color: var(--ink-mid); }
+  .trow-doc-meta { font-family: var(--font-sans); font-size: 0.6875rem; line-height: 1.45; color: var(--ink-muted); }
+  .trow-doc-label { font-family: var(--font-sans); font-size: 0.56rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint); margin-right: 0.35rem; }
   .trow-ref { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.6875rem; font-style: italic; color: var(--ink-muted); display: flex; align-items: center; gap: 0.25rem; }
   .trow-ref::before { content: '→'; font-style: normal; color: var(--ink-faint); font-size: 0.625rem; }
   .trow-hex { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-muted); letter-spacing: 0.04em; text-align: right; }
@@ -229,11 +234,42 @@ function catHeader(name: string): string {
   return `<div class="cat-header"><span class="cat-pip"></span><span class="cat-name">${name}</span><span class="cat-rule"></span></div>`;
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function renderDocs(docs?: TokenDocs): string {
+  if (!docs) return "";
+
+  const parts: string[] = [];
+  if (docs.summary) {
+    parts.push(`<div class="trow-doc-summary">${escapeHtml(docs.summary)}</div>`);
+  }
+  if (docs.usage) {
+    parts.push(`<div class="trow-doc-meta"><span class="trow-doc-label">Usage</span>${escapeHtml(docs.usage)}</div>`);
+  }
+  if (docs.design) {
+    parts.push(`<div class="trow-doc-meta"><span class="trow-doc-label">Design</span>${escapeHtml(docs.design)}</div>`);
+  }
+  if (docs.aliases && docs.aliases.length > 0) {
+    parts.push(
+      `<div class="trow-doc-meta"><span class="trow-doc-label">Aliases</span>${docs.aliases.map(escapeHtml).join(", ")}</div>`,
+    );
+  }
+
+  return parts.length > 0 ? `<div class="trow-token-docs">${parts.join("")}</div>` : "";
+}
+
 /**
  * Render a single-mode token list grid (chip · token name · ref alias · hex value).
  */
 function tokenGrid(
-  tokens: Map<string, { hex: string; ref: string }>,
+  tokens: Map<string, LoadedColorToken>,
   keys: string[],
 ): string {
   return `
@@ -244,10 +280,10 @@ function tokenGrid(
       ${keys.map((key) => {
         const data = tokens.get(key);
         if (!data) return "";
-        const { hex, ref } = data;
+        const { hex, ref, docs } = data;
         return `
           <div class="trow-chip-wrap"><span class="trow-chip" style="background:${hex};"></span></div>
-          <div class="trow-token">${key}</div>
+          <div class="trow-token"><div class="trow-token-name">${key}</div>${renderDocs(docs)}</div>
           <div class="trow-ref">${ref}</div>
           <div class="trow-hex">${hex.slice(0, 9).toUpperCase()}</div>
         `;
@@ -261,7 +297,7 @@ function tokenGrid(
  * Rows = token names, columns = modes.
  */
 function modeCompareTable(
-  tokens: Map<string, { hex: string; ref: string }>,
+  tokens: Map<string, LoadedColorToken>,
   modes: string[],
   category: string,
   tokenNames: string[],
@@ -319,11 +355,11 @@ function modeCompareTable(
  * then falls back to "color.<category>.<token>" (legacy flat structure).
  */
 function resolveToken(
-  tokens: Map<string, { hex: string; ref: string }>,
+  tokens: Map<string, LoadedColorToken>,
   mode: string,
   category: string,
   token: string,
-): { hex: string; ref: string } | undefined {
+): LoadedColorToken | undefined {
   return (
     tokens.get(`color.modes.${mode}.${category}.${token}`) ??
     tokens.get(`color.${category}.${token}`)
@@ -334,7 +370,7 @@ function resolveToken(
  * Collect all modes present in the token map (from color.modes.*).
  * Falls back to a synthetic ["default"] if only the legacy flat structure is present.
  */
-function collectModes(tokens: Map<string, { hex: string; ref: string }>): string[] {
+function collectModes(tokens: Map<string, LoadedColorToken>): string[] {
   const modes = new Set<string>();
   for (const key of tokens.keys()) {
     const match = key.match(/^color\.modes\.([^.]+)\./);

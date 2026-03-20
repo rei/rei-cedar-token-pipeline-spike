@@ -172,6 +172,14 @@ try {
 
   // platformLookup: "web-light" → { "color.option.neutral.warm.grey.900": "#hex", ... }
   const platformLookup = new Map<string, Record<string, string>>();
+  const webLightOptionEntries: Array<{
+    canonicalPath: string;
+    token: {
+      $type: string;
+      $value: string;
+      docs?: ReturnType<typeof parseTokenDescription>;
+    };
+  }> = [];
 
   for (const { file, data } of optionColorFiles) {
     const primitiveMode = extractPrimitiveMode(file)!;
@@ -197,6 +205,10 @@ try {
       for (const { canonicalPath, token } of mapped) {
         lookup[canonicalPath] = token.$value;
       }
+
+      if (primitiveMode === "web-light") {
+        webLightOptionEntries.push(...mapped);
+      }
     }
 
     platformLookup.set(primitiveMode, lookup);
@@ -204,14 +216,8 @@ try {
   }
 
   // Build color.option tree from the web-light snapshot (canonical $value source)
-  const webLightLookup = platformLookup.get("web-light");
-  if (webLightLookup) {
-    const optionEntries = Object.entries(webLightLookup).map(([canonicalPath, $value]) => ({
-      canonicalPath,
-      // $type is color for all option tokens in the current mapping
-      token: { $type: "color", $value },
-    }));
-    const optionTree = buildOptionTree(optionEntries);
+  if (webLightOptionEntries.length > 0) {
+    const optionTree = buildOptionTree(webLightOptionEntries);
     deepMerge(canonical, optionTree);
   }
 

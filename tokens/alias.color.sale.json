@@ -61,7 +61,7 @@
       },
       "link": {
         "$type": "color",
-        "$value": "{neutral-palette.warm-grey.100}",
+        "$value": "{neutral-palette.base-neutrals.white}",
         "$description": "Text color for interactive links and inline navigation.\nusage: Use for hyperlinks, inline anchors, and any text that navigates or triggers an action. Do not use for non-interactive text — use text-base or text-subtle instead.\ndesign: Draws from the blue brand scale to signal interactivity. Paired with text-link-hover to form the link interaction ramp.",
         "$extensions": {
           "com.figma": {

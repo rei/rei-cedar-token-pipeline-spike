@@ -3,7 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "types": "dist/types/index.d.ts",
   "type": "module",
+  "exports": {
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/types/index.d.ts"
+    },
+    "./meta/*": "./dist/rei-dot-com/meta/*",
+    "./package.json": "./package.json"
+  },
   "files": [
     "dist/**/*",
     "README.md"

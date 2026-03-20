@@ -20,6 +20,30 @@
 interface TokenLeaf {
   $value: string;
   $type: string;
+  $extensions?: {
+    cedar?: {
+      docs?: TokenDocs;
+    };
+  };
+}
+
+export interface TokenDocs {
+  summary?: string;
+  design?: string;
+  usage?: string;
+  aliases?: string[];
+}
+
+export interface LoadedColorToken {
+  hex: string;
+  ref: string;
+  docs?: TokenDocs;
+}
+
+export interface PrimitiveColorToken {
+  name: string;
+  value: string;
+  docs?: TokenDocs;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -32,7 +56,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
  * "color.modes.<mode>.<category>.<token>".
  */
 export async function loadColorTokens(): Promise<
-  Map<string, { hex: string; ref: string }>
+  Map<string, LoadedColorToken>
 > {
   const base = window.location.pathname.replace(/\/[^/]*$/, "/");
   const res = await fetch(`${base}normalized/current.json`);
@@ -42,7 +66,7 @@ export async function loadColorTokens(): Promise<
   }
 
   const tree = (await res.json()) as Record<string, unknown>;
-  const result = new Map<string, { hex: string; ref: string }>();
+  const result = new Map<string, LoadedColorToken>();
 
   const colorSection = tree["color"] as Record<string, unknown> | undefined;
   if (!colorSection) return result;
@@ -65,6 +89,7 @@ export async function loadColorTokens(): Promise<
             result.set(`color.modes.${mode}.${category}.${key}`, {
               hex: resolvedHex || leaf.$value,
               ref: buildRef(leaf.$value),
+              docs: leaf.$extensions?.cedar?.docs,
             });
           }
         }
@@ -83,6 +108,7 @@ export async function loadColorTokens(): Promise<
           result.set(`color.${category}.${key}`, {
             hex: resolvedHex || leaf.$value,
             ref: buildRef(leaf.$value),
+            docs: leaf.$extensions?.cedar?.docs,
           });
         }
       }
@@ -102,7 +128,7 @@ export async function loadColorTokens(): Promise<
  * Falls back to reading from flat color.<palette> if no per-mode structure is present.
  */
 export async function loadPrimitiveColors(): Promise<
-  Map<string, Array<{ name: string; value: string }>>
+  Map<string, PrimitiveColorToken[]>
 > {
   const base = window.location.pathname.replace(/\/[^/]*$/, "/");
   const res = await fetch(`${base}normalized/current.json`);
@@ -112,7 +138,7 @@ export async function loadPrimitiveColors(): Promise<
   }
 
   const tree = (await res.json()) as Record<string, unknown>;
-  const result = new Map<string, Array<{ name: string; value: string }>>();
+  const result = new Map<string, PrimitiveColorToken[]>();
 
   const colorSection = tree["color"] as Record<string, unknown> | undefined;
   if (!colorSection) return result;
@@ -123,7 +149,7 @@ export async function loadPrimitiveColors(): Promise<
     // Multi-mode: color.primitives.<mode>.<palette>.<shade>
     for (const [mode, modeData] of Object.entries(primitivesSection)) {
       if (typeof modeData !== "object" || modeData === null) continue;
-      const tokens: Array<{ name: string; value: string }> = [];
+      const tokens: PrimitiveColorToken[] = [];
       for (const palette of ["neutral-palette", "brand-palette"]) {
         const group = (modeData as Record<string, unknown>)[palette] as Record<string, unknown> | undefined;
         if (group) flattenTokens(group, palette, tokens);
@@ -136,7 +162,7 @@ export async function loadPrimitiveColors(): Promise<
     result.set("default", tokens);
   } else {
     // Fallback: flat color.<palette> (legacy structure)
-    const tokens: Array<{ name: string; value: string }> = [];
+    const tokens: PrimitiveColorToken[] = [];
     for (const palette of ["neutral-palette", "brand-palette"]) {
       const group = colorSection[palette] as Record<string, unknown> | undefined;
       if (group) flattenTokens(group, palette, tokens);
@@ -149,8 +175,8 @@ export async function loadPrimitiveColors(): Promise<
 
 function flattenOptionPrimitives(
   optionSection: Record<string, unknown>,
-): Array<{ name: string; value: string }> {
-  const out: Array<{ name: string; value: string }> = [];
+): PrimitiveColorToken[] {
+  const out: PrimitiveColorToken[] = [];
 
   const neutralNode = optionSection["neutral"];
   if (isRecord(neutralNode)) {
@@ -162,7 +188,11 @@ function flattenOptionPrimitives(
       const warmGrey = warmGreyNode;
       for (const [shade, node] of Object.entries(warmGrey)) {
         if (isLeaf(node)) {
-          out.push({ name: `neutral-palette.warm-grey.${shade}`, value: node.$value });
+          out.push({
+            name: `neutral-palette.warm-grey.${shade}`,
+            value: node.$value,
+            docs: node.$extensions?.cedar?.docs,
+          });
         }
       }
     }
@@ -171,7 +201,11 @@ function flattenOptionPrimitives(
     for (const key of ["black", "white"] as const) {
       const node = neutral[key];
       if (isLeaf(node)) {
-        out.push({ name: `neutral-palette.base-neutrals.${key}`, value: node.$value });
+        out.push({
+          name: `neutral-palette.base-neutrals.${key}`,
+          value: node.$value,
+          docs: node.$extensions?.cedar?.docs,
+        });
       }
     }
 
@@ -180,7 +214,11 @@ function flattenOptionPrimitives(
       const overlay = overlayNode;
       for (const [key, node] of Object.entries(overlay)) {
         if (isLeaf(node)) {
-          out.push({ name: `neutral-palette.base-neutrals.overlay-${key}`, value: node.$value });
+          out.push({
+            name: `neutral-palette.base-neutrals.overlay-${key}`,
+            value: node.$value,
+            docs: node.$extensions?.cedar?.docs,
+          });
         }
       }
     }
@@ -194,7 +232,11 @@ function flattenOptionPrimitives(
       if (!isRecord(scaleNode)) continue;
       for (const [shade, leaf] of Object.entries(scaleNode)) {
         if (isLeaf(leaf)) {
-          out.push({ name: `brand-palette.${colorName}.${shade}`, value: leaf.$value });
+          out.push({
+            name: `brand-palette.${colorName}.${shade}`,
+            value: leaf.$value,
+            docs: leaf.$extensions?.cedar?.docs,
+          });
         }
       }
     }
@@ -293,13 +335,13 @@ export async function loadSpacingTokens(): Promise<SpacingToken[]> {
 function flattenTokens(
   node: Record<string, unknown>,
   prefix: string,
-  out: Array<{ name: string; value: string }>,
+  out: PrimitiveColorToken[],
 ): void {
   for (const [key, value] of Object.entries(node)) {
     const path = `${prefix}.${key}`;
     if (isLeaf(value)) {
       const leaf = value as TokenLeaf;
-      out.push({ name: path, value: leaf.$value });
+      out.push({ name: path, value: leaf.$value, docs: leaf.$extensions?.cedar?.docs });
     } else if (typeof value === "object" && value !== null) {
       flattenTokens(value as Record<string, unknown>, path, out);
     }

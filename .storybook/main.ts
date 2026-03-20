@@ -21,6 +21,14 @@ const config: StorybookConfig = {
       from: path.resolve(__dirname, "../canonical"),
       to: "/canonical",
     },
+    {
+      from: path.resolve(__dirname, "../dist/rei-dot-com/meta"),
+      to: "/meta",
+    },
+    {
+      from: path.resolve(__dirname, "../dist/types"),
+      to: "/types",
+    },
   ],
   // Allow overriding Vite's base path at build time via STORYBOOK_BASE_URL.
   // This is needed when deploying to a GH Pages sub-path, e.g.:

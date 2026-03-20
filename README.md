@@ -65,3 +65,43 @@ V1 deferred capabilities:
 - ADRs: [architecture/ADR](architecture/ADR)
 - Diagrams: [architecture/diagrams](architecture/diagrams)
 - Notes: [architecture/notes](architecture/notes)
+
+## Consumer Contract (Types + Metadata)
+
+This repo now generates a consumer-facing TypeScript contract and docs metadata artifacts.
+
+- Type entrypoint: `@rei/cdr-tokens/types`
+- Metadata entrypoint: `@rei/cdr-tokens/meta/*`
+
+Example usage:
+
+```ts
+import type {
+        CdrColorTextTokenName,
+        CdrColorTextTokens,
+        CdrColorTextTokenDocs,
+        TokenDictionary,
+        Theme,
+        Platform,
+        Responsibility,
+} from "@rei/cdr-tokens/types";
+
+type ColorTextDictionary = TokenDictionary<
+        Theme,
+        Platform,
+        Responsibility,
+        "cdr-color-text",
+        CdrColorTextTokens,
+        CdrColorTextTokenName
+>;
+
+const docs: CdrColorTextTokenDocs = {
+        "color-text-link": {
+                summary: "Text color for interactive links and inline navigation.",
+        },
+};
+```
+
+Generated docs metadata JSON is available per module, for example:
+
+- `dist/rei-dot-com/meta/foundations/cdr-color-text.docs.json`

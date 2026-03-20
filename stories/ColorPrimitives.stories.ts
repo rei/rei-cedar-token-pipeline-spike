@@ -1,5 +1,5 @@
 import type { StoryObj, Meta } from "@storybook/html";
-import { loadPrimitiveColors } from "./lib/load-tokens.js";
+import { loadPrimitiveColors, type PrimitiveColorToken, type TokenDocs } from "./lib/load-tokens.js";
 
 type ColorSwatchArgs = Record<string, never>;
 
@@ -163,6 +163,10 @@ const BASE_STYLES = `
   .td-swatch { width: 36px; padding-right: 0.75rem !important; }
   .swatch-chip { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--rule-heavy); display: inline-block; }
   .td-token { font-family: var(--font-mono); font-size: 0.875rem; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+  .td-token-wrap { display: grid; gap: 0.3rem; }
+  .td-doc-summary { font-family: var(--font-sans); font-size: 0.75rem; line-height: 1.4; color: var(--ink-mid); }
+  .td-doc-meta { font-family: var(--font-sans); font-size: 0.6875rem; line-height: 1.45; color: var(--ink-muted); }
+  .td-doc-label { font-family: var(--font-sans); font-size: 0.56rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint); margin-right: 0.35rem; }
   .td-hex { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--ink-muted); text-align: right; letter-spacing: 0.04em; }
 
   /* ── Section spacing ── */
@@ -208,9 +212,32 @@ const BASE_STYLES = `
 
 // ─── Rendering helpers ────────────────────────────────────────────────────────
 
-interface Swatch {
-  name: string;
-  value: string;
+type Swatch = PrimitiveColorToken;
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function renderDocs(docs?: TokenDocs): string {
+  if (!docs) return "";
+
+  const parts: string[] = [];
+  if (docs.summary) {
+    parts.push(`<div class="td-doc-summary">${escapeHtml(docs.summary)}</div>`);
+  }
+  if (docs.usage) {
+    parts.push(`<div class="td-doc-meta"><span class="td-doc-label">Usage</span>${escapeHtml(docs.usage)}</div>`);
+  }
+  if (docs.design) {
+    parts.push(`<div class="td-doc-meta"><span class="td-doc-label">Design</span>${escapeHtml(docs.design)}</div>`);
+  }
+
+  return parts.join("");
 }
 
 function needsDarkLabel(hex: string): boolean {
@@ -253,7 +280,7 @@ function table(swatches: Swatch[]): string {
             <td class="td-swatch">
               <span class="swatch-chip" style="background:${s.value};"></span>
             </td>
-            <td class="td-token">${s.name}</td>
+            <td class="td-token"><div class="td-token-wrap"><div>${s.name}</div>${renderDocs(s.docs)}</div></td>
             <td class="td-hex">${s.value.slice(0, 9).toUpperCase()}</td>
           </tr>
         `).join("")}
