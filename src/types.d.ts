@@ -8,6 +8,31 @@
 
 import { VariableCodeSyntax, VariableScope } from "@figma/rest-api-spec";
 
+type CedarDocs = {
+  summary?: string;
+  design?: string;
+  usage?: string;
+  aliases?: string[];
+};
+
+type CedarPaletteMeta = {
+  scope: "root" | "surface";
+  isBaseline?: boolean;
+  inheritsFrom?: string;
+  cssAttribute?: string;
+};
+
+type CedarResolved = Record<string, Record<string, string>>;
+
+type CedarExtension = {
+  docs?: CedarDocs;
+  appearances?: Record<string, string>;
+  platformOverrides?: Record<string, Record<string, string>>;
+  resolved?: CedarResolved;
+  $meta?: CedarPaletteMeta;
+  [platform: string]: unknown;
+};
+
 export interface Token {
   /**
    * The [type](https://tr.designtokens.org/format/#type-0) of the token.
@@ -27,6 +52,7 @@ export interface Token {
       scopes?: VariableScope[];
       codeSyntax?: VariableCodeSyntax;
     };
+    cedar?: CedarExtension;
   };
 }
 

@@ -1,10 +1,10 @@
 # ADR‑0003: Figma Input Contract
 
-## Status  
-Planned
+## Status
+Draft
 
 > [!NOTE]
-> V0 implements only a minimal subset of this ADR for pipeline validation. > Full implementation begins in V1.
+> The mapping contract section reflects the V1 implementation. The Export Method section describes the V0 automated GitHub Actions export.
 
 
 ## Context  
@@ -106,6 +106,110 @@ The pipeline will reject Raw Variables if:
 
 `raw-figma-variables.json`
 
+
+---
+
+## Figma-to-Canonical Path Mapping Contract
+
+### Purpose
+
+Raw Figma variable names, collection names, and group names are designer-authored and subject to change without notice. The Normalization Layer MUST NOT infer canonical paths by string manipulation of Figma names — doing so couples the pipeline to Figma's current naming and causes silent breakage when designers rename things.
+
+Instead, the mapping between Figma collection paths and canonical `color.option.*` paths is declared explicitly in `src/schema/token-schema.json` (`inputs.figma.collections`). This contract is the formal, version-controlled boundary between design and engineering.
+
+### Schema Mapping Contract
+
+`src/schema/token-schema.json` is committed to the repository and maps every Figma collection to:
+
+- `canonicalPrefix` — the `color.option.*` prefix for all tokens in this collection
+- `tokens` — an explicit map of every Figma token path to its canonical sub-path
+
+```json
+{
+  "collections": {
+    "neutral-palette": {
+      "canonicalPrefix": "color.option.neutral",
+      "tokens": {
+        "warm-grey.100":          "warm.grey.100",
+        "warm-grey.900":          "warm.grey.900",
+        "base-neutrals.white":    "white",
+        "base-neutrals.white-85": "overlay.light",
+        "base-neutrals.white-75": "overlay.subtle"
+      }
+    },
+    "brand-palette": {
+      "canonicalPrefix": "color.option.brand",
+      "tokens": {
+        "blue.400": "blue.400",
+        "red.600":  "red.600"
+      }
+    }
+  }
+}
+```
+
+### Invariants
+
+- `src/schema/token-schema.json` MUST be present. Missing file fails the build.
+- Every Figma collection in `options.color.*.json` MUST have a `collections` entry. Unknown collections fail the build.
+- Every Figma token path within a collection MUST have a `tokens` entry. Unknown paths fail the build.
+- Canonical sub-paths MUST follow ADR-0001 path rules: lowercase, dot-delimited, no hyphens.
+- Semantic renames (e.g. `white-85` → `overlay.light`) are expressed here, not in code.
+
+### Governing Changes
+
+When a designer renames or restructures Figma variables:
+
+1. The build fails with a specific error naming the unmapped path
+2. Engineering and design agree on the canonical name
+3. A PR updates `src/schema/token-schema.json` — reviewable, diffable, governable
+4. The build passes again
+
+This makes designer renames visible at the PR level rather than silently corrupting canonical paths.
+
+---
+
+## Four-File Platform Input Contract
+
+### Why Four Files
+
+The Figma Variables API exports one file per platform-appearance combination because Figma's mode system is one-dimensional — it cannot represent `platform × appearance` in a single export. Cedar's pipeline reconstructs this matrix from four separate files.
+
+This is an architectural constraint of the Figma REST API, not a choice. It means the appearance dimension (light/dark) is encoded in the **filename convention**, not in the file contents.
+
+### Governed File Set
+
+The following four files are the required, governed inputs for color option processing:
+
+| File | Platform | Appearance | Role |
+|---|---|---|---|
+| `options.color.web-light.json` | web | light | Canonical `$value` source for `color.option.*` |
+| `options.color.web-dark.json` | web | dark | Provides `appearances.dark` values |
+| `options.color.ios-light.json` | ios | light | Provides `platformOverrides.ios.light` where different from web |
+| `options.color.ios-dark.json` | ios | dark | Provides `platformOverrides.ios.dark` where different from web-dark |
+
+All four files are baseline-governed inputs. The current normalizer warns if one is missing and fails on unmapped imported collections. Strict fail-on-missing should be enabled in CI as a governance gate.
+
+### Adding a New Platform or Appearance
+
+Adding a new platform (e.g. `android`) or a new appearance (e.g. `high-contrast`) requires:
+
+1. An ADR amendment documenting the new platform/appearance and its governance rules
+2. New Figma files exported under the naming convention (`options.color.android-light.json`, etc.)
+3. Updates to `src/schema/token-schema.json` if the new platform uses different collection names
+4. Updates to `mergeColorVariants` in `normalize.ts` to include the new platform in `platformOverrides`
+5. A new platform config and action in the Style Dictionary pipeline
+
+This is intentionally not self-service — adding a platform is a significant governance decision.
+
+### Figma API vs Pre-Exported Files
+
+The spike implementation uses **pre-exported JSON files** placed in the `tokens/` directory, not live Figma REST API calls during normalization. The normalization script reads from the filesystem. The GitHub Action handles the Figma API calls as a separate upstream step that populates the `tokens/` directory before normalization runs.
+
+This separation is intentional:
+- Normalization is deterministic and testable without Figma API access
+- The Figma API step can be re-run independently when designs change
+- CI can validate `canonical/tokens.json` without network access
 
 ---
 

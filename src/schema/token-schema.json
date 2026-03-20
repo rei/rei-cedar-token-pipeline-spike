@@ -1,0 +1,221 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rei.com/cedar/token-schema.json",
+  "title": "Cedar Token Schema",
+  "description": "Authoritative schema defining token structure, validation, and Figma Input Contract (ADR-0003). Single source of truth for design-to-engineering token governance.",
+  "type": "object",
+  "additionalProperties": {
+    "$ref": "#/$defs/TokenNode"
+  },
+  "inputs": {
+    "figma": {
+      "collections": {
+        "neutral-palette": {
+          "canonicalPrefix": "color.option.neutral",
+          "tokens": {
+            "warm-grey.100": "warm.grey.100",
+            "warm-grey.300": "warm.grey.300",
+            "warm-grey.600": "warm.grey.600",
+            "warm-grey.900": "warm.grey.900",
+            "base-neutrals.black": "black",
+            "base-neutrals.white": "white",
+            "base-neutrals.white-85": "overlay.light",
+            "base-neutrals.white-75": "overlay.subtle"
+          }
+        },
+        "brand-palette": {
+          "canonicalPrefix": "color.option.brand",
+          "tokens": {
+            "blue.400": "blue.400",
+            "blue.600": "blue.600",
+            "red.400": "red.400",
+            "red.600": "red.600",
+            "yellow.400": "yellow.400",
+            "yellow.600": "yellow.600",
+            "green.400": "green.400",
+            "green.600": "green.600"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "InputsContract": {
+      "description": "Figma Input Contract (ADR-0003) — maps Figma collection paths to canonical token paths. Single source of truth for design-to-engineering boundary.",
+      "type": "object",
+      "properties": {
+        "figma": {
+          "description": "Figma-to-canonical mapping for variable collections",
+          "type": "object",
+          "properties": {
+            "collections": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "canonicalPrefix": {
+                    "type": "string",
+                    "description": "Root canonical path prefix for all tokens in this collection (e.g., 'color.option.neutral')"
+                  },
+                  "tokens": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "Explicit map of Figma token path → canonical sub-path. Example: { 'warm-grey.100': 'warm.grey.100' }"
+                  }
+                },
+                "required": ["canonicalPrefix", "tokens"]
+              }
+            }
+          },
+          "required": ["collections"]
+        }
+      },
+      "required": ["figma"]
+    },
+    "TokenType": {
+      "description": "Supported Cedar token types.",
+      "enum": ["color", "number", "string", "boolean", "fluid"],
+      "type": "string"
+    },
+    "TokenValue": {
+      "description": "Primitive token value.",
+      "type": ["string", "number", "boolean"]
+    },
+    "FigmaTokenExtension": {
+      "description": "Optional Figma-specific token metadata.",
+      "type": "object",
+      "properties": {
+        "hiddenFromPublishing": {
+          "type": "boolean"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "codeSyntax": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "DocMetadata": {
+      "description": "Optional documentation metadata extracted from Figma or Cedar governance. Field names match the TokenDocumentation TypeScript interface.",
+      "type": "object",
+      "properties": {
+        "summary": {
+          "type": "string",
+          "description": "Brief description of the token's purpose. Extracted from Figma variable description."
+        },
+        "design": {
+          "type": "string",
+          "description": "Design rationale for this token (future use)."
+        },
+        "usage": {
+          "type": "string",
+          "description": "Guidance on when and how to use this token (future use)."
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Related token names (future use)."
+        }
+      }
+    },
+    "CedarTokenExtension": {
+      "description": "Cedar-specific token metadata including documentation, platform governance, and semantic mapping.",
+      "type": "object",
+      "properties": {
+        "docs": {
+          "$ref": "#/$defs/DocMetadata"
+        },
+        "appearances": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Appearance overrides (e.g., dark mode) for option tokens"
+        },
+        "platformOverrides": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "description": "Platform-specific value overrides for option tokens"
+        }
+      }
+    },
+    "TokenExtensions": {
+      "description": "Optional extension namespaces for a token.",
+      "type": "object",
+      "properties": {
+        "com.figma": {
+          "$ref": "#/$defs/FigmaTokenExtension"
+        },
+        "cedar": {
+          "$ref": "#/$defs/CedarTokenExtension"
+        }
+      },
+      "additionalProperties": true
+    },
+    "TokenAttributes": {
+      "description": "Core properties shared by all tokens.",
+      "type": "object",
+      "properties": {
+        "$type": {
+          "$ref": "#/$defs/TokenType"
+        },
+        "$value": {
+          "$ref": "#/$defs/TokenValue"
+        },
+        "$description": {
+          "type": "string"
+        },
+        "$extensions": {
+          "$ref": "#/$defs/TokenExtensions"
+        }
+      },
+      "required": ["$type", "$value"],
+      "additionalProperties": false
+    },
+    "Token": {
+      "description": "A leaf design token.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/TokenAttributes"
+        }
+      ]
+    },
+    "TokenGroup": {
+      "description": "A recursive token group containing child groups or leaf tokens.",
+      "type": "object",
+      "propertyNames": {
+        "not": {
+          "pattern": "^\\$"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/TokenNode"
+      }
+    },
+    "TokenNode": {
+      "description": "A token leaf or recursive token group.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Token"
+        },
+        {
+          "$ref": "#/$defs/TokenGroup"
+        }
+      ]
+    }
+  }
+}

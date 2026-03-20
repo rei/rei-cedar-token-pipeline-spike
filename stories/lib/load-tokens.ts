@@ -22,6 +22,10 @@ interface TokenLeaf {
   $type: string;
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 /**
  * Fetch the current token snapshot and extract color tokens for all modes.
  * Returns a map of token paths to their hex values, keyed as
@@ -126,6 +130,10 @@ export async function loadPrimitiveColors(): Promise<
       }
       result.set(mode, tokens);
     }
+  } else if (isRecord(colorSection["option"])) {
+    // Canonical fallback: color.option.<neutral|brand>.*
+    const tokens = flattenOptionPrimitives(colorSection["option"] as Record<string, unknown>);
+    result.set("default", tokens);
   } else {
     // Fallback: flat color.<palette> (legacy structure)
     const tokens: Array<{ name: string; value: string }> = [];
@@ -137,6 +145,62 @@ export async function loadPrimitiveColors(): Promise<
   }
 
   return result;
+}
+
+function flattenOptionPrimitives(
+  optionSection: Record<string, unknown>,
+): Array<{ name: string; value: string }> {
+  const out: Array<{ name: string; value: string }> = [];
+
+  const neutralNode = optionSection["neutral"];
+  if (isRecord(neutralNode)) {
+    const neutral = neutralNode;
+    // warm grey scale -> neutral-palette.warm-grey.*
+    const warmNode = neutral["warm"];
+    const warmGreyNode = isRecord(warmNode) ? warmNode["grey"] : undefined;
+    if (isRecord(warmGreyNode)) {
+      const warmGrey = warmGreyNode;
+      for (const [shade, node] of Object.entries(warmGrey)) {
+        if (isLeaf(node)) {
+          out.push({ name: `neutral-palette.warm-grey.${shade}`, value: node.$value });
+        }
+      }
+    }
+
+    // black/white/overlay -> neutral-palette.base-neutrals.*
+    for (const key of ["black", "white"] as const) {
+      const node = neutral[key];
+      if (isLeaf(node)) {
+        out.push({ name: `neutral-palette.base-neutrals.${key}`, value: node.$value });
+      }
+    }
+
+    const overlayNode = neutral["overlay"];
+    if (isRecord(overlayNode)) {
+      const overlay = overlayNode;
+      for (const [key, node] of Object.entries(overlay)) {
+        if (isLeaf(node)) {
+          out.push({ name: `neutral-palette.base-neutrals.overlay-${key}`, value: node.$value });
+        }
+      }
+    }
+  }
+
+  // brand scale -> brand-palette.<color>.*
+  const brandNode = optionSection["brand"];
+  if (isRecord(brandNode)) {
+    const brand = brandNode;
+    for (const [colorName, scaleNode] of Object.entries(brand)) {
+      if (!isRecord(scaleNode)) continue;
+      for (const [shade, leaf] of Object.entries(scaleNode)) {
+        if (isLeaf(leaf)) {
+          out.push({ name: `brand-palette.${colorName}.${shade}`, value: leaf.$value });
+        }
+      }
+    }
+  }
+
+  return out;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

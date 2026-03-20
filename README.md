@@ -1,7 +1,7 @@
 # Cedar Token Pipeline — V0 Spike
 
 This repository contains the **V0 spike** for Cedar’s proposed design token pipeline exploration.  
-The goal of this spike is to **manually validate** a one‑directional workflow from **Figma Variables → ingestion → normalization → diffing → governance → Style Dictionary outputs**, and to establish a **future‑ready architecture** that can support bidirectional sync without re‑architecture.
+The goal of this spike is to **manually validate** a one‑directional workflow from **Figma Variables → ingestion → normalization → canonical tokens → Style Dictionary outputs**, while documenting clear V1 extension points.
 
 This spike is **exploratory**, **manual**, and **documentation‑first**.  
 It is not intended to be production code.
@@ -29,7 +29,7 @@ This V0 spike supports:
 - Normalization into W3C design token contract
 - Validation and error handling
 - Documentation of assumptions, risks, and learnings
-- Architecture that supports future bidirectional sync
+- Documented V1 extension points (deferred capabilities)
 
 ### Out of Scope
 
@@ -39,23 +39,29 @@ This V0 spike supports:
 
 ---
 
-## V0 Architecture (Future‑Ready)
+## V0 Architecture (Implemented)
 
 ```text
 Figma (proposal environment)
         ↓
 Raw Variables JSON (ingestion)
         ↓
-Normalized Token Contract  ←— Future Port B (design proposal intake)
-        ↓
-Diff Layer
-        ↓
-Impact Detection
-        ↓
-Governance Layer
+Normalized Token Contract
         ↓
 Style Dictionary (canonical)
         ↓
 Outputs:
   • CSS variables
-  • Figma‑shaped JSON  ←— Future Port A (sync back to Figma)
+  • iOS colorsets
+
+V1 deferred capabilities:
+  • Diff + impact detection
+  • Reverse-sync payloads for Figma
+```
+
+## Architecture Docs
+
+- Pipeline docs index: [architecture/README.md](architecture/README.md)
+- ADRs: [architecture/ADR](architecture/ADR)
+- Diagrams: [architecture/diagrams](architecture/diagrams)
+- Notes: [architecture/notes](architecture/notes)
