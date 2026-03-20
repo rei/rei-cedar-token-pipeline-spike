@@ -1,0 +1,18 @@
+[15:17:35.637] [INFO] storybook v10.2.15
+[15:17:37.123] [DEBUG] Getting package.json info for /Users/mhewson/Code/REI/rei-cedar-token-pipeline-spike/package.json...
+[15:17:37.134] [INFO] Storybook collects completely anonymous usage telemetry. We use it to shape Storybook's roadmap and prioritize features. You can learn more, including how to opt out, at https://storybook.js.org/telemetry
+[15:17:37.733] [ERROR] [38;2;241;97;97mError: Failed to load static files, no such directory: [36m./dist/normalized[39m
+Make sure this directory exists.[39m
+    at parseStaticDir (file://./node_modules/.pnpm/storybook@10.2.15_@testing-library+dom@10.4.1_prettier@3.8.1_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/storybook/dist/_node-chunks/chunk-JGB33OAY.js:116:11)
+    at file://./node_modules/.pnpm/storybook@10.2.15_@testing-library+dom@10.4.1_prettier@3.8.1_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/storybook/dist/core-server/presets/common-preset.js:1717:48
+    at Array.map (<anonymous>)
+    at Object.favicon (file://./node_modules/.pnpm/storybook@10.2.15_@testing-library+dom@10.4.1_prettier@3.8.1_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/storybook/dist/core-server/presets/common-preset.js:1712:193)
+    at async useStatics (file://./node_modules/.pnpm/storybook@10.2.15_@testing-library+dom@10.4.1_prettier@3.8.1_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/storybook/dist/_node-chunks/chunk-JGB33OAY.js:72:83)
+    at async Promise.all (index 2)
+    at async storybookDevServer (file://./node_modules/.pnpm/storybook@10.2.15_@testing-library+dom@10.4.1_prettier@3.8.1_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/storybook/dist/core-server/index.js:7228:141)
+    at async buildOrThrow (file://./node_modules/.pnpm/storybook@10.2.15_@testing-library+dom@10.4.1_prettier@3.8.1_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/storybook/dist/core-server/index.js:4504:12)
+    at async buildDevStandalone (file://./node_modules/.pnpm/storybook@10.2.15_@testing-library+dom@10.4.1_prettier@3.8.1_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/storybook/dist/core-server/index.js:7611:66)
+    at async withTelemetry (file://./node_modules/.pnpm/storybook@10.2.15_@testing-library+dom@10.4.1_prettier@3.8.1_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/storybook/dist/_node-chunks/chunk-JGB33OAY.js:218:12)
+[15:17:37.737] [WARN] Broken build, fix the error above.
+You may need to refresh the browser.
+[15:37:46.667] [PROMPT] Would you like to send anonymous crash reports to improve Storybook and fix bugs faster? {"choice":true}

@@ -1,0 +1,30 @@
+# CODEOWNERS
+# Update owner handles/teams here if your team structure changes.
+
+# Default owner
+* @mhewson
+
+# Tier 1: Design + Engineering contracts
+src/schema/token-schema.json @mhewson @rei
+canonical/tokens.json @mhewson @rei
+tokens/options.color.*.json @mhewson @rei
+tokens/alias.color.*.json @mhewson @rei
+tokens/spacing.*.json @mhewson @rei
+architecture/ADR/ @mhewson @rei
+
+# Tier 2 and tests: Engineering
+src/normalization/ @mhewson
+style-dictionary/ @mhewson
+src/build/ @mhewson
+src/types/ @mhewson
+src/types.d.ts @mhewson
+stories/lib/ @mhewson
+
+# Tier 4: Tooling/workflow
+.github/workflows/ @mhewson
+package.json @mhewson
+pnpm-lock.yaml @mhewson
+commitlint.config.cjs @mhewson
+.oxlintrc.json @mhewson
+.storybook/ @mhewson
+.vscode/settings.json @mhewson

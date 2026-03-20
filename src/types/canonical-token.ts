@@ -1,6 +1,22 @@
+export interface TokenDocumentation {
+  summary?: string;
+  design?: string;
+  usage?: string;
+  aliases?: string[];
+}
+
+export interface CanonicalTokenExtensions {
+  cedar?: {
+    docs?: TokenDocumentation;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
+
 export interface CanonicalToken {
   $value: string | number | boolean;
   $type: string;
+  $extensions?: CanonicalTokenExtensions;
 }
 
 export interface CanonicalTokenGroup {

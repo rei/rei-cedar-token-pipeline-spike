@@ -26,6 +26,9 @@ import {
   extractColorMode,
   extractPrimitiveMode,
   buildSpacingClamp,
+  applyTokenMapping,
+  buildOptionTree,
+  parseTokenDescription,
 } from "./normalize-utils.js";
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
@@ -409,6 +412,18 @@ describe("nestUnderSections", () => {
     expect((modes.default as Record<string, unknown>).text).toBeDefined();
   });
 
+  it("does not create color.primitives when bare collections are nested", () => {
+    // Option files are processed upstream via applyTokenMapping + buildOptionTree.
+    // If a bare color collection reaches nestUnderSections, it should still avoid
+    // introducing the legacy color.primitives structure.
+    const map = new Map([["neutral-palette", "color"]]);
+    const cleaned = { "neutral-palette": { white: { $value: "#fff", $type: "color" } } };
+    const result = nestUnderSections(cleaned, map);
+    // color section may or may not exist; what matters is no "primitives" key.
+    const colorSection = result.color as Record<string, unknown> | undefined;
+    expect(colorSection?.["primitives"]).toBeUndefined();
+  });
+
   it("nests spacing section wrapper unchanged (no colorMode effect)", () => {
     const parsed = [{ file: "spacing.default.json", data: { spacing: { sm: {}, md: {} } } }];
     const map = buildCollectionToSection(parsed);
@@ -578,6 +593,187 @@ describe("buildSpacingClamp", () => {
   });
 });
 
+// ─── applyTokenMapping ────────────────────────────────────────────────────────
+
+describe("applyTokenMapping", () => {
+  const entry = {
+    canonicalPrefix: "color.option.neutral",
+    tokens: {
+      "warm-grey.900": "warm.grey.900",
+      "warm-grey.600": "warm.grey.600",
+      "base-neutrals.white": "white",
+      "base-neutrals.white-85": "overlay.light",
+    },
+  };
+
+  it("maps known Figma token paths to canonical color.option.* paths", () => {
+    const data = {
+      "warm-grey": {
+        "900": { $value: "#2e2e2b", $type: "color" },
+        "600": { $value: "#736e65", $type: "color" },
+      },
+      "base-neutrals": {
+        white: { $value: "#ffffff", $type: "color" },
+      },
+    };
+    const results = applyTokenMapping("neutral-palette", data, entry, "web-light");
+    const paths = results.map((r) => r.canonicalPath);
+    expect(paths).toContain("color.option.neutral.warm.grey.900");
+    expect(paths).toContain("color.option.neutral.warm.grey.600");
+    expect(paths).toContain("color.option.neutral.white");
+  });
+
+  it("applies semantic renames (white-85 → overlay.light)", () => {
+    const data = {
+      "base-neutrals": {
+        "white-85": { $value: "#ffffffd9", $type: "color" },
+      },
+    };
+    const results = applyTokenMapping("neutral-palette", data, entry, "web-light");
+    expect(results[0].canonicalPath).toBe("color.option.neutral.overlay.light");
+    expect(results[0].token.$value).toBe("#ffffffd9");
+  });
+
+  it("throws for unmapped Figma token paths", () => {
+    const data = {
+      "warm-grey": {
+        "999": { $value: "#abcdef", $type: "color" }, // not in mapping
+      },
+    };
+    expect(() => applyTokenMapping("neutral-palette", data, entry, "web-light")).toThrow(
+      /warm-grey\.999/,
+    );
+    expect(() => applyTokenMapping("neutral-palette", data, entry, "web-light")).toThrow(
+      /token-mapping/,
+    );
+  });
+
+  it("preserves $type from the token", () => {
+    const data = {
+      "warm-grey": {
+        "900": { $value: "#2e2e2b", $type: "color" },
+      },
+    };
+    const results = applyTokenMapping("neutral-palette", data, entry, "web-light");
+    expect(results[0].token.$type).toBe("color");
+  });
+});
+
+// ─── buildOptionTree ──────────────────────────────────────────────────────────
+
+describe("buildOptionTree", () => {
+  it("builds a nested object from flat canonical path entries", () => {
+    const entries = [
+      {
+        canonicalPath: "color.option.neutral.warm.grey.900",
+        token: { $type: "color", $value: "#2e2e2b" },
+      },
+      { canonicalPath: "color.option.neutral.white", token: { $type: "color", $value: "#ffffff" } },
+      {
+        canonicalPath: "color.option.brand.blue.400",
+        token: { $type: "color", $value: "#406eb5" },
+      },
+    ];
+    const tree = buildOptionTree(entries) as any;
+    expect(tree.color.option.neutral.warm.grey["900"].$value).toBe("#2e2e2b");
+    expect(tree.color.option.neutral.white.$value).toBe("#ffffff");
+    expect(tree.color.option.brand.blue["400"].$value).toBe("#406eb5");
+  });
+
+  it("does not clobber sibling paths", () => {
+    const entries = [
+      {
+        canonicalPath: "color.option.neutral.warm.grey.900",
+        token: { $type: "color", $value: "#aaa" },
+      },
+      {
+        canonicalPath: "color.option.neutral.warm.grey.600",
+        token: { $type: "color", $value: "#bbb" },
+      },
+    ];
+    const tree = buildOptionTree(entries) as any;
+    expect(tree.color.option.neutral.warm.grey["900"].$value).toBe("#aaa");
+    expect(tree.color.option.neutral.warm.grey["600"].$value).toBe("#bbb");
+  });
+
+  it("returns an empty object for empty input", () => {
+    expect(buildOptionTree([])).toEqual({});
+  });
+
+  it("writes docs into $extensions.cedar.docs when token has a docs field", () => {
+    const entries = [
+      {
+        canonicalPath: "color.option.neutral.warm.grey.100",
+        token: { $type: "color", $value: "#edeae3", docs: { summary: "Warm neutral base" } },
+      },
+      {
+        canonicalPath: "color.option.neutral.white",
+        token: { $type: "color", $value: "#ffffff" },
+      },
+    ];
+    const tree = buildOptionTree(entries) as any;
+    expect(tree.color.option.neutral.warm.grey["100"].$extensions.cedar.docs.summary).toBe(
+      "Warm neutral base",
+    );
+    expect(tree.color.option.neutral.white.$extensions).toBeUndefined();
+  });
+});
+
+// ─── parseTokenDescription ───────────────────────────────────────────────────
+
+describe("parseTokenDescription", () => {
+  it("returns undefined for empty string", () => {
+    expect(parseTokenDescription("")).toBeUndefined();
+    expect(parseTokenDescription("   ")).toBeUndefined();
+  });
+
+  it("returns summary-only for plain text with no recognised keys", () => {
+    expect(parseTokenDescription("Warm neutral base.")).toEqual({ summary: "Warm neutral base." });
+  });
+
+  it("parses all four fields", () => {
+    const raw = [
+      "Warm neutral, used for backgrounds.",
+      "usage: Use for page and container backgrounds, never for text.",
+      "design: Anchors the warm grey scale; the lightest neutral step.",
+      "aliases: surface-default, surface-subtle",
+    ].join("\n");
+    expect(parseTokenDescription(raw)).toEqual({
+      summary: "Warm neutral, used for backgrounds.",
+      usage: "Use for page and container backgrounds, never for text.",
+      design: "Anchors the warm grey scale; the lightest neutral step.",
+      aliases: ["surface-default", "surface-subtle"],
+    });
+  });
+
+  it("parses usage and design without a summary", () => {
+    const raw = "usage: Use for borders.\ndesign: Part of the neutral scale.";
+    expect(parseTokenDescription(raw)).toEqual({
+      usage: "Use for borders.",
+      design: "Part of the neutral scale.",
+    });
+  });
+
+  it("handles aliases with a single value", () => {
+    const raw = "Light surface.\naliases: surface-default";
+    expect(parseTokenDescription(raw)).toEqual({
+      summary: "Light surface.",
+      aliases: ["surface-default"],
+    });
+  });
+
+  it("ignores unrecognised keys — folds them into summary", () => {
+    const raw = "A colour token.\nunknown: some value";
+    expect(parseTokenDescription(raw)).toEqual({ summary: "A colour token. unknown: some value" });
+  });
+
+  it("treats whitespace-only aliases as absent", () => {
+    const raw = "Summary.\naliases:  ,  ";
+    const result = parseTokenDescription(raw)!;
+    expect(result.aliases).toBeUndefined();
+  });
+});
+
 // ─── Integration: clean + nestUnderSections + deepMerge ──────────────────────
 
 describe("clean + nestUnderSections + deepMerge integration", () => {
@@ -649,7 +845,10 @@ describe("clean + nestUnderSections + deepMerge integration", () => {
 
     const colorSection = canonical.color as Record<string, unknown>;
 
-    // Primitive palettes at top level of color (not under modes)
+    // NOTE: this integration fixture keeps option collections at the top level
+    // of color to exercise the legacy nestUnderSections path in isolation.
+    // Real pipeline option files are handled upstream via applyTokenMapping +
+    // buildOptionTree, so they do not produce color.primitives.
     expect(colorSection["neutral-palette"]).toBeDefined();
     expect(colorSection["brand-palette"]).toBeDefined();
 

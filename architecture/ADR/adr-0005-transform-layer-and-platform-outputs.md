@@ -3,6 +3,17 @@
 ## Status  
 Planned
 
+> **2026-03-19 Consolidation Note**
+> The former `adr-0005-addendum-sd-v5-constraints.md` has been consolidated into this ADR.
+> Treat the SD v5 constraints below as part of the normative ADR-0005 contract.
+
+> **V0 Implementation Note**
+> The V0/V1 spike implements modular output organization by semantic category, not superficial type grouping:
+> - **CSS** organized by semantic intent: `color-surface.css`, `color-text.css`, `color-border.css`, `spacing-scale.css`, `spacing-component.css`, `spacing-layout.css`  
+>   Each theme (light/dark) includes `@import` statements to combine these modular files
+> - **TypeScript Types** generated per semantic category with barrel exports and mode-specific variants: `cdr-color-surface.names.d.ts`, `cdr-color-text.d.ts`, plus `foundations/modes/{default,sale}/` for mode-specific types
+> - Index files (`light.css`, `dist/rei-dot-com/types/index.d.ts`) provide unified entry points for simplicity; consumers can import granularly by category for tree-shaking
+
 ## Context  
 The Canonical Token Model (ADR‑0001) defines a governed, platform‑agnostic representation of design tokens. However, this canonical shape cannot be consumed directly by:
 
@@ -519,6 +530,59 @@ This approach is out of scope for V0 but the architecture supports it.
 
 ## Style Dictionary Configuration
 
+### SD v5 Pipeline Constraints (Normative)
+
+The following constraints are required behavior for this repository's SD v5 pipeline:
+
+1. SD resolves `{ref}` syntax anywhere in a token object, including `$extensions`.
+2. Value transforms only run for tokens flowing through configured `files[]` outputs.
+3. Custom transform groups must not collide with SD built-in names.
+4. Actions can access both `dictionary.allTokens` and `dictionary.tokens`.
+5. `$extensions` is preserved; non-spec top-level custom keys are stripped.
+
+#### Constraint 1: No brace refs in `$extensions.cedar`
+
+Any `$extensions.cedar` value intended for custom action logic must be stored as plain dot paths (no braces), otherwise SD resolves it before action execution.
+
+```json
+// WRONG
+"ios": { "light": "{color.option.brand.blue.600}" }
+
+// CORRECT
+"ios": { "light": "color.option.brand.blue.600" }
+```
+
+#### Constraint 2: `files: []` means value transforms do not pre-run
+
+If a platform config uses `files: []`, value transforms are not executed before actions. For such platforms, actions must own value resolution.
+
+#### Constraint 3: Use namespaced custom transform groups
+
+Do not register custom groups as `ios`, `css`, or `android`. Use a namespace:
+
+- `cedar/ios`
+- `cedar/web`
+- `cedar/android`
+
+#### Constraint 4: Resolve option tokens via `dictionary.tokens`
+
+`dictionary.allTokens` may not include filtered-out option tokens. Actions requiring option resolution must navigate `dictionary.tokens` by dot path.
+
+#### Constraint 5: Keep metadata under `$extensions.cedar`
+
+Top-level custom keys are not reliable through SD parsing. Metadata such as resolved values, mode pointers, and meta flags must live under `$extensions.cedar`.
+
+### Action-Owns-Resolution Pattern
+
+Given constraints 1, 2, and 4, native output actions follow this required flow:
+
+1. Read platform/appearance references from `$extensions.cedar`.
+2. Navigate `dictionary.tokens` to find option token nodes.
+3. Apply resolution precedence (platform override > appearance override > base).
+4. Emit platform-native output.
+
+This is the required pattern for non-text outputs and any output path using `files: []`.
+
 ### Build Process
 
 ```javascript
@@ -783,5 +847,6 @@ The Transform Layer does **not**:
 - ADR-0001: Canonical Token Model  
 - ADR-0002: Normalization Layer  
 - ADR-0004: Semantic Token Architecture  
+- ADR-0011: Hybrid Alias Resolution
 - Style Dictionary Documentation  
 - DTCG Specification

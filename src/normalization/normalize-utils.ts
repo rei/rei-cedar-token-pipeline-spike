@@ -66,6 +66,217 @@ export function isLeaf(
   return typeof node === "object" && node !== null && "$value" in node;
 }
 
+// ─── TokenMapping ─────────────────────────────────────────────────────────────
+
+/**
+ * Shape of src/schema/token-schema.json (`inputs.figma`) — the governed Figma Input Contract (ADR-0003).
+ *
+ * Each entry maps a Figma collection name (e.g. "neutral-palette") to:
+ *   - canonicalPrefix: the color.option.* path prefix for all tokens in this collection
+ *   - tokens: explicit Figma token path → canonical sub-path pairs
+ *
+ * The normalizer throws a build error for any Figma token path not declared here,
+ * so designer renames surface immediately rather than producing corrupt paths.
+ */
+export type TokenMappingEntry = {
+  canonicalPrefix: string;
+  tokens: Record<string, string>;
+};
+
+export type TokenMapping = {
+  collections: Record<string, TokenMappingEntry>;
+};
+
+// ─── parseTokenDescription ──────────────────────────────────────────────────
+
+/**
+ * Parse a Figma variable description into a structured TokenDocumentation object.
+ *
+ * Designers write a single plain-text description in Figma using this format:
+ *
+ *   Warm neutral, used for backgrounds.
+ *   usage: Use for page and container backgrounds, never for text.
+ *   design: Anchors the warm grey scale; the lightest neutral step.
+ *   aliases: surface-default, surface-subtle
+ *
+ * Rules:
+ *   - Lines before the first `key:` line are joined as `summary`.
+ *   - Recognised keys: `usage`, `design`, `aliases`.
+ *   - `aliases` is split on commas and trimmed into a string[].
+ *   - Unrecognised `key: value` lines before any recognised key are folded into `summary`.
+ *   - Returns undefined when the raw string is empty or whitespace-only.
+ */
+export function parseTokenDescription(
+  raw: string,
+): { summary?: string; design?: string; usage?: string; aliases?: string[] } | undefined {
+  const trimmed = raw.trim();
+  if (!trimmed) return undefined;
+
+  const KNOWN_KEYS = new Set(["usage", "design", "aliases"]);
+  const lines = trimmed.split("\n");
+
+  const summaryLines: string[] = [];
+  const fields: Record<string, string> = {};
+  let currentKey: string | null = null;
+
+  for (const line of lines) {
+    const keyMatch = line.match(/^([a-z]+):\s*(.*)$/i);
+    if (keyMatch && KNOWN_KEYS.has(keyMatch[1].toLowerCase())) {
+      currentKey = keyMatch[1].toLowerCase();
+      fields[currentKey] = keyMatch[2].trim();
+    } else if (currentKey) {
+      // Continuation line for current key
+      fields[currentKey] += " " + line.trim();
+    } else {
+      summaryLines.push(line.trim());
+    }
+  }
+
+  const result: { summary?: string; design?: string; usage?: string; aliases?: string[] } = {};
+
+  const summary = summaryLines.join(" ").trim();
+  if (summary) result.summary = summary;
+  if (fields.design) result.design = fields.design.trim();
+  if (fields.usage) result.usage = fields.usage.trim();
+  if (fields.aliases) {
+    const parts = fields.aliases
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (parts.length > 0) result.aliases = parts;
+  }
+
+  return Object.keys(result).length > 0 ? result : undefined;
+}
+
+// ─── applyTokenMapping ────────────────────────────────────────────────────────
+
+/**
+ * Given a single Figma options collection (e.g. the contents of "neutral-palette")
+ * and its mapping entry, return a flat map of:
+ *   canonical path segments → { $type, $value, $description }
+ *
+ * Throws if any Figma token path in the collection has no mapping entry —
+ * this is the governed build error that surfaces designer renames early.
+ *
+ * Descriptions are extracted from the Figma $description field, which designers
+ * can populate in Figma. These are stored in the canonical tree's $extensions.cedar.docs
+ * for use in generated TypeScript types and documentation.
+ *
+ * @param collectionName  Figma collection key (e.g. "neutral-palette")
+ * @param collectionData  The cleaned token tree for that collection
+ * @param entry           The TokenMappingEntry for this collection
+ * @param platformKey     e.g. "web-light" — used only in error messages
+ */
+export function applyTokenMapping(
+  collectionName: string,
+  collectionData: Record<string, unknown>,
+  entry: TokenMappingEntry,
+  platformKey: string,
+): Array<{
+  canonicalPath: string;
+  token: { $type: string; $value: string; docs?: ReturnType<typeof parseTokenDescription> };
+}> {
+  const results: Array<{
+    canonicalPath: string;
+    token: { $type: string; $value: string; docs?: ReturnType<typeof parseTokenDescription> };
+  }> = [];
+
+  function walkCollection(node: Record<string, unknown>, figmaPath: string[]) {
+    for (const [key, value] of Object.entries(node)) {
+      if (key.startsWith("$")) continue;
+      const currentFigmaPath = [...figmaPath, key];
+      const figmaPathStr = currentFigmaPath.join(".");
+
+      if (isLeaf(value)) {
+        // Look up the canonical sub-path for this Figma token path
+        const canonicalSub = entry.tokens[figmaPathStr];
+        if (canonicalSub === undefined) {
+          throw new Error(
+            `[token-mapping] Unknown Figma token path "${collectionName}.${figmaPathStr}" ` +
+              `(from platform "${platformKey}"). ` +
+              `Add an entry to src/schema/token-schema.json (inputs.figma.collections) or rename the Figma variable to match an existing entry.`,
+          );
+        }
+        const canonicalPath = `${entry.canonicalPrefix}.${canonicalSub}`;
+        const token: {
+          $type: string;
+          $value: string;
+          docs?: ReturnType<typeof parseTokenDescription>;
+        } = {
+          $type: (value as any).$type,
+          $value: String((value as any).$value),
+        };
+        // Parse structured documentation from the Figma $description field
+        const rawDescription = (value as any).$description;
+        if (rawDescription && typeof rawDescription === "string") {
+          const docs = parseTokenDescription(rawDescription);
+          if (docs) token.docs = docs;
+        }
+        results.push({
+          canonicalPath,
+          token,
+        });
+      } else if (value && typeof value === "object") {
+        walkCollection(value as Record<string, unknown>, currentFigmaPath);
+      }
+    }
+  }
+
+  walkCollection(collectionData, []);
+  return results;
+}
+
+// ─── buildOptionTree ──────────────────────────────────────────────────────────
+
+/**
+ * Convert a flat list of { canonicalPath, token } pairs into a nested object
+ * tree rooted at the top-level section key.
+ *
+ * e.g. "color.option.neutral.warm.grey.900" with $value "#2e2e2b" and optional $description
+ * becomes: { color: { option: { neutral: { warm: { grey: { "900": { $type, $value, $extensions: { cedar: { docs: ... } } } } } } } } }
+ *
+ * Descriptions from Figma tokens are wrapped into $extensions.cedar.docs.summary for use in
+ * generated TypeScript types and documentation.
+ *
+ * Used to build the color.option subtree from mapped Figma option tokens, preserving
+ * descriptions that designers add to Figma variables.
+ */
+export function buildOptionTree(
+  entries: Array<{
+    canonicalPath: string;
+    token: { $type: string; $value: string; docs?: ReturnType<typeof parseTokenDescription> };
+  }>,
+): Record<string, unknown> {
+  const root: Record<string, unknown> = {};
+
+  for (const { canonicalPath, token } of entries) {
+    const segments = canonicalPath.split(".");
+    let cursor = root as Record<string, unknown>;
+    for (let i = 0; i < segments.length - 1; i++) {
+      const seg = segments[i];
+      if (!cursor[seg]) cursor[seg] = {};
+      cursor = cursor[seg] as Record<string, unknown>;
+    }
+    const leaf = segments[segments.length - 1];
+
+    const tokenNode: any = {
+      $type: token.$type,
+      $value: token.$value,
+    };
+
+    if (token.docs) {
+      tokenNode.$extensions = {
+        cedar: { docs: token.docs },
+      };
+    }
+
+    cursor[leaf] = tokenNode;
+  }
+
+  return root;
+}
+
 // ─── buildCollectionToSection ─────────────────────────────────────────────────
 
 /**
@@ -142,6 +353,7 @@ export function buildCollectionToSection(parsed: ParsedFile[]): Map<string, stri
 export function clean(
   node: Record<string, unknown>,
   collectionToSection: Map<string, string>,
+  tokenMapping?: TokenMapping | null,
 ): TokenNode {
   const out: Record<string, unknown> = {};
 
@@ -152,21 +364,50 @@ export function clean(
     if (isLeaf(value)) {
       let $value = String(value.$value);
 
-      // Rewrite bare alias references if needed
+      // Rewrite alias references that point into Figma option collections
+      // to their canonical color.option.* paths.
+      //
+      // Without a mapping:  {neutral-palette.warm-grey.900} → {color.neutral-palette.warm-grey.900}
+      // With a mapping:     {neutral-palette.warm-grey.900} → {color.option.neutral.warm.grey.900}
+      //
+      // The mapping rewrite is preferred — it produces ADR-0001 compliant paths.
+      // The fallback (section prefix only) is kept for non-option alias types
+      // (e.g. spacing references) that don't go through the mapping.
       if ($value.startsWith("{") && $value.endsWith("}")) {
         const inner = $value.slice(1, -1); // "{x.y.z}" → "x.y.z"
         const firstSegment = inner.split(".")[0]; // "x.y.z" → "x"
-        const section = collectionToSection.get(firstSegment);
-        // Only rewrite if: (1) it's a known collection, and (2) it's not already a section
-        if (section && section !== firstSegment) {
-          $value = `{${section}.${inner}}`; // "x.y.z" → "section.x.y.z"
+        const mappingEntry = tokenMapping?.collections[firstSegment];
+
+        if (mappingEntry) {
+          // This alias points into a mapped Figma collection.
+          // Rewrite to the canonical color.option.* path.
+          const figmaSubPath = inner.split(".").slice(1).join("."); // drop collection name
+          const canonicalSub = mappingEntry.tokens[figmaSubPath];
+          if (canonicalSub !== undefined) {
+            $value = `{${mappingEntry.canonicalPrefix}.${canonicalSub}}`;
+          } else {
+            // Token exists in the alias file but has no mapping entry.
+            // Throw so the gap surfaces immediately rather than producing a broken reference.
+            throw new Error(
+              `[clean] Alias reference "{${inner}}" has no entry in src/schema/token-schema.json (inputs.figma.collections) ` +
+                `for collection "${firstSegment}", path "${figmaSubPath}". ` +
+                `Add the mapping entry or update the Figma alias reference.`,
+            );
+          }
+        } else {
+          // Not a mapped collection — apply the legacy section-prefix rewrite
+          // (handles spacing, typography, and other non-option alias types).
+          const section = collectionToSection.get(firstSegment);
+          if (section && section !== firstSegment) {
+            $value = `{${section}.${inner}}`;
+          }
         }
       }
 
       out[key] = { $value, $type: value.$type };
     } else if (typeof value === "object" && value !== null) {
       // Recursively clean nested token groups
-      out[key] = clean(value as Record<string, unknown>, collectionToSection);
+      out[key] = clean(value as Record<string, unknown>, collectionToSection, tokenMapping);
     }
   }
 
@@ -180,14 +421,16 @@ export function clean(
  * canonical section keys. This creates the final hierarchical canonical tree.
  *
  * Why nested sections?
- *   The Figma sync produces files with different structures:
- *   - alias.color.light.json: { "color": { "surface": {...}, "text": {...} } }
- *   - options.color.light.json: { "neutral-palette": {...}, "brand-palette": {...} }
+ *   Alias and other files wrap their content under a section key:
+ *   - alias.color.<mode>.json: { "color": { "surface": {...}, "text": {...} } }
+ *   - spacing.alias.json:      { "spacing": { "component": {...} } }
  *
- *   To keep aliases resolvable and the tree organized, we nest everything
- *   under section keys:
- *   - Alias tokens (already section-wrapped) stay as-is
- *   - Option collections (bare) get nested under their section
+ *   nestUnderSections ensures these section wrappers are merged correctly
+ *   into the canonical tree, and that alias color tokens are placed under
+ *   color.modes.<palette> rather than directly under color.
+ *
+ *   options.color.*.json files (Figma primitive snapshots) are handled
+ *   upstream by applyTokenMapping + buildOptionTree and never reach this function.
  *
  * Nesting rules (using collectionToSection map):
  *   - If map.get(key) === key:
@@ -208,74 +451,62 @@ export function clean(
  *   under "color". This allows multiple modes to coexist in the canonical
  *   tree without overwriting each other.
  *
- * Example results (no mode):
- *   Input:  { "neutral-palette": {...}, "brand-palette": {...} } (bare collections)
- *   Output: { "color": { "neutral-palette": {...}, "brand-palette": {...} } }
- *
+ * Example results (no colorMode):
  *   Input:  { "color": { "surface": {...}, "text": {...} } } (section wrapper)
  *   Output: { "color": { "surface": {...}, "text": {...} } } (unchanged)
+ *
+ *   Input:  { "spacing": { "sm": {...} } }
+ *   Output: { "spacing": { "sm": {...} } } (unchanged)
  *
  * Example results (with colorMode = "sale"):
  *   Input:  { "color": { "surface": {...}, "text": {...} } }
  *   Output: { "color": { "modes": { "sale": { "surface": {...}, "text": {...} } } } }
  *
- * Example results (with primitiveMode = "web-dark"):
- *   Input:  { "neutral-palette": {...}, "brand-palette": {...} } (bare collections)
- *   Output: { "color": { "primitives": { "web-dark": { "neutral-palette": {...}, "brand-palette": {...} } } } }
+ * Note: options.color.*.json files (Figma primitives) are handled upstream via
+ * applyTokenMapping + buildOptionTree and never reach nestUnderSections.
  */
+
 export function nestUnderSections(
   cleaned: Record<string, unknown>,
   collectionToSection: Map<string, string>,
   colorMode?: string | null,
-  primitiveMode?: string | null,
 ): Record<string, unknown> {
   const out: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(cleaned)) {
     const section = collectionToSection.get(key);
 
+    // ───────────────────────────────────────────────
+    // SECTION WRAPPER (e.g. "color", "spacing")
+    // ───────────────────────────────────────────────
     if (!section || section === key) {
-      // Section wrapper: "color", "spacing", etc.
-      if (colorMode && key === "color" && typeof value === "object" && value !== null) {
-        // Nest semantic children under color.modes.<mode>
-        const modesWrapper: Record<string, unknown> = {
+      // Alias color file → nest under color.modes.<mode>
+      if (colorMode && key === "color") {
+        if (!out["color"]) out["color"] = {};
+        deepMerge(out["color"] as Record<string, unknown>, {
           modes: { [colorMode]: value },
-        };
-        if (out["color"] === undefined) {
-          out["color"] = modesWrapper;
-        } else {
-          deepMerge(out["color"] as Record<string, unknown>, modesWrapper);
-        }
-      } else {
-        // Keep at top level as-is (no mode or not a color section wrapper)
-        if (out[key] === undefined) {
-          out[key] = value;
-        } else {
-          deepMerge(out[key] as Record<string, unknown>, value as Record<string, unknown>);
-        }
+        });
+        continue;
       }
-    } else {
-      // Bare collection: "neutral-palette", "brand-palette", etc.
-      // If we have a primitiveMode, nest under color.primitives.<mode>;
-      // otherwise nest flat under color (legacy / no-mode behaviour).
-      if (out[section] === undefined) {
-        out[section] = {};
-      }
-      if (primitiveMode && section === "color") {
-        // color.primitives.<mode>.<palette>  ← per-mode storage for Storybook display
-        const colorSection = out[section] as Record<string, unknown>;
-        if (!colorSection["primitives"]) colorSection["primitives"] = {};
-        const primitivesSection = colorSection["primitives"] as Record<string, unknown>;
-        if (!primitivesSection[primitiveMode]) primitivesSection[primitiveMode] = {};
-        (primitivesSection[primitiveMode] as Record<string, unknown>)[key] = value;
-        // Also write flat: color.<palette>  ← for semantic alias resolution.
-        // Multiple options files deep-merge; last file wins (web-light is processed last
-        // alphabetically, which is a good default for web/light-mode alias resolution).
-        (out[section] as Record<string, unknown>)[key] = value;
-      } else {
-        (out[section] as Record<string, unknown>)[key] = value;
-      }
+
+      // Normal section wrapper
+      if (!out[key]) out[key] = {};
+      deepMerge(out[key] as Record<string, unknown>, value as Record<string, unknown>);
+      continue;
     }
+
+    // ───────────────────────────────────────────────
+    // BARE COLLECTION (e.g. "neutral-palette")
+    // ───────────────────────────────────────────────
+    if (!out[section]) out[section] = {};
+
+    // Default nesting for non-color bare collections (spacing, typography, etc.)
+    // Color option collections never reach here — they are handled upstream
+    // via applyTokenMapping + buildOptionTree before nestUnderSections is called.
+    // Nest bare collection directly under its section.
+    // Color primitives (e.g. neutral-palette) sit at color root;
+    // option tokens are handled upstream via applyTokenMapping + buildOptionTree.
+    (out[section] as Record<string, unknown>)[key] = value;
   }
 
   return out;
