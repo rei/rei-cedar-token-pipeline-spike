@@ -48,4 +48,7 @@ async function buildAll() {
   console.log('==============================================\n');
 }
 
-buildAll();
+buildAll().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
