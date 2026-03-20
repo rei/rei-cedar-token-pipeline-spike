@@ -167,7 +167,7 @@ export const webCssAction: Action = {
     });
 
     // Write modular CSS files
-    const writeThemeFiles = (theme: 'light' | 'dark', colorCats: any, spacingCats: any) => {
+    const writeThemeFiles = (theme: 'light' | 'dark') => {
       const themeDir = path.join(buildPath, theme);
       const imports: string[] = [];
 
@@ -210,8 +210,8 @@ export const webCssAction: Action = {
       fs.writeFileSync(path.join(buildPath, `${theme}.css`), indexCss);
     };
 
-    writeThemeFiles('light', colorSurface, spacingScale);
-    writeThemeFiles('dark', colorSurface, spacingScale);
+    writeThemeFiles('light');
+    writeThemeFiles('dark');
 
     // Log generated files
     console.log(`  ✓ dist/css/light.css (index)`);

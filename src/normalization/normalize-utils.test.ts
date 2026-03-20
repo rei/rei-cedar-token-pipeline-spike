@@ -412,17 +412,14 @@ describe("nestUnderSections", () => {
     expect((modes.default as Record<string, unknown>).text).toBeDefined();
   });
 
-  it("does not accept bare collections — options files must go through applyTokenMapping", () => {
-    // nestUnderSections no longer handles options.color.*.json files.
-    // They are processed upstream via applyTokenMapping + buildOptionTree.
-    // A bare color collection reaching nestUnderSections is a pipeline error.
+  it("does not create color.primitives when bare collections are nested", () => {
+    // Option files are processed upstream via applyTokenMapping + buildOptionTree.
+    // If a bare color collection reaches nestUnderSections, it should still avoid
+    // introducing the legacy color.primitives structure.
     const map = new Map([["neutral-palette", "color"]]);
     const cleaned = { "neutral-palette": { white: { $value: "#fff", $type: "color" } } };
-    // With no primitiveMode param, bare color collections fall through to the
-    // "section !== color" guard and are silently skipped (they have no place
-    // in the alias file processing path). The option tree comes from buildOptionTree.
     const result = nestUnderSections(cleaned, map);
-    // color section may or may not exist; what matters is no "primitives" key
+    // color section may or may not exist; what matters is no "primitives" key.
     const colorSection = result.color as Record<string, unknown> | undefined;
     expect(colorSection?.["primitives"]).toBeUndefined();
   });
