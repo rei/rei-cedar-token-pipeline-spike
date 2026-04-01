@@ -62,7 +62,7 @@ The V0 spike implements mode-specific types for color alias tokens to support th
 
 Structure:
 ```
-dist/rei-dot-com/types/foundations/
+dist/themes/rei-dot-com/types/foundations/
 ├── cdr-color-text.names.d.ts           # all text colors across all modes
 ├── modes/
 │   ├── index.d.ts                      # CedarMode union

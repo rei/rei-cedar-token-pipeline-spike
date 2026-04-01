@@ -33,10 +33,10 @@ import {
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 
-const FIGMA_LEAF = (value: unknown, type = "color") => ({
+const FIGMA_LEAF = (value: unknown, type = "color", description = "") => ({
   $value: value,
   $type: type,
-  $description: "ignore me",
+  $description: description,
   $extensions: { "com.figma": { hiddenFromPublishing: false } },
 });
 
@@ -256,6 +256,38 @@ describe("clean", () => {
       Record<string, Record<string, Record<string, unknown>>>
     >;
     expect(result.a.b.c.d).toEqual({ $value: "#123456", $type: "color" });
+  });
+
+  it("preserves parsed docs metadata from Figma descriptions on alias tokens", () => {
+    const map = new Map<string, string>();
+    const input = {
+      text: {
+        link: FIGMA_LEAF(
+          "{brand-palette.blue.600}",
+          "color",
+          [
+            "Text color for interactive links.",
+            "usage: Use for inline navigation and hyperlinks.",
+            "design: Brand blue interaction ramp.",
+          ].join("\n"),
+        ),
+      },
+    };
+
+    const result = clean(input, map) as Record<string, Record<string, Record<string, unknown>>>;
+    expect(result.text.link).toEqual({
+      $value: "{brand-palette.blue.600}",
+      $type: "color",
+      $extensions: {
+        cedar: {
+          docs: {
+            summary: "Text color for interactive links.",
+            usage: "Use for inline navigation and hyperlinks.",
+            design: "Brand blue interaction ramp.",
+          },
+        },
+      },
+    });
   });
 });
 

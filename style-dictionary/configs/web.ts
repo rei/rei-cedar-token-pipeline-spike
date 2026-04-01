@@ -7,7 +7,7 @@ export const webConfig: Config = {
   platforms: {
     web: {
       transformGroup: 'cedar/web',
-      buildPath: 'dist/css/',
+      buildPath: 'dist/themes/rei-dot-com/css/',
       actions: ['web-css'],
       files: [],
       filter: (token: TransformedToken) =>

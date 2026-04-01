@@ -47,7 +47,7 @@ describe("webCssAction", () => {
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("accent"));
   });
 
-  it("writes theme index files with imports relative to dist/css", () => {
+  it("writes theme index files with imports relative to cdr-prefixed outputs", () => {
     vi.spyOn(console, "log").mockImplementation(() => {});
     vi.spyOn(console, "warn").mockImplementation(() => {});
     const buildPath = fs.mkdtempSync(path.join(os.tmpdir(), "web-css-action-"));
@@ -73,11 +73,11 @@ describe("webCssAction", () => {
 
     webCssAction.do?.(dictionary as any, { buildPath } as any);
 
-    const lightIndex = fs.readFileSync(path.join(buildPath, "light.css"), "utf8");
-    const darkIndex = fs.readFileSync(path.join(buildPath, "dark.css"), "utf8");
+    const lightIndex = fs.readFileSync(path.join(buildPath, "cdr-light.css"), "utf8");
+    const darkIndex = fs.readFileSync(path.join(buildPath, "cdr-dark.css"), "utf8");
 
-    expect(lightIndex).toContain("@import './light/color-surface.css';");
-    expect(darkIndex).toContain("@import './dark/color-surface.css';");
+    expect(lightIndex).toContain("@import './light/cdr-color-surface.css';");
+    expect(darkIndex).toContain("@import './dark/cdr-color-surface.css';");
     expect(lightIndex).not.toContain("@import './color-surface.css';");
     expect(darkIndex).not.toContain("@import './color-surface.css';");
   });
@@ -191,7 +191,7 @@ describe("webCssAction", () => {
 
     webCssAction.do?.(dictionary as any, { buildPath } as any);
 
-    const darkTextCss = fs.readFileSync(path.join(buildPath, "dark", "color-text.css"), "utf8");
+    const darkTextCss = fs.readFileSync(path.join(buildPath, "dark", "cdr-color-text.css"), "utf8");
     expect(darkTextCss).toContain("--cdr-text-link: #abcdef;");
     expect(darkTextCss).not.toContain("--cdr-text-link: #999999;");
   });

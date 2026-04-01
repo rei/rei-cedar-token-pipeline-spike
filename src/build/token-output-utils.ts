@@ -37,6 +37,7 @@ function createModuleDefinition(
   getRelativePath: (token: TransformedToken) => string[],
 ) {
   const typeBaseName = toPascalCase(moduleFileName);
+  const tokenNamePrefix = moduleFileName.replace(/^cdr-/, "");
 
   return {
     theme: "rei-dot-com",
@@ -45,7 +46,8 @@ function createModuleDefinition(
     interfaceName: `${typeBaseName}Tokens`,
     unionTypeName: `${typeBaseName}TokenName`,
     matchesToken: (token: TransformedToken) => getRelativePath(token).length > 0,
-    getTokenName: (token: TransformedToken) => getRelativePath(token).join("-"),
+    getTokenName: (token: TransformedToken) =>
+      [tokenNamePrefix, ...getRelativePath(token)].join("-"),
   } satisfies ModuleDefinition;
 }
 

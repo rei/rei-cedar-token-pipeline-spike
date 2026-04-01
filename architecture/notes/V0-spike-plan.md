@@ -124,8 +124,8 @@ The spike is successful if:
 
 - `canonical/tokens.json` (V0)
 - `schema.json` (canonical schema)
-- `dist/css/color.css`
-- `dist/ios/ColorTokens.swift`
+- `dist/themes/rei-dot-com/css/color.css`
+- `dist/themes/rei-dot-com/ios/ColorTokens.swift`
 - `dist/android/colors.xml`
 - `@cedar/types` package
 - Mock component library
@@ -192,12 +192,12 @@ Custom transform groups use the `cedar/` namespace (`cedar/ios`, `cedar/web`).
 |---|---|
 | `canonical/tokens.json` (V0) | ✓ Complete — real REI tokens, not mock |
 | `src/schema/token-schema.json` | ✓ Complete — contract artifact not in original plan |
-| `dist/css/light.css` | ✓ Complete — validated with correct values |
-| `dist/css/dark.css` | ✓ Complete — validated with correct values |
-| `dist/ios/Colors.xcassets/` | ✓ Complete — validated with correct iOS P3 values |
+| `dist/themes/rei-dot-com/css/light.css` | ✓ Complete — validated with correct values |
+| `dist/themes/rei-dot-com/css/dark.css` | ✓ Complete — validated with correct values |
+| `dist/themes/rei-dot-com/ios/Colors.xcassets/` | ✓ Complete — validated with correct iOS P3 values |
 | Fluid spacing (`clamp()`) | ✓ Complete |
 | `schema.json` | ○ Not implemented — build-fail governance used instead |
-| `dist/ios/ColorTokens.swift` | ○ Not started — V1 |
+| `dist/themes/rei-dot-com/ios/ColorTokens.swift` | ○ Not started — V1 |
 | `dist/android/colors.xml` | ○ Not started — V1 |
 | `@cedar/types` package | ○ Not started — V1 |
 | Mock component library | ○ Not started — superseded by real Figma exports |
