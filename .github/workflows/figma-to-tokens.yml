@@ -74,7 +74,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist/storybook-static
+          publish_dir: ./storybook-static
           destination_dir: pr/${{ env.PR_BRANCH }}
           keep_files: true
 

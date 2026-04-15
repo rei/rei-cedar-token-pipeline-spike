@@ -17,7 +17,8 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "dist/**/*",
+    "dist/themes/**/*",
+    "dist/types/**/*",
     "README.md"
   ],
   "scripts": {
@@ -29,7 +30,7 @@
     "sync:figma-to-tokens": "tsx src/sync/figma-to-tokens.ts",
     "sync:tokens-to-figma": "tsx src/sync/tokens-to-figma.ts",
     "storybook": "storybook dev -p 6006",
-    "storybook:build": "storybook build -o dist/storybook-static",
+    "storybook:build": "storybook build -o storybook-static",
     "tokens:platforms": "tsx style-dictionary/build.ts",
     "tokens:normalize": "tsx src/normalization/normalize.ts",
     "tokens:types:base": "tsx src/build/generate-base-types.ts",
