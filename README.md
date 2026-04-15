@@ -77,6 +77,15 @@ This repo builds Storybook separately from the published package so documentatio
 - After merge to `main`, Storybook should be available at:
   `https://rei.github.io/rei-cedar-token-pipeline-spike/`
 
+### PR Previews
+
+For pull requests, a Storybook preview is automatically built and deployed to:
+`https://rei.github.io/rei-cedar-token-pipeline-spike/pr/<branch-name>/`
+
+The workflow posts a comment on the PR with the preview URL. This allows reviewers to see live Storybook changes before merging.
+
+The Figma sync workflow also creates PR previews for token updates, deployed to `pr/update-tokens/`.
+
 ## Build and release
 
 This project keeps documentation deployment separate from package output and release.
