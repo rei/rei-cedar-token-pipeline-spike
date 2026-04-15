@@ -85,6 +85,7 @@ This project keeps documentation deployment separate from package output and rel
 - `pnpm release` runs the package build and publishes to npm when credentials are configured
 - Storybook deploy workflow: `.github/workflows/deploy-storybook.yml`
 - Package release workflow: `.github/workflows/release.yml`
+- PR Storybook preview workflow: `.github/workflows/pr-storybook-preview.yml`
 - The `release` workflow builds artifacts in CI before publishing, so `dist/` remains generated output rather than a source tree
 
 ## Consumer Contract (Types + Metadata)
