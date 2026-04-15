@@ -1,0 +1,6 @@
+:root {
+  --cdr-spacing-layout-sm: clamp(11.76px, 0.515vw + 10.112px, 20px);
+  --cdr-spacing-layout-md: clamp(14.08px, 0.62vw + 12.096px, 24px);
+  --cdr-spacing-layout-lg: clamp(18.4px, 0.6071vw + 16.4571px, 32px);
+  --cdr-spacing-layout-xl: clamp(22.72px, 0.7714vw + 20.2514px, 40px);
+}

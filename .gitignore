@@ -6,5 +6,4 @@ npm-debug.log*
 pnpm-debug.log*
 .env
 tokens_new/
-dist/
 .DS_Store

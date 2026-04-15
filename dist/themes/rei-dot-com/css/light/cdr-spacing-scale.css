@@ -1,0 +1,10 @@
+:root {
+  --cdr-spacing-scale--50: clamp(2.48px, 0.1357vw + 2.0457px, 4px);
+  --cdr-spacing-scale--100: clamp(4.8px, 0.25vw + 4px, 8px);
+  --cdr-spacing-scale--150: clamp(7.12px, 0.3297vw + 6.0649px, 12px);
+  --cdr-spacing-scale--200: clamp(9.44px, 0.4432vw + 8.0216px, 16px);
+  --cdr-spacing-scale--250: clamp(11.76px, 0.515vw + 10.112px, 20px);
+  --cdr-spacing-scale--300: clamp(14.08px, 0.62vw + 12.096px, 24px);
+  --cdr-spacing-scale--400: clamp(18.4px, 0.6071vw + 16.4571px, 32px);
+  --cdr-spacing-scale--500: clamp(22.72px, 0.7714vw + 20.2514px, 40px);
+}
