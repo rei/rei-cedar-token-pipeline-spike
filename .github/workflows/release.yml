@@ -42,7 +42,7 @@ jobs:
           path: dist/
 
       - name: Publish package to npm
-        if: ${{ secrets.NPM_TOKEN != '' }}
+        if: secrets.NPM_TOKEN != ''
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: pnpm publish --access public
