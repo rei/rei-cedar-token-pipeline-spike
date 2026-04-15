@@ -6,5 +6,8 @@ npm-debug.log*
 pnpm-debug.log*
 .env
 tokens_new/
-dist/
+# Generated Storybook output
+storybook-static/
+# Local normalized snapshots for Storybook support
+dist/normalized/
 .DS_Store
