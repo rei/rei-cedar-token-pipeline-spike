@@ -66,6 +66,17 @@ V1 deferred capabilities:
 - Diagrams: [architecture/diagrams](architecture/diagrams)
 - Notes: [architecture/notes](architecture/notes)
 
+## Storybook and GitHub Pages
+
+This repo builds Storybook separately from the published package so documentation is deployed to GitHub Pages instead of being bundled in `dist/`.
+
+- `pnpm storybook:build` now emits to `storybook-static/`
+- GitHub Pages deployment is configured in `.github/workflows/deploy-storybook.yml`
+- Published token outputs remain in `dist/themes/` and `dist/types/`
+- `dist/normalized/` is used only at build time for Storybook compatibility and is excluded from package publishing
+- After merge to `main`, Storybook should be available at:
+  `https://rei.github.io/rei-cedar-token-pipeline-spike/`
+
 ## Consumer Contract (Types + Metadata)
 
 This repo now generates a consumer-facing TypeScript contract and docs metadata artifacts.
