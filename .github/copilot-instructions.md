@@ -20,7 +20,8 @@ If combined work is approved, include a brief rationale in the PR summary.
 ## Change budget guidance
 
 - Target <= 10 changed files and <= 300 changed lines per PR
-- If larger, split into stacked PRs or use `scope:large` with explicit justification
+- A repo workflow enforces a PR size budget (currently max 50 changed files). If the branch exceeds that, split into smaller PRs or apply the `scope:large` label with a clear justification
+- Prefer breaking large work into focused incremental PRs, especially when changing workflows, docs, or generated-file handling
 
 ## Safety and intent
 
