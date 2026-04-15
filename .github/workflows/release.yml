@@ -1,4 +1,4 @@
-name: Deploy Storybook to GitHub Pages
+name: Release package
 on:
   push:
     branches:
@@ -6,11 +6,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-storybook:
+  build-and-publish:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pages: write
+      packages: write
       id-token: write
 
     steps:
@@ -29,15 +29,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build tokens and Storybook
-        run: pnpm build
-        env:
-          STORYBOOK_BASE_URL: /rei-cedar-token-pipeline-spike/
+      - name: Build package outputs
+        run: pnpm build:package
 
-      - name: Deploy Storybook to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Run tests
+        run: pnpm test
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./storybook-static
-          publish_branch: gh-pages
-          keep_files: false
+          name: dist-artifact
+          path: dist/
+
+      - name: Publish package to npm
+        if: ${{ secrets.NPM_TOKEN != '' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm publish --access public

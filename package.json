@@ -31,6 +31,8 @@
     "sync:tokens-to-figma": "tsx src/sync/tokens-to-figma.ts",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build -o storybook-static",
+    "build:package": "pnpm tokens:build",
+    "release": "pnpm build:package && pnpm publish --access public",
     "tokens:platforms": "tsx style-dictionary/build.ts",
     "tokens:normalize": "tsx src/normalization/normalize.ts",
     "tokens:types:base": "tsx src/build/generate-base-types.ts",

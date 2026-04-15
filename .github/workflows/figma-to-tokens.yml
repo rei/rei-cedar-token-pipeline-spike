@@ -75,6 +75,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./storybook-static
+          publish_branch: gh-pages
           destination_dir: pr/${{ env.PR_BRANCH }}
           keep_files: true
 

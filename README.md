@@ -77,6 +77,16 @@ This repo builds Storybook separately from the published package so documentatio
 - After merge to `main`, Storybook should be available at:
   `https://rei.github.io/rei-cedar-token-pipeline-spike/`
 
+## Build and release
+
+This project keeps documentation deployment separate from package output and release.
+
+- `pnpm build:package` generates the published token outputs in `dist/`
+- `pnpm release` runs the package build and publishes to npm when credentials are configured
+- Storybook deploy workflow: `.github/workflows/deploy-storybook.yml`
+- Package release workflow: `.github/workflows/release.yml`
+- The `release` workflow builds artifacts in CI before publishing, so `dist/` remains generated output rather than a source tree
+
 ## Consumer Contract (Types + Metadata)
 
 This repo now generates a consumer-facing TypeScript contract and docs metadata artifacts.
