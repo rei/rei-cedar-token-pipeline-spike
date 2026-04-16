@@ -146,36 +146,39 @@ const docs: CdrColorTextTokenDocs = {
       <style>${BASE_STYLES}</style>
       <section class="page">
         <div class="eyebrow">Consumer Contract Reference</div>
-        <h1 class="title">Values + Metadata, Not Just Strings</h1>
+        <h1 class="title">Usage Guidance + Typed Token Access</h1>
         <p class="lede">
-          This reference demonstrates the target public contract: typed token values plus optional token docs metadata.
-          Values come from normalized output, docs come from generated module metadata artifacts.
+          This reference demonstrates the consumer-facing contract that matters in practice: typed token access,
+          token intent, and usage guidance generated from the pipeline. The goal is to help designers and engineers
+          choose the right token quickly, not inspect raw transport artifacts.
         </p>
 
         <div class="grid">
           <article class="card">
             <div class="card-head">
               <div class="card-kicker">Type Contract</div>
-              <div class="card-title">How Consumers Type Values + Docs</div>
+              <div class="card-title">How Consumers Type Values + Usage Docs</div>
             </div>
             <pre>${escapeHtml(typeSnippet)}</pre>
           </article>
 
           <article class="card">
             <div class="card-head">
-              <div class="card-kicker">Runtime Artifact</div>
-              <div class="card-title">Generated Docs Metadata Sample</div>
+              <div class="card-kicker">Usage Documentation</div>
+              <div class="card-title">What Consumers Actually Need To Read</div>
             </div>
             <div class="docs-list">
               ${docsEntries
                 .map(([tokenName, docs]) => {
                   const summary = docs.summary ? escapeHtml(docs.summary) : "No summary";
                   const usage = docs.usage ? `<div class=\"usage\">usage: ${escapeHtml(docs.usage)}</div>` : "";
+                  const design = docs.design ? `<div class=\"usage\">design: ${escapeHtml(docs.design)}</div>` : "";
                   return `
                     <div class="docs-item">
                       <div class="token-name">${escapeHtml(tokenName)}</div>
                       <div class="summary">${summary}</div>
                       ${usage}
+                      ${design}
                     </div>
                   `;
                 })
@@ -187,18 +190,45 @@ const docs: CdrColorTextTokenDocs = {
         <div class="grid" style="margin-top:1rem;">
           <article class="card">
             <div class="card-head">
-              <div class="card-kicker">Value Dictionary Sample</div>
-              <div class="card-title">color-text tokens from normalized output</div>
+              <div class="card-kicker">Recommended Consumption</div>
+              <div class="card-title">Use Typed Maps, Then Read Usage Guidance</div>
             </div>
-            <pre>${escapeHtml(JSON.stringify(valueSample, null, 2))}</pre>
+            <pre>${escapeHtml(`import type {
+  CdrColorTextTokens,
+  CdrColorTextTokenDocs,
+} from "@rei/cdr-tokens/types";
+
+function getTextTokenDocs(
+  values: CdrColorTextTokens,
+  docs: CdrColorTextTokenDocs,
+  tokenName: keyof CdrColorTextTokens,
+) {
+  return {
+    value: values[tokenName],
+    summary: docs[tokenName]?.summary,
+    usage: docs[tokenName]?.usage,
+  };
+}
+
+const base = getTextTokenDocs(values, docs, "color-text-base");`)} </pre>
           </article>
 
           <article class="card">
             <div class="card-head">
-              <div class="card-kicker">Metadata Source</div>
-              <div class="card-title">cdr-color-text.docs.json (generated)</div>
+              <div class="card-kicker">Value Snapshot</div>
+              <div class="card-title">Resolved Token Values For Active Module</div>
             </div>
-            <pre>${escapeHtml(JSON.stringify(docsMap, null, 2))}</pre>
+            <div class="docs-list">
+              ${Object.entries(valueSample)
+                .map(([tokenName, value]) => `
+                  <div class="docs-item">
+                    <div class="token-name">${escapeHtml(tokenName)}</div>
+                    <div class="summary">${escapeHtml(value)}</div>
+                    <div class="usage">paired docs: ${escapeHtml(docsMap[tokenName]?.usage ?? "No usage guidance yet")}</div>
+                  </div>
+                `)
+                .join("")}
+            </div>
           </article>
         </div>
 

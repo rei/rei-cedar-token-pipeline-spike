@@ -1,4 +1,4 @@
-export type Platform = "web" | "ios";
+export type Platform = "web" | "ios" | "android";
 export type Mode = "light" | "dark";
 
 export interface PlatformModeContextValue {
@@ -11,7 +11,8 @@ export const DEFAULT_MODE: Mode = "light";
 
 const STORYBOOK_PLATFORM_MODE_PROPERTY = "__STORYBOOK_PLATFORM_MODE__";
 
-const isPlatform = (value: string | null): value is Platform => value === "web" || value === "ios";
+const isPlatform = (value: string | null): value is Platform =>
+  value === "web" || value === "ios" || value === "android";
 const isMode = (value: string | null): value is Mode => value === "light" || value === "dark";
 
 export function parsePlatformModeFromUrl(

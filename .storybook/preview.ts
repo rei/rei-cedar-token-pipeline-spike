@@ -15,7 +15,7 @@ const platformModeDecorator: DecoratorFunction = (Story, context) => {
   const mode = (context.globals?.mode as string) ?? defaultPlatformMode.mode;
 
   const current = {
-    platform: platform === "ios" ? "ios" : DEFAULT_PLATFORM,
+    platform: platform === "ios" || platform === "android" ? platform : DEFAULT_PLATFORM,
     mode: mode === "dark" ? "dark" : DEFAULT_MODE,
   };
 
@@ -24,12 +24,18 @@ const platformModeDecorator: DecoratorFunction = (Story, context) => {
   installPlatformModeUrlSync();
 
   const story = Story();
+  const wrapper = document.createElement("div");
+  wrapper.className = "cdr-token-story-root";
+  wrapper.dataset.platform = current.platform;
+  wrapper.dataset.mode = current.mode;
+
   if (story instanceof HTMLElement) {
-    story.dataset.platform = current.platform;
-    story.dataset.mode = current.mode;
+    wrapper.appendChild(story);
+  } else if (typeof story === "string") {
+    wrapper.innerHTML = story;
   }
 
-  return story;
+  return wrapper;
 };
 
 const preview: Preview = {
@@ -40,13 +46,14 @@ const preview: Preview = {
   globalTypes: {
     platform: {
       name: "Platform",
-      description: "Select the target platform for Storybook token previews",
+      description: "Target platform for token code examples",
       defaultValue: defaultPlatformMode.platform,
       toolbar: {
-        icon: "box",
+        icon: "browser",
         items: [
-          { value: "web", title: "Web" },
-          { value: "ios", title: "iOS" },
+          { value: "web", title: "Web", icon: "browser" },
+          { value: "ios", title: "iOS", icon: "apple" },
+          { value: "android", title: "Android", icon: "mobile" },
         ],
         dynamicTitle: true,
       },
@@ -67,13 +74,19 @@ const preview: Preview = {
   },
   decorators: [platformModeDecorator],
   parameters: {
-    backgrounds: {
-      default: "light",
-      values: [
-        { name: "light", value: "#ffffff" },
-        { name: "dark", value: "#2e2e2b" },
-      ],
+    options: {
+      storySort: {
+        order: [
+          "Introduction",
+          "Foundations",
+          "Tokens",
+          ["Color", "Space", "Typography", "Elevation", "Motion"],
+          "Components",
+        ],
+      },
     },
+    controls: { expanded: true },
+    backgrounds: { disable: true },
   },
 };
 

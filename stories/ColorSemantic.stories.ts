@@ -81,7 +81,7 @@ function createSemanticResolvedValues(
     const outputModes = mode === "default" ? ["light", "dark"] as const : [mode as "light" | "dark"];
 
     for (const resolvedMode of outputModes) {
-      for (const platform of ["web", "ios"] as const) {
+      for (const platform of ["web", "ios", "android"] as const) {
         values.push({
           platform,
           mode: resolvedMode,
