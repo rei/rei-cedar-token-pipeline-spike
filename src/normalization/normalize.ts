@@ -68,11 +68,14 @@ import {
 } from "./normalize-utils.js";
 import { mergeColorVariants } from "./color-variants.js";
 import { reportValidationIssues, validateFigmaInputs } from "./normalize-validation.js";
+import { mergeMetadata } from "./merge-metadata.js";
+import type { TokenMetadataManifest } from "../types/token-metadata.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const tokensDir = path.resolve(__dirname, "../../tokens");
 const outFile = path.resolve(__dirname, "../../canonical/tokens.json");
 const schemaFile = path.resolve(__dirname, "../../src/schema/token-schema.json");
+const metadataFile = path.resolve(__dirname, "../../metadata/tokens.json");
 
 // ─── main ─────────────────────────────────────────────────────────────────────
 
@@ -243,7 +246,26 @@ try {
   // ── 4. Attach $resolved and $meta to all alias color tokens ─────────────────
   mergeColorVariants(canonical, platformLookup);
 
-  // ── 5. Write canonical/tokens.json ─────────────────────────────────────────────
+  // ── 5. Merge repo-owned token metadata ────────────────────────────────────────
+  //
+  // Load metadata/tokens.json if it exists and merge governance into $extensions.cedar.
+  // This is optional — if the file doesn't exist, build proceeds (all tokens unmarked).
+  // For each token with metadata entry, attach under $extensions.cedar.governance.
+  //
+  // See philosophy: Figma owns values + alias refs, repo owns governance (status,
+  // badges, deprecation, usedBy, etc.). merge-metadata.ts assembles both.
+  let metadataMergedCount = 0;
+  if (fs.existsSync(metadataFile)) {
+    const metadata = JSON.parse(fs.readFileSync(metadataFile, "utf-8")) as TokenMetadataManifest;
+    metadataMergedCount = mergeMetadata(canonical, metadata);
+    console.log(`  ✓ metadata/tokens.json [governance: ${metadataMergedCount} token(s)]`);
+  } else {
+    console.log(
+      `  ⊘ metadata/tokens.json not found (optional). All tokens will be unmarked/unreviewed.`,
+    );
+  }
+
+  // ── 6. Write canonical/tokens.json ─────────────────────────────────────────────
   fs.mkdirSync(path.dirname(outFile), { recursive: true });
   fs.writeFileSync(outFile, JSON.stringify(canonical, null, 2), "utf-8");
 
