@@ -210,15 +210,20 @@ The CSS transform reads `$extensions.cedar.$meta.scope` to determine whether to 
 
 ---
 
-## Token Documentation
+## Token Documentation and Governance Metadata
 
 ### Purpose
 
-Token descriptions provide developer-facing documentation about the purpose and usage of design tokens. These descriptions are captured from Figma during sync, preserved through normalization, and surfaced in generated TypeScript type definitions as JSDoc comments.
+Canonical tokens can carry two documentation-related metadata sources under `$extensions.cedar`:
+
+- `docs`: descriptive docs, typically sourced from Figma descriptions
+- `governance`: lifecycle and consumer governance metadata, sourced from repo metadata manifests
+
+This split preserves authority boundaries while keeping canonical as the merged source for downstream consumers.
 
 ### Structure
 
-Token documentation is stored in `$extensions.cedar.docs` with the following structure:
+Figma documentation is stored in `$extensions.cedar.docs`:
 
 ```json
 {
@@ -239,11 +244,32 @@ The `docs` object contains:
 | Field | Type | Purpose |
 |-------|------|---------|
 | `summary` | string | Brief description of the token's purpose (5-12 words, one sentence) |
-| `usage` | string | Optional guidance on when/how to use this token (future) |
-| `design` | string | Optional design rationale (future) |
-| `aliases` | string[] | Optional list of related semantic token names (future) |
+| `usage` | string | Optional guidance on when/how to use this token |
+| `design` | string | Optional design rationale |
+| `aliases` | string[] | Optional list of related semantic token names |
 
-Currently, only `summary` is populated from Figma descriptions.
+Governance metadata is stored in `$extensions.cedar.governance`, keyed by canonical token path during normalization merge:
+
+```json
+{
+  "$type": "color",
+  "$value": "{color.option.neutral.white}",
+  "$extensions": {
+    "cedar": {
+      "docs": {
+        "summary": "Default page and container background."
+      },
+      "governance": {
+        "status": "stable",
+        "badges": [{ "label": "stable", "tone": "stable" }],
+        "usage": "Use for primary page and container backgrounds.",
+        "usedBy": ["cdr-card", "cdr-modal"],
+        "consumerNotes": "Foundational surface token"
+      }
+    }
+  }
+}
+```
 
 ### Figma Input Contract
 
@@ -261,11 +287,17 @@ Requirements:
 - Empty descriptions are treated as missing and NOT included in the canonical model
 - Only non-empty, trimmed descriptions are preserved through normalization
 
+Repo-governed metadata requirements:
+- Governance metadata MUST be authored in `metadata/tokens.json`
+- Metadata MUST merge under `$extensions.cedar.governance`
+- Governance metadata MUST NOT overwrite `$extensions.cedar.docs`
+
 ### Scope
 
 Token documentation is available for:
 - ✅ **Option tokens** (primitives) — descriptions come from Figma
-- ❌ **Semantic tokens** (aliases) — descriptions come from Cedar component documentation, NOT from Figma
+- ❌ **Semantic tokens** (aliases) — Figma descriptions are not the source of truth
+- ✅ **Semantic and lifecycle governance fields** — authored in repo metadata and merged into canonical
 
 Rationale: Semantic tokens represent Cedar component responsibilities and surface areas. Their documentation should live in component docs, not in the token system.
 
@@ -287,8 +319,10 @@ This allows developers to see token documentation in their IDE without leaving t
 ### Constraints
 
 - `docs` MUST NOT affect token semantics or `$value` resolution
+- `governance` MUST NOT affect token semantics or `$value` resolution
 - `docs` is reference/development documentation only — NOT runtime data
-- `docs` MUST live in `$extensions.cedar`, never in `$value` or elsewhere
+- `governance` is lifecycle/governance metadata only — NOT runtime value data
+- `docs` and `governance` MUST live in `$extensions.cedar`, never in `$value` or elsewhere
 - `docs.summary` MUST be a plain string, no inline formatting or Markdown
 
 See [ADR-0010: Token Documentation Architecture](./adr-0010-token-documentation-architecture.md) for full pipeline details.
