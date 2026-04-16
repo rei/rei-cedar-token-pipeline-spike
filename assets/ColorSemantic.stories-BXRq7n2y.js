@@ -1,33 +1,33 @@
-import{t as e}from"./chunk-BvrOYcoh.js";import{n as t,t as n}from"./load-tokens-DvgTAvDW.js";function r(e){e.querySelectorAll(`[data-tabs-scope]`).forEach(e=>{let t=e.querySelectorAll(`.mode-tab`),n=e.querySelectorAll(`.mode-panel`);t.forEach(e=>{e.addEventListener(`click`,()=>{let r=e.dataset.mode;t.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r)),n.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r))})})})}function i(e){return()=>{let t=document.createElement(`div`);return t.style.cssText=`min-height:200px;background:#f5f2eb;`,t.innerHTML=`
+import{t as e}from"./chunk-BvrOYcoh.js";import{n as t,t as n}from"./iframe-CxDvXmCO.js";import{n as r,t as i}from"./load-tokens-CT6AMABu.js";import{n as a,t as o}from"./TokenOutputPanel-DLuXUcyH.js";function s(e){e.querySelectorAll(`[data-tabs-scope]`).forEach(e=>{let t=e.querySelectorAll(`.mode-tab`),n=e.querySelectorAll(`.mode-panel`);t.forEach(e=>{e.addEventListener(`click`,()=>{let r=e.dataset.mode;t.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r)),n.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r))})})})}function c(e){return()=>{let t=document.createElement(`div`);return t.style.cssText=`min-height:200px;background:#f5f2eb;`,t.innerHTML=`
       <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:.85rem;color:#736e65">
         Loading token data…
-      </div>`,e().then(e=>{t.innerHTML=e,r(t)}).catch(e=>{t.innerHTML=`
+      </div>`,e().then(e=>{typeof e==`string`?t.innerHTML=e:(t.innerHTML=``,t.appendChild(e)),s(t)}).catch(e=>{t.innerHTML=`
           <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:.85rem;color:#be342d">
             Error loading tokens: ${e instanceof Error?e.message:String(e)}
-          </div>`}),t}}function a(...e){return`
+          </div>`}),t}}function l(e,t){let n=document.createElement(`div`);return n.innerHTML=e,t&&n.appendChild(t),n}function u(e,t,n){let r=[];for(let i of n){let n=i===`default`?`color.${e}`:`color.modes.${i}.${e}`,a=t.get(n);if(!a)continue;let o=a.ref.split(` → `)[0]??a.ref,s=i===`default`?[`light`,`dark`]:[i];for(let e of s)for(let t of[`web`,`ios`])r.push({platform:t,mode:e,hex:a.hex,primitive:a.ref,palette:o})}return r}function d(e){let[t,n]=e.split(`.`);return!t||!n?e:`cdr-${{surface:`surface`,text:`text`,border:`border`}[t]??t}-${n}`}function f(e,t,n){let r=u(e,t,n);return r.length===0?null:o({canonicalName:`color.${e}`,outputTokenName:d(e),resolvedValues:r})}function p(...e){return`
     <nav class="breadcrumb">
       ${e.map((t,n)=>{let r=n===e.length-1;return`<span class="bc-segment${r?` bc-current`:``}">${t}</span>${r?``:`<span class="bc-sep">/</span>`}`}).join(``)}
     </nav>
-  `}function o(e,t,n){return`
+  `}function m(e,t,n){return`
     <div class="section-header">
       <span class="section-label">${e}</span>
       <span class="section-title">${t}</span>
       <span class="section-count">${n} tokens</span>
     </div>
-  `}function s(e){return`<div class="cat-header"><span class="cat-pip"></span><span class="cat-name">${e}</span><span class="cat-rule"></span></div>`}function c(e){return e.replaceAll(`&`,`&amp;`).replaceAll(`<`,`&lt;`).replaceAll(`>`,`&gt;`).replaceAll(`"`,`&quot;`).replaceAll(`'`,`&#39;`)}function l(e){if(!e)return``;let t=[];return e.summary&&t.push(`<div class="trow-doc-summary">${c(e.summary)}</div>`),e.usage&&t.push(`<div class="trow-doc-meta"><span class="trow-doc-label">Usage</span>${c(e.usage)}</div>`),e.design&&t.push(`<div class="trow-doc-meta"><span class="trow-doc-label">Design</span>${c(e.design)}</div>`),e.aliases&&e.aliases.length>0&&t.push(`<div class="trow-doc-meta"><span class="trow-doc-label">Aliases</span>${e.aliases.map(c).join(`, `)}</div>`),t.length>0?`<div class="trow-token-docs">${t.join(``)}</div>`:``}function u(e,t){return`
+  `}function h(e){return`<div class="cat-header"><span class="cat-pip"></span><span class="cat-name">${e}</span><span class="cat-rule"></span></div>`}function g(e){return e.replaceAll(`&`,`&amp;`).replaceAll(`<`,`&lt;`).replaceAll(`>`,`&gt;`).replaceAll(`"`,`&quot;`).replaceAll(`'`,`&#39;`)}function _(e){if(!e)return``;let t=[];return e.summary&&t.push(`<div class="trow-doc-summary">${g(e.summary)}</div>`),e.usage&&t.push(`<div class="trow-doc-meta"><span class="trow-doc-label">Usage</span>${g(e.usage)}</div>`),e.design&&t.push(`<div class="trow-doc-meta"><span class="trow-doc-label">Design</span>${g(e.design)}</div>`),e.aliases&&e.aliases.length>0&&t.push(`<div class="trow-doc-meta"><span class="trow-doc-label">Aliases</span>${e.aliases.map(g).join(`, `)}</div>`),t.length>0?`<div class="trow-token-docs">${t.join(``)}</div>`:``}function v(e){return e.startsWith(`color.modes.`)?e.replace(/^color\.modes\.[^.]+\./,``):e.startsWith(`color.`)?e.slice(6):e}function y(e,t){return`
     <div class="token-grid">
       <div class="token-grid-header">
         <div></div><div>Token</div><div>Resolves to</div><div style="text-align:right">Hex</div>
       </div>
-      ${t.map(t=>{let n=e.get(t);if(!n)return``;let{hex:r,ref:i,docs:a}=n,o=l(a),s=o?` has-docs`:``;return`
+      ${t.map(t=>{let n=e.get(t);if(!n)return``;let{hex:r,ref:i,docs:a}=n,o=_(a),s=o?` has-docs`:``;return`
           <div class="trow-chip-wrap${s}"><span class="trow-chip" style="background:${r};"></span></div>
-          <div class="trow-token${s}"><div class="trow-token-name">${t}</div></div>
+          <div class="trow-token${s}"><div class="trow-token-name">${v(t)}</div></div>
           <div class="trow-ref${s}">${i}</div>
           <div class="trow-hex${s}">${r.slice(0,9).toUpperCase()}</div>
           ${o?`<div class="trow-doc-full"><div></div><div class="trow-doc-body">${o}</div></div>`:``}
         `}).join(``)}
     </div>
-  `}function d(e,t,n,r){return`
+  `}function b(e,t,n,r){return`
     <table class="compare-table">
       <thead>
         <tr>
@@ -57,7 +57,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{n as t,t as n}from"./load-tokens-
       </tr>
     `).join(``)}</tbody>
     </table>
-  `}function f(e,t,n,r){return e.get(`color.modes.${t}.${n}.${r}`)??e.get(`color.${n}.${r}`)}function p(e){let t=new Set;for(let n of e.keys()){let e=n.match(/^color\.modes\.([^.]+)\./);e&&t.add(e[1])}return t.size>0?[...t].sort():[`default`]}var m,h,g,_,v,y,b;e((()=>{n(),m={title:`Tokens/Color/Semantic`},h=`
+  `}function x(e,t,n,r){return e.get(`color.modes.${t}.${n}.${r}`)??e.get(`color.${n}.${r}`)}function S(e){let t=new Set;for(let n of e.keys()){let e=n.match(/^color\.modes\.([^.]+)\./);e&&t.add(e[1])}return t.size>0?[...t].sort():[`default`]}var C,w,T,E,D,O,k;e((()=>{t(),i(),a(),C={title:`Tokens/Color/Semantic`},w=`
   @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;500;600;700;800&display=swap');
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -216,112 +216,112 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{n as t,t as n}from"./load-tokens-
     .border-demo-grid { grid-template-columns: 1fr; }
     .compare-table th.mode-col:nth-child(n+4), .compare-table td.mode-val:nth-child(n+4) { display: none; }
   }
-`,g={name:`Surface`,render:i(async()=>{let e=await t(),n=p(e),r=n.length>1,i=``;if(r)i=`
+`,T={name:`Surface`,render:c(async()=>{let{platform:e,mode:t}=n(),i=await r(e,t),a=S(i),o=a.length>1,s=``;if(o)s=`
         <div data-tabs-scope="surface-tabs">
-          <div class="mode-tabs">${n.map((e,t)=>`<button class="mode-tab${t===0?` active`:``}" data-mode="${e}">${e}</button>`).join(``)}</div>
-          ${n.map((t,n)=>{let r=`color.modes.${t}.`,i=[`${r}surface.base`,`${r}surface.raised`],a=f(e,t,`surface`,`base`),o=f(e,t,`surface`,`raised`),s=f(e,t,`text`,`base`),c=f(e,t,`text`,`subtle`),l=f(e,t,`border`,`subtle`);return`
-          <div class="mode-panel${n===0?` active`:``}" data-mode="${t}">
-            ${u(e,i)}
+          <div class="mode-tabs">${a.map((e,t)=>`<button class="mode-tab${t===0?` active`:``}" data-mode="${e}">${e}</button>`).join(``)}</div>
+          ${a.map((e,t)=>{let n=`color.modes.${e}.`,r=[`${n}surface.base`,`${n}surface.raised`],a=x(i,e,`surface`,`base`),o=x(i,e,`surface`,`raised`),s=x(i,e,`text`,`base`),c=x(i,e,`text`,`subtle`),l=x(i,e,`border`,`subtle`);return`
+          <div class="mode-panel${t===0?` active`:``}" data-mode="${e}">
+            ${y(i,r)}
             <div class="demo-card" style="margin-top:1rem;">
               <div class="demo-layer" style="background:${a?.hex??`transparent`};">
-                <span class="demo-layer-label" style="color:${s?.hex};">${r}surface.base</span>
+                <span class="demo-layer-label" style="color:${s?.hex};">${n}surface.base</span>
                 <span class="demo-layer-desc" style="color:${c?.hex};">Base — page background, modal backdrop</span>
               </div>
               <div class="demo-divider" style="background:${l?.hex};"></div>
               <div class="demo-layer" style="background:${o?.hex??`transparent`};">
-                <span class="demo-layer-label" style="color:${s?.hex};">${r}surface.raised</span>
+                <span class="demo-layer-label" style="color:${s?.hex};">${n}surface.raised</span>
                 <span class="demo-layer-desc" style="color:${c?.hex};">Raised — cards, sidebars, dropdowns</span>
               </div>
             </div>
           </div>
         `}).join(``)}
         </div>
-        ${s(`Mode Comparison`)}
-        ${d(e,n,`surface`,[`base`,`raised`])}
-      `;else{let[t]=n,r=`color.${t===`default`?``:`modes.${t}.`}`,a=[`${r}surface.base`,`${r}surface.raised`],o=f(e,t,`surface`,`base`),s=f(e,t,`surface`,`raised`),c=f(e,t,`text`,`base`),l=f(e,t,`text`,`subtle`),d=f(e,t,`border`,`subtle`);i=`
-        ${u(e,a)}
+        ${h(`Mode Comparison`)}
+        ${b(i,a,`surface`,[`base`,`raised`])}
+      `;else{let[e]=a,t=`color.${e===`default`?``:`modes.${e}.`}`,n=[`${t}surface.base`,`${t}surface.raised`],r=x(i,e,`surface`,`base`),o=x(i,e,`surface`,`raised`),c=x(i,e,`text`,`base`),l=x(i,e,`text`,`subtle`),u=x(i,e,`border`,`subtle`);s=`
+        ${y(i,n)}
         <div class="demo-card" style="margin-top:1rem;">
-          <div class="demo-layer" style="background:${o?.hex??`transparent`};">
+          <div class="demo-layer" style="background:${r?.hex??`transparent`};">
             <span class="demo-layer-label" style="color:${c?.hex};">surface.base</span>
             <span class="demo-layer-desc" style="color:${l?.hex};">Base — page background, modal backdrop</span>
           </div>
-          <div class="demo-divider" style="background:${d?.hex};"></div>
-          <div class="demo-layer" style="background:${s?.hex??`transparent`};">
+          <div class="demo-divider" style="background:${u?.hex};"></div>
+          <div class="demo-layer" style="background:${o?.hex??`transparent`};">
             <span class="demo-layer-label" style="color:${c?.hex};">surface.raised</span>
             <span class="demo-layer-desc" style="color:${l?.hex};">Raised — cards, sidebars, dropdowns</span>
           </div>
         </div>
-      `}return`
-      <style>${h}</style>
+      `}return l(`
+      <style>${w}</style>
       <div class="page">
-        ${a(`Cedar Tokens`,`Color`,`Semantic`,`Surface`)}
-        ${o(`Semantic Colors`,`Surface`,n.length*2)}
-        ${i}
+        ${p(`Cedar Tokens`,`Color`,`Semantic`,`Surface`)}
+        ${m(`Semantic Colors`,`Surface`,a.length*2)}
+        ${s}
       </div>
-    `})},_={name:`Text`,render:i(async()=>{let e=await t(),n=p(e),r=n.length>1,i=[`base`,`subtle`,`link`,`link-hover`],c=``;if(r)c=`
+    `,f(`surface.base`,i,a))})},E={name:`Text`,render:c(async()=>{let{platform:e,mode:t}=n(),i=await r(e,t),a=S(i),o=a.length>1,s=[`base`,`subtle`,`link`,`link-hover`],c=``;if(o)c=`
         <div data-tabs-scope="text-tabs">
-          <div class="mode-tabs">${n.map((e,t)=>`<button class="mode-tab${t===0?` active`:``}" data-mode="${e}">${e}</button>`).join(``)}</div>
-          ${n.map((t,n)=>{let r=`color.modes.${t}.`,a=i.map(e=>`${r}text.${e}`),o=f(e,t,`text`,`base`),c=f(e,t,`text`,`subtle`),l=f(e,t,`text`,`link`),d=f(e,t,`text`,`link-hover`),p=f(e,t,`border`,`base`);return`
-          <div class="mode-panel${n===0?` active`:``}" data-mode="${t}">
-            ${u(e,a)}
-            ${s(`Live Preview`)}
+          <div class="mode-tabs">${a.map((e,t)=>`<button class="mode-tab${t===0?` active`:``}" data-mode="${e}">${e}</button>`).join(``)}</div>
+          ${a.map((e,t)=>{let n=`color.modes.${e}.`,r=s.map(e=>`${n}text.${e}`),a=x(i,e,`text`,`base`),o=x(i,e,`text`,`subtle`),c=x(i,e,`text`,`link`),l=x(i,e,`text`,`link-hover`),u=x(i,e,`border`,`base`);return`
+          <div class="mode-panel${t===0?` active`:``}" data-mode="${e}">
+            ${y(i,r)}
+            ${h(`Live Preview`)}
             <div class="text-demo">
-              <div class="text-demo-headline" style="color:${o?.hex};">Gear up for your next adventure.</div>
-              <div class="text-demo-body" style="color:${c?.hex};">From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside.</div>
+              <div class="text-demo-headline" style="color:${a?.hex};">Gear up for your next adventure.</div>
+              <div class="text-demo-body" style="color:${o?.hex};">From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside.</div>
               <div>
-                <a class="text-demo-link" href="#" style="color:${l?.hex};">View all collections</a>
-                <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.625rem;color:${d?.hex};letter-spacing:0.04em;">hover → ${d?.hex?.slice(0,9).toUpperCase()??``}</span>
+                <a class="text-demo-link" href="#" style="color:${c?.hex};">View all collections</a>
+                <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.625rem;color:${l?.hex};letter-spacing:0.04em;">hover → ${l?.hex?.slice(0,9).toUpperCase()??``}</span>
               </div>
-              <div class="text-demo-divider" style="background:${p?.hex};"></div>
+              <div class="text-demo-divider" style="background:${u?.hex};"></div>
               <div style="display:flex;gap:1.25rem;flex-wrap:wrap;">
-                ${a.map(t=>`<div style="display:flex;align-items:center;gap:0.35rem;"><span style="width:7px;height:7px;border-radius:50%;border:1px solid var(--rule-heavy);flex-shrink:0;background:${e.get(t)?.hex};"></span><span style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);">${t}</span></div>`).join(``)}
+                ${r.map(e=>`<div style="display:flex;align-items:center;gap:0.35rem;"><span style="width:7px;height:7px;border-radius:50%;border:1px solid var(--rule-heavy);flex-shrink:0;background:${i.get(e)?.hex};"></span><span style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);">${e}</span></div>`).join(``)}
               </div>
             </div>
           </div>
         `}).join(``)}
         </div>
-        ${s(`Mode Comparison`)}
-        ${d(e,n,`text`,i)}
-      `;else{let[t]=n,r=`color.modes.${t}.`,a=i.map(e=>`${r}text.${e}`),o=f(e,t,`text`,`base`),l=f(e,t,`text`,`subtle`),d=f(e,t,`text`,`link`),p=f(e,t,`text`,`link-hover`),m=f(e,t,`border`,`base`);c=`
-        ${u(e,a)}
-        ${s(`Live Preview`)}
+        ${h(`Mode Comparison`)}
+        ${b(i,a,`text`,s)}
+      `;else{let[e]=a,t=`color.modes.${e}.`,n=s.map(e=>`${t}text.${e}`),r=x(i,e,`text`,`base`),o=x(i,e,`text`,`subtle`),l=x(i,e,`text`,`link`),u=x(i,e,`text`,`link-hover`),d=x(i,e,`border`,`base`);c=`
+        ${y(i,n)}
+        ${h(`Live Preview`)}
         <div class="text-demo">
-          <div class="text-demo-headline" style="color:${o?.hex};">Gear up for your next adventure.</div>
-          <div class="text-demo-body" style="color:${l?.hex};">From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside.</div>
+          <div class="text-demo-headline" style="color:${r?.hex};">Gear up for your next adventure.</div>
+          <div class="text-demo-body" style="color:${o?.hex};">From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside.</div>
           <div>
-            <a class="text-demo-link" href="#" style="color:${d?.hex};">View all collections</a>
-            <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.625rem;color:${p?.hex};letter-spacing:0.04em;">hover → ${p?.hex?.slice(0,9).toUpperCase()??``}</span>
+            <a class="text-demo-link" href="#" style="color:${l?.hex};">View all collections</a>
+            <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.625rem;color:${u?.hex};letter-spacing:0.04em;">hover → ${u?.hex?.slice(0,9).toUpperCase()??``}</span>
           </div>
-          <div class="text-demo-divider" style="background:${m?.hex};"></div>
+          <div class="text-demo-divider" style="background:${d?.hex};"></div>
         </div>
-      `}return`
-      <style>${h}</style>
+      `}return l(`
+      <style>${w}</style>
       <div class="page">
-        ${a(`Cedar Tokens`,`Color`,`Semantic`,`Text`)}
-        ${o(`Semantic Colors`,`Text`,n.length*4)}
+        ${p(`Cedar Tokens`,`Color`,`Semantic`,`Text`)}
+        ${m(`Semantic Colors`,`Text`,a.length*4)}
         ${c}
       </div>
-    `})},v={name:`Border`,render:i(async()=>{let e=await t(),n=p(e),r=n.length>1,i=[`base`,`subtle`],c=``;if(r)c=`
+    `,f(`text.base`,i,a))})},D={name:`Border`,render:c(async()=>{let{platform:e,mode:t}=n(),i=await r(e,t),a=S(i),o=a.length>1,s=[`base`,`subtle`],c=``;if(o)c=`
         <div data-tabs-scope="border-tabs">
-          <div class="mode-tabs">${n.map((e,t)=>`<button class="mode-tab${t===0?` active`:``}" data-mode="${e}">${e}</button>`).join(``)}</div>
-          ${n.map((t,n)=>{let r=`color.modes.${t}.`,a=i.map(e=>`${r}border.${e}`),o=f(e,t,`border`,`base`),s=f(e,t,`border`,`subtle`),c=f(e,t,`text`,`subtle`),l=f(e,t,`text`,`base`),d=f(e,t,`surface`,`raised`);return`
-          <div class="mode-panel${n===0?` active`:``}" data-mode="${t}">
-            ${u(e,a)}
+          <div class="mode-tabs">${a.map((e,t)=>`<button class="mode-tab${t===0?` active`:``}" data-mode="${e}">${e}</button>`).join(``)}</div>
+          ${a.map((e,t)=>{let n=`color.modes.${e}.`,r=s.map(e=>`${n}border.${e}`),a=x(i,e,`border`,`base`),o=x(i,e,`border`,`subtle`),c=x(i,e,`text`,`subtle`),l=x(i,e,`text`,`base`),u=x(i,e,`surface`,`raised`);return`
+          <div class="mode-panel${t===0?` active`:``}" data-mode="${e}">
+            ${y(i,r)}
             <div class="border-demo-grid">
-              <div class="border-demo-cell" style="border:1.5px solid ${o?.hex};">
-                <div class="border-demo-label">${r}border.base</div>
+              <div class="border-demo-cell" style="border:1.5px solid ${a?.hex};">
+                <div class="border-demo-label">${n}border.base</div>
                 <div class="border-demo-desc" style="color:${c?.hex};">Default — cards, inputs, containers</div>
+                <div style="margin-top:0.75rem;height:1px;background:${a?.hex};"></div>
+                <div style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);letter-spacing:0.06em;margin-top:0.25rem;">${a?.hex?.slice(0,9).toUpperCase()}</div>
+              </div>
+              <div class="border-demo-cell" style="border:1.5px solid ${o?.hex};">
+                <div class="border-demo-label">${n}border.subtle</div>
+                <div class="border-demo-desc" style="color:${c?.hex};">Subtle — dividers, section separators</div>
                 <div style="margin-top:0.75rem;height:1px;background:${o?.hex};"></div>
                 <div style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);letter-spacing:0.06em;margin-top:0.25rem;">${o?.hex?.slice(0,9).toUpperCase()}</div>
               </div>
-              <div class="border-demo-cell" style="border:1.5px solid ${s?.hex};">
-                <div class="border-demo-label">${r}border.subtle</div>
-                <div class="border-demo-desc" style="color:${c?.hex};">Subtle — dividers, section separators</div>
-                <div style="margin-top:0.75rem;height:1px;background:${s?.hex};"></div>
-                <div style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);letter-spacing:0.06em;margin-top:0.25rem;">${s?.hex?.slice(0,9).toUpperCase()}</div>
-              </div>
             </div>
-            <div style="margin-top:1rem;padding:1.25rem;background:${d?.hex};border-radius:4px;border-top:3px solid ${o?.hex};">
+            <div style="margin-top:1rem;padding:1.25rem;background:${u?.hex};border-radius:4px;border-top:3px solid ${a?.hex};">
               <div style="font-family:var(--font-sans);font-size:0.625rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:0.375rem;">Usage note</div>
               <div style="font-family:var(--font-sans);font-size:0.75rem;color:${c?.hex};line-height:1.6;">
                 Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${l?.hex};">border.base</code> for interactive and structural boundaries.
@@ -331,41 +331,41 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{n as t,t as n}from"./load-tokens-
           </div>
         `}).join(``)}
         </div>
-        ${s(`Mode Comparison`)}
-        ${d(e,n,`border`,i)}
-      `;else{let[t]=n,r=`color.modes.${t}.`,a=i.map(e=>`${r}border.${e}`),o=f(e,t,`border`,`base`),s=f(e,t,`border`,`subtle`),l=f(e,t,`text`,`subtle`),d=f(e,t,`text`,`base`),p=f(e,t,`surface`,`raised`);c=`
-        ${u(e,a)}
+        ${h(`Mode Comparison`)}
+        ${b(i,a,`border`,s)}
+      `;else{let[e]=a,t=`color.modes.${e}.`,n=s.map(e=>`${t}border.${e}`),r=x(i,e,`border`,`base`),o=x(i,e,`border`,`subtle`),l=x(i,e,`text`,`subtle`),u=x(i,e,`text`,`base`),d=x(i,e,`surface`,`raised`);c=`
+        ${y(i,n)}
         <div class="border-demo-grid">
-          <div class="border-demo-cell" style="border:1.5px solid ${o?.hex};">
-            <div class="border-demo-label">${r}border.base</div>
+          <div class="border-demo-cell" style="border:1.5px solid ${r?.hex};">
+            <div class="border-demo-label">${t}border.base</div>
             <div class="border-demo-desc" style="color:${l?.hex};">Default — cards, inputs, containers</div>
           </div>
-          <div class="border-demo-cell" style="border:1.5px solid ${s?.hex};">
-            <div class="border-demo-label">${r}border.subtle</div>
+          <div class="border-demo-cell" style="border:1.5px solid ${o?.hex};">
+            <div class="border-demo-label">${t}border.subtle</div>
             <div class="border-demo-desc" style="color:${l?.hex};">Subtle — dividers, section separators</div>
           </div>
         </div>
-        <div style="margin-top:1rem;padding:1.25rem;background:${p?.hex};border-radius:4px;border-top:3px solid ${o?.hex};">
+        <div style="margin-top:1rem;padding:1.25rem;background:${d?.hex};border-radius:4px;border-top:3px solid ${r?.hex};">
           <div style="font-family:var(--font-sans);font-size:0.625rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:0.375rem;">Usage note</div>
           <div style="font-family:var(--font-sans);font-size:0.75rem;color:${l?.hex};line-height:1.6;">
-            Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${d?.hex};">border.base</code> for interactive and structural boundaries.
-            Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${d?.hex};">border.subtle</code> for low-emphasis visual separators.
+            Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${u?.hex};">border.base</code> for interactive and structural boundaries.
+            Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${u?.hex};">border.subtle</code> for low-emphasis visual separators.
           </div>
         </div>
-      `}return`
-      <style>${h}</style>
+      `}return l(`
+      <style>${w}</style>
       <div class="page">
-        ${a(`Cedar Tokens`,`Color`,`Semantic`,`Border`)}
-        ${o(`Semantic Colors`,`Border`,n.length*2)}
+        ${p(`Cedar Tokens`,`Color`,`Semantic`,`Border`)}
+        ${m(`Semantic Colors`,`Border`,a.length*2)}
         ${c}
       </div>
-    `})},y={name:`All Semantic Tokens`,render:i(async()=>{let e=await t(),n=p(e),r=e.size,i=[{cat:`surface`,toks:[`base`,`raised`]},{cat:`text`,toks:[`base`,`subtle`,`link`,`link-hover`]},{cat:`border`,toks:[`base`,`subtle`]}].map(({cat:t,toks:r})=>{let i=n.map(e=>`<th class="mode-th" style="min-width:90px;"><span class="cmp-mode-badge">${e}</span></th>`).join(``),a=r.map(r=>`
+    `,f(`border.base`,i,a))})},O={name:`All Semantic Tokens`,render:c(async()=>{let{platform:e,mode:t}=n(),i=await r(e,t),a=S(i),o=i.size,s=[{cat:`surface`,toks:[`base`,`raised`]},{cat:`text`,toks:[`base`,`subtle`,`link`,`link-hover`]},{cat:`border`,toks:[`base`,`subtle`]}].map(({cat:e,toks:t})=>{let n=a.map(e=>`<th class="mode-th" style="min-width:90px;"><span class="cmp-mode-badge">${e}</span></th>`).join(``),r=t.map(t=>`
           <tr>
             <td style="padding:0.5rem 0.875rem 0.5rem 0;border-bottom:1px solid var(--rule);white-space:nowrap;">
-              <span style="font-family:var(--font-mono);font-size:0.5625rem;color:var(--ink-faint);margin-right:0.25rem;">${t} ·</span>
-              <span class="cmp-token-name">${r}</span>
+              <span style="font-family:var(--font-mono);font-size:0.5625rem;color:var(--ink-faint);margin-right:0.25rem;">${e} ·</span>
+              <span class="cmp-token-name">${t}</span>
             </td>
-            ${n.map(n=>{let i=`color.modes.${n}.${t}.${r}`,a=`color.${t}.${r}`,o=e.get(i)??e.get(a);return o?`
+            ${a.map(n=>{let r=`color.modes.${n}.${e}.${t}`,a=`color.${e}.${t}`,o=i.get(r)??i.get(a);return o?`
             <td class="mode-td">
               <div class="cmp-chip-wrap">
                 <span class="cmp-chip" style="background:${o.hex};"></span>
@@ -375,49 +375,49 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{n as t,t as n}from"./load-tokens-
           `:`<td class="mode-td"><span style="color:var(--ink-faint);font-size:0.625rem">—</span></td>`}).join(``)}
           </tr>
         `).join(``);return`
-        ${s(t)}
+        ${h(e)}
         <table class="overview-compare">
           <thead>
             <tr>
               <th>Token</th>
-              ${i}
+              ${n}
             </tr>
           </thead>
-          <tbody>${a}</tbody>
+          <tbody>${r}</tbody>
         </table>
-      `}).join(``),c=n.map((t,n)=>{let r=`color.modes.${t}.`,i=f(e,t,`surface`,`base`),a=f(e,t,`surface`,`raised`),o=f(e,t,`text`,`base`),c=f(e,t,`text`,`subtle`),l=f(e,t,`border`,`subtle`),d=[`base`,`raised`].map(e=>`${r}surface.${e}`),p=[`base`,`subtle`,`link`,`link-hover`].map(e=>`${r}text.${e}`),m=[`base`,`subtle`].map(e=>`${r}border.${e}`);return`
+      `}).join(``),c=a.map((e,t)=>{let n=`color.modes.${e}.`,r=x(i,e,`surface`,`base`),a=x(i,e,`surface`,`raised`),o=x(i,e,`text`,`base`),s=x(i,e,`text`,`subtle`),c=x(i,e,`border`,`subtle`),l=[`base`,`raised`].map(e=>`${n}surface.${e}`),u=[`base`,`subtle`,`link`,`link-hover`].map(e=>`${n}text.${e}`),d=[`base`,`subtle`].map(e=>`${n}border.${e}`);return`
         <div class="mode-section">
           <div class="mode-section-title-row">
             <span class="mode-section-badge">mode</span>
-            <span class="mode-section-name">${t}</span>
+            <span class="mode-section-name">${e}</span>
             <span class="mode-section-rule"></span>
-            <span class="mode-section-index">${String(n+1).padStart(2,`0`)}</span>
+            <span class="mode-section-index">${String(t+1).padStart(2,`0`)}</span>
           </div>
 
-          ${s(`Surface`)}
-          <div style="margin-top:0.5rem">${u(e,d)}</div>
+          ${h(`Surface`)}
+          <div style="margin-top:0.5rem">${y(i,l)}</div>
           <div class="demo-card" style="margin-top:0.75rem">
-            <div class="demo-layer" style="background:${i?.hex??`transparent`}">
+            <div class="demo-layer" style="background:${r?.hex??`transparent`}">
               <span class="demo-layer-label" style="color:${o?.hex}">surface.base</span>
-              <span class="demo-layer-desc" style="color:${c?.hex}">Page background</span>
+              <span class="demo-layer-desc" style="color:${s?.hex}">Page background</span>
             </div>
-            <div class="demo-divider" style="background:${l?.hex}"></div>
+            <div class="demo-divider" style="background:${c?.hex}"></div>
             <div class="demo-layer" style="background:${a?.hex??`transparent`}">
               <span class="demo-layer-label" style="color:${o?.hex}">surface.raised</span>
-              <span class="demo-layer-desc" style="color:${c?.hex}">Cards &amp; panels</span>
+              <span class="demo-layer-desc" style="color:${s?.hex}">Cards &amp; panels</span>
             </div>
           </div>
 
-          ${s(`Text`)}
-          <div style="margin-top:0.5rem">${u(e,p)}</div>
+          ${h(`Text`)}
+          <div style="margin-top:0.5rem">${y(i,u)}</div>
 
-          ${s(`Border`)}
-          <div style="margin-top:0.5rem">${u(e,m)}</div>
+          ${h(`Border`)}
+          <div style="margin-top:0.5rem">${y(i,d)}</div>
         </div>
-      `}).join(``);return`
-      <style>${h}</style>
+      `}).join(``);return l(`
+      <style>${w}</style>
       <div class="page">
-        ${a(`Cedar Tokens`,`Color`,`Semantic`)}
+        ${p(`Cedar Tokens`,`Color`,`Semantic`)}
 
         <div class="page-title-row">
           <div>
@@ -425,25 +425,29 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{n as t,t as n}from"./load-tokens-
             <div class="page-title">Color<br>Semantic</div>
           </div>
           <div class="page-meta">
-            <div class="page-meta-count">${r}</div>
-            <div class="page-meta-label">${n.length} mode${n.length===1?``:`s`} · ${r} alias tokens</div>
+            <div class="page-meta-count">${o}</div>
+            <div class="page-meta-label">${a.length} mode${a.length===1?``:`s`} · ${o} alias tokens</div>
           </div>
         </div>
 
         <div style="height:1.5px;background:var(--rule-heavy);margin:2rem 0;"></div>
 
-        ${o(`Cross-Mode`,`Comparison`,r)}
-        ${i}
+        ${m(`Cross-Mode`,`Comparison`,o)}
+        ${s}
 
         <div style="height:1.5px;background:var(--rule-heavy);margin:3.5rem 0 2.5rem;"></div>
 
-        ${o(`Per-Mode`,`Detail`,r)}
+        ${m(`Per-Mode`,`Detail`,o)}
         ${c}
       </div>
-    `})},g.parameters={...g.parameters,docs:{...g.parameters?.docs,source:{originalSource:`{
+    `,f(`surface.base`,i,a))})},T.parameters={...T.parameters,docs:{...T.parameters?.docs,source:{originalSource:`{
   name: "Surface",
   render: asyncStory(async () => {
-    const tokens = await loadColorTokens();
+    const {
+      platform,
+      mode
+    } = getPlatformModeContext();
+    const tokens = await loadColorTokens(platform, mode);
     const modes = collectModes(tokens);
     const hasMultipleModes = modes.length > 1;
 
@@ -509,7 +513,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{n as t,t as n}from"./load-tokens-
         </div>
       \`;
     }
-    return \`
+    const page = \`
       <style>\${BASE_STYLES}</style>
       <div class="page">
         \${breadcrumb("Cedar Tokens", "Color", "Semantic", "Surface")}
@@ -517,11 +521,16 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{n as t,t as n}from"./load-tokens-
         \${body}
       </div>
     \`;
+    return renderStoryWithPanel(page, buildSemanticPanel("surface.base", tokens, modes));
   })
-}`,...g.parameters?.docs?.source}}},_.parameters={..._.parameters,docs:{..._.parameters?.docs,source:{originalSource:`{
+}`,...T.parameters?.docs?.source}}},E.parameters={...E.parameters,docs:{...E.parameters?.docs,source:{originalSource:`{
   name: "Text",
   render: asyncStory(async () => {
-    const tokens = await loadColorTokens();
+    const {
+      platform,
+      mode
+    } = getPlatformModeContext();
+    const tokens = await loadColorTokens(platform, mode);
     const modes = collectModes(tokens);
     const hasMultipleModes = modes.length > 1;
     const tokenNames = ["base", "subtle", "link", "link-hover"];
@@ -590,7 +599,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{n as t,t as n}from"./load-tokens-
         </div>
       \`;
     }
-    return \`
+    const page = \`
       <style>\${BASE_STYLES}</style>
       <div class="page">
         \${breadcrumb("Cedar Tokens", "Color", "Semantic", "Text")}
@@ -598,11 +607,16 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{n as t,t as n}from"./load-tokens-
         \${body}
       </div>
     \`;
+    return renderStoryWithPanel(page, buildSemanticPanel("text.base", tokens, modes));
   })
-}`,..._.parameters?.docs?.source}}},v.parameters={...v.parameters,docs:{...v.parameters?.docs,source:{originalSource:`{
+}`,...E.parameters?.docs?.source}}},D.parameters={...D.parameters,docs:{...D.parameters?.docs,source:{originalSource:`{
   name: "Border",
   render: asyncStory(async () => {
-    const tokens = await loadColorTokens();
+    const {
+      platform,
+      mode
+    } = getPlatformModeContext();
+    const tokens = await loadColorTokens(platform, mode);
     const modes = collectModes(tokens);
     const hasMultipleModes = modes.length > 1;
     const tokenNames = ["base", "subtle"];
@@ -683,7 +697,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{n as t,t as n}from"./load-tokens-
         </div>
       \`;
     }
-    return \`
+    const page = \`
       <style>\${BASE_STYLES}</style>
       <div class="page">
         \${breadcrumb("Cedar Tokens", "Color", "Semantic", "Border")}
@@ -691,11 +705,16 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{n as t,t as n}from"./load-tokens-
         \${body}
       </div>
     \`;
+    return renderStoryWithPanel(page, buildSemanticPanel("border.base", tokens, modes));
   })
-}`,...v.parameters?.docs?.source}}},y.parameters={...y.parameters,docs:{...y.parameters?.docs,source:{originalSource:`{
+}`,...D.parameters?.docs?.source}}},O.parameters={...O.parameters,docs:{...O.parameters?.docs,source:{originalSource:`{
   name: "All Semantic Tokens",
   render: asyncStory(async () => {
-    const tokens = await loadColorTokens();
+    const {
+      platform,
+      mode
+    } = getPlatformModeContext();
+    const tokens = await loadColorTokens(platform, mode);
     const modes = collectModes(tokens);
     const semanticTokenCount = tokens.size;
 
@@ -801,7 +820,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{n as t,t as n}from"./load-tokens-
         </div>
       \`;
     }).join("");
-    return \`
+    const page = \`
       <style>\${BASE_STYLES}</style>
       <div class="page">
         \${breadcrumb("Cedar Tokens", "Color", "Semantic")}
@@ -828,5 +847,6 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{n as t,t as n}from"./load-tokens-
         \${modeSections}
       </div>
     \`;
+    return renderStoryWithPanel(page, buildSemanticPanel("surface.base", tokens, modes));
   })
-}`,...y.parameters?.docs?.source}}},b=[`Surface`,`Text`,`Border`,`AllSemantic`]}))();export{y as AllSemantic,v as Border,g as Surface,_ as Text,b as __namedExportsOrder,m as default};
+}`,...O.parameters?.docs?.source}}},k=[`Surface`,`Text`,`Border`,`AllSemantic`]}))();export{O as AllSemantic,D as Border,T as Surface,E as Text,k as __namedExportsOrder,C as default};

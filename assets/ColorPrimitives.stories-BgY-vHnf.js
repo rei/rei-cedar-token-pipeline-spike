@@ -1,12 +1,12 @@
-import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-DvgTAvDW.js";function r(e){e.querySelectorAll(`[data-tabs-scope]`).forEach(e=>{let t=e.querySelectorAll(`.mode-tab`),n=e.querySelectorAll(`.mode-panel`);t.forEach(e=>{e.addEventListener(`click`,()=>{let r=e.dataset.mode;t.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r)),n.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r))})})})}function i(e){return()=>{let t=document.createElement(`div`);return t.style.cssText=`min-height:200px;background:#f5f2eb;`,t.innerHTML=`
+import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-CT6AMABu.js";import{n as r,t as i}from"./TokenOutputPanel-DLuXUcyH.js";function a(e){e.querySelectorAll(`[data-tabs-scope]`).forEach(e=>{let t=e.querySelectorAll(`.mode-tab`),n=e.querySelectorAll(`.mode-panel`);t.forEach(e=>{e.addEventListener(`click`,()=>{let r=e.dataset.mode;t.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r)),n.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r))})})})}function o(e){return()=>{let t=document.createElement(`div`);return t.style.cssText=`min-height:200px;background:#f5f2eb;`,t.innerHTML=`
       <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:1rem;color:#736e65">
         Loading token data…
-      </div>`,e().then(e=>{t.innerHTML=e,r(t)}).catch(e=>{t.innerHTML=`
+      </div>`,e().then(e=>{typeof e==`string`?t.innerHTML=e:(t.innerHTML=``,t.appendChild(e)),a(t)}).catch(e=>{t.innerHTML=`
           <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:1rem;color:#be342d">
             Error loading tokens: ${e instanceof Error?e.message:String(e)}
-          </div>`}),t}}function a(e){return e.replaceAll(`&`,`&amp;`).replaceAll(`<`,`&lt;`).replaceAll(`>`,`&gt;`).replaceAll(`"`,`&quot;`).replaceAll(`'`,`&#39;`)}function o(e){if(!e)return``;let t=[];return e.summary&&t.push(`<div class="td-doc-summary">${a(e.summary)}</div>`),e.usage&&t.push(`<div class="td-doc-meta"><span class="td-doc-label">Usage</span>${a(e.usage)}</div>`),e.design&&t.push(`<div class="td-doc-meta"><span class="td-doc-label">Design</span>${a(e.design)}</div>`),t.length>0?`<div class="td-token-docs">${t.join(``)}</div>`:``}function s(e){let t=parseInt(e.slice(1,3),16),n=parseInt(e.slice(3,5),16),r=parseInt(e.slice(5,7),16);return(t*299+n*587+r*114)/1e3>140}function c(e){return`
+          </div>`}),t}}function s(e,t){let n=document.createElement(`div`);return n.innerHTML=e,t&&n.appendChild(t),n}function c(e){return e.startsWith(`ios-`)?{platform:`ios`,mode:e.slice(4)}:e.startsWith(`web-`)?{platform:`web`,mode:e.slice(4)}:e===`light`||e===`dark`?{platform:`web`,mode:e}:{platform:`web`,mode:`light`}}function l(e,t){return[...t.entries()].flatMap(([t,n])=>{let r=n.find(t=>t.name===e);if(!r)return[];let{platform:i,mode:a}=c(t);return[{platform:i,mode:a,hex:r.value,primitive:r.name,palette:r.name.split(`.`)[0]??r.name}]})}function u(e){let t=([...e.values()][0]??[])[0];if(!t)return null;let n=l(t.name,e);return i({canonicalName:`color.${t.name}`,outputTokenName:t.name,resolvedValues:n})}function d(e){return e.replaceAll(`&`,`&amp;`).replaceAll(`<`,`&lt;`).replaceAll(`>`,`&gt;`).replaceAll(`"`,`&quot;`).replaceAll(`'`,`&#39;`)}function f(e){if(!e)return``;let t=[];return e.summary&&t.push(`<div class="td-doc-summary">${d(e.summary)}</div>`),e.usage&&t.push(`<div class="td-doc-meta"><span class="td-doc-label">Usage</span>${d(e.usage)}</div>`),e.design&&t.push(`<div class="td-doc-meta"><span class="td-doc-label">Design</span>${d(e.design)}</div>`),t.length>0?`<div class="td-token-docs">${t.join(``)}</div>`:``}function p(e){let t=parseInt(e.slice(1,3),16),n=parseInt(e.slice(3,5),16),r=parseInt(e.slice(5,7),16);return(t*299+n*587+r*114)/1e3>140}function m(e){return`
     <div class="swatch-strip">
-      ${e.map(e=>{let t=s(e.value.slice(0,7));return`
+      ${e.map(e=>{let t=p(e.value.slice(0,7));return`
           <div class="strip-segment" style="background:${e.value};">
             <div class="strip-label" style="color:${t?`rgba(0,0,0,0.6)`:`rgba(255,255,255,0.8)`}; background:${t?`rgba(255,255,255,0.12)`:`rgba(0,0,0,0.2)`};">
               ${e.value.slice(0,9).toUpperCase()}
@@ -14,7 +14,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
           </div>
         `}).join(``)}
     </div>
-  `}function l(e){return`
+  `}function h(e){return`
     <table class="token-table">
       <thead>
         <tr>
@@ -24,7 +24,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
         </tr>
       </thead>
       <tbody>
-        ${e.map(e=>{let t=o(e.docs);return`
+        ${e.map(e=>{let t=f(e.docs);return`
           <tr class="token-row${t?` has-docs`:``}">
             <td class="td-swatch">
               <span class="swatch-chip" style="background:${e.value};"></span>
@@ -40,28 +40,28 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
         `}).join(``)}
       </tbody>
     </table>
-  `}function u(e,t){return`
+  `}function g(e,t){return`
     <div class="group-header">
       <span class="group-pip"></span>
       <span class="group-name">${e}</span>
       <span class="group-rule"></span>
     </div>
-    ${c(t)}
-    ${l(t)}
-  `}function d(e,t,n){return`
+    ${m(t)}
+    ${h(t)}
+  `}function _(e,t,n){return`
     <div class="section-header">
       <span class="section-label">${e}</span>
       <span class="section-title">${t}</span>
       <span class="section-count">${n} tokens</span>
     </div>
-  `}function f(...e){return`
+  `}function v(...e){return`
     <nav class="breadcrumb">
       ${e.map((t,n)=>{let r=n===e.length-1;return`
           <span class="bc-segment${r?` bc-current`:``}">${t}</span>
           ${r?``:`<span class="bc-sep">/</span>`}
         `}).join(``)}
     </nav>
-  `}function p(e,t){let n=[...e.keys()].sort();if(n.length===0)return``;let r=new Set;for(let n of e.values())n.filter(t).forEach(e=>r.add(e.name));let i=[...r].sort();return i.length===0?``:`
+  `}function y(e,t){let n=[...e.keys()].sort();if(n.length===0)return``;let r=new Set;for(let n of e.values())n.filter(t).forEach(e=>r.add(e.name));let i=[...r].sort();return i.length===0?``:`
     <table class="compare-table">
       <thead>
         <tr>
@@ -87,12 +87,12 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
       </tr>
     `).join(``)}</tbody>
     </table>
-  `}function m(e,t,n,r){let i=[...n.keys()].sort();return i.length===0?``:`
+  `}function b(e,t,n,r){let i=[...n.keys()].sort();return i.length===0?``:`
     <div data-tabs-scope="${e}">
       <div class="mode-tabs">${i.map((e,t)=>`<button class="mode-tab${t===0?` active`:``}" data-mode="${e}">${e}</button>`).join(``)}</div>
       ${i.map((e,i)=>{let a=(n.get(e)??[]).filter(r);return`
       <div class="mode-panel${i===0?` active`:``}" data-mode="${e}">
-        ${u(t,a)}
+        ${g(t,a)}
       </div>
     `}).join(``)}
     </div>
@@ -101,8 +101,8 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
       <span class="group-name">Platform Comparison</span>
       <span class="group-rule"></span>
     </div>
-    ${p(n,r)}
-  `}var h,g,_,v,y,b,x,S,C,w;e((()=>{n(),h={title:`Tokens/Color/Primitives`},g=`
+    ${y(n,r)}
+  `}var x,S,C,w,T,E,D,O,k,A;e((()=>{n(),r(),x={title:`Tokens/Color/Primitives`},S=`
   @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;500;600;700;800&display=swap');
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -260,73 +260,73 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
     .page { padding: 2rem 1.5rem 3rem; }
     .compare-table th.mode-col:nth-child(n+4), .compare-table td.mode-val:nth-child(n+4) { display: none; }
   }
-`,_={name:`Neutral / Warm Grey`,render:i(async()=>{let e=await t(),n=e=>e.name.includes(`warm-grey`),r=([...e.values()][0]??[]).filter(n).length;return`
-      <style>${g}</style>
+`,C={name:`Neutral / Warm Grey`,render:o(async()=>{let e=await t(),n=e=>e.name.includes(`warm-grey`),r=([...e.values()][0]??[]).filter(n).length;return`
+      <style>${S}</style>
       <div class="page">
-        ${f(`Cedar Tokens`,`Color`,`Primitives`,`Neutral / Warm Grey`)}
-        ${d(`Neutral Colors`,`Warm Grey`,r)}
-        ${m(`wg-tabs`,`Warm Grey Scale`,e,n)}
+        ${v(`Cedar Tokens`,`Color`,`Primitives`,`Neutral / Warm Grey`)}
+        ${_(`Neutral Colors`,`Warm Grey`,r)}
+        ${b(`wg-tabs`,`Warm Grey Scale`,e,n)}
       </div>
-    `})},v={name:`Neutral / Base Neutrals`,render:i(async()=>{let e=await t(),n=e=>e.name.includes(`base-neutrals`),r=([...e.values()][0]??[]).filter(n).length;return`
-      <style>${g}</style>
+    `})},w={name:`Neutral / Base Neutrals`,render:o(async()=>{let e=await t(),n=e=>e.name.includes(`base-neutrals`),r=([...e.values()][0]??[]).filter(n).length;return`
+      <style>${S}</style>
       <div class="page">
-        ${f(`Cedar Tokens`,`Color`,`Primitives`,`Neutral / Base Neutrals`)}
-        ${d(`Neutral Colors`,`Base Neutrals`,r)}
-        ${m(`bn-tabs`,`Base Neutrals`,e,n)}
+        ${v(`Cedar Tokens`,`Color`,`Primitives`,`Neutral / Base Neutrals`)}
+        ${_(`Neutral Colors`,`Base Neutrals`,r)}
+        ${b(`bn-tabs`,`Base Neutrals`,e,n)}
       </div>
-    `})},y={name:`Brand / Blue`,render:i(async()=>{let e=await t(),n=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.blue`),r=([...e.values()][0]??[]).filter(n).length;return`
-      <style>${g}</style>
+    `})},T={name:`Brand / Blue`,render:o(async()=>{let e=await t(),n=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.blue`),r=([...e.values()][0]??[]).filter(n).length;return`
+      <style>${S}</style>
       <div class="page">
-        ${f(`Cedar Tokens`,`Color`,`Primitives`,`Brand / Blue`)}
-        ${d(`Brand Colors`,`Blue`,r)}
-        ${m(`blue-tabs`,`Blue Scale`,e,n)}
+        ${v(`Cedar Tokens`,`Color`,`Primitives`,`Brand / Blue`)}
+        ${_(`Brand Colors`,`Blue`,r)}
+        ${b(`blue-tabs`,`Blue Scale`,e,n)}
       </div>
-    `})},b={name:`Brand / Red`,render:i(async()=>{let e=await t(),n=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.red`),r=([...e.values()][0]??[]).filter(n).length;return`
-      <style>${g}</style>
+    `})},E={name:`Brand / Red`,render:o(async()=>{let e=await t(),n=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.red`),r=([...e.values()][0]??[]).filter(n).length;return`
+      <style>${S}</style>
       <div class="page">
-        ${f(`Cedar Tokens`,`Color`,`Primitives`,`Brand / Red`)}
-        ${d(`Brand Colors`,`Red`,r)}
-        ${m(`red-tabs`,`Red Scale`,e,n)}
+        ${v(`Cedar Tokens`,`Color`,`Primitives`,`Brand / Red`)}
+        ${_(`Brand Colors`,`Red`,r)}
+        ${b(`red-tabs`,`Red Scale`,e,n)}
       </div>
-    `})},x={name:`Brand / Green`,render:i(async()=>{let e=await t(),n=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.green`),r=([...e.values()][0]??[]).filter(n).length;return`
-      <style>${g}</style>
+    `})},D={name:`Brand / Green`,render:o(async()=>{let e=await t(),n=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.green`),r=([...e.values()][0]??[]).filter(n).length;return`
+      <style>${S}</style>
       <div class="page">
-        ${f(`Cedar Tokens`,`Color`,`Primitives`,`Brand / Green`)}
-        ${d(`Brand Colors`,`Green`,r)}
-        ${m(`green-tabs`,`Green Scale`,e,n)}
+        ${v(`Cedar Tokens`,`Color`,`Primitives`,`Brand / Green`)}
+        ${_(`Brand Colors`,`Green`,r)}
+        ${b(`green-tabs`,`Green Scale`,e,n)}
       </div>
-    `})},S={name:`Brand / Yellow`,render:i(async()=>{let e=await t(),n=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.yellow`),r=([...e.values()][0]??[]).filter(n).length;return`
-      <style>${g}</style>
+    `})},O={name:`Brand / Yellow`,render:o(async()=>{let e=await t(),n=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.yellow`),r=([...e.values()][0]??[]).filter(n).length;return`
+      <style>${S}</style>
       <div class="page">
-        ${f(`Cedar Tokens`,`Color`,`Primitives`,`Brand / Yellow`)}
-        ${d(`Brand Colors`,`Yellow`,r)}
-        ${m(`yellow-tabs`,`Yellow Scale`,e,n)}
+        ${v(`Cedar Tokens`,`Color`,`Primitives`,`Brand / Yellow`)}
+        ${_(`Brand Colors`,`Yellow`,r)}
+        ${b(`yellow-tabs`,`Yellow Scale`,e,n)}
       </div>
-    `})},C={name:`All Primitives`,render:i(async()=>{let e=await t(),n=[...e.keys()].sort(),r=[...e.values()][0]??[],i=r.length,a=e=>e.name.includes(`warm-grey`),o=e=>e.name.includes(`base-neutrals`),s=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.blue`),c=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.red`),l=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.green`),m=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.yellow`),h=r.filter(a).length+r.filter(o).length,_=r.filter(s).length+r.filter(c).length+r.filter(l).length+r.filter(m).length,v=n.map((e,t)=>`<button class="mode-tab${t===0?` active`:``}" data-mode="${e}">${e}</button>`).join(``),y=n.map((t,n)=>{let r=e.get(t)??[],i=r.filter(a),f=r.filter(o),p=r.filter(s),h=r.filter(c),g=r.filter(l),_=r.filter(m);return`
+    `})},k={name:`All Primitives`,render:o(async()=>{let e=await t(),n=[...e.keys()].sort(),r=[...e.values()][0]??[],i=r.length,a=e=>e.name.includes(`warm-grey`),o=e=>e.name.includes(`base-neutrals`),c=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.blue`),l=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.red`),d=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.green`),f=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.yellow`),p=r.filter(a).length+r.filter(o).length,m=r.filter(c).length+r.filter(l).length+r.filter(d).length+r.filter(f).length,h=n.map((e,t)=>`<button class="mode-tab${t===0?` active`:``}" data-mode="${e}">${e}</button>`).join(``),b=n.map((t,n)=>{let r=e.get(t)??[],i=r.filter(a),s=r.filter(o),u=r.filter(c),p=r.filter(l),m=r.filter(d),h=r.filter(f);return`
         <div class="mode-panel${n===0?` active`:``}" data-mode="${t}">
           <div class="token-section" style="position:relative;">
             <div class="deco-index">01</div>
-            ${d(`Neutral Colors`,`Warm Grey + Base Neutrals`,i.length+f.length)}
+            ${_(`Neutral Colors`,`Warm Grey + Base Neutrals`,i.length+s.length)}
             <div class="primitives-grid" style="margin-top:1.5rem;">
-              <div>${u(`Warm Grey`,i)}</div>
-              <div>${u(`Base Neutrals`,f)}</div>
+              <div>${g(`Warm Grey`,i)}</div>
+              <div>${g(`Base Neutrals`,s)}</div>
             </div>
           </div>
           <div class="token-section" style="position:relative;">
             <div class="deco-index">02</div>
-            ${d(`Brand Colors`,`Blue · Red · Green · Yellow`,p.length+h.length+g.length+_.length)}
+            ${_(`Brand Colors`,`Blue · Red · Green · Yellow`,u.length+p.length+m.length+h.length)}
             <div class="primitives-grid" style="margin-top:1.5rem;">
-              <div>${u(`Blue`,p)}</div>
-              <div>${u(`Red`,h)}</div>
-              <div>${u(`Green`,g)}</div>
-              <div>${u(`Yellow`,_)}</div>
+              <div>${g(`Blue`,u)}</div>
+              <div>${g(`Red`,p)}</div>
+              <div>${g(`Green`,m)}</div>
+              <div>${g(`Yellow`,h)}</div>
             </div>
           </div>
         </div>
-      `}).join(``);return`
-      <style>${g}</style>
+      `}).join(``);return s(`
+      <style>${S}</style>
       <div class="page">
-        ${f(`Cedar Tokens`,`Color`,`Primitives`)}
+        ${v(`Cedar Tokens`,`Color`,`Primitives`)}
 
         <div class="page-title-row">
           <div>
@@ -342,55 +342,55 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
         <div style="height:1.5px;background:var(--rule-heavy);margin:2rem 0;"></div>
 
         <div data-tabs-scope="all-primitives-tabs">
-          <div class="mode-tabs">${v}</div>
-          ${y}
+          <div class="mode-tabs">${h}</div>
+          ${b}
         </div>
 
         <div style="height:1.5px;background:var(--rule-heavy);margin:3.5rem 0 2.5rem;"></div>
 
-        ${d(`Cross-Platform`,`Neutral Comparison`,h)}
+        ${_(`Cross-Platform`,`Neutral Comparison`,p)}
         <div class="group-header" style="margin-top:1.5rem;">
           <span class="group-pip"></span>
           <span class="group-name">Warm Grey</span>
           <span class="group-rule"></span>
         </div>
-        ${p(e,a)}
+        ${y(e,a)}
         <div class="group-header" style="margin-top:2rem;">
           <span class="group-pip"></span>
           <span class="group-name">Base Neutrals</span>
           <span class="group-rule"></span>
         </div>
-        ${p(e,o)}
+        ${y(e,o)}
 
         <div style="height:1.5px;background:var(--rule-heavy);margin:3.5rem 0 2.5rem;"></div>
 
-        ${d(`Cross-Platform`,`Brand Comparison`,_)}
+        ${_(`Cross-Platform`,`Brand Comparison`,m)}
         <div class="group-header" style="margin-top:1.5rem;">
           <span class="group-pip"></span>
           <span class="group-name">Blue</span>
           <span class="group-rule"></span>
         </div>
-        ${p(e,s)}
+        ${y(e,c)}
         <div class="group-header" style="margin-top:2rem;">
           <span class="group-pip"></span>
           <span class="group-name">Red</span>
           <span class="group-rule"></span>
         </div>
-        ${p(e,c)}
+        ${y(e,l)}
         <div class="group-header" style="margin-top:2rem;">
           <span class="group-pip"></span>
           <span class="group-name">Green</span>
           <span class="group-rule"></span>
         </div>
-        ${p(e,l)}
+        ${y(e,d)}
         <div class="group-header" style="margin-top:2rem;">
           <span class="group-pip"></span>
           <span class="group-name">Yellow</span>
           <span class="group-rule"></span>
         </div>
-        ${p(e,m)}
+        ${y(e,f)}
       </div>
-    `})},_.parameters={..._.parameters,docs:{..._.parameters?.docs,source:{originalSource:`{
+    `,u(e))})},C.parameters={...C.parameters,docs:{...C.parameters?.docs,source:{originalSource:`{
   name: "Neutral / Warm Grey",
   render: asyncStory(async () => {
     const modesMap = await loadPrimitiveColors();
@@ -407,8 +407,9 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
         \${tabbedPaletteGroup("wg-tabs", "Warm Grey Scale", modesMap, filterFn)}
       </div>
     \`;
+    return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
   })
-}`,..._.parameters?.docs?.source}}},v.parameters={...v.parameters,docs:{...v.parameters?.docs,source:{originalSource:`{
+}`,...C.parameters?.docs?.source}}},w.parameters={...w.parameters,docs:{...w.parameters?.docs,source:{originalSource:`{
   name: "Neutral / Base Neutrals",
   render: asyncStory(async () => {
     const modesMap = await loadPrimitiveColors();
@@ -423,8 +424,9 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
         \${tabbedPaletteGroup("bn-tabs", "Base Neutrals", modesMap, filterFn)}
       </div>
     \`;
+    return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
   })
-}`,...v.parameters?.docs?.source}}},y.parameters={...y.parameters,docs:{...y.parameters?.docs,source:{originalSource:`{
+}`,...w.parameters?.docs?.source}}},T.parameters={...T.parameters,docs:{...T.parameters?.docs,source:{originalSource:`{
   name: "Brand / Blue",
   render: asyncStory(async () => {
     const modesMap = await loadPrimitiveColors();
@@ -439,8 +441,9 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
         \${tabbedPaletteGroup("blue-tabs", "Blue Scale", modesMap, filterFn)}
       </div>
     \`;
+    return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
   })
-}`,...y.parameters?.docs?.source}}},b.parameters={...b.parameters,docs:{...b.parameters?.docs,source:{originalSource:`{
+}`,...T.parameters?.docs?.source}}},E.parameters={...E.parameters,docs:{...E.parameters?.docs,source:{originalSource:`{
   name: "Brand / Red",
   render: asyncStory(async () => {
     const modesMap = await loadPrimitiveColors();
@@ -455,8 +458,9 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
         \${tabbedPaletteGroup("red-tabs", "Red Scale", modesMap, filterFn)}
       </div>
     \`;
+    return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
   })
-}`,...b.parameters?.docs?.source}}},x.parameters={...x.parameters,docs:{...x.parameters?.docs,source:{originalSource:`{
+}`,...E.parameters?.docs?.source}}},D.parameters={...D.parameters,docs:{...D.parameters?.docs,source:{originalSource:`{
   name: "Brand / Green",
   render: asyncStory(async () => {
     const modesMap = await loadPrimitiveColors();
@@ -471,8 +475,9 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
         \${tabbedPaletteGroup("green-tabs", "Green Scale", modesMap, filterFn)}
       </div>
     \`;
+    return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
   })
-}`,...x.parameters?.docs?.source}}},S.parameters={...S.parameters,docs:{...S.parameters?.docs,source:{originalSource:`{
+}`,...D.parameters?.docs?.source}}},O.parameters={...O.parameters,docs:{...O.parameters?.docs,source:{originalSource:`{
   name: "Brand / Yellow",
   render: asyncStory(async () => {
     const modesMap = await loadPrimitiveColors();
@@ -487,8 +492,9 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
         \${tabbedPaletteGroup("yellow-tabs", "Yellow Scale", modesMap, filterFn)}
       </div>
     \`;
+    return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
   })
-}`,...S.parameters?.docs?.source}}},C.parameters={...C.parameters,docs:{...C.parameters?.docs,source:{originalSource:`{
+}`,...O.parameters?.docs?.source}}},k.parameters={...k.parameters,docs:{...k.parameters?.docs,source:{originalSource:`{
   name: "All Primitives",
   render: asyncStory(async () => {
     const modesMap = await loadPrimitiveColors();
@@ -539,7 +545,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
         </div>
       \`;
     }).join("");
-    return \`
+    const page = \`
       <style>\${BASE_STYLES}</style>
       <div class="page">
         \${breadcrumb("Cedar Tokens", "Color", "Primitives")}
@@ -607,5 +613,6 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
         \${platformCompareTable(modesMap, yellowFn)}
       </div>
     \`;
+    return renderStoryWithPanel(page, buildPanelForFirstToken(modesMap));
   })
-}`,...C.parameters?.docs?.source}}},w=[`NeutralWarmGrey`,`NeutralBaseNeutrals`,`BrandBlue`,`BrandRed`,`BrandGreen`,`BrandYellow`,`AllPrimitives`]}))();export{C as AllPrimitives,y as BrandBlue,x as BrandGreen,b as BrandRed,S as BrandYellow,v as NeutralBaseNeutrals,_ as NeutralWarmGrey,w as __namedExportsOrder,h as default};
+}`,...k.parameters?.docs?.source}}},A=[`NeutralWarmGrey`,`NeutralBaseNeutrals`,`BrandBlue`,`BrandRed`,`BrandGreen`,`BrandYellow`,`AllPrimitives`]}))();export{k as AllPrimitives,T as BrandBlue,D as BrandGreen,E as BrandRed,O as BrandYellow,w as NeutralBaseNeutrals,C as NeutralWarmGrey,A as __namedExportsOrder,x as default};
