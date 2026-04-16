@@ -1,5 +1,7 @@
 import type { StoryObj, Meta } from "@storybook/html";
+import { getPlatformModeContext } from "../src/storybook/platform-mode-context";
 import { loadColorTokens, type LoadedColorToken, type TokenDocs } from "./lib/load-tokens.js";
+import { TokenOutputPanel, type TokenOutputResolvedValue } from "../src/storybook/TokenOutputPanel";
 
 type SemanticTokenArgs = Record<string, never>;
 
@@ -27,7 +29,7 @@ function wireTabSwitchers(root: HTMLElement): void {
   });
 }
 
-function asyncStory(fn: () => Promise<string>): () => HTMLElement {
+function asyncStory(fn: () => Promise<string | HTMLElement>): () => HTMLElement {
   return () => {
     const container = document.createElement("div");
     container.style.cssText = "min-height:200px;background:#f5f2eb;";
@@ -37,7 +39,12 @@ function asyncStory(fn: () => Promise<string>): () => HTMLElement {
       </div>`;
     fn()
       .then((html) => {
-        container.innerHTML = html;
+        if (typeof html === "string") {
+          container.innerHTML = html;
+        } else {
+          container.innerHTML = "";
+          container.appendChild(html);
+        }
         wireTabSwitchers(container);
       })
       .catch((err: unknown) => {
@@ -49,6 +56,72 @@ function asyncStory(fn: () => Promise<string>): () => HTMLElement {
       });
     return container;
   };
+}
+
+function renderStoryWithPanel(pageHtml: string, panel: HTMLElement | null): HTMLElement {
+  const root = document.createElement("div");
+  root.innerHTML = pageHtml;
+  if (panel) root.appendChild(panel);
+  return root;
+}
+
+function createSemanticResolvedValues(
+  key: string,
+  tokens: Map<string, LoadedColorToken>,
+  modes: string[],
+): TokenOutputResolvedValue[] {
+  const values: TokenOutputResolvedValue[] = [];
+
+  for (const mode of modes) {
+    const path = mode === "default" ? `color.${key}` : `color.modes.${mode}.${key}`;
+    const data = tokens.get(path);
+    if (!data) continue;
+
+    const palette = data.ref.split(" → ")[0] ?? data.ref;
+    const outputModes = mode === "default" ? ["light", "dark"] as const : [mode as "light" | "dark"];
+
+    for (const resolvedMode of outputModes) {
+      for (const platform of ["web", "ios"] as const) {
+        values.push({
+          platform,
+          mode: resolvedMode,
+          hex: data.hex,
+          primitive: data.ref,
+          palette,
+        });
+      }
+    }
+  }
+
+  return values;
+}
+
+function getCdrOutputTokenName(tokenKey: string): string {
+  const [category, token] = tokenKey.split(".");
+  if (!category || !token) return tokenKey;
+
+  const categoryMap: Record<string, string> = {
+    surface: "surface",
+    text: "text",
+    border: "border",
+  };
+
+  const outputCategory = categoryMap[category] ?? category;
+  return `cdr-${outputCategory}-${token}`;
+}
+
+function buildSemanticPanel(
+  tokenKey: string,
+  tokens: Map<string, LoadedColorToken>,
+  modes: string[],
+): HTMLElement | null {
+  const resolvedValues = createSemanticResolvedValues(tokenKey, tokens, modes);
+  if (resolvedValues.length === 0) return null;
+  return TokenOutputPanel({
+    canonicalName: `color.${tokenKey}`,
+    outputTokenName: getCdrOutputTokenName(tokenKey),
+    resolvedValues,
+  });
 }
 
 // ─── Design system ────────────────────────────────────────────────────────────
@@ -275,6 +348,18 @@ function renderDocs(docs?: TokenDocs): string {
 /**
  * Render a single-mode token list grid (chip · token name · ref alias · hex value).
  */
+function simplifyTokenName(key: string): string {
+  if (key.startsWith("color.modes.")) {
+    return key.replace(/^color\.modes\.[^.]+\./, "");
+  }
+
+  if (key.startsWith("color.")) {
+    return key.slice("color.".length);
+  }
+
+  return key;
+}
+
 function tokenGrid(
   tokens: Map<string, LoadedColorToken>,
   keys: string[],
@@ -290,9 +375,10 @@ function tokenGrid(
         const { hex, ref, docs } = data;
         const docsMarkup = renderDocs(docs);
         const docsClass = docsMarkup ? " has-docs" : "";
+        const tokenName = simplifyTokenName(key);
         return `
           <div class="trow-chip-wrap${docsClass}"><span class="trow-chip" style="background:${hex};"></span></div>
-          <div class="trow-token${docsClass}"><div class="trow-token-name">${key}</div></div>
+          <div class="trow-token${docsClass}"><div class="trow-token-name">${tokenName}</div></div>
           <div class="trow-ref${docsClass}">${ref}</div>
           <div class="trow-hex${docsClass}">${hex.slice(0, 9).toUpperCase()}</div>
           ${docsMarkup ? `<div class="trow-doc-full"><div></div><div class="trow-doc-body">${docsMarkup}</div></div>` : ""}
@@ -394,7 +480,8 @@ function collectModes(tokens: Map<string, LoadedColorToken>): string[] {
 export const Surface: Story = {
   name: "Surface",
   render: asyncStory(async () => {
-    const tokens = await loadColorTokens();
+    const { platform, mode } = getPlatformModeContext();
+    const tokens = await loadColorTokens(platform, mode);
     const modes = collectModes(tokens);
     const hasMultipleModes = modes.length > 1;
 
@@ -463,7 +550,7 @@ export const Surface: Story = {
       `;
     }
 
-    return `
+    const page = `
       <style>${BASE_STYLES}</style>
       <div class="page">
         ${breadcrumb("Cedar Tokens", "Color", "Semantic", "Surface")}
@@ -471,13 +558,15 @@ export const Surface: Story = {
         ${body}
       </div>
     `;
+    return renderStoryWithPanel(page, buildSemanticPanel("surface.base", tokens, modes));
   }),
 };
 
 export const Text: Story = {
   name: "Text",
   render: asyncStory(async () => {
-    const tokens = await loadColorTokens();
+    const { platform, mode } = getPlatformModeContext();
+    const tokens = await loadColorTokens(platform, mode);
     const modes = collectModes(tokens);
     const hasMultipleModes = modes.length > 1;
     const tokenNames = ["base", "subtle", "link", "link-hover"];
@@ -550,7 +639,7 @@ export const Text: Story = {
       `;
     }
 
-    return `
+    const page = `
       <style>${BASE_STYLES}</style>
       <div class="page">
         ${breadcrumb("Cedar Tokens", "Color", "Semantic", "Text")}
@@ -558,13 +647,15 @@ export const Text: Story = {
         ${body}
       </div>
     `;
+    return renderStoryWithPanel(page, buildSemanticPanel("text.base", tokens, modes));
   }),
 };
 
 export const Border: Story = {
   name: "Border",
   render: asyncStory(async () => {
-    const tokens = await loadColorTokens();
+    const { platform, mode } = getPlatformModeContext();
+    const tokens = await loadColorTokens(platform, mode);
     const modes = collectModes(tokens);
     const hasMultipleModes = modes.length > 1;
     const tokenNames = ["base", "subtle"];
@@ -649,7 +740,7 @@ export const Border: Story = {
       `;
     }
 
-    return `
+    const page = `
       <style>${BASE_STYLES}</style>
       <div class="page">
         ${breadcrumb("Cedar Tokens", "Color", "Semantic", "Border")}
@@ -657,13 +748,15 @@ export const Border: Story = {
         ${body}
       </div>
     `;
+    return renderStoryWithPanel(page, buildSemanticPanel("border.base", tokens, modes));
   }),
 };
 
 export const AllSemantic: Story = {
   name: "All Semantic Tokens",
   render: asyncStory(async () => {
-    const tokens = await loadColorTokens();
+    const { platform, mode } = getPlatformModeContext();
+    const tokens = await loadColorTokens(platform, mode);
     const modes = collectModes(tokens);
     const semanticTokenCount = tokens.size;
 
@@ -762,7 +855,7 @@ export const AllSemantic: Story = {
       `;
     }).join("");
 
-    return `
+    const page = `
       <style>${BASE_STYLES}</style>
       <div class="page">
         ${breadcrumb("Cedar Tokens", "Color", "Semantic")}
@@ -789,5 +882,6 @@ export const AllSemantic: Story = {
         ${modeSections}
       </div>
     `;
+    return renderStoryWithPanel(page, buildSemanticPanel("surface.base", tokens, modes));
   }),
 };

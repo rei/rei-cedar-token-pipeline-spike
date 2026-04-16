@@ -1,5 +1,6 @@
 import type { StoryObj, Meta } from "@storybook/html";
 import { loadPrimitiveColors, type PrimitiveColorToken, type TokenDocs } from "./lib/load-tokens.js";
+import { TokenOutputPanel, type TokenOutputResolvedValue } from "../src/storybook/TokenOutputPanel";
 
 type ColorSwatchArgs = Record<string, never>;
 
@@ -29,7 +30,7 @@ function wireTabSwitchers(root: HTMLElement): void {
 
 // ─── Async story wrapper ──────────────────────────────────────────────────────
 
-function asyncStory(fn: () => Promise<string>): () => HTMLElement {
+function asyncStory(fn: () => Promise<string | HTMLElement>): () => HTMLElement {
   return () => {
     const container = document.createElement("div");
     container.style.cssText = "min-height:200px;background:#f5f2eb;";
@@ -39,7 +40,12 @@ function asyncStory(fn: () => Promise<string>): () => HTMLElement {
       </div>`;
     fn()
       .then((html) => {
-        container.innerHTML = html;
+        if (typeof html === "string") {
+          container.innerHTML = html;
+        } else {
+          container.innerHTML = "";
+          container.appendChild(html);
+        }
         wireTabSwitchers(container);
       })
       .catch((err: unknown) => {
@@ -51,6 +57,69 @@ function asyncStory(fn: () => Promise<string>): () => HTMLElement {
       });
     return container;
   };
+}
+
+function renderStoryWithPanel(pageHtml: string, panel: HTMLElement | null): HTMLElement {
+  const root = document.createElement("div");
+  root.innerHTML = pageHtml;
+  if (panel) root.appendChild(panel);
+  return root;
+}
+
+type PlatformMode = { platform: "web" | "ios"; mode: "light" | "dark" };
+
+function parsePlatformModeName(modeName: string): PlatformMode {
+  if (modeName.startsWith("ios-")) {
+    return { platform: "ios", mode: modeName.slice(4) as "light" | "dark" };
+  }
+  if (modeName.startsWith("web-")) {
+    return { platform: "web", mode: modeName.slice(4) as "light" | "dark" };
+  }
+  if (modeName === "light" || modeName === "dark") {
+    return { platform: "web", mode: modeName };
+  }
+  return { platform: "web", mode: "light" };
+}
+
+function createResolvedValuesForToken(tokenName: string, modesMap: Map<string, Swatch[]>): TokenOutputResolvedValue[] {
+  return [...modesMap.entries()].flatMap(([modeName, modeTokens]) => {
+    const token = modeTokens.find((s) => s.name === tokenName);
+    if (!token) return [];
+    const { platform, mode } = parsePlatformModeName(modeName);
+    return [{
+      platform,
+      mode,
+      hex: token.value,
+      primitive: token.name,
+      palette: token.name.split(".")[0] ?? token.name,
+    }];
+  });
+}
+
+function buildStoryPanel(modesMap: Map<string, Swatch[]>, filterFn: (s: Swatch) => boolean): HTMLElement | null {
+  const firstMode = [...modesMap.values()][0] ?? [];
+  const representative = firstMode.find(filterFn);
+  if (!representative) return null;
+
+  const resolvedValues = createResolvedValuesForToken(representative.name, modesMap);
+  return TokenOutputPanel({
+    canonicalName: `color.${representative.name}`,
+    outputTokenName: representative.name,
+    resolvedValues,
+  });
+}
+
+function buildPanelForFirstToken(modesMap: Map<string, Swatch[]>): HTMLElement | null {
+  const firstMode = [...modesMap.values()][0] ?? [];
+  const representative = firstMode[0];
+  if (!representative) return null;
+
+  const resolvedValues = createResolvedValuesForToken(representative.name, modesMap);
+  return TokenOutputPanel({
+    canonicalName: `color.${representative.name}`,
+    outputTokenName: representative.name,
+    resolvedValues,
+  });
 }
 
 // ─── Shared design system ─────────────────────────────────────────────────────
@@ -459,6 +528,7 @@ export const NeutralWarmGrey: Story = {
         ${tabbedPaletteGroup("wg-tabs", "Warm Grey Scale", modesMap, filterFn)}
       </div>
     `;
+    return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
   }),
 };
 
@@ -479,6 +549,7 @@ export const NeutralBaseNeutrals: Story = {
         ${tabbedPaletteGroup("bn-tabs", "Base Neutrals", modesMap, filterFn)}
       </div>
     `;
+    return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
   }),
 };
 
@@ -499,6 +570,7 @@ export const BrandBlue: Story = {
         ${tabbedPaletteGroup("blue-tabs", "Blue Scale", modesMap, filterFn)}
       </div>
     `;
+    return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
   }),
 };
 
@@ -519,6 +591,7 @@ export const BrandRed: Story = {
         ${tabbedPaletteGroup("red-tabs", "Red Scale", modesMap, filterFn)}
       </div>
     `;
+    return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
   }),
 };
 
@@ -539,6 +612,7 @@ export const BrandGreen: Story = {
         ${tabbedPaletteGroup("green-tabs", "Green Scale", modesMap, filterFn)}
       </div>
     `;
+    return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
   }),
 };
 
@@ -559,6 +633,7 @@ export const BrandYellow: Story = {
         ${tabbedPaletteGroup("yellow-tabs", "Yellow Scale", modesMap, filterFn)}
       </div>
     `;
+    return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
   }),
 };
 
@@ -621,7 +696,7 @@ export const AllPrimitives: Story = {
       `;
     }).join("");
 
-    return `
+    const page = `
       <style>${BASE_STYLES}</style>
       <div class="page">
         ${breadcrumb("Cedar Tokens", "Color", "Primitives")}
@@ -689,5 +764,6 @@ export const AllPrimitives: Story = {
         ${platformCompareTable(modesMap, yellowFn)}
       </div>
     `;
+    return renderStoryWithPanel(page, buildPanelForFirstToken(modesMap));
   }),
 };

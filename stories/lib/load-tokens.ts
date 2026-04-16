@@ -17,12 +17,16 @@
  *   spacing.layout.sm    → { $value: "{spacing.scale.-250}", $type: "number" } (alias)
  */
 
+import type { Platform, Mode } from "../../src/storybook/platform-mode-context";
+
 interface TokenLeaf {
   $value: string;
   $type: string;
   $extensions?: {
     cedar?: {
       docs?: TokenDocs;
+      appearances?: Record<string, string>;
+      platformOverrides?: Record<string, Record<string, string>>;
     };
   };
 }
@@ -55,7 +59,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
  * Returns a map of token paths to their hex values, keyed as
  * "color.modes.<mode>.<category>.<token>".
  */
-export async function loadColorTokens(): Promise<
+export async function loadColorTokens(
+  platform: Platform = "web",
+  mode: Mode = "light",
+): Promise<
   Map<string, LoadedColorToken>
 > {
   const base = window.location.pathname.replace(/\/[^/]*$/, "/");
@@ -74,7 +81,7 @@ export async function loadColorTokens(): Promise<
   const modesSection = colorSection["modes"] as Record<string, unknown> | undefined;
   if (modesSection) {
     // Multi-mode: color.modes.<mode>.<category>.<token>
-    for (const [mode, modeTokens] of Object.entries(modesSection)) {
+    for (const [modeName, modeTokens] of Object.entries(modesSection)) {
       if (typeof modeTokens !== "object" || modeTokens === null) continue;
       const semanticCategories = ["text", "surface", "border"];
       for (const category of semanticCategories) {
@@ -85,8 +92,8 @@ export async function loadColorTokens(): Promise<
         for (const [key, value] of Object.entries(group)) {
           if (isLeaf(value)) {
             const leaf = value as TokenLeaf;
-            const resolvedHex = resolveAlias(leaf.$value, colorSection);
-            result.set(`color.modes.${mode}.${category}.${key}`, {
+            const resolvedHex = resolveAlias(leaf.$value, colorSection, platform, mode);
+            result.set(`color.modes.${modeName}.${category}.${key}`, {
               hex: resolvedHex || leaf.$value,
               ref: buildRef(leaf.$value),
               docs: leaf.$extensions?.cedar?.docs,
@@ -104,7 +111,7 @@ export async function loadColorTokens(): Promise<
       for (const [key, value] of Object.entries(group)) {
         if (isLeaf(value)) {
           const leaf = value as TokenLeaf;
-          const resolvedHex = resolveAlias(leaf.$value, colorSection);
+          const resolvedHex = resolveAlias(leaf.$value, colorSection, platform, mode);
           result.set(`color.${category}.${key}`, {
             hex: resolvedHex || leaf.$value,
             ref: buildRef(leaf.$value),
@@ -351,6 +358,9 @@ function flattenTokens(
 function resolveAlias(
   alias: string,
   colorSection: Record<string, unknown>,
+  platform: Platform,
+  mode: Mode,
+  seen = new Set<string>(),
 ): string | null {
   // Extract the token path from {color.neutral-palette.blue.600} or {neutral-palette.blue.600}
   const match = alias.match(/^{(?:color\.)?(.+)}$/);
@@ -367,11 +377,36 @@ function resolveAlias(
     }
   }
 
-  if (isLeaf(node)) {
-    return node.$value;
+  if (!isLeaf(node)) return null;
+  return resolveLeafValue(node as TokenLeaf, colorSection, platform, mode, seen);
+}
+
+function resolveLeafValue(
+  leaf: TokenLeaf,
+  colorSection: Record<string, unknown>,
+  platform: Platform,
+  mode: Mode,
+  seen: Set<string>,
+): string | null {
+  const rawValue = leaf.$value;
+
+  if (typeof rawValue === "string" && rawValue.startsWith("{") && rawValue.endsWith("}")) {
+    if (seen.has(rawValue)) return null;
+    seen.add(rawValue);
+    return resolveAlias(rawValue, colorSection, platform, mode, seen);
   }
 
-  return null;
+  const cedar = leaf.$extensions?.cedar;
+  const platformOverride = cedar?.platformOverrides?.[platform]?.[mode];
+  if (typeof platformOverride === "string") {
+    return platformOverride;
+  }
+
+  if (mode === "dark" && typeof cedar?.appearances?.dark === "string") {
+    return cedar.appearances.dark;
+  }
+
+  return typeof rawValue === "string" ? rawValue : null;
 }
 
 function buildRef(alias: string): string {
