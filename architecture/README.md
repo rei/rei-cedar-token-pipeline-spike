@@ -30,7 +30,7 @@ It serves as the single entry point for diagrams, ADRs, and technical notes that
 | **[ADR‑0007](./ADR/adr-0007-mode-and-theme.md)** | Modes and Palettes | Proposed | Defines mode architecture (light/dark/high-contrast) and palette architecture. Updated with spike findings on how appearances actually work in the pipeline (option token `appearances.dark` vs Figma mode axis). |
 | **[ADR‑0008](./ADR/adr-0008-responsive-adaptive-tokens.md)** | Responsive and Adaptive Tokens | Proposed | Defines breakpoint tokens, fluid spacing, fluid typography, container query tokens, and density tokens. |
 | **[ADR‑0009](./ADR/adr-0009-accessibility-requirements.md)** | Accessibility Requirements | Proposed | Embeds WCAG 2.2 Level AA requirements into the token system: focus indicators, touch targets, color contrast, high contrast mode, motion preferences. |
-| **[ADR‑0010](./ADR/adr-0010-token-documentation-architecture.md)** | Token Documentation Architecture | Implemented | Defines token documentation architecture and delivery approach for Cedar docs. |
+| **[ADR‑0010](./ADR/adr-0010-token-documentation-architecture.md)** | Token Documentation Architecture | Implemented | Defines split-authority token docs architecture: Figma docs plus repo-owned governance metadata merged in canonical. |
 | **[ADR‑0011](./ADR/adr-0011-hybrid-alias-resolution.md)** | Hybrid Alias Resolution | Accepted | Adopts hybrid alias refs plus `$extensions.cedar.resolved` values with normalization input validation. |
 
 ---
@@ -41,6 +41,9 @@ It serves as the single entry point for diagrams, ADRs, and technical notes that
 |---|---|---|
 | `canonical/tokens.json` | `canonical/tokens.json` | The single source of truth. Produced by `normalize.ts`, consumed by Style Dictionary. |
 | `token-schema.json` | `src/schema/token-schema.json` | Governed Figma→canonical path mapping and contract source. Required for build. Requires design + engineering review to change. |
+| `metadata/tokens.json` | `metadata/tokens.json` | Repo-owned governance metadata keyed by canonical token path (status, badges, usage, deprecation, used-by). |
+| `merge-metadata.ts` | `src/normalization/merge-metadata.ts` | Normalization merge step that attaches metadata into `$extensions.cedar.governance`. |
+| `validate-metadata.ts` | `src/normalization/validate-metadata.ts` | Validation checks for unreviewed, orphaned, and incomplete governance metadata. |
 | `dist/themes/rei-dot-com/css/light.css` | `dist/themes/rei-dot-com/css/light.css` | Web light appearance CSS custom properties. |
 | `dist/themes/rei-dot-com/css/dark.css` | `dist/themes/rei-dot-com/css/dark.css` | Web dark appearance CSS custom properties. |
 | `dist/themes/rei-dot-com/ios/Colors.xcassets` | `dist/themes/rei-dot-com/ios/` | Xcode color asset catalog with Display P3 light/dark pairs. |
@@ -74,6 +77,7 @@ It serves as the single entry point for diagrams, ADRs, and technical notes that
 4. Read **ADR‑0003** for the Figma input contract and governance process.
 5. Read **ADR‑0005** (including the SD v5 constraints section) before writing any Style Dictionary transforms or actions.
 6. Read **ADR‑0011** and the governance notes before changing alias resolution or platform output behavior.
+7. Read **ADR‑0010** before changing token docs, metadata authority boundaries, or governance merge behavior.
 
 ---
 

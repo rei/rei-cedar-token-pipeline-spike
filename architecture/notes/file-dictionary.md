@@ -28,8 +28,10 @@ These owner groups map to `.github/CODEOWNERS` patterns.
 |---|---|---|---|---|
 | `src/schema/token-schema.json` | Figma to canonical contract | Collection mappings and schema contract used by normalization | Require design + engineering review; no silent path remaps | Design + Engineering |
 | `canonical/tokens.json` | Canonical token source of truth | Normalized token graph consumed by Style Dictionary | Only changed by normalization/build; avoid manual edits | Design + Engineering |
+| `metadata/tokens.json` | Governance metadata contract | Repo-owned token lifecycle metadata keyed by canonical path | Require design + engineering review; no silent status or deprecation changes | Design + Engineering |
 | `architecture/ADR/*.md` | Architectural decisions | Decision records, constraints, and migration intent | Update ADR status and rationale with behavior changes | Design + Engineering |
 | `src/types/canonical-token.ts` | Canonical typing contract | Type definitions for canonical token structures | Keep aligned with canonical shape and ADR-0001 | Engineering |
+| `src/types/token-metadata.ts` | Metadata typing contract | Type definitions for governance metadata manifest and fields | Keep aligned with ADR-0010 and canonical metadata shape | Engineering |
 | `src/types.d.ts` | Global token typing surface | Token and extension typing including cedar metadata | Keep backward compatibility explicit in PR notes | Engineering |
 
 ## Tier 2: Build and Transformation Logic
@@ -38,7 +40,9 @@ These owner groups map to `.github/CODEOWNERS` patterns.
 |---|---|---|---|---|
 | `src/normalization/normalize.ts` | Normalization orchestrator | End-to-end ingestion to canonical flow | Changes require snapshot or test verification | Engineering |
 | `src/normalization/normalize-utils.ts` | Normalization helpers | Mapping, cleaning, and path conversion helpers | Keep deterministic and side-effect free | Engineering |
+| `src/normalization/merge-metadata.ts` | Metadata merge step | Canonical leaf traversal and merge into `$extensions.cedar.governance` | Preserve docs/governance authority boundaries; no silent overwrite behavior | Engineering |
 | `src/normalization/normalize-validation.ts` | Input contract validation | Warnings/errors for file and mapping consistency | New checks should include actionable error text | Engineering |
+| `src/normalization/validate-metadata.ts` | Governance validation | Validation of unreviewed, orphaned, and incomplete metadata entries | Keep strict/non-strict behavior explicit and documented in PR | Engineering |
 | `src/normalization/color-variants.ts` | Color merge and resolved values | Appearance/platform merge and alias resolved stamping | Preserve precedence rules and test coverage | Engineering |
 | `style-dictionary/build.ts` | SD build entrypoint | Registration and execution of platform builds | Keep config references stable | Engineering |
 | `style-dictionary/configs/web.ts` | Web build config | Platform filters and output settings for CSS | Validate outputs in `dist/themes/rei-dot-com/css` after edits | Engineering |
