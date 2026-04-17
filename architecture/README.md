@@ -32,6 +32,8 @@ It serves as the single entry point for diagrams, ADRs, and technical notes that
 | **[ADR‑0009](./ADR/adr-0009-accessibility-requirements.md)** | Accessibility Requirements | Proposed | Embeds WCAG 2.2 Level AA requirements into the token system: focus indicators, touch targets, color contrast, high contrast mode, motion preferences. |
 | **[ADR‑0010](./ADR/adr-0010-token-documentation-architecture.md)** | Token Documentation Architecture | Implemented | Defines split-authority token docs architecture: Figma docs plus repo-owned governance metadata merged in canonical. |
 | **[ADR‑0011](./ADR/adr-0011-hybrid-alias-resolution.md)** | Hybrid Alias Resolution | Accepted | Adopts hybrid alias refs plus `$extensions.cedar.resolved` values with normalization input validation. |
+| **[ADR‑0012](./ADR/adr-0012-ai-agent-grounding-strategy.md)** | AI Agent Grounding Strategy | Draft | Defines how AI coding agents are grounded to architectural decisions via the ADR catalog, `@enforces` test annotations, and extended `copilot-instructions.md`. |
+| **[ADR‑0013](./ADR/adr-0013-consumer-token-context-surface.md)** | Consumer Token Context Surface | Draft | Defines a distilled machine-readable `agent-context.json` artifact published alongside token outputs to ground consumer agents on enforced constraints. |
 
 ---
 
