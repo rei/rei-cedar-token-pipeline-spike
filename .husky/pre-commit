@@ -1,2 +1,3 @@
 pnpm lint-staged
+pnpm docs:adr:catalog && git add architecture/adr-catalog.json
 pnpm check:canonical

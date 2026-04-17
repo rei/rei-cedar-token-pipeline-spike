@@ -66,4 +66,16 @@ describe("ADR machine-readable catalog contract", () => {
 
     expect(readmeLinks).toEqual(catalogLinks);
   });
+
+  it("superseded ADRs reference a replacement in relatedDocuments", () => {
+    const catalog = loadCatalogFromDisk();
+    const superseded = catalog.entries.filter((e) => e.status === "Superseded");
+
+    for (const entry of superseded) {
+      expect(
+        entry.relatedDocuments.length,
+        `${entry.fileName} is Superseded but has no relatedDocuments — add a reference to the replacing ADR`,
+      ).toBeGreaterThan(0);
+    }
+  });
 });

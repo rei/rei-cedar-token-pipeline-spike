@@ -29,3 +29,9 @@ jobs:
 
       - name: Validate canonical contract
         run: pnpm test:contract
+
+      - name: Generate ADR catalog
+        run: pnpm docs:adr:catalog
+
+      - name: Validate ADR catalog contract
+        run: pnpm test:adr

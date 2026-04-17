@@ -169,16 +169,19 @@
       "isAddendum": true,
       "sections": [
         "Status",
-        "Note"
+        "Note",
+        "Related Documents"
       ],
       "hasContext": false,
       "hasDecision": false,
       "hasConsequences": false,
-      "hasRelatedDocuments": false,
+      "hasRelatedDocuments": true,
       "context": null,
       "decision": null,
       "consequences": null,
-      "relatedDocuments": [],
+      "relatedDocuments": [
+        "ADR‑0005: Transform Layer & Platform Outputs (`adr-0005-transform-layer-and-platform-outputs.md`)"
+      ],
       "references": []
     },
     {

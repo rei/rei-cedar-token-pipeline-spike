@@ -12,3 +12,7 @@ Use:
 - Section: `SD v5 Pipeline Constraints (Normative)`
 
 This file is intentionally retained as a compatibility pointer for older links.
+
+## Related Documents
+
+- ADR‑0005: Transform Layer & Platform Outputs (`adr-0005-transform-layer-and-platform-outputs.md`)

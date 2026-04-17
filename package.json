@@ -22,7 +22,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "pnpm tokens:build && pnpm storybook:build",
+    "build": "pnpm docs:adr:catalog && pnpm tokens:build && pnpm storybook:build",
     "lint": "oxlint src",
     "format": "oxfmt --write src",
     "prepare": "husky",
