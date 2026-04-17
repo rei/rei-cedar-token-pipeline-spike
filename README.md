@@ -74,13 +74,12 @@ This repo builds Storybook separately from the published package so documentatio
 - GitHub Pages deployment is configured in `.github/workflows/deploy-storybook.yml`
 - Published token outputs remain in `dist/themes/` and `dist/types/`
 - `dist/normalized/` is used only at build time for Storybook compatibility and is excluded from package publishing
-- After merge to `main`, Storybook should be available at:
-  `https://rei.github.io/rei-cedar-token-pipeline-spike/`
+- Hosted Storybook (main): [https://rei.github.io/rei-cedar-token-pipeline-spike/](https://rei.github.io/rei-cedar-token-pipeline-spike/)
 
 ### PR Previews
 
 For pull requests, a Storybook preview is automatically built and deployed to:
-`https://rei.github.io/rei-cedar-token-pipeline-spike/pr/<branch-name>/`
+[https://rei.github.io/rei-cedar-token-pipeline-spike/pr/<branch-name>/](https://rei.github.io/rei-cedar-token-pipeline-spike/pr/<branch-name>/)
 
 The workflow posts a comment on the PR with the preview URL. This allows reviewers to see live Storybook changes before merging.
 
@@ -136,3 +135,19 @@ const docs: CdrColorTextTokenDocs = {
 Generated docs metadata JSON is available per module, for example:
 
 - `dist/themes/rei-dot-com/meta/foundations/cdr-color-text.docs.json`
+
+## Token governance metadata
+
+This repo now supports a 2-gate token publishing model:
+
+- Gate 1 (Figma): token values and alias relationships are authored in Figma and normalized into `canonical/tokens.json`
+- Gate 2 (repo metadata): governance fields are authored in `metadata/tokens.json` and merged into canonical under `$extensions.cedar.governance`
+
+Governance fields include status, badges, usage guidance, deprecation and migration notes, consumer notes, and used-by references.
+
+Normalization merges metadata automatically when `metadata/tokens.json` exists.
+
+Run metadata validation locally:
+
+- `tsx src/normalization/validate-metadata.ts`
+- `tsx src/normalization/validate-metadata.ts --strict`

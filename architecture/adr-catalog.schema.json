@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rei.github.io/rei-cedar-token-pipeline-spike/architecture/adr-catalog.schema.json",
+  "title": "ADR Catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "sourceDir", "entries"],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "sourceDir": {
+      "type": "string",
+      "const": "architecture/ADR"
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "fileName",
+          "filePath",
+          "adrSlug",
+          "adrNumber",
+          "id",
+          "title",
+          "statusRaw",
+          "status",
+          "isAddendum",
+          "sections",
+          "hasContext",
+          "hasDecision",
+          "hasConsequences",
+          "hasRelatedDocuments",
+          "context",
+          "decision",
+          "consequences",
+          "relatedDocuments",
+          "references"
+        ],
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "pattern": "^adr-\\d{4}.*\\.md$"
+          },
+          "filePath": {
+            "type": "string",
+            "pattern": "^architecture/ADR/adr-\\d{4}.*\\.md$"
+          },
+          "adrSlug": {
+            "type": "string"
+          },
+          "adrNumber": {
+            "type": "string",
+            "pattern": "^\\d{4}$"
+          },
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "statusRaw": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["Proposed", "Draft", "Planned", "Accepted", "Implemented", "Superseded"]
+          },
+          "isAddendum": {
+            "type": "boolean"
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hasContext": {
+            "type": "boolean"
+          },
+          "hasDecision": {
+            "type": "boolean"
+          },
+          "hasConsequences": {
+            "type": "boolean"
+          },
+          "hasRelatedDocuments": {
+            "type": "boolean"
+          },
+          "context": {
+            "type": ["string", "null"]
+          },
+          "decision": {
+            "type": ["string", "null"]
+          },
+          "consequences": {
+            "type": ["string", "null"]
+          },
+          "relatedDocuments": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "references": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
