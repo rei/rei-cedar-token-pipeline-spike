@@ -152,6 +152,31 @@ The `build-style-dictionary.ts` build step:
 
 Governance metadata is also emitted as docs JSON artifacts for consumers via generated module docs files.
 
+### 5. Publish-readiness validation flow
+
+Documentation and governance metadata are part of the release contract, not optional decoration. Publish readiness uses a strict gate sequence:
+
+1. Normalize and build canonical token output.
+2. Validate metadata manifest entries against canonical token paths.
+3. Fail on metadata errors and, in strict mode, fail on metadata warnings.
+4. Run contract and test suites before publish.
+
+Current publish entrypoint:
+
+`pnpm check:publish`
+
+This command runs normalize, strict metadata validation, contract tests, and full test suite before release.
+
+### 6. Schema as contract for AI and tooling
+
+`src/schema/token-schema.json` is the governed contract for token and metadata shape, not just a Figma mapping table. It must describe the merged canonical metadata model under `$extensions.cedar`, including:
+
+- `docs` metadata
+- `governance` metadata
+- `semantic` metadata
+
+AI-assisted authoring tools should use this schema to generate valid metadata payloads. Metadata files do not mutate schema automatically. Schema changes are explicit governance changes and require review.
+
 #### Generated TypeScript
 
 ```typescript
@@ -242,6 +267,7 @@ Figma token files + metadata/tokens.json
 - Semantic lifecycle data can be managed without requiring Figma support for governance fields
 - Drift risk is reduced because metadata validation can detect missing or stale governance entries
 - Figma remains design-value authority while repo metadata governs publication readiness
+- Publish failures now surface metadata quality issues before package release
 
 ---
 
@@ -285,5 +311,6 @@ The `docs` and `governance` objects may be extended:
 - [ADR-0002: Token Normalization Layer](./adr-0002-token-normalization-layer.md)
 - [ADR-0003: Figma Input Contract](./adr-0003-figma-input-contract.md)
 - [ADR-0011: Hybrid Alias Resolution](./adr-0011-hybrid-alias-resolution.md)
+- [ADR-0012: Metadata Publish Governance](./adr-0012-metadata-publish-governance.md)
 - [Adding Token Descriptions in Figma](../adding-token-descriptions.md)
 - [DTCG Specification](https://design-tokens.github.io/community-group/format/)

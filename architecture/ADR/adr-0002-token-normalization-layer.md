@@ -26,6 +26,8 @@ The Normalization Layer is a TypeScript script (`normalize.ts`) that:
 2. Processes option files via explicit path mapping (never string inference)
 3. Produces a single `canonical/tokens.json` with the canonical structure
 4. Fails loudly if any Figma token path is not declared in the mapping
+5. Validates repo-authored metadata against canonical token paths before merge
+6. Merges valid metadata under `$extensions.cedar` without overwriting Figma docs
 
 ---
 
@@ -118,6 +120,16 @@ spacing.*       — spacing tokens
 
 `color.primitives` MUST NOT appear in the output.
 
+### 8. Metadata validation and publish gates
+
+After canonical output is produced, metadata validation must confirm:
+
+- every metadata entry maps to a valid canonical token path
+- metadata grammar and governance constraints pass validation
+- publish strict mode fails on warnings and errors
+
+Release gating must run strict metadata validation and tests before package publish.
+
 ---
 
 ## Governed Invariants
@@ -130,6 +142,9 @@ spacing.*       — spacing tokens
 - Option tokens MUST NOT have top-level `$resolved` — platform data lives in `$extensions.cedar`
 - Alias tokens MUST have `$extensions.cedar.ios` and `$extensions.cedar.web` populated
 - `$extensions.cedar` path strings MUST NOT use `{ref}` brace syntax (SD resolves them)
+- Metadata manifest entries MUST reference valid canonical token paths
+- Metadata merge MUST preserve `$extensions.cedar.docs` authority from Figma
+- Publish MUST run strict metadata validation before release
 
 ### Required CI Checks (V1)
 

@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rei.com/cedar/semantic-token-metadata.schema.json",
+  "title": "Cedar semantic token metadata manifest",
+  "type": "object",
+  "required": ["tokens"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+    "tokens": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/TokenMetadata" }
+    }
+  },
+  "$defs": {
+    "Badge": {
+      "type": "object",
+      "required": ["label"],
+      "properties": {
+        "label": { "type": "string" },
+        "tone": {
+          "enum": ["stable", "experimental", "deprecated", "info", "success", "warning", "error"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "ModeValue": {
+      "type": "object",
+      "required": ["value"],
+      "properties": {
+        "value": { "type": "string" },
+        "overlay": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "Accessibility": {
+      "type": "object",
+      "properties": {
+        "minContrast": { "type": "number", "exclusiveMinimum": 0 },
+        "allowedText": { "type": "array", "items": { "type": "string" } },
+        "disallowedText": { "type": "array", "items": { "type": "string" } },
+        "allowedPairings": { "type": "array", "items": { "type": "string" } },
+        "disallowedPairings": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "Validation": {
+      "type": "object",
+      "properties": {
+        "nonBreakingChange": { "enum": ["error", "warn"] },
+        "namingGrammar": { "const": "figma-owned" },
+        "crossPlatformConsistency": { "enum": ["error", "warn"] },
+        "multiCollection": { "type": "array", "items": { "type": "string" } },
+        "requiredPlatforms": {
+          "type": "array",
+          "items": { "enum": ["web", "ios", "android", "react-native"] }
+        }
+      },
+      "additionalProperties": false
+    },
+    "TokenMetadata": {
+      "type": "object",
+      "properties": {
+        "status": { "enum": ["stable", "experimental", "deprecated", "unreviewed"] },
+        "token": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "intent": { "type": "string" },
+        "role": { "type": "string" },
+        "derivedFrom": { "type": "string" },
+        "platformMap": {
+          "type": "object",
+          "properties": {
+            "web": { "type": "string" },
+            "ios": { "type": "string" },
+            "android": { "type": "string" },
+            "react-native": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "states": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "modes": {
+          "type": "object",
+          "additionalProperties": {
+            "oneOf": [
+              { "type": "string" },
+              { "$ref": "#/$defs/ModeValue" }
+            ]
+          }
+        },
+        "accessibility": { "$ref": "#/$defs/Accessibility" },
+        "stability": { "enum": ["stable", "beta", "experimental", "deprecated"] },
+        "introducedIn": { "type": "string" },
+        "deprecatedIn": {
+          "anyOf": [
+            { "type": "string" },
+            { "type": "null" }
+          ]
+        },
+        "figmaVariableId": { "type": "string" },
+        "badges": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Badge" }
+        },
+        "usage": { "type": "string" },
+        "usedBy": { "type": "array", "items": { "type": "string" } },
+        "figma": {
+          "type": "object",
+          "properties": {
+            "collection": { "type": "string" },
+            "variable": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "validation": { "$ref": "#/$defs/Validation" },
+        "consumerNotes": { "type": "string" },
+        "lastChanged": { "type": "string" },
+        "authority": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

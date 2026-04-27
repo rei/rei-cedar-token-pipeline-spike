@@ -27,5 +27,8 @@ jobs:
       - name: Normalize tokens
         run: pnpm tokens:normalize
 
+      - name: Validate semantic metadata
+        run: pnpm tokens:validate:metadata
+
       - name: Validate canonical contract
         run: pnpm test:contract

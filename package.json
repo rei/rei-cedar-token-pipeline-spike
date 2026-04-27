@@ -32,16 +32,19 @@
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build -o storybook-static",
     "build:package": "pnpm tokens:build",
-    "release": "pnpm build:package && pnpm publish --access public",
+    "release": "pnpm check:publish && pnpm publish --access public",
     "tokens:platforms": "tsx style-dictionary/build.ts",
     "tokens:normalize": "tsx src/normalization/normalize.ts",
+    "tokens:validate:metadata": "tsx src/normalization/validate-semantic-metadata.ts",
+    "tokens:validate:metadata:strict": "tsx src/normalization/validate-semantic-metadata.ts --strict",
     "tokens:types:base": "tsx src/build/generate-base-types.ts",
     "tokens:sd": "tsx src/build/build-style-dictionary.ts",
-    "tokens:build": "pnpm tokens:normalize && pnpm tokens:types:base && pnpm tokens:sd && pnpm tokens:platforms && pnpm postbuild:normalized",
+    "tokens:build": "pnpm tokens:normalize && pnpm tokens:validate:metadata && pnpm tokens:types:base && pnpm tokens:sd && pnpm tokens:platforms && pnpm postbuild:normalized",
     "postbuild:normalized": "tsx scripts/postbuild-normalized.js",
     "tokens:validate:normalized": "tsx scripts/validate-normalized-json.ts",
-    "test:contract": "vitest run src/contract/canonical-contract.test.ts --reporter=verbose",
+    "test:contract": "vitest run src/contract/*.test.ts --reporter=verbose",
     "check:canonical": "pnpm tokens:normalize && pnpm test:contract",
+    "check:publish": "pnpm tokens:normalize && pnpm tokens:validate:metadata:strict && pnpm test:contract && pnpm test",
     "tokens:snapshot": "tsx src/snapshot.ts",
     "diff:baseline": "pnpm tokens:normalize && pnpm tokens:snapshot baseline",
     "diff:current": "pnpm tokens:normalize && pnpm tokens:snapshot current",
@@ -79,6 +82,7 @@
     "storybook": "^10.2.15",
     "style-dictionary": "^5.3.3",
     "tsx": "^4.21.0",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "yaml": "^2.8.1"
   }
 }

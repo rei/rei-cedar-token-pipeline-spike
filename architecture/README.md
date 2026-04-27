@@ -32,6 +32,7 @@ It serves as the single entry point for diagrams, ADRs, and technical notes that
 | **[ADR‑0009](./ADR/adr-0009-accessibility-requirements.md)** | Accessibility Requirements | Proposed | Embeds WCAG 2.2 Level AA requirements into the token system: focus indicators, touch targets, color contrast, high contrast mode, motion preferences. |
 | **[ADR‑0010](./ADR/adr-0010-token-documentation-architecture.md)** | Token Documentation Architecture | Implemented | Defines split-authority token docs architecture: Figma docs plus repo-owned governance metadata merged in canonical. |
 | **[ADR‑0011](./ADR/adr-0011-hybrid-alias-resolution.md)** | Hybrid Alias Resolution | Accepted | Adopts hybrid alias refs plus `$extensions.cedar.resolved` values with normalization input validation. |
+| **[ADR‑0012](./ADR/adr-0012-metadata-publish-governance.md)** | Metadata Publish Governance | Proposed | Defines contract-first metadata governance, strict publish validation gates, and schema requirements for AI-safe metadata authoring. |
 
 ---
 
@@ -43,7 +44,7 @@ It serves as the single entry point for diagrams, ADRs, and technical notes that
 | `token-schema.json` | `src/schema/token-schema.json` | Governed Figma→canonical path mapping and contract source. Required for build. Requires design + engineering review to change. |
 | `metadata/tokens.json` | `metadata/tokens.json` | Repo-owned governance metadata keyed by canonical token path (status, badges, usage, deprecation, used-by). |
 | `merge-metadata.ts` | `src/normalization/merge-metadata.ts` | Normalization merge step that attaches metadata into `$extensions.cedar.governance`. |
-| `validate-metadata.ts` | `src/normalization/validate-metadata.ts` | Validation checks for unreviewed, orphaned, and incomplete governance metadata. |
+| `validate-semantic-metadata.ts` | `src/normalization/validate-semantic-metadata.ts` | Strict metadata validation for canonical path assignment, grammar, and publish gating. |
 | `dist/themes/rei-dot-com/css/light.css` | `dist/themes/rei-dot-com/css/light.css` | Web light appearance CSS custom properties. |
 | `dist/themes/rei-dot-com/css/dark.css` | `dist/themes/rei-dot-com/css/dark.css` | Web dark appearance CSS custom properties. |
 | `dist/themes/rei-dot-com/ios/Colors.xcassets` | `dist/themes/rei-dot-com/ios/` | Xcode color asset catalog with Display P3 light/dark pairs. |
@@ -78,6 +79,40 @@ It serves as the single entry point for diagrams, ADRs, and technical notes that
 5. Read **ADR‑0005** (including the SD v5 constraints section) before writing any Style Dictionary transforms or actions.
 6. Read **ADR‑0011** and the governance notes before changing alias resolution or platform output behavior.
 7. Read **ADR‑0010** before changing token docs, metadata authority boundaries, or governance merge behavior.
+8. Read **ADR‑0012** before changing publish gates, schema metadata contract shape, or AI metadata authoring workflows.
+
+---
+
+## Metadata Governance Flow
+
+Publish-readiness metadata flow:
+
+1. Figma sync updates raw token input files
+2. Normalize to canonical (`pnpm tokens:normalize`)
+3. Validate metadata assignment and quality (`pnpm tokens:validate:metadata:strict`)
+4. Run contract and test gates (`pnpm test:contract`, `pnpm test`)
+5. Publish only if all gates pass (`pnpm check:publish`)
+
+Schema governance note:
+
+- `src/schema/token-schema.json` is a governed contract for both mapping and merged metadata shape
+- Metadata files do not auto-update schema; schema changes are explicit reviewed changes
+
+Consumer app-dev AI artifact publish checklist:
+
+1. Generate AI artifacts during token build
+2. Validate artifacts and metadata in strict mode before publish
+3. Publish machine-consumable artifacts under `dist/ai/`
+4. Include `dist/ai/**/*` in package `files`
+5. Export artifacts through package `exports` (for example `./ai/*`)
+6. Include artifact version/compatibility metadata (schema version, generatedAt, package version)
+
+Required consumer-facing AI artifacts:
+
+- `dist/ai/semantic-index.json` (flattened token lookup for agents)
+- `dist/ai/token-usage-policy.json` (do/dont/use-instead and required metadata guidance)
+- `dist/ai/instructions.json` (always-on Cedar constraints for agent execution)
+- `dist/ai/contract-meta.json` (artifact compatibility and generation metadata)
 
 ---
 

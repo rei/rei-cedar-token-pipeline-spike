@@ -1,0 +1,24 @@
+{
+  "configurations": [
+    {
+      "type": "swift",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:rei-cedar-token-pipeline-spike}/swift-app",
+      "name": "Debug CedarTokenDemo (swift-app)",
+      "target": "CedarTokenDemo",
+      "configuration": "debug",
+      "preLaunchTask": "swift: Build Debug CedarTokenDemo (swift-app)"
+    },
+    {
+      "type": "swift",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:rei-cedar-token-pipeline-spike}/swift-app",
+      "name": "Release CedarTokenDemo (swift-app)",
+      "target": "CedarTokenDemo",
+      "configuration": "release",
+      "preLaunchTask": "swift: Build Release CedarTokenDemo (swift-app)"
+    }
+  ]
+}

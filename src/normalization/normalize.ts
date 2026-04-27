@@ -68,14 +68,19 @@ import {
 } from "./normalize-utils.js";
 import { mergeColorVariants } from "./color-variants.js";
 import { reportValidationIssues, validateFigmaInputs } from "./normalize-validation.js";
-import { mergeMetadata } from "./merge-metadata.js";
-import type { TokenMetadataManifest } from "../types/token-metadata.js";
+import {
+  createSemanticTokenContract,
+  loadMetadataManifest,
+  mergeMetadata,
+  validateMetadataManifest,
+} from "./merge-metadata.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const tokensDir = path.resolve(__dirname, "../../tokens");
 const outFile = path.resolve(__dirname, "../../canonical/tokens.json");
+const semanticOutFile = path.resolve(__dirname, "../../canonical/semantic-tokens.json");
 const schemaFile = path.resolve(__dirname, "../../src/schema/token-schema.json");
-const metadataFile = path.resolve(__dirname, "../../metadata/tokens.json");
+const metadataDir = path.resolve(__dirname, "../../metadata");
 
 // ─── main ─────────────────────────────────────────────────────────────────────
 
@@ -255,21 +260,45 @@ try {
   // See philosophy: Figma owns values + alias refs, repo owns governance (status,
   // badges, deprecation, usedBy, etc.). merge-metadata.ts assembles both.
   let metadataMergedCount = 0;
-  if (fs.existsSync(metadataFile)) {
-    const metadata = JSON.parse(fs.readFileSync(metadataFile, "utf-8")) as TokenMetadataManifest;
-    metadataMergedCount = mergeMetadata(canonical, metadata);
-    console.log(`  ✓ metadata/tokens.json [governance: ${metadataMergedCount} token(s)]`);
+  const loadedMetadata = loadMetadataManifest(metadataDir);
+  if (loadedMetadata) {
+    const issues = validateMetadataManifest(canonical, loadedMetadata.manifest);
+    const errors = issues.filter((issue) => issue.severity === "error");
+    const warnings = issues.filter((issue) => issue.severity === "warn");
+
+    warnings.forEach((issue) => {
+      console.warn(`  ⊘ ${issue.code}: ${issue.message}`);
+    });
+
+    if (errors.length > 0) {
+      errors.forEach((issue) => {
+        console.error(`  ✗ ${issue.code}: ${issue.message}`);
+      });
+      throw new Error(`Semantic metadata validation failed for ${loadedMetadata.filePath}`);
+    }
+
+    metadataMergedCount = mergeMetadata(canonical, loadedMetadata.manifest);
+    console.log(
+      `  ✓ ${path.relative(path.resolve(__dirname, "../.."), loadedMetadata.filePath)} [semantic metadata: ${metadataMergedCount} token(s)]`,
+    );
   } else {
     console.log(
-      `  ⊘ metadata/tokens.json not found (optional). All tokens will be unmarked/unreviewed.`,
+      `  ⊘ metadata/tokens.{json,yaml,yml} not found (optional). Canonical semantic output will use defaults only.`,
     );
+    metadataMergedCount = mergeMetadata(canonical, { version: 1, tokens: {} });
   }
 
   // ── 6. Write canonical/tokens.json ─────────────────────────────────────────────
   fs.mkdirSync(path.dirname(outFile), { recursive: true });
   fs.writeFileSync(outFile, JSON.stringify(canonical, null, 2), "utf-8");
+  fs.writeFileSync(
+    semanticOutFile,
+    JSON.stringify(createSemanticTokenContract(canonical), null, 2),
+    "utf-8",
+  );
 
   console.log(`\nSuccessfully created: ${outFile}`);
+  console.log(`Successfully created: ${semanticOutFile}`);
   console.log(
     `  ${files.length} file(s) merged, ${Object.keys(canonical).length} top-level section(s): ${Object.keys(canonical).join(", ")}`,
   );

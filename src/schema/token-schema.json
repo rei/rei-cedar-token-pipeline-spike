@@ -128,7 +128,189 @@
           },
           "description": "Related token names (future use)."
         }
-      }
+      },
+      "additionalProperties": false
+    },
+    "TokenStatus": {
+      "type": "string",
+      "enum": ["stable", "experimental", "deprecated", "unreviewed"]
+    },
+    "TokenStability": {
+      "type": "string",
+      "enum": ["stable", "beta", "experimental", "deprecated"]
+    },
+    "TokenBadge": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "tone": {
+          "type": "string",
+          "enum": ["stable", "experimental", "deprecated", "info", "success", "warning", "error"]
+        }
+      },
+      "required": ["label"],
+      "additionalProperties": false
+    },
+    "TokenAccessibilityMetadata": {
+      "type": "object",
+      "properties": {
+        "minContrast": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "allowedText": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "disallowedText": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "allowedPairings": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "disallowedPairings": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "TokenValidationMetadata": {
+      "type": "object",
+      "properties": {
+        "nonBreakingChange": {
+          "type": "string",
+          "enum": ["error", "warn"]
+        },
+        "namingGrammar": {
+          "type": "string",
+          "enum": ["figma-owned"]
+        },
+        "crossPlatformConsistency": {
+          "type": "string",
+          "enum": ["error", "warn"]
+        },
+        "multiCollection": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "requiredPlatforms": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["web", "ios", "android", "react-native"]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "TokenDeprecationMetadata": {
+      "type": "object",
+      "properties": {
+        "removedIn": { "type": "string" },
+        "migrateToToken": { "type": "string" },
+        "reason": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "GovernanceMetadata": {
+      "description": "Repo-authored governance metadata merged into canonical at $extensions.cedar.governance.",
+      "type": "object",
+      "properties": {
+        "status": { "$ref": "#/$defs/TokenStatus" },
+        "token": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "intent": { "type": "string" },
+        "role": { "type": "string" },
+        "derivedFrom": { "type": "string", "pattern": "^[a-z0-9]+(?:[-.][a-z0-9]+)*$" },
+        "platformMap": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "web": { "type": "string" },
+            "ios": { "type": "string" },
+            "android": { "type": "string" },
+            "react-native": { "type": "string" }
+          }
+        },
+        "states": {
+          "type": "object",
+          "additionalProperties": { "type": "string", "pattern": "^[a-z0-9]+(?:[-.][a-z0-9]+)*$" }
+        },
+        "modes": {
+          "type": "object",
+          "additionalProperties": {
+            "oneOf": [
+              { "type": "string" },
+              {
+                "type": "object",
+                "properties": {
+                  "value": { "type": "string" },
+                  "overlay": { "type": "string" }
+                },
+                "required": ["value"],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "accessibility": { "$ref": "#/$defs/TokenAccessibilityMetadata" },
+        "stability": { "$ref": "#/$defs/TokenStability" },
+        "introducedIn": { "type": "string" },
+        "deprecatedIn": {
+          "oneOf": [{ "type": "string" }, { "type": "null" }]
+        },
+        "figmaVariableId": { "type": "string" },
+        "badges": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/TokenBadge" }
+        },
+        "usage": { "type": "string" },
+        "deprecation": { "$ref": "#/$defs/TokenDeprecationMetadata" },
+        "usedBy": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "figma": {
+          "type": "object",
+          "properties": {
+            "collection": { "type": "string" },
+            "variable": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "validation": { "$ref": "#/$defs/TokenValidationMetadata" },
+        "consumerNotes": { "type": "string" },
+        "lastChanged": { "type": "string" },
+        "authority": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "SemanticMetadata": {
+      "description": "Derived semantic contract entry attached at $extensions.cedar.semantic.",
+      "allOf": [
+        { "$ref": "#/$defs/GovernanceMetadata" },
+        {
+          "type": "object",
+          "properties": {
+            "token": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+            "canonicalPath": { "type": "string" },
+            "value": {
+              "type": ["string", "number", "boolean"]
+            },
+            "type": { "type": "string" },
+            "alias": { "type": "string" },
+            "docs": { "$ref": "#/$defs/DocMetadata" },
+            "status": { "$ref": "#/$defs/TokenStatus" },
+            "stability": { "$ref": "#/$defs/TokenStability" }
+          },
+          "required": ["token", "canonicalPath", "value", "type", "status", "stability"],
+          "additionalProperties": false
+        }
+      ]
     },
     "CedarTokenExtension": {
       "description": "Cedar-specific token metadata including documentation, platform governance, and semantic mapping.",
@@ -150,8 +332,15 @@
             "type": "object"
           },
           "description": "Platform-specific value overrides for option tokens"
+        },
+        "governance": {
+          "$ref": "#/$defs/GovernanceMetadata"
+        },
+        "semantic": {
+          "$ref": "#/$defs/SemanticMetadata"
         }
-      }
+      },
+      "additionalProperties": true
     },
     "TokenExtensions": {
       "description": "Optional extension namespaces for a token.",
