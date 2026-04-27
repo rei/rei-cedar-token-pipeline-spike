@@ -15,6 +15,32 @@ export type TokenType = "color" | "number" | "string" | "boolean" | "fluid";
  */
 export type TokenValue = string | number | boolean;
 /**
+ * This interface was referenced by `CedarTokenSchema`'s JSON-Schema
+ * via the `definition` "TokenStatus".
+ */
+export type TokenStatus = "stable" | "experimental" | "deprecated" | "unreviewed";
+/**
+ * This interface was referenced by `CedarTokenSchema`'s JSON-Schema
+ * via the `definition` "TokenStability".
+ */
+export type TokenStability = "stable" | "beta" | "experimental" | "deprecated";
+/**
+ * Derived semantic contract entry attached at $extensions.cedar.semantic.
+ *
+ * This interface was referenced by `CedarTokenSchema`'s JSON-Schema
+ * via the `definition` "SemanticMetadata".
+ */
+export type SemanticMetadata = GovernanceMetadata & {
+  token: string;
+  canonicalPath: string;
+  value: string | number | boolean;
+  type: string;
+  alias?: string;
+  docs?: DocMetadata;
+  status: TokenStatus;
+  stability: TokenStability;
+};
+/**
  * A leaf design token.
  *
  * This interface was referenced by `CedarTokenSchema`'s JSON-Schema
@@ -101,7 +127,92 @@ export interface DocMetadata {
    * Related token names (future use).
    */
   aliases?: string[];
-  [k: string]: unknown;
+}
+/**
+ * This interface was referenced by `CedarTokenSchema`'s JSON-Schema
+ * via the `definition` "TokenBadge".
+ */
+export interface TokenBadge {
+  label: string;
+  tone?: "stable" | "experimental" | "deprecated" | "info" | "success" | "warning" | "error";
+}
+/**
+ * This interface was referenced by `CedarTokenSchema`'s JSON-Schema
+ * via the `definition` "TokenAccessibilityMetadata".
+ */
+export interface TokenAccessibilityMetadata {
+  minContrast?: number;
+  allowedText?: string[];
+  disallowedText?: string[];
+  allowedPairings?: string[];
+  disallowedPairings?: string[];
+}
+/**
+ * This interface was referenced by `CedarTokenSchema`'s JSON-Schema
+ * via the `definition` "TokenValidationMetadata".
+ */
+export interface TokenValidationMetadata {
+  nonBreakingChange?: "error" | "warn";
+  namingGrammar?: "figma-owned";
+  crossPlatformConsistency?: "error" | "warn";
+  multiCollection?: string[];
+  requiredPlatforms?: ("web" | "ios" | "android" | "react-native")[];
+}
+/**
+ * This interface was referenced by `CedarTokenSchema`'s JSON-Schema
+ * via the `definition` "TokenDeprecationMetadata".
+ */
+export interface TokenDeprecationMetadata {
+  removedIn?: string;
+  migrateToToken?: string;
+  reason?: string;
+}
+/**
+ * Repo-authored governance metadata merged into canonical at $extensions.cedar.governance.
+ *
+ * This interface was referenced by `CedarTokenSchema`'s JSON-Schema
+ * via the `definition` "GovernanceMetadata".
+ */
+export interface GovernanceMetadata {
+  status?: TokenStatus;
+  token?: string;
+  intent?: string;
+  role?: string;
+  derivedFrom?: string;
+  platformMap?: {
+    web?: string;
+    ios?: string;
+    android?: string;
+    "react-native"?: string;
+  };
+  states?: {
+    [k: string]: string;
+  };
+  modes?: {
+    [k: string]:
+      | string
+      | {
+          value: string;
+          overlay?: string;
+        };
+  };
+  accessibility?: TokenAccessibilityMetadata;
+  stability?: TokenStability;
+  introducedIn?: string;
+  deprecatedIn?: string | null;
+  figmaVariableId?: string;
+  badges?: TokenBadge[];
+  usage?: string;
+  deprecation?: TokenDeprecationMetadata;
+  usedBy?: string[];
+  figma?: {
+    collection?: string;
+    variable?: string;
+  };
+  validation?: TokenValidationMetadata;
+  consumerNotes?: string;
+  lastChanged?: string;
+  authority?: string;
 }
 /**
  * Cedar-specific token metadata including documentation, platform governance, and semantic mapping.
@@ -125,6 +236,8 @@ export interface CedarTokenExtension {
       [k: string]: unknown;
     };
   };
+  governance?: GovernanceMetadata;
+  semantic?: SemanticMetadata;
   [k: string]: unknown;
 }
 /**

@@ -2,11 +2,11 @@ import type { Meta, StoryObj } from "@storybook/html";
 
 type Args = Record<string, never>;
 
-type Layer = "foundation" | "semantic" | "stateFamily" | "component";
+type Layer = "primitive" | "semantic" | "stateFamily" | "component";
 type ViewTab = "author" | "taxonomy" | "connections" | "export";
 
-type TaxonomyKey =
-  | "foundation"
+// Semantic token taxonomy keys (used for color.modes.*, spacing.*, etc.)
+type SemanticTaxonomyKey =
   | "intent"
   | "role"
   | "variant"
@@ -14,6 +14,11 @@ type TaxonomyKey =
   | "state"
   | "tier"
   | "breakpoint";
+
+// Primitive token taxonomy keys (used for color.option.*, etc.)
+type PrimitiveTaxonomyKey = "palette" | "category" | "shade";
+
+type TaxonomyKey = SemanticTaxonomyKey | PrimitiveTaxonomyKey;
 
 type TaxonomyMap = Record<TaxonomyKey, string[]>;
 
@@ -55,8 +60,7 @@ const meta: Meta<Args> = {
 export default meta;
 type Story = StoryObj<Args>;
 
-const DEFAULT_TAXONOMY: TaxonomyMap = {
-  foundation: ["color", "type", "radius", "prominence", "spacing", "motion"],
+const DEFAULT_SEMANTIC_TAXONOMY: Record<SemanticTaxonomyKey, string[]> = {
   intent: [
     "brand",
     "primary",
@@ -80,14 +84,26 @@ const DEFAULT_TAXONOMY: TaxonomyMap = {
   breakpoint: ["mobile", "tablet", "desktop", "wide"],
 };
 
+const DEFAULT_PRIMITIVE_TAXONOMY: Record<PrimitiveTaxonomyKey, string[]> = {
+  palette: ["neutral", "brand"],
+  category: ["warm", "cool", "black", "white", "overlay", "blue", "red", "yellow", "green"],
+  shade: ["100", "300", "400", "600", "900", "light", "subtle"],
+};
+
+// Unified taxonomy for all token types
+const DEFAULT_TAXONOMY: TaxonomyMap = {
+  ...DEFAULT_SEMANTIC_TAXONOMY,
+  ...DEFAULT_PRIMITIVE_TAXONOMY,
+};
+
 const SEED_TOKENS: TokenRecord[] = [
   {
-    id: "tok-foundation-spruce",
-    name: "color.brand.primary.base",
-    value: "oklch(38% 0.12 165)",
-    description: "Primary Cedar spruce foundation value.",
-    layer: "foundation",
-    taxonomy: { foundation: "color", intent: "brand", variant: "base" },
+    id: "tok-primitive-grey-600",
+    name: "color.option.neutral.warm.grey.600",
+    value: "#736e65",
+    description: "Warm neutral mid-tone, used for borders and dividers.",
+    layer: "primitive",
+    taxonomy: { palette: "neutral", category: "warm.grey.600" },
     links: ["tok-semantic-action-fill-accent"],
   },
   {
@@ -121,20 +137,21 @@ const SEED_TOKENS: TokenRecord[] = [
 
 function cloneTaxonomy(taxonomy: TaxonomyMap): TaxonomyMap {
   return {
-    foundation: [...taxonomy.foundation],
-    intent: [...taxonomy.intent],
-    role: [...taxonomy.role],
-    variant: [...taxonomy.variant],
-    stateFamily: [...taxonomy.stateFamily],
-    state: [...taxonomy.state],
-    tier: [...taxonomy.tier],
-    breakpoint: [...taxonomy.breakpoint],
+    palette: [...(taxonomy.palette || [])],
+    category: [...(taxonomy.category || [])],
+    intent: [...(taxonomy.intent || [])],
+    role: [...(taxonomy.role || [])],
+    variant: [...(taxonomy.variant || [])],
+    stateFamily: [...(taxonomy.stateFamily || [])],
+    state: [...(taxonomy.state || [])],
+    tier: [...(taxonomy.tier || [])],
+    breakpoint: [...(taxonomy.breakpoint || [])],
   };
 }
 
 /**
- * Parse a canonical token path (e.g., "color.action.fill.accent.ghost.hover")
- * into its taxonomy components by matching segments against known taxonomy values.
+ * Parse a canonical token path into its taxonomy components.
+ * Handles both primitive tokens (color.option.palette.*) and semantic tokens.
  */
 function parseCanonicalPath(
   name: string,
@@ -146,17 +163,26 @@ function parseCanonicalPath(
   const result: Partial<Record<TaxonomyKey, string>> = {};
   const remaining = [...segments];
 
-  // First segment is typically the foundation/category (color, type, space, radius, etc.)
-  if (remaining.length > 0) {
-    const first = remaining[0];
-    if (taxonomyMap.foundation.includes(first)) {
-      result.foundation = first;
-      remaining.shift();
+  // Check if this is a primitive token (color.option.*)
+  if (remaining.length >= 3 && remaining[0] === "color" && remaining[1] === "option") {
+    remaining.shift(); // Remove "color"
+    remaining.shift(); // Remove "option"
+    
+    // First remaining segment is the palette (neutral, brand, etc.)
+    if (remaining.length > 0 && taxonomyMap.palette?.includes(remaining[0])) {
+      result.palette = remaining.shift()!;
     }
+    
+    // Rest is combined into category (e.g., "warm.grey.600")
+    if (remaining.length > 0) {
+      result.category = remaining.join(".");
+    }
+    
+    return result;
   }
 
-  // Priority order for matching remaining segments:
-  // intent > role > variant > stateFamily > state > tier > breakpoint
+  // Semantic token path parsing
+  // Priority order: intent > role > variant > stateFamily > state > tier > breakpoint
   const taxonomyPriority: TaxonomyKey[] = [
     "intent",
     "role",
@@ -171,7 +197,8 @@ function parseCanonicalPath(
     if (remaining.length === 0) break;
 
     const segment = remaining[0];
-    if (taxonomyMap[key].includes(segment)) {
+    const keyTaxonomy = taxonomyMap[key];
+    if (keyTaxonomy && keyTaxonomy.includes(segment)) {
       result[key] = segment;
       remaining.shift();
     }
@@ -182,16 +209,27 @@ function parseCanonicalPath(
 
 /**
  * Reconstruct a canonical token name from taxonomy fields.
- * Follows the pattern: <foundation>.<intent>[.<role>][.<variant>][.<stateFamily>][.<state>]
+ * Handles both primitive (color.option.palette.category) and semantic patterns.
  */
 function reconstructCanonicalPath(
   taxonomy: Partial<Record<TaxonomyKey, string>>,
 ): string {
   const parts: string[] = [];
 
-  // Canonical order: foundation, intent, role, variant, stateFamily, state, tier, breakpoint
+  // Check if this is a primitive token (has palette/category)
+  if (taxonomy.palette) {
+    parts.push("color");
+    parts.push("option");
+    parts.push(taxonomy.palette);
+    if (taxonomy.category) {
+      parts.push(...taxonomy.category.split("."));
+    }
+    return parts.join(".");
+  }
+
+  // Semantic token reconstruction
+  // Canonical order: intent, role, variant, stateFamily, state, tier, breakpoint
   const order: TaxonomyKey[] = [
-    "foundation",
     "intent",
     "role",
     "variant",
@@ -245,7 +283,7 @@ function createId(prefix: string): string {
 }
 
 function layerLabel(layer: Layer): string {
-  if (layer === "foundation") return "Foundations";
+  if (layer === "primitive") return "Primitives";
   if (layer === "semantic") return "Semantic ancestors";
   if (layer === "stateFamily") return "State families";
   return "Components";
@@ -257,10 +295,13 @@ function guessLayer(name: string): Layer {
   if (lower.includes(".ghost.") || lower.includes(".nudge.") || lower.includes(".selected") || lower.includes(".hover")) {
     return "stateFamily";
   }
+  if (lower.startsWith("color.option.") || lower.startsWith("spacing.scale.") || lower.startsWith("type.option.")) {
+    return "primitive";
+  }
   if (lower.startsWith("color.") || lower.startsWith("type.") || lower.startsWith("space.") || lower.startsWith("radius.")) {
     return "semantic";
   }
-  return "foundation";
+  return "primitive";
 }
 
 function getField(record: Record<string, string>, aliases: string[]): string {
@@ -296,7 +337,7 @@ function toTokenFromRecord(record: Record<string, string>): TokenRecord | null {
   const layerRaw = getField(record, ["layer", "tier", "token layer"]);
 
   const layer =
-    layerRaw === "foundation" ||
+    layerRaw === "primitive" ||
     layerRaw === "semantic" ||
     layerRaw === "stateFamily" ||
     layerRaw === "component"
@@ -845,7 +886,7 @@ function buildStory(): HTMLElement {
   // ─── helpers ────────────────────────────────────────────────────────────
   const CATEGORIES: { id: string; label: string; layer: Layer | "all"; group: string; dot: string }[] = [
     { id: "all",             label: "All tokens",   layer: "all",        group: "Overview",                dot: "dot-n" },
-    { id: "foundation",      label: "All foundation",layer: "foundation", group: "Tier 1 · Foundations",    dot: "dot-1" },
+    { id: "primitive",       label: "All primitives",layer: "primitive", group: "Tier 1 · Primitives",    dot: "dot-1" },
     { id: "semantic",        label: "All semantic",  layer: "semantic",   group: "Tier 2 · Semantic",       dot: "dot-2" },
     { id: "stateFamily",     label: "State families",layer: "stateFamily",group: "Tier 3 · State Families", dot: "dot-3" },
     { id: "component",       label: "Component",     layer: "component",  group: "Tier 4 · Component",      dot: "dot-4" },
@@ -919,7 +960,7 @@ function buildStory(): HTMLElement {
         const swatch = colorVal
           ? `<span class="tcard-swatch" style="background:${escapeHtml(colorVal)}"></span>`
           : `<span class="tcard-swatch tcard-swatch--empty"></span>`;
-        const layerDot = { foundation: "dot-1", semantic: "dot-2", stateFamily: "dot-3", component: "dot-4" }[token.layer] ?? "dot-n";
+        const layerDot = { primitive: "dot-1", semantic: "dot-2", stateFamily: "dot-3", component: "dot-4" }[token.layer] ?? "dot-n";
         return `
           <button class="tcard${isSelected ? " tcard--sel" : ""}" data-action="select-token" data-id="${escapeHtml(token.id)}" type="button">
             <div class="tcard-row">
@@ -973,7 +1014,7 @@ function buildStory(): HTMLElement {
     const semanticTargets = state.tokens.filter((token) => token.layer === "semantic");
     const linkTargets = state.tokens.filter((token) => token.id !== selected.id);
 
-    const linkOptions = (selected.layer === "foundation" ? semanticTargets : linkTargets)
+    const linkOptions = (selected.layer === "primitive" ? semanticTargets : linkTargets)
       .map((token) => {
         const selectedFlag = selected.links.includes(token.id) ? " selected" : "";
         return `<option value="${escapeHtml(token.id)}"${selectedFlag}>${escapeHtml(token.name)}</option>`;
@@ -1008,7 +1049,7 @@ function buildStory(): HTMLElement {
             <label class="field"><span>Name</span><input class="text-input" data-action="token-name" value="${escapeHtml(selected.name)}" /></label>
             <label class="field"><span>Layer</span>
               <select data-action="token-layer">
-                <option value="foundation"${selected.layer === "foundation" ? " selected" : ""}>Foundations</option>
+                <option value="primitive"${selected.layer === "primitive" ? " selected" : ""}>Primitives</option>
                 <option value="semantic"${selected.layer === "semantic" ? " selected" : ""}>Semantic ancestors</option>
                 <option value="stateFamily"${selected.layer === "stateFamily" ? " selected" : ""}>State families</option>
                 <option value="component"${selected.layer === "component" ? " selected" : ""}>Components</option>
@@ -1020,7 +1061,8 @@ function buildStory(): HTMLElement {
 
           <h4>Taxonomy fields</h4>
           <div class="field-grid three">
-            ${renderTaxonomySelect(selected, "foundation")}
+            ${renderTaxonomySelect(selected, "palette")}
+            ${renderTaxonomySelect(selected, "category")}
             ${renderTaxonomySelect(selected, "intent")}
             ${renderTaxonomySelect(selected, "role")}
             ${renderTaxonomySelect(selected, "variant")}
@@ -1032,10 +1074,10 @@ function buildStory(): HTMLElement {
 
           <h4>Token connections</h4>
           <label class="field">
-            <span>${selected.layer === "foundation" ? "Assign semantic ancestors" : "Assign linked tokens"}</span>
+            <span>${selected.layer === "primitive" ? "Assign semantic ancestors" : "Assign linked tokens"}</span>
             <select multiple size="8" data-action="token-links">${linkOptions}</select>
           </label>
-          <p class="hint">Foundations can map to one or many semantic ancestors. Other layers can link to downstream tokens for traceability.</p>
+          <p class="hint">Primitives can map to one or many semantic ancestors. Other layers can link to downstream tokens for traceability.</p>
 
           <h4>State family generator (OKLCH)</h4>
           <div class="field-grid two">
@@ -1091,7 +1133,8 @@ function buildStory(): HTMLElement {
           <label class="field">
             <span>Taxonomy layer</span>
             <select data-action="taxonomy-focus">
-              <option value="foundation"${key === "foundation" ? " selected" : ""}>foundation</option>
+              <option value="palette"${key === "palette" ? " selected" : ""}>palette</option>
+              <option value="category"${key === "category" ? " selected" : ""}>category</option>
               <option value="intent"${key === "intent" ? " selected" : ""}>intent</option>
               <option value="role"${key === "role" ? " selected" : ""}>role</option>
               <option value="variant"${key === "variant" ? " selected" : ""}>variant</option>
@@ -1115,9 +1158,9 @@ function buildStory(): HTMLElement {
   };
 
   const renderConnectionsTab = (): string => {
-    const foundationTokens = state.tokens.filter((token) => token.layer === "foundation");
+    const primitiveTokens = state.tokens.filter((token) => token.layer === "primitive");
 
-    const rows = foundationTokens
+    const rows = primitiveTokens
       .map((token) => {
         const linkedSemantics = token.links
           .map((id) => state.tokens.find((candidate) => candidate.id === id))
@@ -1135,13 +1178,13 @@ function buildStory(): HTMLElement {
 
     return `
       <section class="panel">
-        <h3>Foundation to semantic mapping</h3>
-        <p class="hint">Each foundation token can connect to one or many semantic ancestors when creating or editing token mappings.</p>
+        <h3>Primitive to semantic mapping</h3>
+        <p class="hint">Each primitive token can connect to one or many semantic ancestors when creating or editing token mappings.</p>
         <table class="mapping-table">
           <thead>
-            <tr><th>Foundation token</th><th>Value</th><th>Mapped semantic ancestors</th></tr>
+            <tr><th>Primitive token</th><th>Value</th><th>Mapped semantic ancestors</th></tr>
           </thead>
-          <tbody>${rows || '<tr><td colspan="3">No foundation tokens available.</td></tr>'}</tbody>
+          <tbody>${rows || '<tr><td colspan="3">No primitive tokens available.</td></tr>'}</tbody>
         </table>
       </section>
     `;
@@ -1646,7 +1689,7 @@ function buildStory(): HTMLElement {
         <header class="header">
           <div class="logo">C</div>
           <h1>Cedar token authoring studio vNext</h1>
-          <div class="subtitle">Foundations -> Semantic ancestors -> State families -> Components</div>
+          <div class="subtitle">Primitives -> Semantic ancestors -> State families -> Components</div>
         </header>
 
           <div class="project-bar">
