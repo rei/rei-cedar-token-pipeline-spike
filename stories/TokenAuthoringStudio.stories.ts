@@ -132,6 +132,85 @@ function cloneTaxonomy(taxonomy: TaxonomyMap): TaxonomyMap {
   };
 }
 
+/**
+ * Parse a canonical token path (e.g., "color.action.fill.accent.ghost.hover")
+ * into its taxonomy components by matching segments against known taxonomy values.
+ */
+function parseCanonicalPath(
+  name: string,
+  taxonomyMap: TaxonomyMap,
+): Partial<Record<TaxonomyKey, string>> {
+  const segments = name.toLowerCase().split(".").filter(Boolean);
+  if (segments.length === 0) return {};
+
+  const result: Partial<Record<TaxonomyKey, string>> = {};
+  const remaining = [...segments];
+
+  // First segment is typically the foundation/category (color, type, space, radius, etc.)
+  if (remaining.length > 0) {
+    const first = remaining[0];
+    if (taxonomyMap.foundation.includes(first)) {
+      result.foundation = first;
+      remaining.shift();
+    }
+  }
+
+  // Priority order for matching remaining segments:
+  // intent > role > variant > stateFamily > state > tier > breakpoint
+  const taxonomyPriority: TaxonomyKey[] = [
+    "intent",
+    "role",
+    "variant",
+    "stateFamily",
+    "state",
+    "tier",
+    "breakpoint",
+  ];
+
+  for (const key of taxonomyPriority) {
+    if (remaining.length === 0) break;
+
+    const segment = remaining[0];
+    if (taxonomyMap[key].includes(segment)) {
+      result[key] = segment;
+      remaining.shift();
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Reconstruct a canonical token name from taxonomy fields.
+ * Follows the pattern: <foundation>.<intent>[.<role>][.<variant>][.<stateFamily>][.<state>]
+ */
+function reconstructCanonicalPath(
+  taxonomy: Partial<Record<TaxonomyKey, string>>,
+): string {
+  const parts: string[] = [];
+
+  // Canonical order: foundation, intent, role, variant, stateFamily, state, tier, breakpoint
+  const order: TaxonomyKey[] = [
+    "foundation",
+    "intent",
+    "role",
+    "variant",
+    "stateFamily",
+    "state",
+    "tier",
+    "breakpoint",
+  ];
+
+  for (const key of order) {
+    const value = taxonomy[key];
+    if (value && value.trim().length > 0) {
+      parts.push(value.toLowerCase());
+    }
+  }
+
+  return parts.length > 0 ? parts.join(".") : "";
+}
+
 function createDefaultState(): StudioState {
   const tokens = structuredClone(SEED_TOKENS);
   return {
@@ -230,7 +309,7 @@ function toTokenFromRecord(record: Record<string, string>): TokenRecord | null {
     value,
     description,
     layer,
-    taxonomy: {},
+    taxonomy: parseCanonicalPath(name, DEFAULT_TAXONOMY),
     links: [],
   };
 }
@@ -1838,9 +1917,14 @@ function buildStory(): HTMLElement {
 
       const tokenNameInput = root.querySelector<HTMLInputElement>("[data-action='token-name']");
       tokenNameInput?.addEventListener("input", () => {
+        const newName = tokenNameInput.value;
         patchSelected((token) => {
-          token.name = tokenNameInput.value;
-        }, "Token updated");
+          token.name = newName;
+          // When name changes, parse it and update taxonomy fields
+          token.taxonomy = parseCanonicalPath(newName, state.taxonomy);
+        }, "Token name updated");
+        // After patching, re-render to update taxonomy field UI
+        render();
       });
 
       const tokenValueInput = root.querySelector<HTMLTextAreaElement>("[data-action='token-value']");
@@ -1874,7 +1958,11 @@ function buildStory(): HTMLElement {
             } else {
               token.taxonomy[key] = select.value;
             }
+            // When taxonomy changes, reconstruct the name
+            token.name = reconstructCanonicalPath(token.taxonomy);
           }, "Token taxonomy updated");
+          // After patching, re-render to update the name field UI
+          render();
         });
       });
 
