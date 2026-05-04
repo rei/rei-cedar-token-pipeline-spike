@@ -3,30 +3,40 @@
 export interface CdrColorTextTokens {
   /**
    * Primary text color for body content and headings.
+   * @value #2e2e2b
+   * @cssvar --cdr-text-base
    * @usage Use for all default body copy, headings, and labels. Do not use for decorative text, disabled states, or secondary information — use text-subtle for those.
    * @design Anchors the text scale at maximum legibility. Darkest step in the warm-grey text ramp.
    */
   "color-text-base": string;
   /**
    * Text color for interactive links and inline navigation.
+   * @value #0b2d60
+   * @cssvar --cdr-text-link
    * @usage Use for hyperlinks, inline anchors, and any text that navigates or triggers an action. Do not use for non-interactive text — use text-base or text-subtle instead.
    * @design Draws from the blue brand scale to signal interactivity. Paired with text-link-hover to form the link interaction ramp.
    */
   "color-text-link": string;
   /**
    * Text color for links in their hovered state.
+   * @value #406eb5
+   * @cssvar --cdr-text-link-hover
    * @usage Use only as the hover state for text-link. Do not use for default link text or any non-interactive element.
    * @design Lighter step in the blue brand scale, creating a visible but controlled shift from text-link on hover.
    */
   "color-text-link-hover": string;
   /**
    * Text color for sale prices and promotional messaging.
+   * @value #c7370f
+   * @cssvar --cdr-text-sale
    * @usage Use exclusively for sale price labels and discount indicators. Do not use for error states, alerts, or general emphasis — those have dedicated tokens.
    * @design Draws from the red brand scale. Reserved solely for commerce pricing contexts to preserve its signal strength.
    */
   "color-text-sale": string;
   /**
    * Secondary text color for supporting and supplementary content.
+   * @value #736e65
+   * @cssvar --cdr-text-subtle
    * @usage Use for captions, helper text, metadata, and secondary labels. Do not use for primary body copy or anything requiring full legibility — use text-base for those.
    * @design Mid-point in the text scale. Reduced contrast signals secondary importance while remaining accessible.
    */

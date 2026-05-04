@@ -88,7 +88,7 @@ const BASE_STYLES = `
 `;
 
 export const ConsumerReference: Story = {
-  name: "Consumer Type + Docs Contract",
+  name: "Contract: type",
   render: asyncStory(async () => {
     const base = window.location.pathname.replace(/\/[^/]*$/, "/");
 
@@ -121,36 +121,39 @@ export const ConsumerReference: Story = {
 
     const docsEntries = Object.entries(docsMap).slice(0, 4);
 
-    const typeSnippet = `import type {
-  CdrColorTextTokenName,
-  CdrColorTextTokens,
-  CdrColorTextTokenDocs,
-} from "@rei/cdr-tokens/types";
+    const typeSnippet = `import type { CdrColorTextTokens } from "@rei/cdr-tokens/types/foundations/cdr-color-text";
+import type { CdrColorTextTokenDocs } from "@rei/cdr-tokens/types/foundations/cdr-color-text.docs";
 
-const values: CdrColorTextTokens = {
-  "color-text-base": "{color.option.neutral.warm.grey.900}",
-  "color-text-subtle": "{color.option.neutral.warm.grey.600}",
-  "color-text-link": "{color.option.brand.blue.600}",
-  "color-text-link-hover": "{color.option.brand.blue.400}",
-  "color-text-sale": "{color.option.brand.red.400}",
-};
+// Generated token value map
+declare const textValues: CdrColorTextTokens;
 
-const docs: CdrColorTextTokenDocs = {
-  "color-text-link": {
-    summary: "Text color for interactive links and inline navigation.",
-    usage: "Use for hyperlinks and inline anchors.",
-  },
-};`;
+// Generated docs map keyed by token name
+declare const textDocs: CdrColorTextTokenDocs;
+
+const tokenName = "color-text-base" as const;
+
+const tokenValue = textValues[tokenName];
+const tokenSummary = textDocs[tokenName]?.summary;
+const tokenUsage = textDocs[tokenName]?.usage;`;
+
+    const dtsSnippet = `export interface CdrColorTextTokens {
+  /**
+   * Primary text color for body content and headings.
+   * @usage Use for all default body copy, headings, and labels.
+   * @design Anchors the text scale at maximum legibility.
+   */
+  "color-text-base": string;
+}`;
 
     return `
       <style>${BASE_STYLES}</style>
       <section class="page">
         <div class="eyebrow">Consumer Contract Reference</div>
-        <h1 class="title">Usage Guidance + Typed Token Access</h1>
+        <h1 class="title">Contract: type</h1>
         <p class="lede">
-          This reference demonstrates the consumer-facing contract that matters in practice: typed token access,
-          token intent, and usage guidance generated from the pipeline. The goal is to help designers and engineers
-          choose the right token quickly, not inspect raw transport artifacts.
+          Type definitions are generated alongside Cedar token modules. In this build, IDE hover/help comes from
+          token JSDoc in the generated <code>.d.ts</code> plus token documentation maps in <code>*.docs.d.ts</code>.
+          This page reflects the current generated artifacts used by Storybook.
         </p>
 
         <div class="grid">
@@ -190,27 +193,10 @@ const docs: CdrColorTextTokenDocs = {
         <div class="grid" style="margin-top:1rem;">
           <article class="card">
             <div class="card-head">
-              <div class="card-kicker">Recommended Consumption</div>
-              <div class="card-title">Use Typed Maps, Then Read Usage Guidance</div>
+              <div class="card-kicker">Generated .d.ts</div>
+              <div class="card-title">What IDE Hover Surfaces</div>
             </div>
-            <pre>${escapeHtml(`import type {
-  CdrColorTextTokens,
-  CdrColorTextTokenDocs,
-} from "@rei/cdr-tokens/types";
-
-function getTextTokenDocs(
-  values: CdrColorTextTokens,
-  docs: CdrColorTextTokenDocs,
-  tokenName: keyof CdrColorTextTokens,
-) {
-  return {
-    value: values[tokenName],
-    summary: docs[tokenName]?.summary,
-    usage: docs[tokenName]?.usage,
-  };
-}
-
-const base = getTextTokenDocs(values, docs, "color-text-base");`)} </pre>
+            <pre>${escapeHtml(dtsSnippet)} </pre>
           </article>
 
           <article class="card">
@@ -233,7 +219,7 @@ const base = getTextTokenDocs(values, docs, "color-text-base");`)} </pre>
         </div>
 
         <p class="foot">
-          Files served in Storybook: /meta/foundations/*.docs.json and /types/* for generated type artifacts.
+          Current generated contract: token interfaces include full JSDoc metadata — summary, usage, design guidance, plus resolved <code>@value</code> and CSS variable names via <code>@cssvar</code> tags.
         </p>
       </section>
     `;

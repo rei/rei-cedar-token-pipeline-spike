@@ -3,12 +3,16 @@
 export interface CdrColorBorderTokens {
   /**
    * Default border color for containers, inputs, and dividers.
+   * @value #b2ab9f
+   * @cssvar --cdr-border-base
    * @usage Use for input field borders, card outlines, and structural dividers. Do not use for decorative separators or low-emphasis boundaries — use border-subtle for those.
    * @design Mid-light step in the warm-grey scale, providing enough contrast to define structure without competing with content.
    */
   "color-border-base": string;
   /**
    * Low-emphasis border for decorative separators and understated boundaries.
+   * @value #edeae3
+   * @cssvar --cdr-border-subtle
    * @usage Use for dividers between list items, section rules, and subtle layout separators. Do not use where a border needs to define a structure or interactive boundary — use border-base for those.
    * @design Lightest step in the border scale. Provides just enough separation to guide the eye without drawing attention.
    */

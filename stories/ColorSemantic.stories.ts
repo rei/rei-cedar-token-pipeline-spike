@@ -504,12 +504,12 @@ export const Surface: Story = {
             ${tokenGrid(tokens, keys)}
             <div class="demo-card" style="margin-top:1rem;">
               <div class="demo-layer" style="background:${base?.hex ?? "transparent"};">
-                <span class="demo-layer-label" style="color:${textBase?.hex};">${surfacePrefix}surface.base</span>
+                <span class="demo-layer-label" style="color:${textBase?.hex};">${simplifyTokenName(`${surfacePrefix}surface.base`)}</span>
                 <span class="demo-layer-desc" style="color:${textSubtle?.hex};">Base — page background, modal backdrop</span>
               </div>
               <div class="demo-divider" style="background:${borderSubtle?.hex};"></div>
               <div class="demo-layer" style="background:${raised?.hex ?? "transparent"};">
-                <span class="demo-layer-label" style="color:${textBase?.hex};">${surfacePrefix}surface.raised</span>
+                <span class="demo-layer-label" style="color:${textBase?.hex};">${simplifyTokenName(`${surfacePrefix}surface.raised`)}</span>
                 <span class="demo-layer-desc" style="color:${textSubtle?.hex};">Raised — cards, sidebars, dropdowns</span>
               </div>
             </div>
@@ -599,7 +599,7 @@ export const Text: Story = {
               <div style="display:flex;gap:1.25rem;flex-wrap:wrap;">
                 ${keys.map((key) => {
                   const d = tokens.get(key);
-                  return `<div style="display:flex;align-items:center;gap:0.35rem;"><span style="width:7px;height:7px;border-radius:50%;border:1px solid var(--rule-heavy);flex-shrink:0;background:${d?.hex};"></span><span style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);">${key}</span></div>`;
+                  return `<div style="display:flex;align-items:center;gap:0.35rem;"><span style="width:7px;height:7px;border-radius:50%;border:1px solid var(--rule-heavy);flex-shrink:0;background:${d?.hex};"></span><span style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);">${simplifyTokenName(key)}</span></div>`;
                 }).join("")}
               </div>
             </div>
@@ -678,13 +678,13 @@ export const Border: Story = {
             ${tokenGrid(tokens, keys)}
             <div class="border-demo-grid">
               <div class="border-demo-cell" style="border:1.5px solid ${borderBase?.hex};">
-                <div class="border-demo-label">${p}border.base</div>
+                <div class="border-demo-label">${simplifyTokenName(`${p}border.base`)}</div>
                 <div class="border-demo-desc" style="color:${textSubtle?.hex};">Default — cards, inputs, containers</div>
                 <div style="margin-top:0.75rem;height:1px;background:${borderBase?.hex};"></div>
                 <div style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);letter-spacing:0.06em;margin-top:0.25rem;">${borderBase?.hex?.slice(0, 9).toUpperCase()}</div>
               </div>
               <div class="border-demo-cell" style="border:1.5px solid ${borderSubtle?.hex};">
-                <div class="border-demo-label">${p}border.subtle</div>
+                <div class="border-demo-label">${simplifyTokenName(`${p}border.subtle`)}</div>
                 <div class="border-demo-desc" style="color:${textSubtle?.hex};">Subtle — dividers, section separators</div>
                 <div style="margin-top:0.75rem;height:1px;background:${borderSubtle?.hex};"></div>
                 <div style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);letter-spacing:0.06em;margin-top:0.25rem;">${borderSubtle?.hex?.slice(0, 9).toUpperCase()}</div>
@@ -722,11 +722,11 @@ export const Border: Story = {
         ${tokenGrid(tokens, keys)}
         <div class="border-demo-grid">
           <div class="border-demo-cell" style="border:1.5px solid ${borderBase?.hex};">
-            <div class="border-demo-label">${p}border.base</div>
+            <div class="border-demo-label">${simplifyTokenName(`${p}border.base`)}</div>
             <div class="border-demo-desc" style="color:${textSubtle?.hex};">Default — cards, inputs, containers</div>
           </div>
           <div class="border-demo-cell" style="border:1.5px solid ${borderSubtle?.hex};">
-            <div class="border-demo-label">${p}border.subtle</div>
+            <div class="border-demo-label">${simplifyTokenName(`${p}border.subtle`)}</div>
             <div class="border-demo-desc" style="color:${textSubtle?.hex};">Subtle — dividers, section separators</div>
           </div>
         </div>

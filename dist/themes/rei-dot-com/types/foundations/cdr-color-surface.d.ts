@@ -3,12 +3,16 @@
 export interface CdrColorSurfaceTokens {
   /**
    * Default page and container background.
+   * @value #ffffff
+   * @cssvar --cdr-surface-base
    * @usage Use as the background for the primary content area, cards, modals, and any surface that sits at the base elevation. Do not use for text or interactive elements.
    * @design First step in the surface elevation scale. Anchors the layering system — raised surfaces sit above this token, not below.
    */
   "color-surface-base": string;
   /**
    * Elevated surface background, one step above the base layer.
+   * @value #edeae3
+   * @cssvar --cdr-surface-raised
    * @usage Use for cards, panels, and drawers that sit above the base page surface. Do not use for the root page background or inline content areas.
    * @design Second step in the surface elevation scale. Creates visual separation from surface-base through a subtle warm-grey tint.
    */

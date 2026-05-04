@@ -4,6 +4,7 @@ type Args = Record<string, never>;
 
 type Layer = "primitive" | "semantic" | "stateFamily" | "component";
 type ViewTab = "author" | "taxonomy" | "connections" | "export";
+type SemanticCategory = "color" | "radius" | "spacing" | "type" | "other";
 
 // Semantic token taxonomy keys (used for color.modes.*, spacing.*, etc.)
 type SemanticTaxonomyKey =
@@ -84,6 +85,56 @@ const DEFAULT_SEMANTIC_TAXONOMY: Record<SemanticTaxonomyKey, string[]> = {
   breakpoint: ["mobile", "tablet", "desktop", "wide"],
 };
 
+const SEMANTIC_CATEGORY_OPTIONS: Record<
+  SemanticCategory,
+  Partial<Record<SemanticTaxonomyKey, string[]>>
+> = {
+  color: {
+    intent: [
+      "brand",
+      "primary",
+      "secondary",
+      "tertiary",
+      "surface",
+      "action",
+      "navigation",
+      "error",
+      "success",
+      "warning",
+      "info",
+      "outline",
+      "overlay",
+    ],
+    role: ["fill", "on-fill", "border", "text", "icon"],
+    variant: ["highlight", "subtle", "muted", "base", "accent", "shade", "strong", "vibrant"],
+    stateFamily: ["ghost", "nudge"],
+    state: ["default", "hover", "pressed", "disabled", "selected", "focus"],
+  },
+  radius: {
+    intent: ["interactive", "container", "surface"],
+    variant: ["none", "sm", "md", "lg", "full"],
+  },
+  spacing: {
+    intent: ["component", "layout", "inline", "stack"],
+    variant: ["xxs", "xs", "sm", "md", "lg", "xl", "xxl"],
+    breakpoint: ["mobile", "tablet", "desktop", "wide"],
+  },
+  type: {
+    intent: ["body", "heading", "label", "code"],
+    variant: ["xs", "sm", "md", "lg", "xl", "xxl"],
+    tier: ["regular", "medium", "semibold", "bold"],
+  },
+  other: {
+    intent: DEFAULT_SEMANTIC_TAXONOMY.intent,
+    role: DEFAULT_SEMANTIC_TAXONOMY.role,
+    variant: DEFAULT_SEMANTIC_TAXONOMY.variant,
+    stateFamily: DEFAULT_SEMANTIC_TAXONOMY.stateFamily,
+    state: DEFAULT_SEMANTIC_TAXONOMY.state,
+    tier: DEFAULT_SEMANTIC_TAXONOMY.tier,
+    breakpoint: DEFAULT_SEMANTIC_TAXONOMY.breakpoint,
+  },
+};
+
 const DEFAULT_PRIMITIVE_TAXONOMY: Record<PrimitiveTaxonomyKey, string[]> = {
   palette: ["neutral", "brand"],
   category: ["warm", "cool", "black", "white", "overlay", "blue", "red", "yellow", "green"],
@@ -108,7 +159,7 @@ const SEED_TOKENS: TokenRecord[] = [
   },
   {
     id: "tok-semantic-action-fill-accent",
-    name: "color.action.fill.accent",
+    name: "color.modes.default.action.fill.accent",
     value: "{color.brand.primary.base}",
     description: "Semantic action fill accent ancestor.",
     layer: "semantic",
@@ -117,7 +168,7 @@ const SEED_TOKENS: TokenRecord[] = [
   },
   {
     id: "tok-state-family-ghost",
-    name: "color.action.fill.accent.ghost.hover",
+    name: "color.modes.default.action.fill.accent.ghost.hover",
     value: "oklch(+0.50L C->0)",
     description: "Ghost family hover transform.",
     layer: "stateFamily",
@@ -127,7 +178,7 @@ const SEED_TOKENS: TokenRecord[] = [
   {
     id: "tok-component-button-primary-hover",
     name: "cdr.button.primary.bg.hover",
-    value: "{color.action.fill.accent.ghost.hover}",
+    value: "{color.modes.default.action.fill.accent.ghost.hover}",
     description: "Primary button hover color.",
     layer: "component",
     taxonomy: { intent: "action", role: "fill", variant: "accent", state: "hover" },
@@ -179,6 +230,21 @@ function parseCanonicalPath(
     }
     
     return result;
+  }
+
+  // Semantic path may be canonical (color.modes.<mode>.*), scoped (color.*), or exposed (*).
+  if (remaining.length >= 4 && remaining[0] === "color" && remaining[1] === "modes") {
+    remaining.shift(); // color
+    remaining.shift(); // modes
+    remaining.shift(); // mode value
+  } else if (
+    remaining[0] === "color" ||
+    remaining[0] === "radius" ||
+    remaining[0] === "space" ||
+    remaining[0] === "spacing" ||
+    remaining[0] === "type"
+  ) {
+    remaining.shift();
   }
 
   // Semantic token path parsing
@@ -289,6 +355,43 @@ function layerLabel(layer: Layer): string {
   return "Components";
 }
 
+function displayTokenName(name: string): string {
+  if (name.startsWith("color.modes.default.")) {
+    return name.replace(/^color\.modes\.default\./, "");
+  }
+
+  if (name.startsWith("color.modes.")) {
+    const match = name.match(/^color\.modes\.([^.]+)\.(.+)$/);
+    if (match) {
+      return `${match[1]}.${match[2]}`;
+    }
+  }
+
+  return name;
+}
+
+function getSemanticModeFromName(name: string): string {
+  const match = name.match(/^color\.modes\.([^.]+)\./);
+  return match?.[1] ?? "default";
+}
+
+function toDesignerSemanticName(name: string): string {
+  if (name.startsWith("color.modes.")) {
+    return name.replace(/^color\.modes\.[^.]+\./, "");
+  }
+  if (name.startsWith("color.")) {
+    return name.replace(/^color\./, "");
+  }
+  return name;
+}
+
+function toCanonicalSemanticName(name: string, mode = "default"): string {
+  const trimmed = name.trim();
+  if (trimmed.startsWith("color.modes.")) return trimmed;
+  const semanticTail = trimmed.startsWith("color.") ? trimmed.replace(/^color\./, "") : trimmed;
+  return semanticTail.length > 0 ? `color.modes.${mode}.${semanticTail}` : "";
+}
+
 function guessLayer(name: string): Layer {
   const lower = name.toLowerCase();
   if (lower.startsWith("cdr.") || lower.includes("component")) return "component";
@@ -302,6 +405,60 @@ function guessLayer(name: string): Layer {
     return "semantic";
   }
   return "primitive";
+}
+
+function isSemanticLayer(layer: Layer): boolean {
+  return layer === "semantic";
+}
+
+function detectSemanticCategory(name: string): SemanticCategory {
+  const first = name.split(".").filter(Boolean)[0]?.toLowerCase();
+  if (first === "color") return "color";
+  if (first === "radius") return "radius";
+  if (first === "space" || first === "spacing") return "spacing";
+  if (first === "type") return "type";
+  return "other";
+}
+
+function getSemanticTaxonomyKeys(category: SemanticCategory): SemanticTaxonomyKey[] {
+  if (category === "color") {
+    return ["intent", "role", "variant", "stateFamily", "state"];
+  }
+  if (category === "radius") {
+    return ["intent", "variant"];
+  }
+  if (category === "spacing") {
+    return ["intent", "variant", "breakpoint"];
+  }
+  if (category === "type") {
+    return ["intent", "variant", "tier"];
+  }
+  return ["intent", "role", "variant", "stateFamily", "state", "tier", "breakpoint"];
+}
+
+function taxonomyFieldLabel(category: SemanticCategory, key: SemanticTaxonomyKey): string {
+  if (category === "radius") {
+    if (key === "intent") return "usage";
+    if (key === "variant") return "size";
+  }
+  if (category === "spacing") {
+    if (key === "intent") return "scale group";
+    if (key === "variant") return "step";
+  }
+  if (category === "type") {
+    if (key === "intent") return "text role";
+    if (key === "variant") return "size";
+    if (key === "tier") return "weight tier";
+  }
+  return key;
+}
+
+function getSemanticTaxonomyOptions(
+  category: SemanticCategory,
+  key: SemanticTaxonomyKey,
+  fallback: TaxonomyMap,
+): string[] {
+  return SEMANTIC_CATEGORY_OPTIONS[category]?.[key] ?? fallback[key] ?? [];
 }
 
 function getField(record: Record<string, string>, aliases: string[]): string {
@@ -863,9 +1020,15 @@ function buildStory(): HTMLElement {
       </div>`;
   };
 
-  const renderTaxonomySelect = (token: TokenRecord, key: TaxonomyKey): string => {
+  const renderTaxonomySelect = (
+    token: TokenRecord,
+    key: TaxonomyKey,
+    label?: string,
+    optionsOverride?: string[],
+  ): string => {
     const selected = token.taxonomy[key] ?? "";
-    const options = state.taxonomy[key]
+    const optionsSource = optionsOverride ?? state.taxonomy[key];
+    const options = optionsSource
       .map(
         (option) =>
           `<option value="${escapeHtml(option)}"${selected === option ? " selected" : ""}>${escapeHtml(option)}</option>`,
@@ -874,7 +1037,7 @@ function buildStory(): HTMLElement {
 
     return `
       <label class="field">
-        <span>${escapeHtml(key)}</span>
+        <span>${escapeHtml(label ?? key)}</span>
         <select data-action="token-taxonomy" data-key="${escapeHtml(key)}">
           <option value="">None</option>
           ${options}
@@ -966,7 +1129,7 @@ function buildStory(): HTMLElement {
             <div class="tcard-row">
               ${swatch}
               <div class="tcard-body">
-                <div class="tcard-name">${escapeHtml(token.name)}</div>
+                <div class="tcard-name">${escapeHtml(displayTokenName(token.name))}</div>
                 <div class="tcard-value">${escapeHtml(token.value)}</div>
                 ${token.description ? `<div class="tcard-desc">${escapeHtml(token.description)}</div>` : ""}
               </div>
@@ -1017,9 +1180,13 @@ function buildStory(): HTMLElement {
     const linkOptions = (selected.layer === "primitive" ? semanticTargets : linkTargets)
       .map((token) => {
         const selectedFlag = selected.links.includes(token.id) ? " selected" : "";
-        return `<option value="${escapeHtml(token.id)}"${selectedFlag}>${escapeHtml(token.name)}</option>`;
+        return `<option value="${escapeHtml(token.id)}"${selectedFlag}>${escapeHtml(displayTokenName(token.name))}</option>`;
       })
       .join("");
+
+    const nameInputValue = isSemanticLayer(selected.layer)
+      ? toDesignerSemanticName(selected.name)
+      : selected.name;
 
     return `
       <div class="author-grid">
@@ -1046,7 +1213,7 @@ function buildStory(): HTMLElement {
         <section class="panel editor-panel">
           <h3>Token authoring</h3>
           <div class="field-grid two">
-            <label class="field"><span>Name</span><input class="text-input" data-action="token-name" value="${escapeHtml(selected.name)}" /></label>
+            <label class="field"><span>Name</span><input class="text-input" data-action="token-name" value="${escapeHtml(nameInputValue)}" /></label>
             <label class="field"><span>Layer</span>
               <select data-action="token-layer">
                 <option value="primitive"${selected.layer === "primitive" ? " selected" : ""}>Primitives</option>
@@ -1060,17 +1227,26 @@ function buildStory(): HTMLElement {
           <label class="field"><span>Description</span><textarea class="text-input" rows="2" data-action="token-description">${escapeHtml(selected.description)}</textarea></label>
 
           <h4>Taxonomy fields</h4>
-          <div class="field-grid three">
-            ${renderTaxonomySelect(selected, "palette")}
-            ${renderTaxonomySelect(selected, "category")}
-            ${renderTaxonomySelect(selected, "intent")}
-            ${renderTaxonomySelect(selected, "role")}
-            ${renderTaxonomySelect(selected, "variant")}
-            ${renderTaxonomySelect(selected, "stateFamily")}
-            ${renderTaxonomySelect(selected, "state")}
-            ${renderTaxonomySelect(selected, "tier")}
-            ${renderTaxonomySelect(selected, "breakpoint")}
-          </div>
+          ${isSemanticLayer(selected.layer)
+            ? `<div class="field-grid three">
+                ${getSemanticTaxonomyKeys(detectSemanticCategory(selected.name))
+                  .map((key) =>
+                    renderTaxonomySelect(
+                      selected,
+                      key,
+                      taxonomyFieldLabel(detectSemanticCategory(selected.name), key),
+                      getSemanticTaxonomyOptions(
+                        detectSemanticCategory(selected.name),
+                        key,
+                        state.taxonomy,
+                      ),
+                    ),
+                  )
+                  .join("")}
+              </div>
+              <p class="hint">Semantic taxonomy fields drive semantic token naming and update the name as you edit.</p>`
+            : `<div class="empty-state" style="margin-bottom:0.75rem;">Taxonomy naming is enabled for semantic tokens only.</div>
+               <p class="hint">Primitives are designer-defined palette options. Edit primitive names directly (for example: color.option.neutral.warm.grey.100).</p>`}
 
           <h4>Token connections</h4>
           <label class="field">
@@ -1168,9 +1344,9 @@ function buildStory(): HTMLElement {
 
         return `
           <tr>
-            <td>${escapeHtml(token.name)}</td>
+            <td>${escapeHtml(displayTokenName(token.name))}</td>
             <td>${escapeHtml(token.value)}</td>
-            <td>${linkedSemantics.length === 0 ? "-" : linkedSemantics.map((item) => escapeHtml(item.name)).join("<br>")}</td>
+            <td>${linkedSemantics.length === 0 ? "-" : linkedSemantics.map((item) => escapeHtml(displayTokenName(item.name))).join("<br>")}</td>
           </tr>
         `;
       })
@@ -1962,9 +2138,16 @@ function buildStory(): HTMLElement {
       tokenNameInput?.addEventListener("input", () => {
         const newName = tokenNameInput.value;
         patchSelected((token) => {
-          token.name = newName;
-          // When name changes, parse it and update taxonomy fields
-          token.taxonomy = parseCanonicalPath(newName, state.taxonomy);
+          if (isSemanticLayer(token.layer)) {
+            const mode = getSemanticModeFromName(token.name);
+            token.name = toCanonicalSemanticName(newName, mode);
+          } else {
+            token.name = newName;
+          }
+          // Keep taxonomy↔name binding semantic-only.
+          if (isSemanticLayer(token.layer)) {
+            token.taxonomy = parseCanonicalPath(token.name, state.taxonomy);
+          }
         }, "Token name updated");
         // After patching, re-render to update taxonomy field UI
         render();
@@ -1989,20 +2172,30 @@ function buildStory(): HTMLElement {
         patchSelected((token) => {
           token.layer = tokenLayerSelect.value as Layer;
           token.links = [];
+          if (isSemanticLayer(token.layer)) {
+            token.taxonomy = parseCanonicalPath(token.name, state.taxonomy);
+          } else {
+            token.taxonomy = {};
+          }
         }, "Token layer updated");
+        render();
       });
 
       root.querySelectorAll<HTMLSelectElement>("[data-action='token-taxonomy']").forEach((select) => {
         select.addEventListener("change", () => {
           const key = select.dataset.key as TaxonomyKey;
           patchSelected((token) => {
+            if (!isSemanticLayer(token.layer)) {
+              return;
+            }
             if (select.value.trim().length === 0) {
               delete token.taxonomy[key];
             } else {
               token.taxonomy[key] = select.value;
             }
-            // When taxonomy changes, reconstruct the name
-            token.name = reconstructCanonicalPath(token.taxonomy);
+            // When semantic taxonomy changes, reconstruct semantic name.
+            const mode = getSemanticModeFromName(token.name);
+            token.name = toCanonicalSemanticName(reconstructCanonicalPath(token.taxonomy), mode);
           }, "Token taxonomy updated");
           // After patching, re-render to update the name field UI
           render();

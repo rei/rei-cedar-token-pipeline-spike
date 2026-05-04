@@ -101,6 +101,42 @@ function normalizeDocs(docs: unknown): TokenDocumentation | undefined {
   return Object.keys(result).length > 0 ? result : undefined;
 }
 
+function toCssVarFromPath(tokenPath: string[]): string {
+  // Match the web output naming convention: drop color.modes.<mode> scaffolding.
+  const meaningful =
+    tokenPath[0] === "color" && tokenPath[1] === "modes" ? tokenPath.slice(3) : tokenPath;
+  return `--cdr-${meaningful.join("-")}`;
+}
+
+function resolveValueForDocs(token: TransformedToken): string | undefined {
+  const tokenRecord = token as Record<string, unknown>;
+  const cedar = (tokenRecord.$extensions as Record<string, unknown> | undefined)?.cedar as
+    | Record<string, unknown>
+    | undefined;
+
+  // Prefer resolved web light value when available.
+  const resolved = cedar?.resolved as Record<string, unknown> | undefined;
+  const web = resolved?.web as Record<string, unknown> | undefined;
+  const webLight = web?.light;
+  if (typeof webLight === "string" && webLight.trim().length > 0) return webLight;
+
+  // Fallback to transformed value, then raw $value.
+  if (typeof tokenRecord.value === "string" && tokenRecord.value.trim().length > 0) {
+    return tokenRecord.value;
+  }
+  if (typeof tokenRecord.$value === "string" && tokenRecord.$value.trim().length > 0) {
+    return tokenRecord.$value;
+  }
+  if (typeof tokenRecord.value === "number" || typeof tokenRecord.value === "boolean") {
+    return String(tokenRecord.value);
+  }
+  if (typeof tokenRecord.$value === "number" || typeof tokenRecord.$value === "boolean") {
+    return String(tokenRecord.$value);
+  }
+
+  return undefined;
+}
+
 function writeCoreTypeContracts(modules: ModuleDefinition[]): string[] {
   const generatedFiles: string[] = [];
   const moduleNames = [
@@ -434,17 +470,24 @@ function renderModuleInterface({ dictionary, file }: FormatFnArguments): string 
 
       // Render all populated doc fields as a JSDoc block:
       //   @summary   (rendered as the leading description, no tag)
+      //   @value
+      //   @cssvar
       //   @usage
       //   @design
       //   @aliases
       const docs = (token as any)?.$extensions?.cedar?.docs;
       let jsdoc = "";
-      if (docs) {
+      {
         const lines: string[] = [];
-        if (docs.summary) lines.push(docs.summary);
-        if (docs.usage) lines.push(`@usage ${docs.usage}`);
-        if (docs.design) lines.push(`@design ${docs.design}`);
-        if (Array.isArray(docs.aliases) && docs.aliases.length > 0) {
+        const resolvedValue = token ? resolveValueForDocs(token) : undefined;
+        const cssVar = token ? toCssVarFromPath(token.path) : undefined;
+
+        if (docs?.summary) lines.push(docs.summary);
+        if (resolvedValue) lines.push(`@value ${resolvedValue}`);
+        if (cssVar) lines.push(`@cssvar ${cssVar}`);
+        if (docs?.usage) lines.push(`@usage ${docs.usage}`);
+        if (docs?.design) lines.push(`@design ${docs.design}`);
+        if (docs && Array.isArray(docs.aliases) && docs.aliases.length > 0) {
           lines.push(`@aliases ${docs.aliases.join(", ")}`);
         }
         if (lines.length > 0) {
