@@ -3,7 +3,7 @@
     "scale": {
       "-50": {
         "$type": "number",
-        "$value": 3.8459999561309814,
+        "$value": 3.1500000953674316,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -17,7 +17,7 @@
       },
       "-100": {
         "$type": "number",
-        "$value": 7.078000068664551,
+        "$value": 5.916999816894531,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -31,7 +31,7 @@
       },
       "-150": {
         "$type": "number",
-        "$value": 10.309000015258789,
+        "$value": 8.6850004196167,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -45,7 +45,7 @@
       },
       "-200": {
         "$type": "number",
-        "$value": 13.538999557495117,
+        "$value": 11.45199966430664,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -59,7 +59,7 @@
       },
       "-250": {
         "$type": "number",
-        "$value": 16.770999908447266,
+        "$value": 14.218000411987305,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -73,7 +73,7 @@
       },
       "-300": {
         "$type": "number",
-        "$value": 20.003999710083008,
+        "$value": 16.985000610351562,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -87,7 +87,7 @@
       },
       "-400": {
         "$type": "number",
-        "$value": 25.232999801635742,
+        "$value": 21.753000259399414,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -101,7 +101,65 @@
       },
       "-500": {
         "$type": "number",
-        "$value": 30.46299934387207,
+        "$value": 26.520000457763672,
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      }
+    },
+    "static": {
+      "eighth-x": {
+        "$type": "number",
+        "$value": 2,
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "quarter-x": {
+        "$type": "number",
+        "$value": 4,
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "half-x": {
+        "$type": "number",
+        "$value": 8,
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "one-x": {
+        "$type": "number",
+        "$value": 16,
         "$description": "",
         "$extensions": {
           "com.figma": {

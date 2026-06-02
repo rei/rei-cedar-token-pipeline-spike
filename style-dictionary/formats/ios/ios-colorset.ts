@@ -1,5 +1,5 @@
 type P3ColorValue = {
-  'color-space': 'display-p3';
+  "color-space": "display-p3";
   components: {
     red: string;
     green: string;
@@ -20,7 +20,7 @@ export const iosColorsetFormatter = (token: IosColorsetToken): string => {
   if (!token.value || !token.value.light || !token.value.dark) {
     throw new Error(
       `Token ${token.name} is missing light/dark P3 values. ` +
-      `Check that ios-color-action resolved the option token correctly.`
+        `Check that ios-color-action resolved the option token correctly.`
     );
   }
 
@@ -29,16 +29,16 @@ export const iosColorsetFormatter = (token: IosColorsetToken): string => {
       colors: [
         {
           color: token.value.light,
-          idiom: 'universal',
+          idiom: "universal",
         },
         {
-          appearances: [{ appearance: 'luminosity', value: 'dark' }],
+          appearances: [{ appearance: "luminosity", value: "dark" }],
           color: token.value.dark,
-          idiom: 'universal',
+          idiom: "universal",
         },
       ],
       info: {
-        author: 'xcode',
+        author: "xcode",
         version: 1,
       },
     },

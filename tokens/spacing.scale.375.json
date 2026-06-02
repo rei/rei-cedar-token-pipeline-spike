@@ -3,7 +3,7 @@
     "scale": {
       "-50": {
         "$type": "number",
-        "$value": 4,
+        "$value": 2.559999942779541,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -17,7 +17,7 @@
       },
       "-100": {
         "$type": "number",
-        "$value": 8,
+        "$value": 4.940000057220459,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -31,7 +31,7 @@
       },
       "-150": {
         "$type": "number",
-        "$value": 12,
+        "$value": 7.309999942779541,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -45,7 +45,7 @@
       },
       "-200": {
         "$type": "number",
-        "$value": 16,
+        "$value": 9.6899995803833,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -59,7 +59,7 @@
       },
       "-250": {
         "$type": "number",
-        "$value": 20,
+        "$value": 12.0600004196167,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -73,7 +73,7 @@
       },
       "-300": {
         "$type": "number",
-        "$value": 24,
+        "$value": 14.4399995803833,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -87,7 +87,7 @@
       },
       "-400": {
         "$type": "number",
-        "$value": 32,
+        "$value": 18.809999465942383,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -101,7 +101,65 @@
       },
       "-500": {
         "$type": "number",
-        "$value": 40,
+        "$value": 23.190000534057617,
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      }
+    },
+    "static": {
+      "eighth-x": {
+        "$type": "number",
+        "$value": 2,
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "quarter-x": {
+        "$type": "number",
+        "$value": 4,
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "half-x": {
+        "$type": "number",
+        "$value": 8,
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "one-x": {
+        "$type": "number",
+        "$value": 16,
         "$description": "",
         "$extensions": {
           "com.figma": {

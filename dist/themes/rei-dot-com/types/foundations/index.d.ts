@@ -18,4 +18,7 @@ export * from "./cdr-spacing-component.docs.js";
 export * from "./cdr-spacing-layout.names.js";
 export * from "./cdr-spacing-layout.js";
 export * from "./cdr-spacing-layout.docs.js";
+export * from "./cdr-spacing-static.names.js";
+export * from "./cdr-spacing-static.js";
+export * from "./cdr-spacing-static.docs.js";
 export * from "./modes/index.js";

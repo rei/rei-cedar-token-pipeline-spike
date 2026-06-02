@@ -123,11 +123,18 @@ try {
   }));
 
   // ── Partition files by type ─────────────────────────────────────────────────
-  const SPACING_BP_RE = /^spacing\.(\d+)\.json$/;
+  const SPACING_BP_RE = /^spacing.scale\.(\d+)\.json$/;
   const spacingBpFiles = parsed.filter(({ file }) => SPACING_BP_RE.test(file));
   const optionColorFiles = parsed.filter(({ file }) => extractPrimitiveMode(file) !== null);
   const otherFiles = parsed.filter(
-    ({ file }) => !SPACING_BP_RE.test(file) && extractPrimitiveMode(file) === null,
+    ({ file }) =>
+      !SPACING_BP_RE.test(file) &&
+      extractPrimitiveMode(file) === null &&
+      file !== "spacing.web.json" &&
+      file !== "spacing.ios.json",
+  );
+  const spacingPlatformFiles = parsed.filter(
+    ({ file }) => file === "spacing.web.json" || file === "spacing.ios.json",
   );
 
   const validationIssues = validateFigmaInputs({
@@ -140,7 +147,7 @@ try {
 
   const canonical: Record<string, unknown> = {};
 
-  // ── 1. Fluid spacing ────────────────────────────────────────────────────────
+  // ── 1. Spacing properties ────────────────────────────────────────────────────────
   if (spacingBpFiles.length > 0) {
     const parsedBps = spacingBpFiles.map(({ file, data }) => ({
       breakpoint: parseInt(SPACING_BP_RE.exec(file)![1], 10),
@@ -155,6 +162,59 @@ try {
     console.log(
       `  ✓ spacing.[${bpList}].json → fluid clamp() values (${spacingBpFiles.length} breakpoints)`,
     );
+  }
+
+  // ── 3.5 Normalize Platform Spacing Scales ─────────────────────────────────────
+  if (spacingPlatformFiles.length > 0) {
+    // Initialize the baseline spacing block if it doesn't exist
+    if (!canonical.spacing) {
+      canonical.spacing = {};
+    }
+
+    const spacingTarget = canonical.spacing as Record<string, any>;
+
+    if (!spacingTarget.space) {
+      spacingTarget.space = {};
+    }
+
+    for (const { file, data } of spacingPlatformFiles) {
+      // Determine target platform profile ("spacing.web.json" -> "web", "spacing.web.ios" -> "ios")
+      let platformName = file.split(".")[1];
+
+      if (platformName === "web" && platformName === "ios") {
+        platformName = "ios";
+      } else if (file === "spacing.ios.json") {
+        platformName = "ios";
+      }
+
+      const spaceSource = (data.space || data) as Record<string, any>;
+
+      for (const [tokenKey, tokenData] of Object.entries(spaceSource)) {
+        const rawToken = tokenData as Record<string, any>;
+
+        if (!spacingTarget.space[tokenKey]) {
+          spacingTarget.space[tokenKey] = {
+            $type: rawToken.$type || "number",
+            $value: "",
+            $description: rawToken.$description || "",
+            $extensions: {
+              cedar: {
+                platforms: {},
+              },
+            },
+          };
+        }
+
+        if (platformName === "web") {
+          spacingTarget.space[tokenKey].$value = rawToken.$value;
+        }
+
+        spacingTarget.space[tokenKey].$extensions.cedar.platforms[platformName] = {
+          $value: rawToken.$value,
+        };
+      }
+    }
+    console.log(`  ✓ Normalized platform files into canonical spacing.space.*`);
   }
 
   // ── 2. Option color files → color.option + platform lookup table ────────────
@@ -271,7 +331,9 @@ try {
 
   console.log(`\nSuccessfully created: ${outFile}`);
   console.log(
-    `  ${files.length} file(s) merged, ${Object.keys(canonical).length} top-level section(s): ${Object.keys(canonical).join(", ")}`,
+    `  ${files.length} file(s) merged, ${
+      Object.keys(canonical).length
+    } top-level section(s): ${Object.keys(canonical).join(", ")}`,
   );
 } catch (error) {
   console.error("Error creating canonical/tokens.json:", error);
