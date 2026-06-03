@@ -1,6 +1,6 @@
 :root {
-  --cdr-spacing-component-xs: clamp(2.48px, 0.1357vw + 2.0457px, 4px);
-  --cdr-spacing-component-sm: clamp(4.8px, 0.25vw + 4px, 8px);
-  --cdr-spacing-component-md: clamp(7.12px, 0.3297vw + 6.0649px, 12px);
-  --cdr-spacing-component-lg: clamp(9.44px, 0.4432vw + 8.0216px, 16px);
+  --cdr-spacing-component-xs: 3.48799991607666;
+  --cdr-spacing-component-sm: 6.480000019073486;
+  --cdr-spacing-component-md: 9.472000122070312;
+  --cdr-spacing-component-lg: 12.46399974822998;
 }

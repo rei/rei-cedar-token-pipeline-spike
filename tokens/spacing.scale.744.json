@@ -1,9 +1,9 @@
 {
   "spacing": {
     "scale": {
-      "-50": {
+      "50": {
         "$type": "number",
-        "$value": 3.799999952316284,
+        "$value": 3.115999937057495,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -15,9 +15,9 @@
           }
         }
       },
-      "-100": {
+      "100": {
         "$type": "number",
-        "$value": 7,
+        "$value": 5.800000190734863,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -29,9 +29,9 @@
           }
         }
       },
-      "-150": {
+      "150": {
         "$type": "number",
-        "$value": 10.199999809265137,
+        "$value": 8.604000091552734,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -43,9 +43,9 @@
           }
         }
       },
-      "-200": {
+      "200": {
         "$type": "number",
-        "$value": 13.399999618530273,
+        "$value": 11.347999572753906,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -57,9 +57,9 @@
           }
         }
       },
-      "-250": {
+      "250": {
         "$type": "number",
-        "$value": 16.600000381469727,
+        "$value": 14.092000007629395,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -71,9 +71,9 @@
           }
         }
       },
-      "-300": {
+      "300": {
         "$type": "number",
-        "$value": 19.799999237060547,
+        "$value": 16.836000442504883,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -85,9 +85,9 @@
           }
         }
       },
-      "-400": {
+      "400": {
         "$type": "number",
-        "$value": 25,
+        "$value": 21.579999923706055,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -99,9 +99,9 @@
           }
         }
       },
-      "-500": {
+      "500": {
         "$type": "number",
-        "$value": 30.200000762939453,
+        "$value": 25.323999404907227,
         "$description": "",
         "$extensions": {
           "com.figma": {

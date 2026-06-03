@@ -1,9 +1,9 @@
 {
   "spacing": {
     "scale": {
-      "-50": {
+      "50": {
         "$type": "number",
-        "$value": 4,
+        "$value": 3.5360000133514404,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -15,9 +15,9 @@
           }
         }
       },
-      "-100": {
+      "100": {
         "$type": "number",
-        "$value": 8,
+        "$value": 6.559999942779541,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -29,9 +29,9 @@
           }
         }
       },
-      "-150": {
+      "150": {
         "$type": "number",
-        "$value": 12,
+        "$value": 9.583999633789062,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -43,9 +43,9 @@
           }
         }
       },
-      "-200": {
+      "200": {
         "$type": "number",
-        "$value": 16,
+        "$value": 12.607999801635742,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -57,9 +57,9 @@
           }
         }
       },
-      "-250": {
+      "250": {
         "$type": "number",
-        "$value": 20,
+        "$value": 15.631999969482422,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -71,9 +71,9 @@
           }
         }
       },
-      "-300": {
+      "300": {
         "$type": "number",
-        "$value": 24,
+        "$value": 18.6560001373291,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -85,9 +85,9 @@
           }
         }
       },
-      "-400": {
+      "400": {
         "$type": "number",
-        "$value": 30.399999618530273,
+        "$value": 23.68000030517578,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -99,9 +99,9 @@
           }
         }
       },
-      "-500": {
+      "500": {
         "$type": "number",
-        "$value": 36.31999969482422,
+        "$value": 28.70400047302246,
         "$description": "",
         "$extensions": {
           "com.figma": {

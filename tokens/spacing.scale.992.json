@@ -1,9 +1,9 @@
 {
   "spacing": {
     "scale": {
-      "-50": {
+      "50": {
         "$type": "number",
-        "$value": 3.5360000133514404,
+        "$value": 3.48799991607666,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -15,9 +15,9 @@
           }
         }
       },
-      "-100": {
+      "100": {
         "$type": "number",
-        "$value": 6.559999942779541,
+        "$value": 6.480000019073486,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -29,9 +29,9 @@
           }
         }
       },
-      "-150": {
+      "150": {
         "$type": "number",
-        "$value": 9.583999633789062,
+        "$value": 9.472000122070312,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -43,9 +43,9 @@
           }
         }
       },
-      "-200": {
+      "200": {
         "$type": "number",
-        "$value": 12.607999801635742,
+        "$value": 12.46399974822998,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -57,9 +57,9 @@
           }
         }
       },
-      "-250": {
+      "250": {
         "$type": "number",
-        "$value": 15.631999969482422,
+        "$value": 15.456000328063965,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -71,9 +71,9 @@
           }
         }
       },
-      "-300": {
+      "300": {
         "$type": "number",
-        "$value": 18.6560001373291,
+        "$value": 18.447999954223633,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -85,9 +85,9 @@
           }
         }
       },
-      "-400": {
+      "400": {
         "$type": "number",
-        "$value": 23.68000030517578,
+        "$value": 23.440000534057617,
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -99,9 +99,9 @@
           }
         }
       },
-      "-500": {
+      "500": {
         "$type": "number",
-        "$value": 28.70400047302246,
+        "$value": 28.43199920654297,
         "$description": "",
         "$extensions": {
           "com.figma": {

@@ -1,9 +1,9 @@
 {
   "spacing": {
-    "scale": {
-      "-50": {
+    "component": {
+      "xs": {
         "$type": "number",
-        "$value": 4,
+        "$value": "{spacing.scale.50}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -15,9 +15,9 @@
           }
         }
       },
-      "-100": {
+      "sm": {
         "$type": "number",
-        "$value": 8,
+        "$value": "{spacing.scale.100}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -29,9 +29,9 @@
           }
         }
       },
-      "-150": {
+      "md": {
         "$type": "number",
-        "$value": 12,
+        "$value": "{spacing.scale.150}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -43,9 +43,25 @@
           }
         }
       },
-      "-200": {
+      "lg": {
         "$type": "number",
-        "$value": 16,
+        "$value": "{spacing.scale.200}",
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      }
+    },
+    "layout": {
+      "sm": {
+        "$type": "number",
+        "$value": "{spacing.scale.250}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -57,9 +73,9 @@
           }
         }
       },
-      "-250": {
+      "md": {
         "$type": "number",
-        "$value": 20,
+        "$value": "{spacing.scale.300}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -71,9 +87,9 @@
           }
         }
       },
-      "-300": {
+      "lg": {
         "$type": "number",
-        "$value": 24,
+        "$value": "{spacing.scale.300}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -85,23 +101,9 @@
           }
         }
       },
-      "-400": {
+      "xl": {
         "$type": "number",
-        "$value": 32,
-        "$description": "",
-        "$extensions": {
-          "com.figma": {
-            "hiddenFromPublishing": false,
-            "scopes": [
-              "ALL_SCOPES"
-            ],
-            "codeSyntax": {}
-          }
-        }
-      },
-      "-500": {
-        "$type": "number",
-        "$value": 40,
+        "$value": "{spacing.scale.500}",
         "$description": "",
         "$extensions": {
           "com.figma": {
