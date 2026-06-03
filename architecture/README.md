@@ -87,8 +87,8 @@ It serves as the single entry point for diagrams, ADRs, and technical notes that
 |---|---|
 | `canonical/tokens.json` (color tokens) | ✓ Complete |
 | `src/schema/token-schema.json` | ✓ Complete |
-| `dist/themes/rei-dot-com/css/light.css` | ✓ Complete — validated with correct web light hex values |
-| `dist/themes/rei-dot-com/css/dark.css` | ✓ Complete — validated with correct web dark hex values |
+| `dist/themes/rei-dot-com/css/light.css` | ✓ Complete — validated with web light hex fallbacks plus OKLCH overrides |
+| `dist/themes/rei-dot-com/css/dark.css` | ✓ Complete — validated with web dark hex fallbacks plus OKLCH overrides |
 | `dist/themes/rei-dot-com/ios/Colors.xcassets` | ✓ Complete — validated with correct iOS Display P3 values |
 | Fluid spacing (`clamp()`) | ✓ Complete |
 | `dist/themes/rei-dot-com/ios/ColorTokens.swift` | ○ Not started — V1 |

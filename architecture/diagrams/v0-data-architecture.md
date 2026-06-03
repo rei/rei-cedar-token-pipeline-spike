@@ -66,8 +66,8 @@ Style Dictionary (cedar/ios + cedar/web platforms)
          ▼
 dist/
   ├── css/
-  │     ├── light.css   — :root { --cdr-* } web-light values
-  │     └── dark.css    — :root { --cdr-* } web-dark values
+  │     ├── light.css   — :root { --cdr-* } web-light hex fallback + OKLCH override
+  │     └── dark.css    — :root { --cdr-* } web-dark hex fallback + OKLCH override
   └── ios/
         └── Colors.xcassets/
               └── <tokenName>.colorset/Contents.json (×N)
@@ -165,8 +165,8 @@ Consumes `canonical/tokens.json` and produces platform outputs via custom action
 ### 6. Platform Outputs
 
 **Validated in spike:**
-- `dist/themes/rei-dot-com/css/light.css` — CSS custom properties, web-light values
-- `dist/themes/rei-dot-com/css/dark.css` — CSS custom properties, web-dark values
+- `dist/themes/rei-dot-com/css/light.css` — CSS custom properties, web-light hex fallbacks plus OKLCH overrides
+- `dist/themes/rei-dot-com/css/dark.css` — CSS custom properties, web-dark hex fallbacks plus OKLCH overrides
 - `dist/themes/rei-dot-com/ios/Colors.xcassets/` — Xcode color asset catalog, iOS Display P3 values
 
 **Not yet implemented (V1):**

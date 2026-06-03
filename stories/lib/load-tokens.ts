@@ -3,6 +3,8 @@
  *
  * Utility to fetch and extract token data from snapshots at runtime.
  * This allows color and spacing stories to display the latest token values dynamically.
+ * Web color stories intentionally format colors as CSS oklch() values while
+ * preserving canonical hex as sourceHex for fallback/contrast context.
  *
  * Color token structure (multi-mode canonical format):
  *   color.modes.<mode>.surface.base
@@ -18,6 +20,7 @@
  */
 
 import type { Platform, Mode } from "../../src/storybook/platform-mode-context";
+import { toWebOklch } from "./web-color-format.js";
 
 interface TokenLeaf {
   $value: string;
@@ -27,6 +30,7 @@ interface TokenLeaf {
       docs?: TokenDocs;
       appearances?: Record<string, string>;
       platformOverrides?: Record<string, Record<string, string>>;
+      resolved?: Record<string, Record<string, string>>;
     };
   };
 }
@@ -39,7 +43,8 @@ export interface TokenDocs {
 }
 
 export interface LoadedColorToken {
-  hex: string;
+  value: string;
+  sourceHex: string;
   ref: string;
   docs?: TokenDocs;
 }
@@ -47,6 +52,7 @@ export interface LoadedColorToken {
 export interface PrimitiveColorToken {
   name: string;
   value: string;
+  sourceHex: string;
   docs?: TokenDocs;
 }
 
@@ -56,7 +62,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 /**
  * Fetch the current token snapshot and extract color tokens for all modes.
- * Returns a map of token paths to their hex values, keyed as
+ * Returns a map of token paths to their web OKLCH values, keyed as
  * "color.modes.<mode>.<category>.<token>".
  */
 export async function loadColorTokens(
@@ -92,9 +98,10 @@ export async function loadColorTokens(
         for (const [key, value] of Object.entries(group)) {
           if (isLeaf(value)) {
             const leaf = value as TokenLeaf;
-            const resolvedHex = resolveAlias(leaf.$value, colorSection, platform, mode);
+            const sourceHex = resolveColorValue(leaf, colorSection, platform, mode);
             result.set(`color.modes.${modeName}.${category}.${key}`, {
-              hex: resolvedHex || leaf.$value,
+              value: formatColorForPlatform(sourceHex, platform),
+              sourceHex,
               ref: buildRef(leaf.$value),
               docs: leaf.$extensions?.cedar?.docs,
             });
@@ -111,9 +118,10 @@ export async function loadColorTokens(
       for (const [key, value] of Object.entries(group)) {
         if (isLeaf(value)) {
           const leaf = value as TokenLeaf;
-          const resolvedHex = resolveAlias(leaf.$value, colorSection, platform, mode);
+          const sourceHex = resolveColorValue(leaf, colorSection, platform, mode);
           result.set(`color.${category}.${key}`, {
-            hex: resolvedHex || leaf.$value,
+            value: formatColorForPlatform(sourceHex, platform),
+            sourceHex,
             ref: buildRef(leaf.$value),
             docs: leaf.$extensions?.cedar?.docs,
           });
@@ -126,11 +134,11 @@ export async function loadColorTokens(
 }
 
 /**
- * Fetch the current token snapshot and extract primitive color tokens per platform mode.
+ * Fetch the current token snapshot and extract primitive color tokens for web appearances.
  * Returns a map of mode name → array of { name, value } objects.
  *
  * Mode names match the options.color.<mode>.json filenames:
- *   "light", "web-light", "web-dark", "ios-light", "ios-dark"
+ *   "web-light", "web-dark"
  *
  * Falls back to reading from flat color.<palette> if no per-mode structure is present.
  */
@@ -155,6 +163,7 @@ export async function loadPrimitiveColors(): Promise<
   if (primitivesSection) {
     // Multi-mode: color.primitives.<mode>.<palette>.<shade>
     for (const [mode, modeData] of Object.entries(primitivesSection)) {
+      if (!isWebMode(mode)) continue;
       if (typeof modeData !== "object" || modeData === null) continue;
       const tokens: PrimitiveColorToken[] = [];
       for (const palette of ["neutral-palette", "brand-palette"]) {
@@ -164,9 +173,10 @@ export async function loadPrimitiveColors(): Promise<
       result.set(mode, tokens);
     }
   } else if (isRecord(colorSection["option"])) {
-    // Canonical fallback: color.option.<neutral|brand>.*
-    const tokens = flattenOptionPrimitives(colorSection["option"] as Record<string, unknown>);
-    result.set("default", tokens);
+    // Canonical fallback: derive web appearances from color.option.*.
+    const optionSection = colorSection["option"] as Record<string, unknown>;
+    result.set("web-light", flattenOptionPrimitives(optionSection, "light"));
+    result.set("web-dark", flattenOptionPrimitives(optionSection, "dark"));
   } else {
     // Fallback: flat color.<palette> (legacy structure)
     const tokens: PrimitiveColorToken[] = [];
@@ -180,8 +190,13 @@ export async function loadPrimitiveColors(): Promise<
   return result;
 }
 
+function isWebMode(mode: string): boolean {
+  return mode === "light" || mode === "dark" || mode.startsWith("web-");
+}
+
 function flattenOptionPrimitives(
   optionSection: Record<string, unknown>,
+  appearance: "light" | "dark",
 ): PrimitiveColorToken[] {
   const out: PrimitiveColorToken[] = [];
 
@@ -195,9 +210,11 @@ function flattenOptionPrimitives(
       const warmGrey = warmGreyNode;
       for (const [shade, node] of Object.entries(warmGrey)) {
         if (isLeaf(node)) {
+          const sourceHex = resolveOptionWebHex(node, appearance);
           out.push({
             name: `neutral-palette.warm-grey.${shade}`,
-            value: node.$value,
+            value: toWebOklch(sourceHex),
+            sourceHex,
             docs: node.$extensions?.cedar?.docs,
           });
         }
@@ -208,9 +225,11 @@ function flattenOptionPrimitives(
     for (const key of ["black", "white"] as const) {
       const node = neutral[key];
       if (isLeaf(node)) {
+        const sourceHex = resolveOptionWebHex(node, appearance);
         out.push({
           name: `neutral-palette.base-neutrals.${key}`,
-          value: node.$value,
+          value: toWebOklch(sourceHex),
+          sourceHex,
           docs: node.$extensions?.cedar?.docs,
         });
       }
@@ -221,9 +240,11 @@ function flattenOptionPrimitives(
       const overlay = overlayNode;
       for (const [key, node] of Object.entries(overlay)) {
         if (isLeaf(node)) {
+          const sourceHex = resolveOptionWebHex(node, appearance);
           out.push({
             name: `neutral-palette.base-neutrals.overlay-${key}`,
-            value: node.$value,
+            value: toWebOklch(sourceHex),
+            sourceHex,
             docs: node.$extensions?.cedar?.docs,
           });
         }
@@ -239,9 +260,11 @@ function flattenOptionPrimitives(
       if (!isRecord(scaleNode)) continue;
       for (const [shade, leaf] of Object.entries(scaleNode)) {
         if (isLeaf(leaf)) {
+          const sourceHex = resolveOptionWebHex(leaf, appearance);
           out.push({
             name: `brand-palette.${colorName}.${shade}`,
-            value: leaf.$value,
+            value: toWebOklch(sourceHex),
+            sourceHex,
             docs: leaf.$extensions?.cedar?.docs,
           });
         }
@@ -348,11 +371,36 @@ function flattenTokens(
     const path = `${prefix}.${key}`;
     if (isLeaf(value)) {
       const leaf = value as TokenLeaf;
-      out.push({ name: path, value: leaf.$value, docs: leaf.$extensions?.cedar?.docs });
+      out.push({
+        name: path,
+        value: toWebOklch(leaf.$value),
+        sourceHex: leaf.$value,
+        docs: leaf.$extensions?.cedar?.docs,
+      });
     } else if (typeof value === "object" && value !== null) {
       flattenTokens(value as Record<string, unknown>, path, out);
     }
   }
+}
+
+function formatColorForPlatform(value: string, platform: Platform): string {
+  return platform === "web" ? toWebOklch(value) : value;
+}
+
+function resolveColorValue(
+  leaf: TokenLeaf,
+  colorSection: Record<string, unknown>,
+  platform: Platform,
+  mode: Mode,
+): string {
+  const resolved = leaf.$extensions?.cedar?.resolved?.[platform]?.[mode];
+  if (typeof resolved === "string") return resolved;
+  return resolveAlias(leaf.$value, colorSection, platform, mode) ?? leaf.$value;
+}
+
+function resolveOptionWebHex(node: TokenLeaf, appearance: "light" | "dark"): string {
+  const dark = node.$extensions?.cedar?.appearances?.dark;
+  return appearance === "dark" && typeof dark === "string" ? dark : node.$value;
 }
 
 function resolveAlias(
