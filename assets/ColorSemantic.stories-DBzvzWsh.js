@@ -1,10 +1,10 @@
-import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mode-context-B5Yqe24o.js";import{n as r,t as i}from"./load-tokens-CbjuqQrc.js";import{n as a,t as o}from"./TokenOutputPanel-DlA3hEs_.js";function s(e){e.querySelectorAll(`[data-tabs-scope]`).forEach(e=>{let t=e.querySelectorAll(`.mode-tab`),n=e.querySelectorAll(`.mode-panel`);t.forEach(e=>{e.addEventListener(`click`,()=>{let r=e.dataset.mode;t.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r)),n.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r))})})})}function c(e){return()=>{let t=document.createElement(`div`);return t.style.cssText=`min-height:200px;background:#f5f2eb;`,t.innerHTML=`
+import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mode-context-B5Yqe24o.js";import{n as r,t as i}from"./load-tokens-TMPKsR-w.js";import{n as a,t as o}from"./TokenOutputPanel-DlA3hEs_.js";function s(e){e.querySelectorAll(`[data-tabs-scope]`).forEach(e=>{let t=e.querySelectorAll(`.mode-tab`),n=e.querySelectorAll(`.mode-panel`);t.forEach(e=>{e.addEventListener(`click`,()=>{let r=e.dataset.mode;t.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r)),n.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r))})})})}function c(e){return()=>{let t=document.createElement(`div`);return t.style.cssText=`min-height:200px;background:#f5f2eb;`,t.innerHTML=`
       <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:.85rem;color:#736e65">
         Loading token data…
       </div>`,e().then(e=>{typeof e==`string`?t.innerHTML=e:(t.innerHTML=``,t.appendChild(e)),s(t)}).catch(e=>{t.innerHTML=`
           <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:.85rem;color:#be342d">
             Error loading tokens: ${e instanceof Error?e.message:String(e)}
-          </div>`}),t}}function l(e,t){let n=document.createElement(`div`);return n.innerHTML=e,t&&n.appendChild(t),n}function u(e,t,n){let r=[];for(let i of n){let n=i===`default`?`color.${e}`:`color.modes.${i}.${e}`,a=t.get(n);if(!a)continue;let o=a.ref.split(` → `)[0]??a.ref,s=i===`default`?[`light`,`dark`]:[i];for(let e of s)for(let t of[`web`,`ios`,`android`])r.push({platform:t,mode:e,hex:a.hex,primitive:a.ref,palette:o})}return r}function d(e){let[t,n]=e.split(`.`);return!t||!n?e:`cdr-${{surface:`surface`,text:`text`,border:`border`}[t]??t}-${n}`}function f(e,t,n){let r=u(e,t,n);return r.length===0?null:o({canonicalName:`color.${e}`,outputTokenName:d(e),resolvedValues:r})}function p(...e){return`
+          </div>`}),t}}function l(e,t){let n=document.createElement(`div`);return n.innerHTML=e,t&&n.appendChild(t),n}function u(e,t,n){let r=[];for(let i of n){let n=i===`default`?`color.${e}`:`color.modes.${i}.${e}`,a=t.get(n);if(!a)continue;let o=a.ref.split(` → `)[0]??a.ref,s=i===`default`?[`light`,`dark`]:[i];for(let e of s)for(let t of[`web`,`ios`,`android`])r.push({platform:t,mode:e,hex:a.sourceHex,primitive:a.ref,palette:o})}return r}function d(e){let[t,n]=e.split(`.`);return!t||!n?e:`cdr-${{surface:`surface`,text:`text`,border:`border`}[t]??t}-${n}`}function f(e,t,n){let r=u(e,t,n);return r.length===0?null:o({canonicalName:`color.${e}`,outputTokenName:d(e),resolvedValues:r})}function p(...e){return`
     <nav class="breadcrumb">
       ${e.map((t,n)=>{let r=n===e.length-1;return`<span class="bc-segment${r?` bc-current`:``}">${t}</span>${r?``:`<span class="bc-sep">/</span>`}`}).join(``)}
     </nav>
@@ -17,13 +17,13 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
   `}function h(e){return`<div class="cat-header"><span class="cat-pip"></span><span class="cat-name">${e}</span><span class="cat-rule"></span></div>`}function g(e){return e.replaceAll(`&`,`&amp;`).replaceAll(`<`,`&lt;`).replaceAll(`>`,`&gt;`).replaceAll(`"`,`&quot;`).replaceAll(`'`,`&#39;`)}function _(e){if(!e)return``;let t=[];return e.summary&&t.push(`<div class="trow-doc-summary">${g(e.summary)}</div>`),e.usage&&t.push(`<div class="trow-doc-meta"><span class="trow-doc-label">Usage</span>${g(e.usage)}</div>`),e.design&&t.push(`<div class="trow-doc-meta"><span class="trow-doc-label">Design</span>${g(e.design)}</div>`),e.aliases&&e.aliases.length>0&&t.push(`<div class="trow-doc-meta"><span class="trow-doc-label">Aliases</span>${e.aliases.map(g).join(`, `)}</div>`),t.length>0?`<div class="trow-token-docs">${t.join(``)}</div>`:``}function v(e){return e.startsWith(`color.modes.`)?e.replace(/^color\.modes\.[^.]+\./,``):e.startsWith(`color.`)?e.slice(6):e}function y(e,t){return`
     <div class="token-grid">
       <div class="token-grid-header">
-        <div></div><div>Token</div><div>Resolves to</div><div style="text-align:right">Hex</div>
+        <div></div><div>Token</div><div>Resolves to</div><div style="text-align:right">oklch</div>
       </div>
-      ${t.map(t=>{let n=e.get(t);if(!n)return``;let{hex:r,ref:i,docs:a}=n,o=_(a),s=o?` has-docs`:``;return`
+      ${t.map(t=>{let n=e.get(t);if(!n)return``;let{value:r,ref:i,docs:a}=n,o=_(a),s=o?` has-docs`:``;return`
           <div class="trow-chip-wrap${s}"><span class="trow-chip" style="background:${r};"></span></div>
           <div class="trow-token${s}"><div class="trow-token-name">${v(t)}</div></div>
           <div class="trow-ref${s}">${i}</div>
-          <div class="trow-hex${s}">${r.slice(0,9).toUpperCase()}</div>
+          <div class="trow-value${s}">${r}</div>
           ${o?`<div class="trow-doc-full"><div></div><div class="trow-doc-body">${o}</div></div>`:``}
         `}).join(``)}
     </div>
@@ -49,8 +49,8 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
         ${t.map(t=>{let i=`color.modes.${t}.${n}.${r}`,a=`color.${n}.${r}`,o=e.get(i)??e.get(a);return o?`
         <td class="mode-val">
           <div class="cmp-chip-wrap">
-            <span class="cmp-chip" style="background:${o.hex};"></span>
-            <span class="cmp-hex">${o.hex.slice(0,9).toUpperCase()}</span>
+            <span class="cmp-chip" style="background:${o.value};"></span>
+            <span class="cmp-value">${o.value}</span>
           </div>
         </td>
       `:`<td class="mode-val"><span style="color:var(--ink-faint);font-size:0.625rem;">—</span></td>`}).join(``)}
@@ -141,8 +141,8 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
   .trow-ref { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.6875rem; font-style: italic; color: var(--ink-muted); display: flex; align-items: center; gap: 0.25rem; }
   .trow-ref.has-docs { border-bottom: none; }
   .trow-ref::before { content: '→'; font-style: normal; color: var(--ink-faint); font-size: 0.625rem; }
-  .trow-hex { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-muted); letter-spacing: 0.04em; text-align: right; }
-  .trow-hex.has-docs { border-bottom: none; }
+  .trow-value { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.6875rem; color: var(--ink-muted); letter-spacing: 0.01em; text-align: right; }
+  .trow-value.has-docs { border-bottom: none; }
   .trow-doc-body { grid-column: 2 / -1; }
 
   /* ── Multi-mode comparison table ── */
@@ -159,7 +159,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
   .cmp-token-name { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 500; color: var(--ink); }
   .cmp-chip-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
   .cmp-chip { width: 30px; height: 30px; border-radius: 3px; border: 1px solid var(--rule-heavy); display: block; flex-shrink: 0; }
-  .cmp-hex { font-family: var(--font-mono); font-size: 0.625rem; color: var(--ink-faint); letter-spacing: 0.03em; }
+  .cmp-value { font-family: var(--font-mono); font-size: 0.5625rem; color: var(--ink-faint); letter-spacing: 0.01em; }
   .cmp-mode-header { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; }
   .cmp-mode-badge {
     display: inline-block; font-family: var(--font-sans); font-size: 0.5625rem; font-weight: 700;
@@ -223,14 +223,14 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
           <div class="mode-panel${t===0?` active`:``}" data-mode="${e}">
             ${y(i,r)}
             <div class="demo-card" style="margin-top:1rem;">
-              <div class="demo-layer" style="background:${a?.hex??`transparent`};">
-                <span class="demo-layer-label" style="color:${s?.hex};">${n}surface.base</span>
-                <span class="demo-layer-desc" style="color:${c?.hex};">Base — page background, modal backdrop</span>
+              <div class="demo-layer" style="background:${a?.value??`transparent`};">
+                <span class="demo-layer-label" style="color:${s?.value};">${n}surface.base</span>
+                <span class="demo-layer-desc" style="color:${c?.value};">Base — page background, modal backdrop</span>
               </div>
-              <div class="demo-divider" style="background:${l?.hex};"></div>
-              <div class="demo-layer" style="background:${o?.hex??`transparent`};">
-                <span class="demo-layer-label" style="color:${s?.hex};">${n}surface.raised</span>
-                <span class="demo-layer-desc" style="color:${c?.hex};">Raised — cards, sidebars, dropdowns</span>
+              <div class="demo-divider" style="background:${l?.value};"></div>
+              <div class="demo-layer" style="background:${o?.value??`transparent`};">
+                <span class="demo-layer-label" style="color:${s?.value};">${n}surface.raised</span>
+                <span class="demo-layer-desc" style="color:${c?.value};">Raised — cards, sidebars, dropdowns</span>
               </div>
             </div>
           </div>
@@ -241,14 +241,14 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
       `;else{let[e]=a,t=`color.${e===`default`?``:`modes.${e}.`}`,n=[`${t}surface.base`,`${t}surface.raised`],r=x(i,e,`surface`,`base`),o=x(i,e,`surface`,`raised`),c=x(i,e,`text`,`base`),l=x(i,e,`text`,`subtle`),u=x(i,e,`border`,`subtle`);s=`
         ${y(i,n)}
         <div class="demo-card" style="margin-top:1rem;">
-          <div class="demo-layer" style="background:${r?.hex??`transparent`};">
-            <span class="demo-layer-label" style="color:${c?.hex};">surface.base</span>
-            <span class="demo-layer-desc" style="color:${l?.hex};">Base — page background, modal backdrop</span>
+          <div class="demo-layer" style="background:${r?.value??`transparent`};">
+            <span class="demo-layer-label" style="color:${c?.value};">surface.base</span>
+            <span class="demo-layer-desc" style="color:${l?.value};">Base — page background, modal backdrop</span>
           </div>
-          <div class="demo-divider" style="background:${u?.hex};"></div>
-          <div class="demo-layer" style="background:${o?.hex??`transparent`};">
-            <span class="demo-layer-label" style="color:${c?.hex};">surface.raised</span>
-            <span class="demo-layer-desc" style="color:${l?.hex};">Raised — cards, sidebars, dropdowns</span>
+          <div class="demo-divider" style="background:${u?.value};"></div>
+          <div class="demo-layer" style="background:${o?.value??`transparent`};">
+            <span class="demo-layer-label" style="color:${c?.value};">surface.raised</span>
+            <span class="demo-layer-desc" style="color:${l?.value};">Raised — cards, sidebars, dropdowns</span>
           </div>
         </div>
       `}return l(`
@@ -266,15 +266,15 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
             ${y(i,r)}
             ${h(`Live Preview`)}
             <div class="text-demo">
-              <div class="text-demo-headline" style="color:${a?.hex};">Gear up for your next adventure.</div>
-              <div class="text-demo-body" style="color:${o?.hex};">From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside.</div>
+              <div class="text-demo-headline" style="color:${a?.value};">Gear up for your next adventure.</div>
+              <div class="text-demo-body" style="color:${o?.value};">From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside.</div>
               <div>
-                <a class="text-demo-link" href="#" style="color:${c?.hex};">View all collections</a>
-                <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.625rem;color:${l?.hex};letter-spacing:0.04em;">hover → ${l?.hex?.slice(0,9).toUpperCase()??``}</span>
+                <a class="text-demo-link" href="#" style="color:${c?.value};">View all collections</a>
+                <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.625rem;color:${l?.value};letter-spacing:0.01em;">hover -> ${l?.value??``}</span>
               </div>
-              <div class="text-demo-divider" style="background:${u?.hex};"></div>
+              <div class="text-demo-divider" style="background:${u?.value};"></div>
               <div style="display:flex;gap:1.25rem;flex-wrap:wrap;">
-                ${r.map(e=>`<div style="display:flex;align-items:center;gap:0.35rem;"><span style="width:7px;height:7px;border-radius:50%;border:1px solid var(--rule-heavy);flex-shrink:0;background:${i.get(e)?.hex};"></span><span style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);">${e}</span></div>`).join(``)}
+                ${r.map(e=>`<div style="display:flex;align-items:center;gap:0.35rem;"><span style="width:7px;height:7px;border-radius:50%;border:1px solid var(--rule-heavy);flex-shrink:0;background:${i.get(e)?.value};"></span><span style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);">${e}</span></div>`).join(``)}
               </div>
             </div>
           </div>
@@ -286,13 +286,13 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
         ${y(i,n)}
         ${h(`Live Preview`)}
         <div class="text-demo">
-          <div class="text-demo-headline" style="color:${r?.hex};">Gear up for your next adventure.</div>
-          <div class="text-demo-body" style="color:${o?.hex};">From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside.</div>
+          <div class="text-demo-headline" style="color:${r?.value};">Gear up for your next adventure.</div>
+          <div class="text-demo-body" style="color:${o?.value};">From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside.</div>
           <div>
-            <a class="text-demo-link" href="#" style="color:${l?.hex};">View all collections</a>
-            <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.625rem;color:${u?.hex};letter-spacing:0.04em;">hover → ${u?.hex?.slice(0,9).toUpperCase()??``}</span>
+            <a class="text-demo-link" href="#" style="color:${l?.value};">View all collections</a>
+            <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.625rem;color:${u?.value};letter-spacing:0.01em;">hover -> ${u?.value??``}</span>
           </div>
-          <div class="text-demo-divider" style="background:${d?.hex};"></div>
+          <div class="text-demo-divider" style="background:${d?.value};"></div>
         </div>
       `}return l(`
       <style>${w}</style>
@@ -308,24 +308,24 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
           <div class="mode-panel${t===0?` active`:``}" data-mode="${e}">
             ${y(i,r)}
             <div class="border-demo-grid">
-              <div class="border-demo-cell" style="border:1.5px solid ${a?.hex};">
+              <div class="border-demo-cell" style="border:1.5px solid ${a?.value};">
                 <div class="border-demo-label">${n}border.base</div>
-                <div class="border-demo-desc" style="color:${c?.hex};">Default — cards, inputs, containers</div>
-                <div style="margin-top:0.75rem;height:1px;background:${a?.hex};"></div>
-                <div style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);letter-spacing:0.06em;margin-top:0.25rem;">${a?.hex?.slice(0,9).toUpperCase()}</div>
+                <div class="border-demo-desc" style="color:${c?.value};">Default — cards, inputs, containers</div>
+                <div style="margin-top:0.75rem;height:1px;background:${a?.value};"></div>
+                <div style="font-family:var(--font-mono);font-size:0.5625rem;color:var(--ink-faint);letter-spacing:0.01em;margin-top:0.25rem;">${a?.value??``}</div>
               </div>
-              <div class="border-demo-cell" style="border:1.5px solid ${o?.hex};">
+              <div class="border-demo-cell" style="border:1.5px solid ${o?.value};">
                 <div class="border-demo-label">${n}border.subtle</div>
-                <div class="border-demo-desc" style="color:${c?.hex};">Subtle — dividers, section separators</div>
-                <div style="margin-top:0.75rem;height:1px;background:${o?.hex};"></div>
-                <div style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);letter-spacing:0.06em;margin-top:0.25rem;">${o?.hex?.slice(0,9).toUpperCase()}</div>
+                <div class="border-demo-desc" style="color:${c?.value};">Subtle — dividers, section separators</div>
+                <div style="margin-top:0.75rem;height:1px;background:${o?.value};"></div>
+                <div style="font-family:var(--font-mono);font-size:0.5625rem;color:var(--ink-faint);letter-spacing:0.01em;margin-top:0.25rem;">${o?.value??``}</div>
               </div>
             </div>
-            <div style="margin-top:1rem;padding:1.25rem;background:${u?.hex};border-radius:4px;border-top:3px solid ${a?.hex};">
+            <div style="margin-top:1rem;padding:1.25rem;background:${u?.value};border-radius:4px;border-top:3px solid ${a?.value};">
               <div style="font-family:var(--font-sans);font-size:0.625rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:0.375rem;">Usage note</div>
-              <div style="font-family:var(--font-sans);font-size:0.75rem;color:${c?.hex};line-height:1.6;">
-                Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${l?.hex};">border.base</code> for interactive and structural boundaries.
-                Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${l?.hex};">border.subtle</code> for low-emphasis visual separators.
+              <div style="font-family:var(--font-sans);font-size:0.75rem;color:${c?.value};line-height:1.6;">
+                Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${l?.value};">border.base</code> for interactive and structural boundaries.
+                Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${l?.value};">border.subtle</code> for low-emphasis visual separators.
               </div>
             </div>
           </div>
@@ -336,20 +336,20 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
       `;else{let[e]=a,t=`color.modes.${e}.`,n=s.map(e=>`${t}border.${e}`),r=x(i,e,`border`,`base`),o=x(i,e,`border`,`subtle`),l=x(i,e,`text`,`subtle`),u=x(i,e,`text`,`base`),d=x(i,e,`surface`,`raised`);c=`
         ${y(i,n)}
         <div class="border-demo-grid">
-          <div class="border-demo-cell" style="border:1.5px solid ${r?.hex};">
+          <div class="border-demo-cell" style="border:1.5px solid ${r?.value};">
             <div class="border-demo-label">${t}border.base</div>
-            <div class="border-demo-desc" style="color:${l?.hex};">Default — cards, inputs, containers</div>
+            <div class="border-demo-desc" style="color:${l?.value};">Default — cards, inputs, containers</div>
           </div>
-          <div class="border-demo-cell" style="border:1.5px solid ${o?.hex};">
+          <div class="border-demo-cell" style="border:1.5px solid ${o?.value};">
             <div class="border-demo-label">${t}border.subtle</div>
-            <div class="border-demo-desc" style="color:${l?.hex};">Subtle — dividers, section separators</div>
+            <div class="border-demo-desc" style="color:${l?.value};">Subtle — dividers, section separators</div>
           </div>
         </div>
-        <div style="margin-top:1rem;padding:1.25rem;background:${d?.hex};border-radius:4px;border-top:3px solid ${r?.hex};">
+        <div style="margin-top:1rem;padding:1.25rem;background:${d?.value};border-radius:4px;border-top:3px solid ${r?.value};">
           <div style="font-family:var(--font-sans);font-size:0.625rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:0.375rem;">Usage note</div>
-          <div style="font-family:var(--font-sans);font-size:0.75rem;color:${l?.hex};line-height:1.6;">
-            Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${u?.hex};">border.base</code> for interactive and structural boundaries.
-            Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${u?.hex};">border.subtle</code> for low-emphasis visual separators.
+          <div style="font-family:var(--font-sans);font-size:0.75rem;color:${l?.value};line-height:1.6;">
+            Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${u?.value};">border.base</code> for interactive and structural boundaries.
+            Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${u?.value};">border.subtle</code> for low-emphasis visual separators.
           </div>
         </div>
       `}return l(`
@@ -368,8 +368,8 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
             ${a.map(n=>{let r=`color.modes.${n}.${e}.${t}`,a=`color.${e}.${t}`,o=i.get(r)??i.get(a);return o?`
             <td class="mode-td">
               <div class="cmp-chip-wrap">
-                <span class="cmp-chip" style="background:${o.hex};"></span>
-                <span class="cmp-hex">${o.hex.slice(0,9).toUpperCase()}</span>
+                <span class="cmp-chip" style="background:${o.value};"></span>
+                <span class="cmp-value">${o.value}</span>
               </div>
             </td>
           `:`<td class="mode-td"><span style="color:var(--ink-faint);font-size:0.625rem">—</span></td>`}).join(``)}
@@ -397,14 +397,14 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
           ${h(`Surface`)}
           <div style="margin-top:0.5rem">${y(i,l)}</div>
           <div class="demo-card" style="margin-top:0.75rem">
-            <div class="demo-layer" style="background:${r?.hex??`transparent`}">
-              <span class="demo-layer-label" style="color:${o?.hex}">surface.base</span>
-              <span class="demo-layer-desc" style="color:${s?.hex}">Page background</span>
+            <div class="demo-layer" style="background:${r?.value??`transparent`}">
+              <span class="demo-layer-label" style="color:${o?.value}">surface.base</span>
+              <span class="demo-layer-desc" style="color:${s?.value}">Page background</span>
             </div>
-            <div class="demo-divider" style="background:${c?.hex}"></div>
-            <div class="demo-layer" style="background:${a?.hex??`transparent`}">
-              <span class="demo-layer-label" style="color:${o?.hex}">surface.raised</span>
-              <span class="demo-layer-desc" style="color:${s?.hex}">Cards &amp; panels</span>
+            <div class="demo-divider" style="background:${c?.value}"></div>
+            <div class="demo-layer" style="background:${a?.value??`transparent`}">
+              <span class="demo-layer-label" style="color:${o?.value}">surface.raised</span>
+              <span class="demo-layer-desc" style="color:${s?.value}">Cards &amp; panels</span>
             </div>
           </div>
 
@@ -468,14 +468,14 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
           <div class="mode-panel\${i === 0 ? " active" : ""}" data-mode="\${m}">
             \${tokenGrid(tokens, keys)}
             <div class="demo-card" style="margin-top:1rem;">
-              <div class="demo-layer" style="background:\${base?.hex ?? "transparent"};">
-                <span class="demo-layer-label" style="color:\${textBase?.hex};">\${surfacePrefix}surface.base</span>
-                <span class="demo-layer-desc" style="color:\${textSubtle?.hex};">Base — page background, modal backdrop</span>
+              <div class="demo-layer" style="background:\${base?.value ?? "transparent"};">
+                <span class="demo-layer-label" style="color:\${textBase?.value};">\${surfacePrefix}surface.base</span>
+                <span class="demo-layer-desc" style="color:\${textSubtle?.value};">Base — page background, modal backdrop</span>
               </div>
-              <div class="demo-divider" style="background:\${borderSubtle?.hex};"></div>
-              <div class="demo-layer" style="background:\${raised?.hex ?? "transparent"};">
-                <span class="demo-layer-label" style="color:\${textBase?.hex};">\${surfacePrefix}surface.raised</span>
-                <span class="demo-layer-desc" style="color:\${textSubtle?.hex};">Raised — cards, sidebars, dropdowns</span>
+              <div class="demo-divider" style="background:\${borderSubtle?.value};"></div>
+              <div class="demo-layer" style="background:\${raised?.value ?? "transparent"};">
+                <span class="demo-layer-label" style="color:\${textBase?.value};">\${surfacePrefix}surface.raised</span>
+                <span class="demo-layer-desc" style="color:\${textSubtle?.value};">Raised — cards, sidebars, dropdowns</span>
               </div>
             </div>
           </div>
@@ -501,14 +501,14 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
       body = \`
         \${tokenGrid(tokens, keys)}
         <div class="demo-card" style="margin-top:1rem;">
-          <div class="demo-layer" style="background:\${base?.hex ?? "transparent"};">
-            <span class="demo-layer-label" style="color:\${textBase?.hex};">surface.base</span>
-            <span class="demo-layer-desc" style="color:\${textSubtle?.hex};">Base — page background, modal backdrop</span>
+          <div class="demo-layer" style="background:\${base?.value ?? "transparent"};">
+            <span class="demo-layer-label" style="color:\${textBase?.value};">surface.base</span>
+            <span class="demo-layer-desc" style="color:\${textSubtle?.value};">Base — page background, modal backdrop</span>
           </div>
-          <div class="demo-divider" style="background:\${borderSubtle?.hex};"></div>
-          <div class="demo-layer" style="background:\${raised?.hex ?? "transparent"};">
-            <span class="demo-layer-label" style="color:\${textBase?.hex};">surface.raised</span>
-            <span class="demo-layer-desc" style="color:\${textSubtle?.hex};">Raised — cards, sidebars, dropdowns</span>
+          <div class="demo-divider" style="background:\${borderSubtle?.value};"></div>
+          <div class="demo-layer" style="background:\${raised?.value ?? "transparent"};">
+            <span class="demo-layer-label" style="color:\${textBase?.value};">surface.raised</span>
+            <span class="demo-layer-desc" style="color:\${textSubtle?.value};">Raised — cards, sidebars, dropdowns</span>
           </div>
         </div>
       \`;
@@ -551,17 +551,17 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
             \${tokenGrid(tokens, keys)}
             \${catHeader("Live Preview")}
             <div class="text-demo">
-              <div class="text-demo-headline" style="color:\${textBase?.hex};">Gear up for your next adventure.</div>
-              <div class="text-demo-body" style="color:\${textSubtle?.hex};">From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside.</div>
+              <div class="text-demo-headline" style="color:\${textBase?.value};">Gear up for your next adventure.</div>
+              <div class="text-demo-body" style="color:\${textSubtle?.value};">From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside.</div>
               <div>
-                <a class="text-demo-link" href="#" style="color:\${textLink?.hex};">View all collections</a>
-                <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.625rem;color:\${textLinkHover?.hex};letter-spacing:0.04em;">hover → \${textLinkHover?.hex?.slice(0, 9).toUpperCase() ?? ""}</span>
+                <a class="text-demo-link" href="#" style="color:\${textLink?.value};">View all collections</a>
+                <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.625rem;color:\${textLinkHover?.value};letter-spacing:0.01em;">hover -> \${textLinkHover?.value ?? ""}</span>
               </div>
-              <div class="text-demo-divider" style="background:\${borderBase?.hex};"></div>
+              <div class="text-demo-divider" style="background:\${borderBase?.value};"></div>
               <div style="display:flex;gap:1.25rem;flex-wrap:wrap;">
                 \${keys.map(key => {
           const d = tokens.get(key);
-          return \`<div style="display:flex;align-items:center;gap:0.35rem;"><span style="width:7px;height:7px;border-radius:50%;border:1px solid var(--rule-heavy);flex-shrink:0;background:\${d?.hex};"></span><span style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);">\${key}</span></div>\`;
+          return \`<div style="display:flex;align-items:center;gap:0.35rem;"><span style="width:7px;height:7px;border-radius:50%;border:1px solid var(--rule-heavy);flex-shrink:0;background:\${d?.value};"></span><span style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);">\${key}</span></div>\`;
         }).join("")}
               </div>
             </div>
@@ -589,13 +589,13 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
         \${tokenGrid(tokens, keys)}
         \${catHeader("Live Preview")}
         <div class="text-demo">
-          <div class="text-demo-headline" style="color:\${textBase?.hex};">Gear up for your next adventure.</div>
-          <div class="text-demo-body" style="color:\${textSubtle?.hex};">From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside.</div>
+          <div class="text-demo-headline" style="color:\${textBase?.value};">Gear up for your next adventure.</div>
+          <div class="text-demo-body" style="color:\${textSubtle?.value};">From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside.</div>
           <div>
-            <a class="text-demo-link" href="#" style="color:\${textLink?.hex};">View all collections</a>
-            <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.625rem;color:\${textLinkHover?.hex};letter-spacing:0.04em;">hover → \${textLinkHover?.hex?.slice(0, 9).toUpperCase() ?? ""}</span>
+            <a class="text-demo-link" href="#" style="color:\${textLink?.value};">View all collections</a>
+            <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.625rem;color:\${textLinkHover?.value};letter-spacing:0.01em;">hover -> \${textLinkHover?.value ?? ""}</span>
           </div>
-          <div class="text-demo-divider" style="background:\${borderBase?.hex};"></div>
+          <div class="text-demo-divider" style="background:\${borderBase?.value};"></div>
         </div>
       \`;
     }
@@ -636,24 +636,24 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
           <div class="mode-panel\${i === 0 ? " active" : ""}" data-mode="\${m}">
             \${tokenGrid(tokens, keys)}
             <div class="border-demo-grid">
-              <div class="border-demo-cell" style="border:1.5px solid \${borderBase?.hex};">
+              <div class="border-demo-cell" style="border:1.5px solid \${borderBase?.value};">
                 <div class="border-demo-label">\${p}border.base</div>
-                <div class="border-demo-desc" style="color:\${textSubtle?.hex};">Default — cards, inputs, containers</div>
-                <div style="margin-top:0.75rem;height:1px;background:\${borderBase?.hex};"></div>
-                <div style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);letter-spacing:0.06em;margin-top:0.25rem;">\${borderBase?.hex?.slice(0, 9).toUpperCase()}</div>
+                <div class="border-demo-desc" style="color:\${textSubtle?.value};">Default — cards, inputs, containers</div>
+                <div style="margin-top:0.75rem;height:1px;background:\${borderBase?.value};"></div>
+                <div style="font-family:var(--font-mono);font-size:0.5625rem;color:var(--ink-faint);letter-spacing:0.01em;margin-top:0.25rem;">\${borderBase?.value ?? ""}</div>
               </div>
-              <div class="border-demo-cell" style="border:1.5px solid \${borderSubtle?.hex};">
+              <div class="border-demo-cell" style="border:1.5px solid \${borderSubtle?.value};">
                 <div class="border-demo-label">\${p}border.subtle</div>
-                <div class="border-demo-desc" style="color:\${textSubtle?.hex};">Subtle — dividers, section separators</div>
-                <div style="margin-top:0.75rem;height:1px;background:\${borderSubtle?.hex};"></div>
-                <div style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);letter-spacing:0.06em;margin-top:0.25rem;">\${borderSubtle?.hex?.slice(0, 9).toUpperCase()}</div>
+                <div class="border-demo-desc" style="color:\${textSubtle?.value};">Subtle — dividers, section separators</div>
+                <div style="margin-top:0.75rem;height:1px;background:\${borderSubtle?.value};"></div>
+                <div style="font-family:var(--font-mono);font-size:0.5625rem;color:var(--ink-faint);letter-spacing:0.01em;margin-top:0.25rem;">\${borderSubtle?.value ?? ""}</div>
               </div>
             </div>
-            <div style="margin-top:1rem;padding:1.25rem;background:\${surfaceRaised?.hex};border-radius:4px;border-top:3px solid \${borderBase?.hex};">
+            <div style="margin-top:1rem;padding:1.25rem;background:\${surfaceRaised?.value};border-radius:4px;border-top:3px solid \${borderBase?.value};">
               <div style="font-family:var(--font-sans);font-size:0.625rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:0.375rem;">Usage note</div>
-              <div style="font-family:var(--font-sans);font-size:0.75rem;color:\${textSubtle?.hex};line-height:1.6;">
-                Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:\${textBase?.hex};">border.base</code> for interactive and structural boundaries.
-                Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:\${textBase?.hex};">border.subtle</code> for low-emphasis visual separators.
+              <div style="font-family:var(--font-sans);font-size:0.75rem;color:\${textSubtle?.value};line-height:1.6;">
+                Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:\${textBase?.value};">border.base</code> for interactive and structural boundaries.
+                Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:\${textBase?.value};">border.subtle</code> for low-emphasis visual separators.
               </div>
             </div>
           </div>
@@ -679,20 +679,20 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
       body = \`
         \${tokenGrid(tokens, keys)}
         <div class="border-demo-grid">
-          <div class="border-demo-cell" style="border:1.5px solid \${borderBase?.hex};">
+          <div class="border-demo-cell" style="border:1.5px solid \${borderBase?.value};">
             <div class="border-demo-label">\${p}border.base</div>
-            <div class="border-demo-desc" style="color:\${textSubtle?.hex};">Default — cards, inputs, containers</div>
+            <div class="border-demo-desc" style="color:\${textSubtle?.value};">Default — cards, inputs, containers</div>
           </div>
-          <div class="border-demo-cell" style="border:1.5px solid \${borderSubtle?.hex};">
+          <div class="border-demo-cell" style="border:1.5px solid \${borderSubtle?.value};">
             <div class="border-demo-label">\${p}border.subtle</div>
-            <div class="border-demo-desc" style="color:\${textSubtle?.hex};">Subtle — dividers, section separators</div>
+            <div class="border-demo-desc" style="color:\${textSubtle?.value};">Subtle — dividers, section separators</div>
           </div>
         </div>
-        <div style="margin-top:1rem;padding:1.25rem;background:\${surfaceRaised?.hex};border-radius:4px;border-top:3px solid \${borderBase?.hex};">
+        <div style="margin-top:1rem;padding:1.25rem;background:\${surfaceRaised?.value};border-radius:4px;border-top:3px solid \${borderBase?.value};">
           <div style="font-family:var(--font-sans);font-size:0.625rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:0.375rem;">Usage note</div>
-          <div style="font-family:var(--font-sans);font-size:0.75rem;color:\${textSubtle?.hex};line-height:1.6;">
-            Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:\${textBase?.hex};">border.base</code> for interactive and structural boundaries.
-            Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:\${textBase?.hex};">border.subtle</code> for low-emphasis visual separators.
+          <div style="font-family:var(--font-sans);font-size:0.75rem;color:\${textSubtle?.value};line-height:1.6;">
+            Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:\${textBase?.value};">border.base</code> for interactive and structural boundaries.
+            Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:\${textBase?.value};">border.subtle</code> for low-emphasis visual separators.
           </div>
         </div>
       \`;
@@ -748,8 +748,8 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
           return \`
             <td class="mode-td">
               <div class="cmp-chip-wrap">
-                <span class="cmp-chip" style="background:\${data.hex};"></span>
-                <span class="cmp-hex">\${data.hex.slice(0, 9).toUpperCase()}</span>
+                <span class="cmp-chip" style="background:\${data.value};"></span>
+                <span class="cmp-value">\${data.value}</span>
               </div>
             </td>
           \`;
@@ -801,14 +801,14 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{i as t,r as n}from"./platform-mod
           \${catHeader("Surface")}
           <div style="margin-top:0.5rem">\${tokenGrid(tokens, surfaceKeys)}</div>
           <div class="demo-card" style="margin-top:0.75rem">
-            <div class="demo-layer" style="background:\${surfaceBase?.hex ?? "transparent"}">
-              <span class="demo-layer-label" style="color:\${textBase?.hex}">surface.base</span>
-              <span class="demo-layer-desc" style="color:\${textSubtle?.hex}">Page background</span>
+            <div class="demo-layer" style="background:\${surfaceBase?.value ?? "transparent"}">
+              <span class="demo-layer-label" style="color:\${textBase?.value}">surface.base</span>
+              <span class="demo-layer-desc" style="color:\${textSubtle?.value}">Page background</span>
             </div>
-            <div class="demo-divider" style="background:\${borderSubtle?.hex}"></div>
-            <div class="demo-layer" style="background:\${surfaceRaised?.hex ?? "transparent"}">
-              <span class="demo-layer-label" style="color:\${textBase?.hex}">surface.raised</span>
-              <span class="demo-layer-desc" style="color:\${textSubtle?.hex}">Cards &amp; panels</span>
+            <div class="demo-divider" style="background:\${borderSubtle?.value}"></div>
+            <div class="demo-layer" style="background:\${surfaceRaised?.value ?? "transparent"}">
+              <span class="demo-layer-label" style="color:\${textBase?.value}">surface.raised</span>
+              <span class="demo-layer-desc" style="color:\${textSubtle?.value}">Cards &amp; panels</span>
             </div>
           </div>
 

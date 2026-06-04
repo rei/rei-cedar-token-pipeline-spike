@@ -1,4 +1,4 @@
-import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-CbjuqQrc.js";import{n as r,t as i}from"./TokenOutputPanel-DlA3hEs_.js";function a(e){e.querySelectorAll(`[data-tabs-scope]`).forEach(e=>{let t=e.querySelectorAll(`.mode-tab`),n=e.querySelectorAll(`.mode-panel`);t.forEach(e=>{e.addEventListener(`click`,()=>{let r=e.dataset.mode;t.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r)),n.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r))})})})}function o(e){return()=>{let t=document.createElement(`div`);return t.style.cssText=`min-height:200px;background:#f5f2eb;`,t.innerHTML=`
+import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-TMPKsR-w.js";import{n as r,t as i}from"./TokenOutputPanel-DlA3hEs_.js";function a(e){e.querySelectorAll(`[data-tabs-scope]`).forEach(e=>{let t=e.querySelectorAll(`.mode-tab`),n=e.querySelectorAll(`.mode-panel`);t.forEach(e=>{e.addEventListener(`click`,()=>{let r=e.dataset.mode;t.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r)),n.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r))})})})}function o(e){return()=>{let t=document.createElement(`div`);return t.style.cssText=`min-height:200px;background:#f5f2eb;`,t.innerHTML=`
       <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:1rem;color:#736e65">
         Loading token data…
       </div>`,e().then(e=>{typeof e==`string`?t.innerHTML=e:(t.innerHTML=``,t.appendChild(e)),a(t)}).catch(e=>{t.innerHTML=`
@@ -6,10 +6,10 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
             Error loading tokens: ${e instanceof Error?e.message:String(e)}
           </div>`}),t}}function s(e,t){let n=document.createElement(`div`);return n.innerHTML=e,t&&n.appendChild(t),n}function c(e){return e.startsWith(`ios-`)?{platform:`ios`,mode:e.slice(4)}:e.startsWith(`web-`)?{platform:`web`,mode:e.slice(4)}:e===`light`||e===`dark`?{platform:`web`,mode:e}:{platform:`web`,mode:`light`}}function l(e,t){return[...t.entries()].flatMap(([t,n])=>{let r=n.find(t=>t.name===e);if(!r)return[];let{platform:i,mode:a}=c(t);return[{platform:i,mode:a,hex:r.value,primitive:r.name,palette:r.name.split(`.`)[0]??r.name}]})}function u(e){let t=([...e.values()][0]??[])[0];if(!t)return null;let n=l(t.name,e);return i({canonicalName:`color.${t.name}`,outputTokenName:t.name,resolvedValues:n})}function d(e){return e.replaceAll(`&`,`&amp;`).replaceAll(`<`,`&lt;`).replaceAll(`>`,`&gt;`).replaceAll(`"`,`&quot;`).replaceAll(`'`,`&#39;`)}function f(e){if(!e)return``;let t=[];return e.summary&&t.push(`<div class="td-doc-summary">${d(e.summary)}</div>`),e.usage&&t.push(`<div class="td-doc-meta"><span class="td-doc-label">Usage</span>${d(e.usage)}</div>`),e.design&&t.push(`<div class="td-doc-meta"><span class="td-doc-label">Design</span>${d(e.design)}</div>`),t.length>0?`<div class="td-token-docs">${t.join(``)}</div>`:``}function p(e){let t=parseInt(e.slice(1,3),16),n=parseInt(e.slice(3,5),16),r=parseInt(e.slice(5,7),16);return(t*299+n*587+r*114)/1e3>140}function m(e){return`
     <div class="swatch-strip">
-      ${e.map(e=>{let t=p(e.value.slice(0,7));return`
+      ${e.map(e=>{let t=p(e.sourceHex.slice(0,7));return`
           <div class="strip-segment" style="background:${e.value};">
             <div class="strip-label" style="color:${t?`rgba(0,0,0,0.6)`:`rgba(255,255,255,0.8)`}; background:${t?`rgba(255,255,255,0.12)`:`rgba(0,0,0,0.2)`};">
-              ${e.value.slice(0,9).toUpperCase()}
+              ${e.value}
             </div>
           </div>
         `}).join(``)}
@@ -20,7 +20,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
         <tr>
           <th style="width:36px;"></th>
           <th>Token</th>
-          <th>Hex</th>
+          <th>oklch</th>
         </tr>
       </thead>
       <tbody>
@@ -30,7 +30,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
               <span class="swatch-chip" style="background:${e.value};"></span>
             </td>
             <td class="td-token"><div class="td-token-wrap"><span class="td-token-name">${e.name}</span></div></td>
-            <td class="td-hex">${e.value.slice(0,9).toUpperCase()}</td>
+            <td class="td-value">${e.value}</td>
           </tr>
           ${t?`
           <tr class="token-doc-row">
@@ -80,7 +80,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
         <td class="mode-val">
           <div class="cmp-chip-wrap">
             <span class="cmp-chip" style="background:${r.value};"></span>
-            <span class="cmp-hex">${r.value.slice(0,9).toUpperCase()}</span>
+            <span class="cmp-value">${r.value}</span>
           </div>
         </td>
       `:`<td class="mode-val"><span style="color:var(--ink-faint);font-size:0.5rem;">—</span></td>`}).join(``)}
@@ -98,7 +98,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
     </div>
     <div class="group-header" style="margin-top:2rem;">
       <span class="group-pip"></span>
-      <span class="group-name">Platform Comparison</span>
+      <span class="group-name">Web Appearance Comparison</span>
       <span class="group-rule"></span>
     </div>
     ${y(n,r)}
@@ -219,7 +219,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
   .td-doc-summary { font-family: var(--font-sans); font-size: 0.75rem; line-height: 1.4; color: var(--ink-mid); }
   .td-doc-meta { font-family: var(--font-sans); font-size: 0.6875rem; line-height: 1.45; color: var(--ink-muted); }
   .td-doc-label { font-family: var(--font-sans); font-size: 0.56rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint); margin-right: 0.35rem; }
-  .td-hex { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--ink-muted); text-align: right; letter-spacing: 0.04em; }
+  .td-value { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--ink-muted); text-align: right; letter-spacing: 0.01em; }
 
   /* ── Section spacing ── */
   .token-section { margin-bottom: 3.5rem; }
@@ -247,7 +247,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
   .compare-table tr:hover td { background: rgba(46,46,43,0.025); }
   .cmp-chip-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
   .cmp-chip { width: 30px; height: 30px; border-radius: 3px; border: 1px solid var(--rule-heavy); display: block; flex-shrink: 0; }
-  .cmp-hex { font-family: var(--font-mono); font-size: 0.625rem; color: var(--ink-faint); letter-spacing: 0.03em; }
+  .cmp-value { font-family: var(--font-mono); font-size: 0.5625rem; color: var(--ink-faint); letter-spacing: 0.01em; }
   .cmp-mode-badge {
     display: inline-block; font-family: var(--font-sans); font-size: 0.4375rem; font-weight: 700;
     letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-muted);
@@ -335,7 +335,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
           </div>
           <div class="page-meta">
             <div class="page-meta-count">${i}</div>
-            <div class="page-meta-label">${n.length} platform${n.length===1?``:`s`} · ${i} tokens</div>
+            <div class="page-meta-label">${n.length} web appearance${n.length===1?``:`s`} · ${i} tokens</div>
           </div>
         </div>
 
@@ -348,7 +348,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
 
         <div style="height:1.5px;background:var(--rule-heavy);margin:3.5rem 0 2.5rem;"></div>
 
-        ${_(`Cross-Platform`,`Neutral Comparison`,p)}
+        ${_(`Web Appearances`,`Neutral Comparison`,p)}
         <div class="group-header" style="margin-top:1.5rem;">
           <span class="group-pip"></span>
           <span class="group-name">Warm Grey</span>
@@ -364,7 +364,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
 
         <div style="height:1.5px;background:var(--rule-heavy);margin:3.5rem 0 2.5rem;"></div>
 
-        ${_(`Cross-Platform`,`Brand Comparison`,m)}
+        ${_(`Web Appearances`,`Brand Comparison`,m)}
         <div class="group-header" style="margin-top:1.5rem;">
           <span class="group-pip"></span>
           <span class="group-name">Blue</span>
@@ -557,7 +557,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
           </div>
           <div class="page-meta">
             <div class="page-meta-count">\${total}</div>
-            <div class="page-meta-label">\${modes.length} platform\${modes.length !== 1 ? "s" : ""} · \${total} tokens</div>
+            <div class="page-meta-label">\${modes.length} web appearance\${modes.length !== 1 ? "s" : ""} · \${total} tokens</div>
           </div>
         </div>
 
@@ -570,7 +570,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
 
         <div style="height:1.5px;background:var(--rule-heavy);margin:3.5rem 0 2.5rem;"></div>
 
-        \${sectionHeader("Cross-Platform", "Neutral Comparison", neutralCount)}
+        \${sectionHeader("Web Appearances", "Neutral Comparison", neutralCount)}
         <div class="group-header" style="margin-top:1.5rem;">
           <span class="group-pip"></span>
           <span class="group-name">Warm Grey</span>
@@ -586,7 +586,7 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
 
         <div style="height:1.5px;background:var(--rule-heavy);margin:3.5rem 0 2.5rem;"></div>
 
-        \${sectionHeader("Cross-Platform", "Brand Comparison", brandCount)}
+        \${sectionHeader("Web Appearances", "Brand Comparison", brandCount)}
         <div class="group-header" style="margin-top:1.5rem;">
           <span class="group-pip"></span>
           <span class="group-name">Blue</span>
