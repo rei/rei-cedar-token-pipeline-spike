@@ -85,7 +85,7 @@ function createSemanticResolvedValues(
         values.push({
           platform,
           mode: resolvedMode,
-          hex: data.hex,
+          hex: data.sourceHex,
           primitive: data.ref,
           palette,
         });
@@ -210,8 +210,8 @@ const BASE_STYLES = `
   .trow-ref { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.6875rem; font-style: italic; color: var(--ink-muted); display: flex; align-items: center; gap: 0.25rem; }
   .trow-ref.has-docs { border-bottom: none; }
   .trow-ref::before { content: '→'; font-style: normal; color: var(--ink-faint); font-size: 0.625rem; }
-  .trow-hex { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-muted); letter-spacing: 0.04em; text-align: right; }
-  .trow-hex.has-docs { border-bottom: none; }
+  .trow-value { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.6875rem; color: var(--ink-muted); letter-spacing: 0.01em; text-align: right; }
+  .trow-value.has-docs { border-bottom: none; }
   .trow-doc-body { grid-column: 2 / -1; }
 
   /* ── Multi-mode comparison table ── */
@@ -228,7 +228,7 @@ const BASE_STYLES = `
   .cmp-token-name { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 500; color: var(--ink); }
   .cmp-chip-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
   .cmp-chip { width: 30px; height: 30px; border-radius: 3px; border: 1px solid var(--rule-heavy); display: block; flex-shrink: 0; }
-  .cmp-hex { font-family: var(--font-mono); font-size: 0.625rem; color: var(--ink-faint); letter-spacing: 0.03em; }
+  .cmp-value { font-family: var(--font-mono); font-size: 0.5625rem; color: var(--ink-faint); letter-spacing: 0.01em; }
   .cmp-mode-header { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; }
   .cmp-mode-badge {
     display: inline-block; font-family: var(--font-sans); font-size: 0.5625rem; font-weight: 700;
@@ -346,7 +346,7 @@ function renderDocs(docs?: TokenDocs): string {
 }
 
 /**
- * Render a single-mode token list grid (chip · token name · ref alias · hex value).
+ * Render a single-mode token list grid (chip · token name · ref alias · web OKLCH value).
  */
 function simplifyTokenName(key: string): string {
   if (key.startsWith("color.modes.")) {
@@ -367,20 +367,20 @@ function tokenGrid(
   return `
     <div class="token-grid">
       <div class="token-grid-header">
-        <div></div><div>Token</div><div>Resolves to</div><div style="text-align:right">Hex</div>
+        <div></div><div>Token</div><div>Resolves to</div><div style="text-align:right">oklch</div>
       </div>
       ${keys.map((key) => {
         const data = tokens.get(key);
         if (!data) return "";
-        const { hex, ref, docs } = data;
+        const { value, ref, docs } = data;
         const docsMarkup = renderDocs(docs);
         const docsClass = docsMarkup ? " has-docs" : "";
         const tokenName = simplifyTokenName(key);
         return `
-          <div class="trow-chip-wrap${docsClass}"><span class="trow-chip" style="background:${hex};"></span></div>
+          <div class="trow-chip-wrap${docsClass}"><span class="trow-chip" style="background:${value};"></span></div>
           <div class="trow-token${docsClass}"><div class="trow-token-name">${tokenName}</div></div>
           <div class="trow-ref${docsClass}">${ref}</div>
-          <div class="trow-hex${docsClass}">${hex.slice(0, 9).toUpperCase()}</div>
+          <div class="trow-value${docsClass}">${value}</div>
           ${docsMarkup ? `<div class="trow-doc-full"><div></div><div class="trow-doc-body">${docsMarkup}</div></div>` : ""}
         `;
       }).join("")}
@@ -415,8 +415,8 @@ function modeCompareTable(
       return `
         <td class="mode-val">
           <div class="cmp-chip-wrap">
-            <span class="cmp-chip" style="background:${data.hex};"></span>
-            <span class="cmp-hex">${data.hex.slice(0, 9).toUpperCase()}</span>
+            <span class="cmp-chip" style="background:${data.value};"></span>
+            <span class="cmp-value">${data.value}</span>
           </div>
         </td>
       `;
@@ -503,14 +503,14 @@ export const Surface: Story = {
           <div class="mode-panel${i === 0 ? " active" : ""}" data-mode="${m}">
             ${tokenGrid(tokens, keys)}
             <div class="demo-card" style="margin-top:1rem;">
-              <div class="demo-layer" style="background:${base?.hex ?? "transparent"};">
-                <span class="demo-layer-label" style="color:${textBase?.hex};">${surfacePrefix}surface.base</span>
-                <span class="demo-layer-desc" style="color:${textSubtle?.hex};">Base — page background, modal backdrop</span>
+              <div class="demo-layer" style="background:${base?.value ?? "transparent"};">
+                <span class="demo-layer-label" style="color:${textBase?.value};">${surfacePrefix}surface.base</span>
+                <span class="demo-layer-desc" style="color:${textSubtle?.value};">Base — page background, modal backdrop</span>
               </div>
-              <div class="demo-divider" style="background:${borderSubtle?.hex};"></div>
-              <div class="demo-layer" style="background:${raised?.hex ?? "transparent"};">
-                <span class="demo-layer-label" style="color:${textBase?.hex};">${surfacePrefix}surface.raised</span>
-                <span class="demo-layer-desc" style="color:${textSubtle?.hex};">Raised — cards, sidebars, dropdowns</span>
+              <div class="demo-divider" style="background:${borderSubtle?.value};"></div>
+              <div class="demo-layer" style="background:${raised?.value ?? "transparent"};">
+                <span class="demo-layer-label" style="color:${textBase?.value};">${surfacePrefix}surface.raised</span>
+                <span class="demo-layer-desc" style="color:${textSubtle?.value};">Raised — cards, sidebars, dropdowns</span>
               </div>
             </div>
           </div>
@@ -537,14 +537,14 @@ export const Surface: Story = {
       body = `
         ${tokenGrid(tokens, keys)}
         <div class="demo-card" style="margin-top:1rem;">
-          <div class="demo-layer" style="background:${base?.hex ?? "transparent"};">
-            <span class="demo-layer-label" style="color:${textBase?.hex};">surface.base</span>
-            <span class="demo-layer-desc" style="color:${textSubtle?.hex};">Base — page background, modal backdrop</span>
+          <div class="demo-layer" style="background:${base?.value ?? "transparent"};">
+            <span class="demo-layer-label" style="color:${textBase?.value};">surface.base</span>
+            <span class="demo-layer-desc" style="color:${textSubtle?.value};">Base — page background, modal backdrop</span>
           </div>
-          <div class="demo-divider" style="background:${borderSubtle?.hex};"></div>
-          <div class="demo-layer" style="background:${raised?.hex ?? "transparent"};">
-            <span class="demo-layer-label" style="color:${textBase?.hex};">surface.raised</span>
-            <span class="demo-layer-desc" style="color:${textSubtle?.hex};">Raised — cards, sidebars, dropdowns</span>
+          <div class="demo-divider" style="background:${borderSubtle?.value};"></div>
+          <div class="demo-layer" style="background:${raised?.value ?? "transparent"};">
+            <span class="demo-layer-label" style="color:${textBase?.value};">surface.raised</span>
+            <span class="demo-layer-desc" style="color:${textSubtle?.value};">Raised — cards, sidebars, dropdowns</span>
           </div>
         </div>
       `;
@@ -589,17 +589,17 @@ export const Text: Story = {
             ${tokenGrid(tokens, keys)}
             ${catHeader("Live Preview")}
             <div class="text-demo">
-              <div class="text-demo-headline" style="color:${textBase?.hex};">Gear up for your next adventure.</div>
-              <div class="text-demo-body" style="color:${textSubtle?.hex};">From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside.</div>
+              <div class="text-demo-headline" style="color:${textBase?.value};">Gear up for your next adventure.</div>
+              <div class="text-demo-body" style="color:${textSubtle?.value};">From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside.</div>
               <div>
-                <a class="text-demo-link" href="#" style="color:${textLink?.hex};">View all collections</a>
-                <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.625rem;color:${textLinkHover?.hex};letter-spacing:0.04em;">hover → ${textLinkHover?.hex?.slice(0, 9).toUpperCase() ?? ""}</span>
+                <a class="text-demo-link" href="#" style="color:${textLink?.value};">View all collections</a>
+                <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.625rem;color:${textLinkHover?.value};letter-spacing:0.01em;">hover -> ${textLinkHover?.value ?? ""}</span>
               </div>
-              <div class="text-demo-divider" style="background:${borderBase?.hex};"></div>
+              <div class="text-demo-divider" style="background:${borderBase?.value};"></div>
               <div style="display:flex;gap:1.25rem;flex-wrap:wrap;">
                 ${keys.map((key) => {
                   const d = tokens.get(key);
-                  return `<div style="display:flex;align-items:center;gap:0.35rem;"><span style="width:7px;height:7px;border-radius:50%;border:1px solid var(--rule-heavy);flex-shrink:0;background:${d?.hex};"></span><span style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);">${key}</span></div>`;
+                  return `<div style="display:flex;align-items:center;gap:0.35rem;"><span style="width:7px;height:7px;border-radius:50%;border:1px solid var(--rule-heavy);flex-shrink:0;background:${d?.value};"></span><span style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);">${key}</span></div>`;
                 }).join("")}
               </div>
             </div>
@@ -628,13 +628,13 @@ export const Text: Story = {
         ${tokenGrid(tokens, keys)}
         ${catHeader("Live Preview")}
         <div class="text-demo">
-          <div class="text-demo-headline" style="color:${textBase?.hex};">Gear up for your next adventure.</div>
-          <div class="text-demo-body" style="color:${textSubtle?.hex};">From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside.</div>
+          <div class="text-demo-headline" style="color:${textBase?.value};">Gear up for your next adventure.</div>
+          <div class="text-demo-body" style="color:${textSubtle?.value};">From technical alpine climbing to casual day hikes, REI has the gear, expertise, and community to get you outside.</div>
           <div>
-            <a class="text-demo-link" href="#" style="color:${textLink?.hex};">View all collections</a>
-            <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.625rem;color:${textLinkHover?.hex};letter-spacing:0.04em;">hover → ${textLinkHover?.hex?.slice(0, 9).toUpperCase() ?? ""}</span>
+            <a class="text-demo-link" href="#" style="color:${textLink?.value};">View all collections</a>
+            <span style="margin-left:0.5rem;font-family:var(--font-mono);font-size:0.625rem;color:${textLinkHover?.value};letter-spacing:0.01em;">hover -> ${textLinkHover?.value ?? ""}</span>
           </div>
-          <div class="text-demo-divider" style="background:${borderBase?.hex};"></div>
+          <div class="text-demo-divider" style="background:${borderBase?.value};"></div>
         </div>
       `;
     }
@@ -677,24 +677,24 @@ export const Border: Story = {
           <div class="mode-panel${i === 0 ? " active" : ""}" data-mode="${m}">
             ${tokenGrid(tokens, keys)}
             <div class="border-demo-grid">
-              <div class="border-demo-cell" style="border:1.5px solid ${borderBase?.hex};">
+              <div class="border-demo-cell" style="border:1.5px solid ${borderBase?.value};">
                 <div class="border-demo-label">${p}border.base</div>
-                <div class="border-demo-desc" style="color:${textSubtle?.hex};">Default — cards, inputs, containers</div>
-                <div style="margin-top:0.75rem;height:1px;background:${borderBase?.hex};"></div>
-                <div style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);letter-spacing:0.06em;margin-top:0.25rem;">${borderBase?.hex?.slice(0, 9).toUpperCase()}</div>
+                <div class="border-demo-desc" style="color:${textSubtle?.value};">Default — cards, inputs, containers</div>
+                <div style="margin-top:0.75rem;height:1px;background:${borderBase?.value};"></div>
+                <div style="font-family:var(--font-mono);font-size:0.5625rem;color:var(--ink-faint);letter-spacing:0.01em;margin-top:0.25rem;">${borderBase?.value ?? ""}</div>
               </div>
-              <div class="border-demo-cell" style="border:1.5px solid ${borderSubtle?.hex};">
+              <div class="border-demo-cell" style="border:1.5px solid ${borderSubtle?.value};">
                 <div class="border-demo-label">${p}border.subtle</div>
-                <div class="border-demo-desc" style="color:${textSubtle?.hex};">Subtle — dividers, section separators</div>
-                <div style="margin-top:0.75rem;height:1px;background:${borderSubtle?.hex};"></div>
-                <div style="font-family:var(--font-mono);font-size:0.625rem;color:var(--ink-faint);letter-spacing:0.06em;margin-top:0.25rem;">${borderSubtle?.hex?.slice(0, 9).toUpperCase()}</div>
+                <div class="border-demo-desc" style="color:${textSubtle?.value};">Subtle — dividers, section separators</div>
+                <div style="margin-top:0.75rem;height:1px;background:${borderSubtle?.value};"></div>
+                <div style="font-family:var(--font-mono);font-size:0.5625rem;color:var(--ink-faint);letter-spacing:0.01em;margin-top:0.25rem;">${borderSubtle?.value ?? ""}</div>
               </div>
             </div>
-            <div style="margin-top:1rem;padding:1.25rem;background:${surfaceRaised?.hex};border-radius:4px;border-top:3px solid ${borderBase?.hex};">
+            <div style="margin-top:1rem;padding:1.25rem;background:${surfaceRaised?.value};border-radius:4px;border-top:3px solid ${borderBase?.value};">
               <div style="font-family:var(--font-sans);font-size:0.625rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:0.375rem;">Usage note</div>
-              <div style="font-family:var(--font-sans);font-size:0.75rem;color:${textSubtle?.hex};line-height:1.6;">
-                Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${textBase?.hex};">border.base</code> for interactive and structural boundaries.
-                Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${textBase?.hex};">border.subtle</code> for low-emphasis visual separators.
+              <div style="font-family:var(--font-sans);font-size:0.75rem;color:${textSubtle?.value};line-height:1.6;">
+                Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${textBase?.value};">border.base</code> for interactive and structural boundaries.
+                Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${textBase?.value};">border.subtle</code> for low-emphasis visual separators.
               </div>
             </div>
           </div>
@@ -721,20 +721,20 @@ export const Border: Story = {
       body = `
         ${tokenGrid(tokens, keys)}
         <div class="border-demo-grid">
-          <div class="border-demo-cell" style="border:1.5px solid ${borderBase?.hex};">
+          <div class="border-demo-cell" style="border:1.5px solid ${borderBase?.value};">
             <div class="border-demo-label">${p}border.base</div>
-            <div class="border-demo-desc" style="color:${textSubtle?.hex};">Default — cards, inputs, containers</div>
+            <div class="border-demo-desc" style="color:${textSubtle?.value};">Default — cards, inputs, containers</div>
           </div>
-          <div class="border-demo-cell" style="border:1.5px solid ${borderSubtle?.hex};">
+          <div class="border-demo-cell" style="border:1.5px solid ${borderSubtle?.value};">
             <div class="border-demo-label">${p}border.subtle</div>
-            <div class="border-demo-desc" style="color:${textSubtle?.hex};">Subtle — dividers, section separators</div>
+            <div class="border-demo-desc" style="color:${textSubtle?.value};">Subtle — dividers, section separators</div>
           </div>
         </div>
-        <div style="margin-top:1rem;padding:1.25rem;background:${surfaceRaised?.hex};border-radius:4px;border-top:3px solid ${borderBase?.hex};">
+        <div style="margin-top:1rem;padding:1.25rem;background:${surfaceRaised?.value};border-radius:4px;border-top:3px solid ${borderBase?.value};">
           <div style="font-family:var(--font-sans);font-size:0.625rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:0.375rem;">Usage note</div>
-          <div style="font-family:var(--font-sans);font-size:0.75rem;color:${textSubtle?.hex};line-height:1.6;">
-            Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${textBase?.hex};">border.base</code> for interactive and structural boundaries.
-            Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${textBase?.hex};">border.subtle</code> for low-emphasis visual separators.
+          <div style="font-family:var(--font-sans);font-size:0.75rem;color:${textSubtle?.value};line-height:1.6;">
+            Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${textBase?.value};">border.base</code> for interactive and structural boundaries.
+            Use <code style="font-family:var(--font-mono);font-size:0.6875rem;color:${textBase?.value};">border.subtle</code> for low-emphasis visual separators.
           </div>
         </div>
       `;
@@ -779,8 +779,8 @@ export const AllSemantic: Story = {
           return `
             <td class="mode-td">
               <div class="cmp-chip-wrap">
-                <span class="cmp-chip" style="background:${data.hex};"></span>
-                <span class="cmp-hex">${data.hex.slice(0, 9).toUpperCase()}</span>
+                <span class="cmp-chip" style="background:${data.value};"></span>
+                <span class="cmp-value">${data.value}</span>
               </div>
             </td>
           `;
@@ -835,14 +835,14 @@ export const AllSemantic: Story = {
           ${catHeader("Surface")}
           <div style="margin-top:0.5rem">${tokenGrid(tokens, surfaceKeys)}</div>
           <div class="demo-card" style="margin-top:0.75rem">
-            <div class="demo-layer" style="background:${surfaceBase?.hex ?? "transparent"}">
-              <span class="demo-layer-label" style="color:${textBase?.hex}">surface.base</span>
-              <span class="demo-layer-desc" style="color:${textSubtle?.hex}">Page background</span>
+            <div class="demo-layer" style="background:${surfaceBase?.value ?? "transparent"}">
+              <span class="demo-layer-label" style="color:${textBase?.value}">surface.base</span>
+              <span class="demo-layer-desc" style="color:${textSubtle?.value}">Page background</span>
             </div>
-            <div class="demo-divider" style="background:${borderSubtle?.hex}"></div>
-            <div class="demo-layer" style="background:${surfaceRaised?.hex ?? "transparent"}">
-              <span class="demo-layer-label" style="color:${textBase?.hex}">surface.raised</span>
-              <span class="demo-layer-desc" style="color:${textSubtle?.hex}">Cards &amp; panels</span>
+            <div class="demo-divider" style="background:${borderSubtle?.value}"></div>
+            <div class="demo-layer" style="background:${surfaceRaised?.value ?? "transparent"}">
+              <span class="demo-layer-label" style="color:${textBase?.value}">surface.raised</span>
+              <span class="demo-layer-desc" style="color:${textSubtle?.value}">Cards &amp; panels</span>
             </div>
           </div>
 
