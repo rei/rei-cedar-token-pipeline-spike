@@ -21,10 +21,10 @@
  */
 /// <reference path="../../types/culori.d.ts" />
 
-import fs from 'node:fs';
-import path from 'node:path';
-import { converter, parse } from 'culori';
-import type { Action } from 'style-dictionary/types';
+import fs from "node:fs";
+import path from "node:path";
+import { converter, parse } from "culori";
+import type { Action } from "style-dictionary/types";
 
 type CedarOptionNode = {
   value?: unknown;
@@ -44,7 +44,7 @@ type OklchColor = {
   alpha?: number;
 };
 
-const toOklch = converter('oklch');
+const toOklch = converter("oklch");
 
 function formatNumber(value: number, precision: number): string {
   const rounded = Number(value.toFixed(precision));
@@ -53,74 +53,83 @@ function formatNumber(value: number, precision: number): string {
 
 function formatOklch(hex: string): string {
   const parsed = parse(hex);
-  const oklch = parsed ? (toOklch(parsed) as OklchColor | undefined) : undefined;
+  const oklch = parsed
+    ? (toOklch(parsed) as OklchColor | undefined)
+    : undefined;
 
-  if (!oklch || typeof oklch.l !== 'number' || typeof oklch.c !== 'number') {
-    throw new Error(`[web-css] Could not convert color value "${hex}" to oklch().`);
+  if (!oklch || typeof oklch.l !== "number" || typeof oklch.c !== "number") {
+    throw new Error(
+      `[web-css] Could not convert color value "${hex}" to oklch().`
+    );
   }
 
   const lightness = formatNumber(Math.min(100, Math.max(0, oklch.l * 100)), 3);
   const chroma = formatNumber(Math.max(0, oklch.c), 4);
   const hue =
-    typeof oklch.h === 'number' && Number.isFinite(oklch.h)
+    typeof oklch.h === "number" && Number.isFinite(oklch.h)
       ? formatNumber(((oklch.h % 360) + 360) % 360, 2)
-      : '0';
+      : "0";
   const alpha =
-    typeof oklch.alpha === 'number' && oklch.alpha < 1
+    typeof oklch.alpha === "number" && oklch.alpha < 1
       ? ` / ${formatNumber(Math.min(1, Math.max(0, oklch.alpha)), 3)}`
-      : '';
+      : "";
 
   return `oklch(${lightness}% ${chroma} ${hue}${alpha})`;
 }
 
 function renderColorDeclarations(cssVar: string, hex: string): string {
-  return [`  ${cssVar}: ${hex};`, `  ${cssVar}: ${formatOklch(hex)};`].join('\n');
+  return [`  ${cssVar}: ${hex};`, `  ${cssVar}: ${formatOklch(hex)};`].join(
+    "\n"
+  );
 }
 
 /** Navigate dictionary.tokens by dot-separated path */
 function getTokenAtPath(tokens: any, dotPath: string): any {
-  return dotPath.split('.').reduce(
-    (node: any, seg: string) => node?.[seg],
-    tokens
-  );
+  return dotPath
+    .split(".")
+    .reduce((node: any, seg: string) => node?.[seg], tokens);
 }
 
 /** Convert dot-path token name to CSS custom property */
 function toCssVar(tokenPath: string[]): string {
   // Drop structural scaffolding: color, modes, <palette>
   const meaningful =
-    tokenPath[0] === 'color' && tokenPath[1] === 'modes'
+    tokenPath[0] === "color" && tokenPath[1] === "modes"
       ? tokenPath.slice(3)
       : tokenPath;
-  return `--cdr-${meaningful.join('-')}`;
+  return `--cdr-${meaningful.join("-")}`;
 }
 
 /** Convert token ref syntax like {spacing.scale.-50} into var(--cdr-spacing-scale--50) */
 function toCssValue(value: string): string {
   return value.replace(/\{([^}]+)\}/g, (_match, refPath: string) => {
-    const refSegments = refPath.split('.');
+    const refSegments = refPath.split(".");
     return `var(${toCssVar(refSegments)})`;
   });
 }
 
-function resolveOptionHex(optionNode: CedarOptionNode | undefined, appearance: 'light' | 'dark') {
+function resolveOptionHex(
+  optionNode: CedarOptionNode | undefined,
+  appearance: "light" | "dark"
+) {
   const cedar = optionNode?.$extensions?.cedar;
   const platformOverride = cedar?.platformOverrides?.web?.[appearance];
   if (platformOverride) return platformOverride;
-  if (appearance === 'dark' && cedar?.appearances?.dark) return cedar.appearances.dark;
+  if (appearance === "dark" && cedar?.appearances?.dark)
+    return cedar.appearances.dark;
 
   const val = optionNode?.value ?? optionNode?.$value;
-  return typeof val === 'string' ? val : undefined;
+  return typeof val === "string" ? val : undefined;
 }
 
 export const webCssAction: Action = {
-  name: 'web-css',
+  name: "web-css",
 
   do: (dictionary, config) => {
-    const buildPath = config.buildPath ?? 'dist/themes/rei-dot-com/css/';
+    const buildPath = config.buildPath ?? "dist/themes/rei-dot-com/css/";
     fs.mkdirSync(buildPath, { recursive: true });
-    fs.mkdirSync(path.join(buildPath, 'light'), { recursive: true });
-    fs.mkdirSync(path.join(buildPath, 'dark'), { recursive: true });
+    fs.mkdirSync(path.join(buildPath, "light"), { recursive: true });
+    fs.mkdirSync(path.join(buildPath, "dark"), { recursive: true });
 
     // Organize color tokens by semantic category
     const colorSurface = { light: [] as string[], dark: [] as string[] };
@@ -129,29 +138,38 @@ export const webCssAction: Action = {
 
     // Organize spacing tokens by type
     const spacingScale = { light: [] as string[], dark: [] as string[] };
+    const spacingStatic = { light: [] as string[], dark: [] as string[] };
     const spacingComponent = { light: [] as string[], dark: [] as string[] };
     const spacingLayout = { light: [] as string[], dark: [] as string[] };
 
-    function pushColorByCategory(token: any, line: string, darkLine: string): boolean {
+    function pushColorByCategory(
+      token: any,
+      line: string,
+      darkLine: string
+    ): boolean {
       const category = token.path[3];
-      if (category === 'surface') {
+      if (category === "surface") {
         colorSurface.light.push(line);
         colorSurface.dark.push(darkLine);
         return true;
       }
-      if (category === 'text') {
+      if (category === "text") {
         colorText.light.push(line);
         colorText.dark.push(darkLine);
         return true;
       }
-      if (category === 'border') {
+      if (category === "border") {
         colorBorder.light.push(line);
         colorBorder.dark.push(darkLine);
         return true;
       }
 
       console.warn(
-        `[web-css] Token ${token.name}: unknown semantic color category "${String(category)}" at path "${token.path.join('.')}"`
+        `[web-css] Token ${
+          token.name
+        }: unknown semantic color category "${String(
+          category
+        )}" at path "${token.path.join(".")}"`
       );
       return false;
     }
@@ -159,15 +177,19 @@ export const webCssAction: Action = {
     // Categorize color tokens
     const colorTokens = dictionary.allTokens.filter(
       (t) =>
-        t.path[0] === 'color' &&
-        t.path[1] === 'modes' &&
-        t.path[2] === 'default' &&
-        t.$type === 'color'
+        t.path[0] === "color" &&
+        t.path[1] === "modes" &&
+        t.path[2] === "default" &&
+        t.$type === "color"
     );
 
     colorTokens.forEach((token) => {
       const resolved = (token.$extensions as any)?.cedar?.resolved?.web;
-      if (resolved && typeof resolved.light === 'string' && typeof resolved.dark === 'string') {
+      if (
+        resolved &&
+        typeof resolved.light === "string" &&
+        typeof resolved.dark === "string"
+      ) {
         const cssVar = toCssVar(token.path);
         const line = renderColorDeclarations(cssVar, resolved.light);
         const darkLine = renderColorDeclarations(cssVar, resolved.dark);
@@ -179,33 +201,39 @@ export const webCssAction: Action = {
       const webCedar = (token.$extensions as any)?.cedar?.web;
 
       if (
-        typeof webCedar?.light !== 'string' ||
-        typeof webCedar?.dark !== 'string'
+        typeof webCedar?.light !== "string" ||
+        typeof webCedar?.dark !== "string"
       ) {
         throw new Error(
           `[web-css] Token ${token.name}: missing $extensions.cedar.web { light, dark }. ` +
-          `Expected string refs but got light=${typeof webCedar?.light}, dark=${typeof webCedar?.dark}. ` +
-          `Ensure normalize.ts mergeColorVariants generated web option refs.`
+            `Expected string refs but got light=${typeof webCedar?.light}, dark=${typeof webCedar?.dark}. ` +
+            `Ensure normalize.ts mergeColorVariants generated web option refs.`
         );
       }
 
-      const lightOptionNode = getTokenAtPath(dictionary.tokens, webCedar.light) as CedarOptionNode | undefined;
-      const darkOptionNode = getTokenAtPath(dictionary.tokens, webCedar.dark) as CedarOptionNode | undefined;
+      const lightOptionNode = getTokenAtPath(
+        dictionary.tokens,
+        webCedar.light
+      ) as CedarOptionNode | undefined;
+      const darkOptionNode = getTokenAtPath(
+        dictionary.tokens,
+        webCedar.dark
+      ) as CedarOptionNode | undefined;
 
       if (!lightOptionNode || !darkOptionNode) {
         throw new Error(
           `[web-css] Token ${token.name}: could not resolve web option tokens. ` +
-          `light="${webCedar.light}", dark="${webCedar.dark}".`
+            `light="${webCedar.light}", dark="${webCedar.dark}".`
         );
       }
 
-      const lightHex = resolveOptionHex(lightOptionNode, 'light');
-      const darkHex = resolveOptionHex(darkOptionNode, 'dark');
+      const lightHex = resolveOptionHex(lightOptionNode, "light");
+      const darkHex = resolveOptionHex(darkOptionNode, "dark");
 
       if (!lightHex || !darkHex) {
         throw new Error(
           `[web-css] Token ${token.name}: could not resolve web hex values. ` +
-          `light="${webCedar.light}"→${lightHex}, dark="${webCedar.dark}"→${darkHex}.`
+            `light="${webCedar.light}"→${lightHex}, dark="${webCedar.dark}"→${darkHex}.`
         );
       }
 
@@ -217,11 +245,13 @@ export const webCssAction: Action = {
     });
 
     // Categorize spacing tokens
-    const spacingTokens = dictionary.allTokens.filter((t) => t.path[0] === 'spacing');
+    const spacingTokens = dictionary.allTokens.filter(
+      (t) => t.path[0] === "spacing"
+    );
 
     spacingTokens.forEach((token) => {
       const raw = (token.value ?? token.$value) as string;
-      if (typeof raw !== 'string') return;
+      if (typeof raw !== "string") return;
 
       const cssVar = toCssVar(token.path);
       const cssValue = toCssValue(raw);
@@ -229,98 +259,145 @@ export const webCssAction: Action = {
 
       // Organize by spacing type (path[1]: scale, component, layout)
       const type = token.path[1];
-      if (type === 'scale') {
+      if (type === "scale") {
         spacingScale.light.push(line);
         spacingScale.dark.push(line);
-      } else if (type === 'component') {
+      } else if (type === "static") {
+        spacingStatic.light.push(line);
+        spacingStatic.dark.push(line);
+      } else if (type === "component") {
         spacingComponent.light.push(line);
         spacingComponent.dark.push(line);
-      } else if (type === 'layout') {
+      } else if (type === "layout") {
         spacingLayout.light.push(line);
         spacingLayout.dark.push(line);
       }
     });
 
     // Write modular CSS files
-    const writeThemeFiles = (theme: 'light' | 'dark') => {
+    const writeThemeFiles = (theme: "light" | "dark") => {
       const themeDir = path.join(buildPath, theme);
       const imports: string[] = [];
 
       // Color files
       if (colorSurface[theme].length > 0) {
-        const css = `:root {\n${colorSurface[theme].join('\n')}\n}\n`;
-        fs.writeFileSync(path.join(themeDir, 'cdr-color-surface.css'), css);
+        const css = `:root {\n${colorSurface[theme].join("\n")}\n}\n`;
+        fs.writeFileSync(path.join(themeDir, "cdr-color-surface.css"), css);
         imports.push(`@import './${theme}/cdr-color-surface.css';`);
       }
       if (colorText[theme].length > 0) {
-        const css = `:root {\n${colorText[theme].join('\n')}\n}\n`;
-        fs.writeFileSync(path.join(themeDir, 'cdr-color-text.css'), css);
+        const css = `:root {\n${colorText[theme].join("\n")}\n}\n`;
+        fs.writeFileSync(path.join(themeDir, "cdr-color-text.css"), css);
         imports.push(`@import './${theme}/cdr-color-text.css';`);
       }
       if (colorBorder[theme].length > 0) {
-        const css = `:root {\n${colorBorder[theme].join('\n')}\n}\n`;
-        fs.writeFileSync(path.join(themeDir, 'cdr-color-border.css'), css);
+        const css = `:root {\n${colorBorder[theme].join("\n")}\n}\n`;
+        fs.writeFileSync(path.join(themeDir, "cdr-color-border.css"), css);
         imports.push(`@import './${theme}/cdr-color-border.css';`);
       }
 
       // Spacing files
       if (spacingScale[theme].length > 0) {
-        const css = `:root {\n${spacingScale[theme].join('\n')}\n}\n`;
-        fs.writeFileSync(path.join(themeDir, 'cdr-spacing-scale.css'), css);
+        const css = `:root {\n${spacingScale[theme].join("\n")}\n}\n`;
+        fs.writeFileSync(path.join(themeDir, "cdr-spacing-scale.css"), css);
         imports.push(`@import './${theme}/cdr-spacing-scale.css';`);
       }
+
       if (spacingComponent[theme].length > 0) {
-        const css = `:root {\n${spacingComponent[theme].join('\n')}\n}\n`;
-        fs.writeFileSync(path.join(themeDir, 'cdr-spacing-component.css'), css);
+        const css = `:root {\n${spacingComponent[theme].join("\n")}\n}\n`;
+        fs.writeFileSync(path.join(themeDir, "cdr-spacing-component.css"), css);
         imports.push(`@import './${theme}/cdr-spacing-component.css';`);
       }
       if (spacingLayout[theme].length > 0) {
-        const css = `:root {\n${spacingLayout[theme].join('\n')}\n}\n`;
-        fs.writeFileSync(path.join(themeDir, 'cdr-spacing-layout.css'), css);
+        const css = `:root {\n${spacingLayout[theme].join("\n")}\n}\n`;
+        fs.writeFileSync(path.join(themeDir, "cdr-spacing-layout.css"), css);
         imports.push(`@import './${theme}/cdr-spacing-layout.css';`);
       }
 
       // Write index file
-      const indexCss = imports.join('\n') + '\n';
+      const indexCss = imports.join("\n") + "\n";
       fs.writeFileSync(path.join(buildPath, `cdr-${theme}.css`), indexCss);
     };
 
-    writeThemeFiles('light');
-    writeThemeFiles('dark');
+    writeThemeFiles("light");
+    writeThemeFiles("dark");
 
     // Log generated files
     console.log(`  ✓ dist/themes/rei-dot-com/css/cdr-light.css (index)`);
-    if (colorSurface.light.length > 0) console.log(`    ✓ cdr-color-surface.css (${colorSurface.light.length} tokens)`);
-    if (colorText.light.length > 0) console.log(`    ✓ cdr-color-text.css (${colorText.light.length} tokens)`);
-    if (colorBorder.light.length > 0) console.log(`    ✓ cdr-color-border.css (${colorBorder.light.length} tokens)`);
-    if (spacingScale.light.length > 0) console.log(`    ✓ cdr-spacing-scale.css (${spacingScale.light.length} tokens)`);
-    if (spacingComponent.light.length > 0) console.log(`    ✓ cdr-spacing-component.css (${spacingComponent.light.length} tokens)`);
-    if (spacingLayout.light.length > 0) console.log(`    ✓ cdr-spacing-layout.css (${spacingLayout.light.length} tokens)`);
+    if (colorSurface.light.length > 0)
+      console.log(
+        `    ✓ cdr-color-surface.css (${colorSurface.light.length} tokens)`
+      );
+    if (colorText.light.length > 0)
+      console.log(
+        `    ✓ cdr-color-text.css (${colorText.light.length} tokens)`
+      );
+    if (colorBorder.light.length > 0)
+      console.log(
+        `    ✓ cdr-color-border.css (${colorBorder.light.length} tokens)`
+      );
+    if (spacingScale.light.length > 0)
+      console.log(
+        `    ✓ cdr-spacing-scale.css (${spacingScale.light.length} tokens)`
+      );
+    if (spacingComponent.light.length > 0)
+      console.log(
+        `    ✓ cdr-spacing-component.css (${spacingComponent.light.length} tokens)`
+      );
+    if (spacingLayout.light.length > 0)
+      console.log(
+        `    ✓ cdr-spacing-layout.css (${spacingLayout.light.length} tokens)`
+      );
 
     console.log(`  ✓ dist/themes/rei-dot-com/css/cdr-dark.css (index)`);
-    if (colorSurface.dark.length > 0) console.log(`    ✓ cdr-color-surface.css (${colorSurface.dark.length} tokens)`);
-    if (colorText.dark.length > 0) console.log(`    ✓ cdr-color-text.css (${colorText.dark.length} tokens)`);
-    if (colorBorder.dark.length > 0) console.log(`    ✓ cdr-color-border.css (${colorBorder.dark.length} tokens)`);
-    if (spacingScale.dark.length > 0) console.log(`    ✓ cdr-spacing-scale.css (${spacingScale.dark.length} tokens)`);
-    if (spacingComponent.dark.length > 0) console.log(`    ✓ cdr-spacing-component.css (${spacingComponent.dark.length} tokens)`);
-    if (spacingLayout.dark.length > 0) console.log(`    ✓ cdr-spacing-layout.css (${spacingLayout.dark.length} tokens)`);
+    if (colorSurface.dark.length > 0)
+      console.log(
+        `    ✓ cdr-color-surface.css (${colorSurface.dark.length} tokens)`
+      );
+    if (colorText.dark.length > 0)
+      console.log(`    ✓ cdr-color-text.css (${colorText.dark.length} tokens)`);
+    if (colorBorder.dark.length > 0)
+      console.log(
+        `    ✓ cdr-color-border.css (${colorBorder.dark.length} tokens)`
+      );
+    if (spacingScale.dark.length > 0)
+      console.log(
+        `    ✓ cdr-spacing-scale.css (${spacingScale.dark.length} tokens)`
+      );
+    if (spacingComponent.dark.length > 0)
+      console.log(
+        `    ✓ cdr-spacing-component.css (${spacingComponent.dark.length} tokens)`
+      );
+    if (spacingLayout.dark.length > 0)
+      console.log(
+        `    ✓ cdr-spacing-layout.css (${spacingLayout.dark.length} tokens)`
+      );
   },
 
   undo: (_dictionary, config) => {
-    const buildPath = config.buildPath ?? 'dist/themes/rei-dot-com/css/';
+    const buildPath = config.buildPath ?? "dist/themes/rei-dot-com/css/";
     const filesToRemove = [
-      'cdr-light.css', 'cdr-dark.css',
-      'light/cdr-color-surface.css', 'light/cdr-color-text.css', 'light/cdr-color-border.css',
-      'light/cdr-spacing-scale.css', 'light/cdr-spacing-component.css', 'light/cdr-spacing-layout.css',
-      'dark/cdr-color-surface.css', 'dark/cdr-color-text.css', 'dark/cdr-color-border.css',
-      'dark/cdr-spacing-scale.css', 'dark/cdr-spacing-component.css', 'dark/cdr-spacing-layout.css',
+      "cdr-light.css",
+      "cdr-dark.css",
+      "light/cdr-color-surface.css",
+      "light/cdr-color-text.css",
+      "light/cdr-color-border.css",
+      "light/cdr-spacing-scale.css",
+      "light/cdr-spacing-component.css",
+      "light/cdr-spacing-layout.css",
+      "dark/cdr-color-surface.css",
+      "dark/cdr-color-text.css",
+      "dark/cdr-color-border.css",
+      "dark/cdr-spacing-scale.css",
+      "dark/cdr-spacing-component.css",
+      "dark/cdr-spacing-layout.css",
     ];
     filesToRemove.forEach((f) => {
       const p = path.join(buildPath, f);
       if (fs.existsSync(p)) fs.rmSync(p);
     });
     // Clean up directories if empty
-    ['light', 'dark'].forEach((dir) => {
+    ["light", "dark"].forEach((dir) => {
       const p = path.join(buildPath, dir);
       try {
         if (fs.existsSync(p) && fs.readdirSync(p).length === 0) {

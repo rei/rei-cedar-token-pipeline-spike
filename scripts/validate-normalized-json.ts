@@ -41,7 +41,9 @@ function checkColorModes(color: JsonRecord): void {
 
       for (const [key, value] of Object.entries(categoryTokens as JsonRecord)) {
         if (!isLeaf(value)) {
-          throw new Error(`color.modes.${mode}.${category}.${key} is not a leaf`);
+          throw new Error(
+            `color.modes.${mode}.${category}.${key} is not a leaf`
+          );
         }
       }
     }
@@ -92,7 +94,9 @@ function main(): void {
   checkColorModes(data.color as JsonRecord);
   checkSpacing(data.spacing as JsonRecord);
 
-  console.log("dist/normalized/current.json is valid and matches expected shape.");
+  console.log(
+    "dist/normalized/current.json is valid and matches expected shape."
+  );
 }
 
 main();

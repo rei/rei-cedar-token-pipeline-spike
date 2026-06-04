@@ -21,7 +21,9 @@ function asyncStory(fn: () => Promise<string>): () => HTMLElement {
         Loading token data…
       </div>`;
     fn()
-      .then((html) => { container.innerHTML = html; })
+      .then((html) => {
+        container.innerHTML = html;
+      })
       .catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : String(err);
         container.innerHTML = `
@@ -153,10 +155,14 @@ const BASE_STYLES = `
 function breadcrumb(...parts: string[]): string {
   return `
     <nav class="breadcrumb">
-      ${parts.map((p, i) => {
-        const last = i === parts.length - 1;
-        return `<span class="bc-seg${last ? " bc-cur" : ""}">${p}</span>${last ? "" : '<span class="bc-sep">/</span>'}`;
-      }).join("")}
+      ${parts
+        .map((p, i) => {
+          const last = i === parts.length - 1;
+          return `<span class="bc-seg${last ? " bc-cur" : ""}">${p}</span>${
+            last ? "" : '<span class="bc-sep">/</span>'
+          }`;
+        })
+        .join("")}
     </nav>
   `;
 }
@@ -184,18 +190,23 @@ function parseClamp(clamp: string): { min: number; max: number } | null {
 
 function fluidGrid(tokens: SpacingToken[]): string {
   const scaleTokens = tokens.filter((t) => t.kind === "fluid");
-  const maxVal = Math.max(...scaleTokens.map((t) => parseClamp(t.value)?.max ?? 0));
+  const maxVal = Math.max(
+    ...scaleTokens.map((t) => parseClamp(t.value)?.max ?? 0)
+  );
 
-  const rows = scaleTokens.map((tok) => {
-    const parsed = parseClamp(tok.value);
-    const scaleKey = tok.path.split(".").pop() ?? tok.path;
-    // Express min/max as percentages of the largest max in the set
-    const minPct = parsed ? (parsed.min / maxVal) * 100 : 0;
-    const maxPct = parsed ? (parsed.max / maxVal) * 100 : 0;
-    return `
+  const rows = scaleTokens
+    .map((tok) => {
+      const parsed = parseClamp(tok.value);
+      const scaleKey = tok.path.split(".").pop() ?? tok.path;
+      // Express min/max as percentages of the largest max in the set
+      const minPct = parsed ? (parsed.min / maxVal) * 100 : 0;
+      const maxPct = parsed ? (parsed.max / maxVal) * 100 : 0;
+      return `
       <div class="frow-bar-wrap">
         <div class="frow-bar-track">
-          <div class="frow-bar-fill" style="left:0%;width:${maxPct.toFixed(1)}%;"></div>
+          <div class="frow-bar-fill" style="left:0%;width:${maxPct.toFixed(
+            1
+          )}%;"></div>
         </div>
         <div class="frow-bar-labels">
           <span>${parsed?.min ?? ""}px</span>
@@ -206,7 +217,8 @@ function fluidGrid(tokens: SpacingToken[]): string {
       <div class="frow-clamp">${tok.value}</div>
       <div class="frow-kind"><span class="frow-badge fluid">fluid</span></div>
     `;
-  }).join("");
+    })
+    .join("");
 
   return `
     <div class="fluid-grid">
@@ -218,18 +230,25 @@ function fluidGrid(tokens: SpacingToken[]): string {
   `;
 }
 
-function aliasGrid(tokens: SpacingToken[], group: "component" | "layout"): string {
-  const grouped = tokens.filter((t) => t.kind === "alias" && t.path.startsWith(`spacing.${group}.`));
+function aliasGrid(
+  tokens: SpacingToken[],
+  group: "component" | "layout"
+): string {
+  const grouped = tokens.filter(
+    (t) => t.kind === "alias" && t.path.startsWith(`spacing.${group}.`)
+  );
   if (grouped.length === 0) return "";
 
-  const rows = grouped.map((tok) => {
-    const name = tok.path.split(".").pop() ?? tok.path;
-    return `
+  const rows = grouped
+    .map((tok) => {
+      const name = tok.path.split(".").pop() ?? tok.path;
+      return `
       <div class="arow-cell arow-name">${name}</div>
       <div class="arow-cell arow-ref">${tok.aliasRef ?? ""}</div>
       <div class="arow-cell">${tok.value}</div>
     `;
-  }).join("");
+    })
+    .join("");
 
   return `
     <div class="alias-grid">
@@ -281,15 +300,17 @@ export const Scale: Story = {
         ${catHeader("Live Demo — resize your browser to see fluid scaling")}
         <div class="demo-section">
           <div class="demo-label">Token bars (proportional to max value)</div>
-          ${scaleTokens.map((tok) => {
-            const scaleKey = tok.path.split(".").pop() ?? tok.path;
-            return `
+          ${scaleTokens
+            .map((tok) => {
+              const scaleKey = tok.path.split(".").pop() ?? tok.path;
+              return `
               <div class="demo-row">
                 <div class="demo-bar" style="width:${tok.value};"></div>
                 <span class="demo-row-label">${scaleKey} — ${tok.value}</span>
               </div>
             `;
-          }).join("")}
+            })
+            .join("")}
         </div>
       </div>
     `;
@@ -322,15 +343,20 @@ export const Aliases: Story = {
 
         ${catHeader("Live Demo")}
         <div class="demo-section">
-          ${aliasTokens.map((tok) => {
-            const name = tok.path.split(".").pop() ?? tok.path;
-            return `
+          ${aliasTokens
+            .map((tok) => {
+              const name = tok.path.split(".").pop() ?? tok.path;
+              return `
               <div class="demo-row">
                 <div class="demo-bar" style="width:${tok.value};"></div>
-                <span class="demo-row-label">${tok.path.replace("spacing.", "")} (${tok.scaleKey})</span>
+                <span class="demo-row-label">${tok.path.replace(
+                  "spacing.",
+                  ""
+                )} (${tok.scaleKey})</span>
               </div>
             `;
-          }).join("")}
+            })
+            .join("")}
         </div>
       </div>
     `;
@@ -356,7 +382,9 @@ export const AllSpacing: Story = {
           </div>
           <div>
             <div class="page-meta-count">${tokens.length}</div>
-            <div class="page-meta-label">${scaleTokens.length} scale · ${aliasTokens.length} aliases</div>
+            <div class="page-meta-label">${scaleTokens.length} scale · ${
+      aliasTokens.length
+    } aliases</div>
           </div>
         </div>
 
@@ -367,7 +395,12 @@ export const AllSpacing: Story = {
 
         <div style="height:1.5px;background:var(--rule-heavy);margin:3rem 0 2rem;"></div>
 
-        ${sectionHeader("Aliases", "Component", aliasTokens.filter(t => t.path.startsWith("spacing.component.")).length)}
+        ${sectionHeader(
+          "Aliases",
+          "Component",
+          aliasTokens.filter((t) => t.path.startsWith("spacing.component."))
+            .length
+        )}
         ${catHeader("Component")}
         ${aliasGrid(tokens, "component")}
 

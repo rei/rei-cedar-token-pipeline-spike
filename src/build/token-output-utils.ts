@@ -97,6 +97,14 @@ const MODULE_DEFINITIONS: ModuleDefinition[] = [
     // token path: spacing.layout.sm → return ["sm"]
     return token.path.slice(2);
   }),
+
+  createModuleDefinition("cdr-spacing-static", (token) => {
+    if (token.path[0] !== "spacing" || token.path[1] !== "static" || token.path.length < 3) {
+      return [];
+    }
+    // token path: spacing.static.sm → return ["sm"]
+    return token.path.slice(2);
+  }),
 ];
 
 function collectLeafPaths(tokens: DesignTokens): string[][] {
