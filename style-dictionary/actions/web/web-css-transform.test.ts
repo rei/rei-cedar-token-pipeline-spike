@@ -82,6 +82,81 @@ describe("webCssAction", () => {
     expect(darkIndex).not.toContain("@import './color-surface.css';");
   });
 
+  it("writes hex fallback before oklch color declarations", () => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const buildPath = fs.mkdtempSync(path.join(os.tmpdir(), "web-css-action-"));
+    tempDirs.push(buildPath);
+
+    const dictionary = {
+      allTokens: [
+        {
+          name: "textLink",
+          path: ["color", "modes", "default", "text", "link"],
+          $type: "color",
+          $extensions: {
+            cedar: {
+              resolved: {
+                web: { light: "#406eb5", dark: "#0b2d60" },
+              },
+            },
+          },
+        },
+      ],
+      tokens: {},
+    };
+
+    webCssAction.do?.(dictionary as any, { buildPath } as any);
+
+    const lightTextCss = fs.readFileSync(
+      path.join(buildPath, "light", "cdr-color-text.css"),
+      "utf8",
+    );
+    const hexDeclaration = "--cdr-text-link: #406eb5;";
+    const oklchDeclaration = "--cdr-text-link: oklch(";
+
+    expect(lightTextCss).toContain(hexDeclaration);
+    expect(lightTextCss).toContain(oklchDeclaration);
+    expect(lightTextCss.indexOf(hexDeclaration)).toBeLessThan(
+      lightTextCss.indexOf(oklchDeclaration),
+    );
+  });
+
+  it("preserves alpha from 8-digit hex in oklch declarations", () => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const buildPath = fs.mkdtempSync(path.join(os.tmpdir(), "web-css-action-"));
+    tempDirs.push(buildPath);
+
+    const dictionary = {
+      allTokens: [
+        {
+          name: "surfaceScrim",
+          path: ["color", "modes", "default", "surface", "scrim"],
+          $type: "color",
+          $extensions: {
+            cedar: {
+              resolved: {
+                web: { light: "#ffffffd9", dark: "#000000bf" },
+              },
+            },
+          },
+        },
+      ],
+      tokens: {},
+    };
+
+    webCssAction.do?.(dictionary as any, { buildPath } as any);
+
+    const lightSurfaceCss = fs.readFileSync(
+      path.join(buildPath, "light", "cdr-color-surface.css"),
+      "utf8",
+    );
+
+    expect(lightSurfaceCss).toContain("--cdr-surface-scrim: #ffffffd9;");
+    expect(lightSurfaceCss).toContain("--cdr-surface-scrim: oklch(100% 0 0 / 0.851);");
+  });
+
   it("throws when web option refs are missing", () => {
     vi.spyOn(console, "log").mockImplementation(() => {});
     vi.spyOn(console, "warn").mockImplementation(() => {});

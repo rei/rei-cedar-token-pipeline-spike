@@ -241,7 +241,7 @@ const BASE_STYLES = `
   .td-doc-summary { font-family: var(--font-sans); font-size: 0.75rem; line-height: 1.4; color: var(--ink-mid); }
   .td-doc-meta { font-family: var(--font-sans); font-size: 0.6875rem; line-height: 1.45; color: var(--ink-muted); }
   .td-doc-label { font-family: var(--font-sans); font-size: 0.56rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint); margin-right: 0.35rem; }
-  .td-hex { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--ink-muted); text-align: right; letter-spacing: 0.04em; }
+  .td-value { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--ink-muted); text-align: right; letter-spacing: 0.01em; }
 
   /* ── Section spacing ── */
   .token-section { margin-bottom: 3.5rem; }
@@ -269,7 +269,7 @@ const BASE_STYLES = `
   .compare-table tr:hover td { background: rgba(46,46,43,0.025); }
   .cmp-chip-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
   .cmp-chip { width: 30px; height: 30px; border-radius: 3px; border: 1px solid var(--rule-heavy); display: block; flex-shrink: 0; }
-  .cmp-hex { font-family: var(--font-mono); font-size: 0.625rem; color: var(--ink-faint); letter-spacing: 0.03em; }
+  .cmp-value { font-family: var(--font-mono); font-size: 0.5625rem; color: var(--ink-faint); letter-spacing: 0.01em; }
   .cmp-mode-badge {
     display: inline-block; font-family: var(--font-sans); font-size: 0.4375rem; font-weight: 700;
     letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-muted);
@@ -314,10 +314,10 @@ function renderDocs(docs?: TokenDocs): string {
   return parts.length > 0 ? `<div class="td-token-docs">${parts.join("")}</div>` : "";
 }
 
-function needsDarkLabel(hex: string): boolean {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
+function needsDarkLabel(sourceHex: string): boolean {
+  const r = parseInt(sourceHex.slice(1, 3), 16);
+  const g = parseInt(sourceHex.slice(3, 5), 16);
+  const b = parseInt(sourceHex.slice(5, 7), 16);
   return (r * 299 + g * 587 + b * 114) / 1000 > 140;
 }
 
@@ -325,11 +325,11 @@ function strip(swatches: Swatch[]): string {
   return `
     <div class="swatch-strip">
       ${swatches.map((s) => {
-        const dark = needsDarkLabel(s.value.slice(0, 7));
+        const dark = needsDarkLabel(s.sourceHex.slice(0, 7));
         return `
           <div class="strip-segment" style="background:${s.value};">
             <div class="strip-label" style="color:${dark ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.8)"}; background:${dark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.2)"};">
-              ${s.value.slice(0, 9).toUpperCase()}
+              ${s.value}
             </div>
           </div>
         `;
@@ -345,7 +345,7 @@ function table(swatches: Swatch[]): string {
         <tr>
           <th style="width:36px;"></th>
           <th>Token</th>
-          <th>Hex</th>
+          <th>oklch</th>
         </tr>
       </thead>
       <tbody>
@@ -357,7 +357,7 @@ function table(swatches: Swatch[]): string {
               <span class="swatch-chip" style="background:${s.value};"></span>
             </td>
             <td class="td-token"><div class="td-token-wrap"><span class="td-token-name">${s.name}</span></div></td>
-            <td class="td-hex">${s.value.slice(0, 9).toUpperCase()}</td>
+            <td class="td-value">${s.value}</td>
           </tr>
           ${docsMarkup ? `
           <tr class="token-doc-row">
@@ -409,7 +409,7 @@ function breadcrumb(...parts: string[]): string {
 
 /**
  * Render a cross-mode comparison table for a given palette/filter.
- * Rows = token shades, columns = platform modes.
+ * Rows = token shades, columns = web appearances.
  */
 function platformCompareTable(
   modesMap: Map<string, Swatch[]>,
@@ -438,7 +438,7 @@ function platformCompareTable(
         <td class="mode-val">
           <div class="cmp-chip-wrap">
             <span class="cmp-chip" style="background:${swatch.value};"></span>
-            <span class="cmp-hex">${swatch.value.slice(0, 9).toUpperCase()}</span>
+            <span class="cmp-value">${swatch.value}</span>
           </div>
         </td>
       `;
@@ -467,7 +467,7 @@ function platformCompareTable(
 }
 
 /**
- * Render tabbed panels for a single palette group across platform modes.
+ * Render tabbed panels for a single palette group across web appearances.
  * First tab is active by default. Returns tabbed UI + cross-mode comparison table.
  */
 function tabbedPaletteGroup(
@@ -501,7 +501,7 @@ function tabbedPaletteGroup(
     </div>
     <div class="group-header" style="margin-top:2rem;">
       <span class="group-pip"></span>
-      <span class="group-name">Platform Comparison</span>
+      <span class="group-name">Web Appearance Comparison</span>
       <span class="group-rule"></span>
     </div>
     ${compareTable}
@@ -708,7 +708,7 @@ export const AllPrimitives: Story = {
           </div>
           <div class="page-meta">
             <div class="page-meta-count">${total}</div>
-            <div class="page-meta-label">${modes.length} platform${modes.length !== 1 ? "s" : ""} · ${total} tokens</div>
+            <div class="page-meta-label">${modes.length} web appearance${modes.length !== 1 ? "s" : ""} · ${total} tokens</div>
           </div>
         </div>
 
@@ -721,7 +721,7 @@ export const AllPrimitives: Story = {
 
         <div style="height:1.5px;background:var(--rule-heavy);margin:3.5rem 0 2.5rem;"></div>
 
-        ${sectionHeader("Cross-Platform", "Neutral Comparison", neutralCount)}
+        ${sectionHeader("Web Appearances", "Neutral Comparison", neutralCount)}
         <div class="group-header" style="margin-top:1.5rem;">
           <span class="group-pip"></span>
           <span class="group-name">Warm Grey</span>
@@ -737,7 +737,7 @@ export const AllPrimitives: Story = {
 
         <div style="height:1.5px;background:var(--rule-heavy);margin:3.5rem 0 2.5rem;"></div>
 
-        ${sectionHeader("Cross-Platform", "Brand Comparison", brandCount)}
+        ${sectionHeader("Web Appearances", "Brand Comparison", brandCount)}
         <div class="group-header" style="margin-top:1.5rem;">
           <span class="group-pip"></span>
           <span class="group-name">Blue</span>

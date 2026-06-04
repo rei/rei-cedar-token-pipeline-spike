@@ -19,9 +19,11 @@
  *   dark:  option.$extensions.cedar.appearances.dark  (web-dark override)
  *          falling back to option.$value if no dark variant exists
  */
+/// <reference path="../../types/culori.d.ts" />
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { converter, parse } from 'culori';
 import type { Action } from 'style-dictionary/types';
 
 type CedarOptionNode = {
@@ -34,6 +36,46 @@ type CedarOptionNode = {
     };
   };
 };
+
+type OklchColor = {
+  l?: number;
+  c?: number;
+  h?: number;
+  alpha?: number;
+};
+
+const toOklch = converter('oklch');
+
+function formatNumber(value: number, precision: number): string {
+  const rounded = Number(value.toFixed(precision));
+  return String(Object.is(rounded, -0) ? 0 : rounded);
+}
+
+function formatOklch(hex: string): string {
+  const parsed = parse(hex);
+  const oklch = parsed ? (toOklch(parsed) as OklchColor | undefined) : undefined;
+
+  if (!oklch || typeof oklch.l !== 'number' || typeof oklch.c !== 'number') {
+    throw new Error(`[web-css] Could not convert color value "${hex}" to oklch().`);
+  }
+
+  const lightness = formatNumber(Math.min(100, Math.max(0, oklch.l * 100)), 3);
+  const chroma = formatNumber(Math.max(0, oklch.c), 4);
+  const hue =
+    typeof oklch.h === 'number' && Number.isFinite(oklch.h)
+      ? formatNumber(((oklch.h % 360) + 360) % 360, 2)
+      : '0';
+  const alpha =
+    typeof oklch.alpha === 'number' && oklch.alpha < 1
+      ? ` / ${formatNumber(Math.min(1, Math.max(0, oklch.alpha)), 3)}`
+      : '';
+
+  return `oklch(${lightness}% ${chroma} ${hue}${alpha})`;
+}
+
+function renderColorDeclarations(cssVar: string, hex: string): string {
+  return [`  ${cssVar}: ${hex};`, `  ${cssVar}: ${formatOklch(hex)};`].join('\n');
+}
 
 /** Navigate dictionary.tokens by dot-separated path */
 function getTokenAtPath(tokens: any, dotPath: string): any {
@@ -127,8 +169,8 @@ export const webCssAction: Action = {
       const resolved = (token.$extensions as any)?.cedar?.resolved?.web;
       if (resolved && typeof resolved.light === 'string' && typeof resolved.dark === 'string') {
         const cssVar = toCssVar(token.path);
-        const line = `  ${cssVar}: ${resolved.light};`;
-        const darkLine = `  ${cssVar}: ${resolved.dark};`;
+        const line = renderColorDeclarations(cssVar, resolved.light);
+        const darkLine = renderColorDeclarations(cssVar, resolved.dark);
 
         pushColorByCategory(token, line, darkLine);
         return;
@@ -168,8 +210,8 @@ export const webCssAction: Action = {
       }
 
       const cssVar = toCssVar(token.path);
-      const line = `  ${cssVar}: ${lightHex};`;
-      const darkLine = `  ${cssVar}: ${darkHex};`;
+      const line = renderColorDeclarations(cssVar, lightHex);
+      const darkLine = renderColorDeclarations(cssVar, darkHex);
 
       pushColorByCategory(token, line, darkLine);
     });

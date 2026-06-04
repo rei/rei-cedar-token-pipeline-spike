@@ -141,8 +141,8 @@ See ADR-0005 (SD v5 constraints section) for full constraint documentation.
 
 | Output | Description |
 |---|---|
-| `dist/themes/rei-dot-com/css/light.css` | CSS custom properties, web-light values |
-| `dist/themes/rei-dot-com/css/dark.css` | CSS custom properties, web-dark values |
+| `dist/themes/rei-dot-com/css/light.css` | CSS custom properties, web-light hex fallbacks plus OKLCH overrides |
+| `dist/themes/rei-dot-com/css/dark.css` | CSS custom properties, web-dark hex fallbacks plus OKLCH overrides |
 | `dist/themes/rei-dot-com/ios/Colors.xcassets/` | Xcode color asset catalog, iOS Display P3 light/dark |
 
 **Not yet implemented (V1):**
