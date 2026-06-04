@@ -3,7 +3,7 @@
     "component": {
       "xs": {
         "$type": "number",
-        "$value": "{spacing.scale.-50}",
+        "$value": "{spacing.scale.50}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -17,7 +17,7 @@
       },
       "sm": {
         "$type": "number",
-        "$value": "{spacing.scale.-100}",
+        "$value": "{spacing.scale.100}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -31,7 +31,7 @@
       },
       "md": {
         "$type": "number",
-        "$value": "{spacing.scale.-150}",
+        "$value": "{spacing.scale.150}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -45,7 +45,7 @@
       },
       "lg": {
         "$type": "number",
-        "$value": "{spacing.scale.-200}",
+        "$value": "{spacing.scale.200}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -61,7 +61,7 @@
     "layout": {
       "sm": {
         "$type": "number",
-        "$value": "{spacing.scale.-250}",
+        "$value": "{spacing.scale.250}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -75,7 +75,7 @@
       },
       "md": {
         "$type": "number",
-        "$value": "{spacing.scale.-300}",
+        "$value": "{spacing.scale.300}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -89,7 +89,7 @@
       },
       "lg": {
         "$type": "number",
-        "$value": "{spacing.scale.-400}",
+        "$value": "{spacing.scale.400}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -103,7 +103,7 @@
       },
       "xl": {
         "$type": "number",
-        "$value": "{spacing.scale.-500}",
+        "$value": "{spacing.scale.500}",
         "$description": "",
         "$extensions": {
           "com.figma": {

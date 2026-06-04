@@ -8,9 +8,6 @@ export type CdrSpacingStaticTokenName =
   | "spacing-static-one-x"
   | "spacing-static-quarter-x"
   | "spacing-static-sixteenth-x"
-  | "spacing-static-three-eighth-x"
-  | "spacing-static-three-quarter-x"
-  | "spacing-static-three-sixteenth-x"
   | "spacing-static-three-x"
   | "spacing-static-two-x"
   | "spacing-static-zero";

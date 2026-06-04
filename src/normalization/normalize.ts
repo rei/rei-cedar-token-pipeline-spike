@@ -64,6 +64,8 @@ import {
   buildSpacingClamp,
   applyTokenMapping,
   buildOptionTree,
+  expandHyphenatedTokens,
+  fixStaticReferencePaths,
   type TokenMapping,
 } from "./normalize-utils.js";
 import { mergeColorVariants } from "./color-variants.js";
@@ -125,16 +127,20 @@ try {
   // ── Partition files by type ─────────────────────────────────────────────────
   const SPACING_BP_RE = /^spacing.scale\.(\d+)\.json$/;
   const spacingBpFiles = parsed.filter(({ file }) => SPACING_BP_RE.test(file));
+  const spacingStaticFiles = parsed.filter(
+    ({ file }) => file.includes("spacing") && file.includes("static"),
+  );
   const optionColorFiles = parsed.filter(({ file }) => extractPrimitiveMode(file) !== null);
   const otherFiles = parsed.filter(
     ({ file }) =>
       !SPACING_BP_RE.test(file) &&
       extractPrimitiveMode(file) === null &&
-      file !== "spacing.web.json" &&
-      file !== "spacing.ios.json",
+      file !== "alias.spacing.web.json" &&
+      file !== "alias.spacing.ios.json" &&
+      file !== "spacing.static.default.json",
   );
   const spacingPlatformFiles = parsed.filter(
-    ({ file }) => file === "spacing.web.json" || file === "spacing.ios.json",
+    ({ file }) => file === "alias.spacing.web.json" || file === "alias.spacing.ios.json",
   );
 
   const validationIssues = validateFigmaInputs({
@@ -164,7 +170,22 @@ try {
     );
   }
 
-  // ── 3.5 Normalize Platform Spacing Scales ─────────────────────────────────────
+  // ── 1.2 Static spacing properties - iOS ─────────────────────────────────────────────────────
+  if (spacingStaticFiles.length > 0) {
+    // Initialize the baseline spacing block if it doesn't exist
+    if (!canonical.spacing) {
+      canonical.spacing = {};
+    }
+
+    const collectionToSection = buildCollectionToSection(spacingStaticFiles);
+    const { data } = Object.values(clean(spacingStaticFiles, collectionToSection))[0];
+    const expandedHyphenTokens = expandHyphenatedTokens(data);
+
+    deepMerge(canonical, expandedHyphenTokens);
+    console.log(JSON.stringify(expandHyphenatedTokens(data)));
+  }
+
+  // ── 1.3 Normalize Platform Spacing Scales ─────────────────────────────────────
   if (spacingPlatformFiles.length > 0) {
     // Initialize the baseline spacing block if it doesn't exist
     if (!canonical.spacing) {
@@ -173,48 +194,54 @@ try {
 
     const spacingTarget = canonical.spacing as Record<string, any>;
 
-    if (!spacingTarget.space) {
-      spacingTarget.space = {};
-    }
-
     for (const { file, data } of spacingPlatformFiles) {
       // Determine target platform profile ("spacing.web.json" -> "web", "spacing.web.ios" -> "ios")
-      let platformName = file.split(".")[1];
+      let platformName = file.split(".")[2];
+      platformName = platformName.includes("web") ? "web" : "ios";
 
-      if (platformName === "web" && platformName === "ios") {
-        platformName = "ios";
-      } else if (file === "spacing.ios.json") {
-        platformName = "ios";
-      }
+      const spaceSource = data as Record<string, any>;
 
-      const spaceSource = (data.space || data) as Record<string, any>;
+      for (const [tokenGroupKey, tokenData] of Object.entries(spaceSource.spacing)) {
+        const rawTokenGroup = tokenData as Record<string, any>;
 
-      for (const [tokenKey, tokenData] of Object.entries(spaceSource)) {
-        const rawToken = tokenData as Record<string, any>;
+        for (const [tokenKey, tokenData] of Object.entries(rawTokenGroup)) {
+          if (!spacingTarget[tokenGroupKey]) {
+            spacingTarget[tokenGroupKey] = {};
+          }
 
-        if (!spacingTarget.space[tokenKey]) {
-          spacingTarget.space[tokenKey] = {
-            $type: rawToken.$type || "number",
-            $value: "",
-            $description: rawToken.$description || "",
-            $extensions: {
-              cedar: {
-                platforms: {},
+          if (!spacingTarget[tokenGroupKey][tokenKey]) {
+            spacingTarget[tokenGroupKey][tokenKey] = {
+              $type: tokenData.$type || "number",
+              $value: tokenData.$value,
+              $description: tokenData.$description || "",
+              $extensions: {
+                cedar: {
+                  ios: {
+                    dark: fixStaticReferencePaths(tokenData.$value),
+                    light: fixStaticReferencePaths(tokenData.$value),
+                  },
+                  web: {
+                    dark: fixStaticReferencePaths(tokenData.$value),
+                    light: fixStaticReferencePaths(tokenData.$value),
+                  },
+                },
               },
-            },
+            };
+          }
+
+          if (platformName === "web") {
+            spacingTarget[tokenGroupKey][tokenKey].$value = tokenData.$value;
+          }
+
+          spacingTarget[tokenGroupKey][tokenKey].$extensions.cedar[platformName] = {
+            dark: fixStaticReferencePaths(tokenData.$value),
+            light: fixStaticReferencePaths(tokenData.$value),
           };
         }
-
-        if (platformName === "web") {
-          spacingTarget.space[tokenKey].$value = rawToken.$value;
-        }
-
-        spacingTarget.space[tokenKey].$extensions.cedar.platforms[platformName] = {
-          $value: rawToken.$value,
-        };
       }
     }
-    console.log(`  ✓ Normalized platform files into canonical spacing.space.*`);
+
+    console.log(`  ✓ Normalized platform files into canonical spacing`);
   }
 
   // ── 2. Option color files → color.option + platform lookup table ────────────

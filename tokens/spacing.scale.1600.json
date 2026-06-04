@@ -1,7 +1,7 @@
 {
   "spacing": {
     "scale": {
-      "-50": {
+      "50": {
         "$type": "number",
         "$value": 4,
         "$description": "",
@@ -15,7 +15,7 @@
           }
         }
       },
-      "-100": {
+      "100": {
         "$type": "number",
         "$value": 8,
         "$description": "",
@@ -29,7 +29,7 @@
           }
         }
       },
-      "-150": {
+      "150": {
         "$type": "number",
         "$value": 11.600000381469727,
         "$description": "",
@@ -43,7 +43,7 @@
           }
         }
       },
-      "-200": {
+      "200": {
         "$type": "number",
         "$value": 15.199999809265137,
         "$description": "",
@@ -57,7 +57,7 @@
           }
         }
       },
-      "-250": {
+      "250": {
         "$type": "number",
         "$value": 18.799999237060547,
         "$description": "",
@@ -71,7 +71,7 @@
           }
         }
       },
-      "-300": {
+      "300": {
         "$type": "number",
         "$value": 22.399999618530273,
         "$description": "",
@@ -85,7 +85,7 @@
           }
         }
       },
-      "-400": {
+      "400": {
         "$type": "number",
         "$value": 28,
         "$description": "",
@@ -99,67 +99,9 @@
           }
         }
       },
-      "-500": {
+      "500": {
         "$type": "number",
         "$value": 33.599998474121094,
-        "$description": "",
-        "$extensions": {
-          "com.figma": {
-            "hiddenFromPublishing": false,
-            "scopes": [
-              "ALL_SCOPES"
-            ],
-            "codeSyntax": {}
-          }
-        }
-      }
-    },
-    "static": {
-      "eighth-x": {
-        "$type": "number",
-        "$value": 2,
-        "$description": "",
-        "$extensions": {
-          "com.figma": {
-            "hiddenFromPublishing": false,
-            "scopes": [
-              "ALL_SCOPES"
-            ],
-            "codeSyntax": {}
-          }
-        }
-      },
-      "quarter-x": {
-        "$type": "number",
-        "$value": 4,
-        "$description": "",
-        "$extensions": {
-          "com.figma": {
-            "hiddenFromPublishing": false,
-            "scopes": [
-              "ALL_SCOPES"
-            ],
-            "codeSyntax": {}
-          }
-        }
-      },
-      "half-x": {
-        "$type": "number",
-        "$value": 8,
-        "$description": "",
-        "$extensions": {
-          "com.figma": {
-            "hiddenFromPublishing": false,
-            "scopes": [
-              "ALL_SCOPES"
-            ],
-            "codeSyntax": {}
-          }
-        }
-      },
-      "one-x": {
-        "$type": "number",
-        "$value": 16,
         "$description": "",
         "$extensions": {
           "com.figma": {

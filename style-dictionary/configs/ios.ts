@@ -24,7 +24,8 @@ export const iosConfig: Config = {
           destination: "CdrSpacing.swift",
           format: "swift/spacing-static-struct",
           filter: (token: TransformedToken) =>
-            token.path[0] === "spacing" && token.path[1] === "space",
+            token.path[0] === "spacing" &&
+            (token.path[1] === "component" || token.path[1] === "layout"),
         },
       ],
     },

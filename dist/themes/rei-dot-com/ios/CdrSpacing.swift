@@ -3,9 +3,12 @@ import UIKit
 import Foundation
 
 public struct CdrSpacing {
-    public static let spacingSpaceXs = CGFloat(0)
-    public static let spacingSpaceSm = CGFloat(0.20000000298023224)
-    public static let spacingSpaceMd = CGFloat(0.4000000059604645)
-    public static let spacingSpaceLg = CGFloat(0.800000011920929)
-    public static let spacingSpaceXl = CGFloat(1.600000023841858)
+    public static let spacingComponentXs = CGFloat(0)
+    public static let spacingComponentSm = CGFloat(0.20000000298023224)
+    public static let spacingComponentMd = CGFloat(0.4000000059604645)
+    public static let spacingComponentLg = CGFloat(0.800000011920929)
+    public static let spacingLayoutSm = CGFloat(1.600000023841858)
+    public static let spacingLayoutMd = CGFloat(3.200000047683716)
+    public static let spacingLayoutLg = CGFloat(4.800000190734863)
+    public static let spacingLayoutXl = CGFloat(6.400000095367432)
 }

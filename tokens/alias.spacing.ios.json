@@ -1,9 +1,9 @@
 {
   "spacing": {
-    "scale": {
-      "50": {
+    "component": {
+      "xs": {
         "$type": "number",
-        "$value": 3.5360000133514404,
+        "$value": "{spacing.static.zero}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -15,9 +15,9 @@
           }
         }
       },
-      "100": {
+      "sm": {
         "$type": "number",
-        "$value": 6.559999942779541,
+        "$value": "{spacing.static.eighth-x}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -29,9 +29,9 @@
           }
         }
       },
-      "150": {
+      "md": {
         "$type": "number",
-        "$value": 9.583999633789062,
+        "$value": "{spacing.static.quarter-x}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -43,9 +43,25 @@
           }
         }
       },
-      "200": {
+      "lg": {
         "$type": "number",
-        "$value": 12.607999801635742,
+        "$value": "{spacing.static.half-x}",
+        "$description": "",
+        "$extensions": {
+          "com.figma": {
+            "hiddenFromPublishing": false,
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      }
+    },
+    "layout": {
+      "sm": {
+        "$type": "number",
+        "$value": "{spacing.static.one-x}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -57,9 +73,9 @@
           }
         }
       },
-      "250": {
+      "md": {
         "$type": "number",
-        "$value": 15.631999969482422,
+        "$value": "{spacing.static.two-x}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -71,9 +87,9 @@
           }
         }
       },
-      "300": {
+      "lg": {
         "$type": "number",
-        "$value": 18.6560001373291,
+        "$value": "{spacing.static.three-x}",
         "$description": "",
         "$extensions": {
           "com.figma": {
@@ -85,23 +101,9 @@
           }
         }
       },
-      "400": {
+      "xl": {
         "$type": "number",
-        "$value": 23.68000030517578,
-        "$description": "",
-        "$extensions": {
-          "com.figma": {
-            "hiddenFromPublishing": false,
-            "scopes": [
-              "ALL_SCOPES"
-            ],
-            "codeSyntax": {}
-          }
-        }
-      },
-      "500": {
-        "$type": "number",
-        "$value": 28.70400047302246,
+        "$value": "{spacing.static.four-x}",
         "$description": "",
         "$extensions": {
           "com.figma": {

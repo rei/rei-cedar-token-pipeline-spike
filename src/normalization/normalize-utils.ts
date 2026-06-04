@@ -60,9 +60,11 @@ export function extractPrimitiveMode(file: string): string | null {
 
 // ─── isLeaf ───────────────────────────────────────────────────────────────────
 
-export function isLeaf(
-  node: unknown,
-): node is { $value: string | number | boolean; $type: string; [k: string]: unknown } {
+export function isLeaf(node: unknown): node is {
+  $value: string | number | boolean;
+  $type: string;
+  [k: string]: unknown;
+} {
   return typeof node === "object" && node !== null && "$value" in node;
 }
 
@@ -132,7 +134,12 @@ export function parseTokenDescription(
     }
   }
 
-  const result: { summary?: string; design?: string; usage?: string; aliases?: string[] } = {};
+  const result: {
+    summary?: string;
+    design?: string;
+    usage?: string;
+    aliases?: string[];
+  } = {};
 
   const summary = summaryLines.join(" ").trim();
   if (summary) result.summary = summary;
@@ -175,11 +182,19 @@ export function applyTokenMapping(
   platformKey: string,
 ): Array<{
   canonicalPath: string;
-  token: { $type: string; $value: string; docs?: ReturnType<typeof parseTokenDescription> };
+  token: {
+    $type: string;
+    $value: string;
+    docs?: ReturnType<typeof parseTokenDescription>;
+  };
 }> {
   const results: Array<{
     canonicalPath: string;
-    token: { $type: string; $value: string; docs?: ReturnType<typeof parseTokenDescription> };
+    token: {
+      $type: string;
+      $value: string;
+      docs?: ReturnType<typeof parseTokenDescription>;
+    };
   }> = [];
 
   function walkCollection(node: Record<string, unknown>, figmaPath: string[]) {
@@ -245,7 +260,11 @@ export function applyTokenMapping(
 export function buildOptionTree(
   entries: Array<{
     canonicalPath: string;
-    token: { $type: string; $value: string; docs?: ReturnType<typeof parseTokenDescription> };
+    token: {
+      $type: string;
+      $value: string;
+      docs?: ReturnType<typeof parseTokenDescription>;
+    };
   }>,
 ): Record<string, unknown> {
   const root: Record<string, unknown> = {};
@@ -555,7 +574,10 @@ export function nestUnderSections(
  *   and data is the parsed JSON (null-safe: alias file is excluded by the caller).
  */
 export function buildSpacingClamp(
-  parsedSpacingFiles: Array<{ breakpoint: number; data: Record<string, unknown> }>,
+  parsedSpacingFiles: Array<{
+    breakpoint: number;
+    data: Record<string, unknown>;
+  }>,
 ): Record<string, unknown> {
   if (parsedSpacingFiles.length === 0) return {};
 
@@ -607,7 +629,9 @@ export function buildSpacingClamp(
     const slope = (vMax - vMin) / (bpMaxVw - bpMinVw); // px / vw
     const intercept = vMin - slope * bpMinVw; // px
 
-    const clampValue = `clamp(${roundPx(vMin)}px, ${roundSlope(slope)}vw + ${roundPx(intercept)}px, ${roundPx(vMax)}px)`;
+    const clampValue = `clamp(${roundPx(vMin)}px, ${roundSlope(
+      slope,
+    )}vw + ${roundPx(intercept)}px, ${roundPx(vMax)}px)`;
     scaleOut[tokenKey] = { $value: clampValue, $type: "fluid" };
   }
 
@@ -650,4 +674,69 @@ export function deepMerge(dest: Record<string, unknown>, src: Record<string, unk
       dest[key] = value;
     }
   }
+}
+
+export function expandHyphenatedTokens(obj: Record<string, any>): TokenNode {
+  // Base case: If it's not an object or it's null, return as-is
+  if (typeof obj !== "object" || obj === null) {
+    return obj;
+  }
+
+  // W3C Design Token Guard: If it's a leaf node, don't look deeper
+  if ("$value" in obj) {
+    return obj as unknown as TokenNode;
+  }
+
+  const root: TokenNode = {};
+
+  for (const [key, value] of Object.entries(obj)) {
+    // 1. Recursively process the child nodes first
+    const processedValue = expandHyphenatedTokens(value);
+
+    // 2. Split the current key by its hyphens
+    const segments = key.split("-");
+    let currentLevel = root;
+
+    // 3. Walk down the tree, creating nests where needed
+    segments.forEach((segment, index) => {
+      const isLastSegment = index === segments.length - 1;
+
+      if (isLastSegment) {
+        currentLevel[segment] = processedValue;
+      } else {
+        // If the next level doesn't exist yet, initialize it
+        if (
+          !currentLevel[segment] ||
+          typeof currentLevel[segment] !== "object" ||
+          "$value" in currentLevel[segment]
+        ) {
+          currentLevel[segment] = {};
+        }
+        currentLevel = currentLevel[segment];
+      }
+    });
+  }
+
+  return root;
+}
+
+/**
+ * Detects reference pointers like "{spacing.static.two-x}"
+ * and rewrites them cleanly to "{spacing.static.two.x}"
+ */
+export function fixStaticReferencePaths(value: unknown): any {
+  if (typeof value !== "string") return value;
+
+  // Intercept references containing standard trailing hyphens
+  if (value.startsWith("{spacing.static.") && value.endsWith("-x}")) {
+    // Replaces the last hyphen with a dot: "{spacing.static.two-x}" -> "{spacing.static.two.x}"
+    return value.replace(/-x}$/, ".x}");
+  }
+
+  // Handle multi-hyphen edge-cases if you split all hyphens (e.g., "one-and-a-half-x")
+  if (value === "{spacing.static.one-and-a-half-x}") {
+    return "{spacing.static.one.and.a.half.x}";
+  }
+
+  return value;
 }

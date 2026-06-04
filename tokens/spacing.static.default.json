@@ -43,20 +43,6 @@
           }
         }
       },
-      "three-sixteenth-x": {
-        "$type": "number",
-        "$value": 0.30000001192092896,
-        "$description": "",
-        "$extensions": {
-          "com.figma": {
-            "hiddenFromPublishing": false,
-            "scopes": [
-              "ALL_SCOPES"
-            ],
-            "codeSyntax": {}
-          }
-        }
-      },
       "quarter-x": {
         "$type": "number",
         "$value": 0.4000000059604645,
@@ -71,37 +57,9 @@
           }
         }
       },
-      "three-eighth-x": {
-        "$type": "number",
-        "$value": 0.6000000238418579,
-        "$description": "",
-        "$extensions": {
-          "com.figma": {
-            "hiddenFromPublishing": false,
-            "scopes": [
-              "ALL_SCOPES"
-            ],
-            "codeSyntax": {}
-          }
-        }
-      },
       "half-x": {
         "$type": "number",
         "$value": 0.800000011920929,
-        "$description": "",
-        "$extensions": {
-          "com.figma": {
-            "hiddenFromPublishing": false,
-            "scopes": [
-              "ALL_SCOPES"
-            ],
-            "codeSyntax": {}
-          }
-        }
-      },
-      "three-quarter-x": {
-        "$type": "number",
-        "$value": 1.2000000476837158,
         "$description": "",
         "$extensions": {
           "com.figma": {

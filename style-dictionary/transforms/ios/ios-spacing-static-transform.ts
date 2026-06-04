@@ -12,11 +12,10 @@ StyleDictionary.registerTransform({
   filter: (token: TransformedToken) => {
     return (
       token.path[0] === "spacing" &&
-      token.path[1] === "space" &&
-      !!token.$extensions?.cedar?.platforms?.ios
+      (token.path[1] === "layout" || token.path[1] === "component")
     );
   },
   transform: (token: TransformedToken) => {
-    return token.$extensions.cedar.platforms.ios.$value;
+    return token.$extensions.cedar.ios.light;
   },
 });

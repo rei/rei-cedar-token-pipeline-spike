@@ -8,9 +8,6 @@ export interface CdrSpacingStaticTokens {
   "spacing-static-one-x": string;
   "spacing-static-quarter-x": string;
   "spacing-static-sixteenth-x": string;
-  "spacing-static-three-eighth-x": string;
-  "spacing-static-three-quarter-x": string;
-  "spacing-static-three-sixteenth-x": string;
   "spacing-static-three-x": string;
   "spacing-static-two-x": string;
   "spacing-static-zero": string;
