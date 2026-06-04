@@ -182,7 +182,6 @@ try {
     const expandedHyphenTokens = expandHyphenatedTokens(data);
 
     deepMerge(canonical, expandedHyphenTokens);
-    console.log(JSON.stringify(expandHyphenatedTokens(data)));
   }
 
   // ── 1.3 Normalize Platform Spacing Scales ─────────────────────────────────────
