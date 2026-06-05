@@ -390,6 +390,22 @@ export function clean(
     // Strip Figma metadata keys
     if (key === "$extensions" || key === "$description") continue;
 
+    // Mixed node guard: if an object has both $value (leaf) AND child token
+    // groups, it's a Figma API artifact where a group folder was exported with
+    // its own value alongside real child variables.  Drop the group-level leaf
+    // properties and recurse into the children only.
+    if (
+      isLeaf(value) &&
+      typeof value === "object" &&
+      value !== null &&
+      Object.keys(value).some(
+        (k) => !k.startsWith("$") && typeof (value as Record<string, unknown>)[k] === "object",
+      )
+    ) {
+      out[key] = clean(value as Record<string, unknown>, collectionToSection, tokenMapping);
+      continue;
+    }
+
     if (isLeaf(value)) {
       let $value = String(value.$value);
 

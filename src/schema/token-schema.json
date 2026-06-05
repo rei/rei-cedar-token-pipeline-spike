@@ -41,101 +41,149 @@
             "500": "500"
           }
         },
-        "neutral-palette": {
-          "canonicalPrefix": "color.option.neutral",
-          "colorFamily": "warm-grey",
-          "tokens": {
-            "warm-grey.100": "warm.grey.100",
-            "warm-grey.300": "warm.grey.300",
-            "warm-grey.600": "warm.grey.600",
-            "warm-grey.900": "warm.grey.900",
-            "base-neutrals.black": "black",
-            "base-neutrals.white": "white",
-            "base-neutrals.white-85": "overlay.light",
-            "base-neutrals.white-75": "overlay.subtle"
-          }
-        },
-        "brand-palette": {
-          "canonicalPrefix": "color.option.brand",
-          "tokens": {
-            "blue.400": "blue.400",
-            "blue.600": "blue.600",
-            "red.400": "red.400",
-            "red.600": "red.600",
-            "yellow.400": "yellow.400",
-            "yellow.600": "yellow.600",
-            "green.400": "green.400",
-            "green.600": "green.600"
-          }
-        },
         "warm-grey": {
-          "canonicalPrefix": "color.option.neutral",
+          "canonicalPrefix": "color.option.warm-grey",
           "colorFamily": "warm-grey",
           "tokens": {
-            "warm-grey.100": "warm.grey.100",
-            "warm-grey.300": "warm.grey.300",
-            "warm-grey.600": "warm.grey.600",
-            "warm-grey.900": "warm.grey.900",
-            "base-neutrals.black": "black",
-            "base-neutrals.white": "white",
-            "base-neutrals.white-85": "overlay.light",
-            "base-neutrals.white-75": "overlay.subtle"
+            "010": "010",
+            "100": "100",
+            "200": "200",
+            "300": "300",
+            "400": "400",
+            "500": "500",
+            "600": "600",
+            "700": "700",
+            "800": "800",
+            "900": "900",
+            "1000": "1000",
+            "1100": "1100",
+            "1200": "1200"
           }
         },
         "alpine-lake-blue": {
-          "canonicalPrefix": "color.option.brand.blue",
+          "canonicalPrefix": "color.option.alpine-lake-blue",
           "colorFamily": "alpine-lake-blue",
           "tokens": {
-            "blue.400": "blue.400",
-            "blue.600": "blue.600"
+            "100": "100",
+            "200": "200",
+            "300": "300",
+            "400": "400",
+            "500": "500",
+            "600": "600",
+            "700": "700",
+            "800": "800",
+            "900": "900",
+            "1000": "1000",
+            "1100": "1100",
+            "1200": "1200"
           }
         },
         "info-blue": {
-          "canonicalPrefix": "color.option.brand.info",
+          "canonicalPrefix": "color.option.info-blue",
           "colorFamily": "info-blue",
           "tokens": {
-            "blue.400": "blue.400",
-            "blue.600": "blue.600"
+            "100": "100",
+            "200": "200",
+            "300": "300",
+            "400": "400",
+            "500": "500",
+            "600": "600",
+            "700": "700",
+            "800": "800",
+            "900": "900",
+            "1000": "1000",
+            "1100": "1100",
+            "1200": "1200"
           }
         },
         "blue-spruce-green": {
-          "canonicalPrefix": "color.option.brand.green",
+          "canonicalPrefix": "color.option.blue-spruce-green",
           "colorFamily": "blue-spruce-green",
           "tokens": {
-            "green.400": "green.400",
-            "green.600": "green.600"
+            "100": "100",
+            "200": "200",
+            "300": "300",
+            "400": "400",
+            "500": "500",
+            "600": "600",
+            "700": "700",
+            "800": "800",
+            "900": "900",
+            "1000": "1000",
+            "1100": "1100",
+            "1200": "1200"
           }
         },
         "success-green": {
-          "canonicalPrefix": "color.option.brand.success",
+          "canonicalPrefix": "color.option.success-green",
           "colorFamily": "success-green",
           "tokens": {
-            "green.400": "green.400",
-            "green.600": "green.600"
+            "100": "100",
+            "200": "200",
+            "300": "300",
+            "400": "400",
+            "500": "500",
+            "600": "600",
+            "700": "700",
+            "800": "800",
+            "900": "900",
+            "1000": "1000",
+            "1100": "1100",
+            "1200": "1200"
           }
         },
         "warning-yellow": {
-          "canonicalPrefix": "color.option.brand.warning",
+          "canonicalPrefix": "color.option.warning-yellow",
           "colorFamily": "warning-yellow",
           "tokens": {
-            "yellow.400": "yellow.400",
-            "yellow.600": "yellow.600"
+            "100": "100",
+            "200": "200",
+            "300": "300",
+            "400": "400",
+            "500": "500",
+            "600": "600",
+            "700": "700",
+            "800": "800",
+            "900": "900",
+            "1000": "1000",
+            "1100": "1100",
+            "1200": "1200"
           }
         },
         "error-red": {
-          "canonicalPrefix": "color.option.brand.error",
+          "canonicalPrefix": "color.option.error-red",
           "colorFamily": "error-red",
           "tokens": {
-            "red.400": "red.400",
-            "red.600": "red.600"
+            "100": "100",
+            "200": "200",
+            "300": "300",
+            "400": "400",
+            "500": "500",
+            "600": "600",
+            "700": "700",
+            "800": "800",
+            "900": "900",
+            "1000": "1000",
+            "1100": "1100",
+            "1200": "1200"
           }
         },
         "sale-red": {
-          "canonicalPrefix": "color.option.brand.sale",
+          "canonicalPrefix": "color.option.sale-red",
           "colorFamily": "sale-red",
           "tokens": {
-            "red.400": "red.400",
-            "red.600": "red.600"
+            "100": "100",
+            "200": "200",
+            "300": "300",
+            "400": "400",
+            "500": "500",
+            "600": "600",
+            "700": "700",
+            "800": "800",
+            "900": "900",
+            "1000": "1000",
+            "1100": "1100",
+            "1200": "1200"
           }
         }
       }
