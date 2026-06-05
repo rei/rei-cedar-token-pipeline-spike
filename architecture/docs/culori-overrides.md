@@ -18,11 +18,30 @@ This document captures:
 
 Culori's default sRGB → OKLCH conversion produces mathematically correct color space conversions, but Cedar's design system specifies custom lightness curves for perceptual alignment with brand requirements.
 
+Additionally, hex values are quantized sRGB approximations. Deriving OKLCH lightness from hex via culori introduces rounding drift that gets amplified by the chroma formula’s parabolic shape—especially near the curve edges. To avoid this, the pipeline uses **authoritative design-spec L and C values** for known palette steps.
+
 ### Implementation
 
 **File:** `style-dictionary/actions/web/oklch-formulas.ts`
 
-**Formula:**
+#### Two-Tier Resolution
+
+The function `hexToCustomOklch(hex, colorFamily?, step?)` resolves OKLCH values in two tiers:
+
+1. **Spec lookup (preferred):** When both `colorFamily` and `step` are provided, the function checks `SPEC_OKLCH[colorFamily][step]`. If found, it uses the authoritative L and C values directly. These are the designer-approved values that define the palette.
+
+2. **Formula fallback:** When no spec entry exists (e.g., unmapped step or unknown family), the function derives L from hex via culori and computes C from the parabolic chroma formula.
+
+3. **Culori passthrough:** When no `colorFamily` is provided at all (e.g., Storybook preview of arbitrary colors), the function uses culori's default OKLCH conversion with no custom chroma.
+
+#### Spec Values (`SPEC_OKLCH`)
+
+The `SPEC_OKLCH` table contains the final, designer-approved L (lightness) and C (chroma) values for every palette step. These values are hand-tuned—the parabolic formula describes the overall curve shape, but designers adjust individual stops for visual harmony.
+
+H (hue) is fixed per family in `COLOR_FAMILIES` and not repeated in the spec table.
+
+#### Parabolic Chroma Formula (Fallback)
+
 ```
 C(L) = Cmin + (Cmax - Cmin) * (1 - ((L - Lo) / W)^2)
 ```
@@ -36,6 +55,8 @@ Where:
 - `Cmin`: Chroma floor (Clight-min for light side, Cdark-min for dark side)
 - `Lmax`: 0.98
 - `Lmin`: 0.20
+
+This formula is kept as a fallback for future palette extensions (e.g., new steps or new families) where spec values haven't been authored yet.
 
 ### Color Families
 
@@ -69,21 +90,27 @@ The `colorFamily` is attached to each token's `$extensions.cedar` during normali
 ### Usage
 
 **Web CSS Transform:** `style-dictionary/actions/web/web-css-transform.ts`
+
+The transform extracts `colorFamily` from `$extensions.cedar.colorFamily` on the option token and `step` from the last segment of the option ref path (e.g., `color.option.warm-grey.900` → step `900`).
+
 ```typescript
 import { hexToCustomOklch } from './oklch-formulas';
 
-function formatOklch(hex: string, colorFamily?: string): string {
-  return hexToCustomOklch(hex, colorFamily);
+function formatOklch(hex: string, colorFamily?: string, step?: string): string {
+  return hexToCustomOklch(hex, colorFamily, step);
 }
 ```
 
 **Storybook:** `stories/lib/web-color-format.ts`
+
+Storybook preview doesn't have step context, so it falls back to culori's default conversion (no custom chroma). This is acceptable since Storybook is for visual preview, not production output.
+
 ```typescript
 import { hexToCustomOklch } from "../../style-dictionary/actions/web/oklch-formulas";
 
-export function toWebOklch(value: string, colorFamily?: string): string {
+export function toWebOklch(value: string): string {
   if (!isHexColor(value)) return value;
-  return hexToCustomOklch(value, colorFamily);
+  return hexToCustomOklch(value);
 }
 ```
 
@@ -93,9 +120,22 @@ Web CSS outputs both hex (fallback) and OKLCH (modern browsers):
 ```css
 :root {
   --cdr-surface-raised: #edeae3;
-  --cdr-surface-raised: oklch(93.744% 0.0048 82);
+  --cdr-surface-raised: oklch(91.5% 0.0062 82);
 }
 ```
+
+When a spec entry is available (step known), the L and C values come from
+`SPEC_OKLCH` and match the design spec exactly. When no spec entry exists,
+L is derived from hex via culori and C is computed from the parabolic formula.
+
+### Testing
+
+**File:** `style-dictionary/actions/web/oklch-formulas.test.ts`
+
+The test suite validates:
+1. **Formula parameters** match the design spec for all 8 families
+2. **Design-intent values** for all 97 palette steps (8 families × 12 steps + warm-grey 010) match the spec exactly when the step parameter is provided
+3. **Fallback behavior** (no family, invalid family, alpha handling)
 
 ### Browser Support
 
