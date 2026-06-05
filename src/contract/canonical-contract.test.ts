@@ -457,21 +457,23 @@ describe("canonical contract invariants", () => {
       }
 
       if (category === "static") {
-        if (leaf.$type !== "dimension") {
+        if (leaf.$type !== "dimension" && leaf.$type !== "number") {
           pushViolation(
             violations,
             tokenPath,
             "SPACING_STATIC_TYPE",
-            '$type is "dimension"',
+            '$type is "dimension" or "number"',
             leaf.$type,
           );
         }
-        if (!isDimension(leaf.$value)) {
+        // Static spacing can be either dimension strings (px/rem) or raw numbers
+        const isValidValue = isDimension(leaf.$value) || typeof leaf.$value === "number";
+        if (!isValidValue) {
           pushViolation(
             violations,
             tokenPath,
             "SPACING_STATIC_TYPE",
-            "$value is dimension (px/rem)",
+            "$value is dimension (px/rem) or number",
             leaf.$value,
           );
         }

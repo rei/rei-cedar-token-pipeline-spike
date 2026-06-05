@@ -10,4 +10,5 @@ export type FoundationModule =
   | "cdr-color-text"
   | "cdr-spacing-component"
   | "cdr-spacing-layout"
-  | "cdr-spacing-scale";
+  | "cdr-spacing-scale"
+  | "cdr-spacing-static";
