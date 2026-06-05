@@ -19,8 +19,6 @@
  *   dark:  option.$extensions.cedar.appearances.dark  (web-dark override)
  *          falling back to option.$value if no dark variant exists
  */
-/// <reference path="../../types/culori.d.ts" />
-
 import fs from 'node:fs';
 import path from 'node:path';
 import type { Action } from 'style-dictionary/types';
@@ -37,12 +35,12 @@ type CedarOptionNode = {
   };
 };
 
-function formatOklch(hex: string, colorFamily?: string, step?: string): string {
-  return hexToCustomOklch(hex, colorFamily, step);
+function formatOklch(hex: string, colorFamily?: string): string {
+  return hexToCustomOklch(hex, colorFamily);
 }
 
-function renderColorDeclarations(cssVar: string, hex: string, colorFamily?: string, step?: string): string {
-  return [`  ${cssVar}: ${hex};`, `  ${cssVar}: ${formatOklch(hex, colorFamily, step)};`].join('\n');
+function renderColorDeclarations(cssVar: string, hex: string, colorFamily?: string): string {
+  return [`  ${cssVar}: ${hex};`, `  ${cssVar}: ${formatOklch(hex, colorFamily)};`].join('\n');
 }
 
 /** Navigate dictionary.tokens by dot-separated path */
@@ -202,10 +200,8 @@ export const webCssAction: Action = {
 
       const cssVar = toCssVar(token.path);
       const colorFamily = (lightOptionNode.$extensions as any)?.cedar?.colorFamily;
-      const lightStep = typeof webCedar.light === 'string' ? webCedar.light.split('.').pop() : undefined;
-      const darkStep = typeof webCedar.dark === 'string' ? webCedar.dark.split('.').pop() : undefined;
-      const line = renderColorDeclarations(cssVar, lightHex, colorFamily, lightStep);
-      const darkLine = renderColorDeclarations(cssVar, darkHex, colorFamily, darkStep);
+      const line = renderColorDeclarations(cssVar, lightHex, colorFamily);
+      const darkLine = renderColorDeclarations(cssVar, darkHex, colorFamily);
 
       pushColorByCategory(token, line, darkLine);
     });

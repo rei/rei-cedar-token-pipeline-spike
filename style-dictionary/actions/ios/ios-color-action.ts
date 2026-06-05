@@ -1,5 +1,3 @@
-/// <reference path="../../types/culori.d.ts" />
-
 import fs from 'node:fs';
 import path from 'node:path';
 import type { Action } from 'style-dictionary/types';

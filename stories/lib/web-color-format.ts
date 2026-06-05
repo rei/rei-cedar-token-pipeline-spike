@@ -1,5 +1,3 @@
-/// <reference path="../../style-dictionary/types/culori.d.ts" />
-
 import { hexToCustomOklch } from "../../style-dictionary/actions/web/oklch-formulas";
 
 export function isHexColor(value: string): boolean {

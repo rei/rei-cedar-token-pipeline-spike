@@ -16,31 +16,23 @@ This document captures:
 
 ### Why Override?
 
-Culori's default sRGB → OKLCH conversion produces mathematically correct color space conversions, but Cedar's design system specifies custom lightness curves for perceptual alignment with brand requirements.
-
-Additionally, hex values are quantized sRGB approximations. Deriving OKLCH lightness from hex via culori introduces rounding drift that gets amplified by the chroma formula’s parabolic shape—especially near the curve edges. To avoid this, the pipeline uses **authoritative design-spec L and C values** for known palette steps.
+Culori's default sRGB → OKLCH conversion produces mathematically correct color space conversions, but Cedar's design system specifies custom chroma curves for perceptual alignment with brand requirements. Rather than using culori's chroma, the pipeline applies a parabolic chroma formula with per-family parameters while using culori's lightness (derived from the hex value).
 
 ### Implementation
 
 **File:** `style-dictionary/actions/web/oklch-formulas.ts`
 
-#### Two-Tier Resolution
+#### Resolution Tiers
 
-The function `hexToCustomOklch(hex, colorFamily?, step?)` resolves OKLCH values in two tiers:
+The function `hexToCustomOklch(hex, colorFamily?)` resolves OKLCH values as follows:
 
-1. **Spec lookup (preferred):** When both `colorFamily` and `step` are provided, the function checks `SPEC_OKLCH[colorFamily][step]`. If found, it uses the authoritative L and C values directly. These are the designer-approved values that define the palette.
+1. **Custom formula path:** When `colorFamily` is provided and found in `COLOR_FAMILIES` → uses culori’s hex→L plus the parabolic chroma formula with the family’s fixed hue.
 
-2. **Formula fallback:** When no spec entry exists (e.g., unmapped step or unknown family), the function derives L from hex via culori and computes C from the parabolic chroma formula.
+2. **Warning + fallback:** When `colorFamily` is provided but NOT found in `COLOR_FAMILIES` → logs a warning (so missing families surface during builds) and falls back to culori’s default OKLCH conversion.
 
-3. **Culori passthrough:** When no `colorFamily` is provided at all (e.g., Storybook preview of arbitrary colors), the function uses culori's default OKLCH conversion with no custom chroma.
+3. **Culori passthrough:** When `colorFamily` is omitted (e.g., Storybook preview of arbitrary colors) → culori’s default OKLCH conversion with no custom chroma.
 
-#### Spec Values (`SPEC_OKLCH`)
-
-The `SPEC_OKLCH` table contains the final, designer-approved L (lightness) and C (chroma) values for every palette step. These values are hand-tuned—the parabolic formula describes the overall curve shape, but designers adjust individual stops for visual harmony.
-
-H (hue) is fixed per family in `COLOR_FAMILIES` and not repeated in the spec table.
-
-#### Parabolic Chroma Formula (Fallback)
+#### Parabolic Chroma Formula
 
 ```
 C(L) = Cmin + (Cmax - Cmin) * (1 - ((L - Lo) / W)^2)
@@ -56,7 +48,13 @@ Where:
 - `Lmax`: 0.98
 - `Lmin`: 0.20
 
-This formula is kept as a fallback for future palette extensions (e.g., new steps or new families) where spec values haven't been authored yet.
+#### Adding New Color Families
+
+When designers add new palette families in Figma:
+
+1. Add the collection entry to `src/schema/token-schema.json` with a `colorFamily` field
+2. Add corresponding formula parameters to `COLOR_FAMILIES` in `oklch-formulas.ts`
+3. The schema-driven test will automatically fail if step 2 is missing, surfacing the gap
 
 ### Color Families
 
@@ -91,19 +89,19 @@ The `colorFamily` is attached to each token's `$extensions.cedar` during normali
 
 **Web CSS Transform:** `style-dictionary/actions/web/web-css-transform.ts`
 
-The transform extracts `colorFamily` from `$extensions.cedar.colorFamily` on the option token and `step` from the last segment of the option ref path (e.g., `color.option.warm-grey.900` → step `900`).
+The transform extracts `colorFamily` from `$extensions.cedar.colorFamily` on the option token and passes it to `hexToCustomOklch`.
 
 ```typescript
 import { hexToCustomOklch } from './oklch-formulas';
 
-function formatOklch(hex: string, colorFamily?: string, step?: string): string {
-  return hexToCustomOklch(hex, colorFamily, step);
+function formatOklch(hex: string, colorFamily?: string): string {
+  return hexToCustomOklch(hex, colorFamily);
 }
 ```
 
 **Storybook:** `stories/lib/web-color-format.ts`
 
-Storybook preview doesn't have step context, so it falls back to culori's default conversion (no custom chroma). This is acceptable since Storybook is for visual preview, not production output.
+Storybook can optionally pass `colorFamily` for accurate preview, or omit it to fall back to culori’s default conversion.
 
 ```typescript
 import { hexToCustomOklch } from "../../style-dictionary/actions/web/oklch-formulas";
@@ -120,22 +118,22 @@ Web CSS outputs both hex (fallback) and OKLCH (modern browsers):
 ```css
 :root {
   --cdr-surface-raised: #edeae3;
-  --cdr-surface-raised: oklch(91.5% 0.0062 82);
+  --cdr-surface-raised: oklch(93.744% 0.0048 82);
 }
 ```
 
-When a spec entry is available (step known), the L and C values come from
-`SPEC_OKLCH` and match the design spec exactly. When no spec entry exists,
-L is derived from hex via culori and C is computed from the parabolic formula.
+Lightness is derived from hex via culori. Chroma is computed from the parabolic formula using the family’s parameters. Hue is fixed per family.
 
 ### Testing
 
 **File:** `style-dictionary/actions/web/oklch-formulas.test.ts`
 
-The test suite validates:
-1. **Formula parameters** match the design spec for all 8 families
-2. **Design-intent values** for all 97 palette steps (8 families × 12 steps + warm-grey 010) match the spec exactly when the step parameter is provided
-3. **Fallback behavior** (no family, invalid family, alpha handling)
+The test suite is **schema-driven** and does not hardcode palette values:
+1. **Formula math** — chroma peaks at Lo, stays within Cmin–Cmax bounds
+2. **Determinism** — same hex + family always produces same output
+3. **Schema coverage** — dynamically reads `token-schema.json` and verifies every declared `colorFamily` has a `COLOR_FAMILIES` entry (fails fast when new families are added to Figma but formula params are missing)
+4. **Warning behavior** — unknown family logs a warning and falls back to culori
+5. **Parameter ranges** — every `COLOR_FAMILIES` entry has valid hue, cmax, etc.
 
 ### Browser Support
 
