@@ -78,12 +78,33 @@ const RULE_DOCS: Record<string, RuleDocMeta> = {
       "architecture/ADR/adr-0005-transform-layer-and-platform-outputs.md#sd-v5-pipeline-constraints-normative",
   },
   RESOLVED_PLATFORM_OBJECT: {
-    adr: "ADR-0011",
-    source: "architecture/ADR/adr-0011-hybrid-alias-resolution.md#decision",
+    adr: "ADR-0012",
+    source: "architecture/ADR/adr-0012-hybrid-alias-resolution.md#decision",
   },
   RESOLVED_HEX: {
-    adr: "ADR-0011",
-    source: "architecture/ADR/adr-0011-hybrid-alias-resolution.md#decision",
+    adr: "ADR-0012",
+    source: "architecture/ADR/adr-0012-hybrid-alias-resolution.md#decision",
+  },
+  SPACING_ROOT_OBJECT: {
+    adr: "ADR-0001",
+    source: "architecture/ADR/adr-0001-token-canonical-model.md#canonical-json-structure",
+  },
+  SPACING_SCALE_TYPE: {
+    adr: "ADR-0008",
+    source: "architecture/ADR/adr-0008-responsive-adaptive-tokens.md#fluid-spacing-tokens",
+  },
+  SPACING_STATIC_TYPE: {
+    adr: "ADR-0008",
+    source: "architecture/ADR/adr-0008-responsive-adaptive-tokens.md#fluid-spacing-tokens",
+  },
+  FLUID_SPACING_STRUCTURE: {
+    adr: "ADR-0008",
+    source: "architecture/ADR/adr-0008-responsive-adaptive-tokens.md#canonical-representation",
+  },
+  COLOR_FAMILY_IN_EXTENSIONS: {
+    adr: "ADR-0005",
+    source:
+      "architecture/ADR/adr-0005-transform-layer-and-platform-outputs.md#oklch-color-conversion",
   },
 };
 
@@ -103,6 +124,14 @@ function isColorOptionAlias(value: unknown): value is string {
 
 function isPlainPathString(value: unknown): value is string {
   return typeof value === "string" && !value.includes("{") && !value.includes("}");
+}
+
+function isDimension(value: unknown): value is string {
+  return typeof value === "string" && /^\d+(\.\d+)?(px|rem|em|vh|vw|%)$/.test(value);
+}
+
+function isFluid(value: unknown): value is string {
+  return typeof value === "string" && value.includes("clamp(");
 }
 
 function walkTokenLeaves(
@@ -379,6 +408,132 @@ describe("canonical contract invariants", () => {
               );
             }
           }
+        }
+      }
+    });
+
+    expect(violations, formatViolationReport(violations)).toHaveLength(0);
+  });
+
+  it("matches ADR-0008 spacing token structure", () => {
+    const canonical = JSON.parse(fs.readFileSync(canonicalPath, "utf8")) as JsonObject;
+    const violations: Violation[] = [];
+
+    if (!isObject(canonical.spacing)) {
+      pushViolation(
+        violations,
+        "spacing",
+        "SPACING_ROOT_OBJECT",
+        "canonical root contains a spacing object",
+        canonical.spacing,
+      );
+    }
+
+    const spacing = (canonical.spacing as JsonObject | undefined) ?? {};
+
+    walkTokenLeaves(spacing, ["spacing"], (leaf, pathParts) => {
+      const tokenPath = pathParts.join(".");
+      const category = pathParts[1]; // scale, component, layout, static, fluid
+
+      if (category === "scale") {
+        if (leaf.$type !== "dimension") {
+          pushViolation(
+            violations,
+            tokenPath,
+            "SPACING_SCALE_TYPE",
+            '$type is "dimension"',
+            leaf.$type,
+          );
+        }
+        if (!isDimension(leaf.$value) && !isFluid(leaf.$value)) {
+          pushViolation(
+            violations,
+            tokenPath,
+            "SPACING_SCALE_TYPE",
+            "$value is dimension or fluid clamp()",
+            leaf.$value,
+          );
+        }
+      }
+
+      if (category === "static") {
+        if (leaf.$type !== "dimension") {
+          pushViolation(
+            violations,
+            tokenPath,
+            "SPACING_STATIC_TYPE",
+            '$type is "dimension"',
+            leaf.$type,
+          );
+        }
+        if (!isDimension(leaf.$value)) {
+          pushViolation(
+            violations,
+            tokenPath,
+            "SPACING_STATIC_TYPE",
+            "$value is dimension (px/rem)",
+            leaf.$value,
+          );
+        }
+      }
+
+      if (category === "fluid") {
+        if (leaf.$type !== "dimension") {
+          pushViolation(
+            violations,
+            tokenPath,
+            "FLUID_SPACING_STRUCTURE",
+            '$type is "dimension"',
+            leaf.$type,
+          );
+        }
+        if (!isFluid(leaf.$value)) {
+          pushViolation(
+            violations,
+            tokenPath,
+            "FLUID_SPACING_STRUCTURE",
+            "$value is fluid clamp() expression",
+            leaf.$value,
+          );
+        }
+        const cedar = (leaf.$extensions as JsonObject | undefined)?.cedar;
+        if (!isObject(cedar?.fluid)) {
+          pushViolation(
+            violations,
+            tokenPath,
+            "FLUID_SPACING_STRUCTURE",
+            "$extensions.cedar.fluid contains min/ideal/max structure",
+            cedar?.fluid,
+          );
+        }
+      }
+    });
+
+    expect(violations, formatViolationReport(violations)).toHaveLength(0);
+  });
+
+  it("validates color family in option token extensions", () => {
+    const canonical = JSON.parse(fs.readFileSync(canonicalPath, "utf8")) as JsonObject;
+    const violations: Violation[] = [];
+
+    const color = (canonical.color as JsonObject | undefined) ?? {};
+    const colorOption = (color.option as JsonObject | undefined) ?? {};
+
+    walkTokenLeaves(colorOption, ["color", "option"], (leaf, pathParts) => {
+      const tokenPath = pathParts.join(".");
+      const cedar = (leaf.$extensions as JsonObject | undefined)?.cedar;
+
+      // colorFamily is optional - only validate if present
+      if (isObject(cedar) && "colorFamily" in cedar) {
+        const colorFamily = cedar.colorFamily;
+        if (typeof colorFamily !== "string") {
+          pushViolation(
+            violations,
+            `${tokenPath}.$extensions.cedar.colorFamily`,
+            "COLOR_FAMILY_IN_EXTENSIONS",
+            "colorFamily is string",
+            colorFamily,
+          );
         }
       }
     });

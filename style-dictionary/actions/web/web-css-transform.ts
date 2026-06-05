@@ -23,8 +23,9 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { converter, parse } from 'culori';
+import { parse } from 'culori';
 import type { Action } from 'style-dictionary/types';
+import { hexToCustomOklch } from './oklch-formulas';
 
 type CedarOptionNode = {
   value?: unknown;
@@ -44,37 +45,12 @@ type OklchColor = {
   alpha?: number;
 };
 
-const toOklch = converter('oklch');
-
-function formatNumber(value: number, precision: number): string {
-  const rounded = Number(value.toFixed(precision));
-  return String(Object.is(rounded, -0) ? 0 : rounded);
+function formatOklch(hex: string, colorFamily?: string): string {
+  return hexToCustomOklch(hex, colorFamily);
 }
 
-function formatOklch(hex: string): string {
-  const parsed = parse(hex);
-  const oklch = parsed ? (toOklch(parsed) as OklchColor | undefined) : undefined;
-
-  if (!oklch || typeof oklch.l !== 'number' || typeof oklch.c !== 'number') {
-    throw new Error(`[web-css] Could not convert color value "${hex}" to oklch().`);
-  }
-
-  const lightness = formatNumber(Math.min(100, Math.max(0, oklch.l * 100)), 3);
-  const chroma = formatNumber(Math.max(0, oklch.c), 4);
-  const hue =
-    typeof oklch.h === 'number' && Number.isFinite(oklch.h)
-      ? formatNumber(((oklch.h % 360) + 360) % 360, 2)
-      : '0';
-  const alpha =
-    typeof oklch.alpha === 'number' && oklch.alpha < 1
-      ? ` / ${formatNumber(Math.min(1, Math.max(0, oklch.alpha)), 3)}`
-      : '';
-
-  return `oklch(${lightness}% ${chroma} ${hue}${alpha})`;
-}
-
-function renderColorDeclarations(cssVar: string, hex: string): string {
-  return [`  ${cssVar}: ${hex};`, `  ${cssVar}: ${formatOklch(hex)};`].join('\n');
+function renderColorDeclarations(cssVar: string, hex: string, colorFamily?: string): string {
+  return [`  ${cssVar}: ${hex};`, `  ${cssVar}: ${formatOklch(hex, colorFamily)};`].join('\n');
 }
 
 /** Navigate dictionary.tokens by dot-separated path */
@@ -169,8 +145,9 @@ export const webCssAction: Action = {
       const resolved = (token.$extensions as any)?.cedar?.resolved?.web;
       if (resolved && typeof resolved.light === 'string' && typeof resolved.dark === 'string') {
         const cssVar = toCssVar(token.path);
-        const line = renderColorDeclarations(cssVar, resolved.light);
-        const darkLine = renderColorDeclarations(cssVar, resolved.dark);
+        const colorFamily = (token.$extensions as any)?.cedar?.colorFamily;
+        const line = renderColorDeclarations(cssVar, resolved.light, colorFamily);
+        const darkLine = renderColorDeclarations(cssVar, resolved.dark, colorFamily);
 
         pushColorByCategory(token, line, darkLine);
         return;
@@ -210,8 +187,9 @@ export const webCssAction: Action = {
       }
 
       const cssVar = toCssVar(token.path);
-      const line = renderColorDeclarations(cssVar, lightHex);
-      const darkLine = renderColorDeclarations(cssVar, darkHex);
+      const colorFamily = (lightOptionNode.$extensions as any)?.cedar?.colorFamily;
+      const line = renderColorDeclarations(cssVar, lightHex, colorFamily);
+      const darkLine = renderColorDeclarations(cssVar, darkHex, colorFamily);
 
       pushColorByCategory(token, line, darkLine);
     });

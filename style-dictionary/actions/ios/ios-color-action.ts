@@ -1,6 +1,9 @@
+/// <reference path="../../types/culori.d.ts" />
+
 import fs from 'node:fs';
 import path from 'node:path';
 import type { Action } from 'style-dictionary/types';
+import { converter, parse } from 'culori';
 import { iosColorsetFormatter } from '../../formats/ios/ios-colorset';
 
 type CedarOptionNode = {
@@ -48,22 +51,30 @@ function resolveOptionHex(
   return typeof val === 'string' ? val : undefined;
 }
 
+const toP3 = converter('p3');
+
+function formatNumber(value: number, precision: number): string {
+  const rounded = Number(value.toFixed(precision));
+  return String(Object.is(rounded, -0) ? 0 : rounded);
+}
+
 function hexToP3Components(hex: string) {
-  const clean = hex.replace('#', '');
-  const full =
-    clean.length === 3
-      ? clean.split('').map((c) => c + c).join('')
-      : clean.length === 8
-        ? clean.substring(0, 6)
-        : clean;
-  const r = parseInt(full.substring(0, 2), 16) / 255;
-  const g = parseInt(full.substring(2, 4), 16) / 255;
-  const b = parseInt(full.substring(4, 6), 16) / 255;
-  const alpha =
-    clean.length === 8
-      ? (parseInt(clean.substring(6, 8), 16) / 255).toFixed(3)
-      : '1.000';
-  return { red: r.toFixed(4), green: g.toFixed(4), blue: b.toFixed(4), alpha };
+  const parsed = parse(hex);
+  if (!parsed) {
+    throw new Error(`[ios-colorset] Could not parse color value "${hex}"`);
+  }
+
+  const p3 = toP3(parsed);
+  if (!p3) {
+    throw new Error(`[ios-colorset] Could not convert color value "${hex}" to Display P3`);
+  }
+
+  const r = typeof p3.r === 'number' ? formatNumber(p3.r, 4) : '0';
+  const g = typeof p3.g === 'number' ? formatNumber(p3.g, 4) : '0';
+  const b = typeof p3.b === 'number' ? formatNumber(p3.b, 4) : '0';
+  const alpha = typeof p3.alpha === 'number' ? formatNumber(p3.alpha, 3) : '1.000';
+
+  return { red: r, green: g, blue: b, alpha };
 }
 
 function hexToP3(hex: string) {

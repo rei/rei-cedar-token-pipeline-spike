@@ -1,4 +1,4 @@
-# ADR-0011: Hybrid Alias Resolution (`$extensions.cedar.resolved`)
+# ADR-0012: Hybrid Alias Resolution (`$extensions.cedar.resolved`)
 
 - Status: Accepted
 - Date: 2026-03-19

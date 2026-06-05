@@ -1,0 +1,407 @@
+{
+  "version": "1.0.0",
+  "generated": "2026-06-02",
+  "description": "Machine-readable catalog of Cedar token pipeline Architecture Decision Records",
+  "adrs": [
+    {
+      "number": "0001",
+      "title": "Canonical Token Model",
+      "status": "Partially Implemented",
+      "file": "adr-0001-token-canonical-model.md",
+      "description": "Defines the governed, platform-agnostic token shape. Includes the $extensions.cedar model for option token platform data, alias token platform references, and the SD pipeline constraint on {ref} resolution.",
+      "topics": [
+        "canonical-model",
+        "token-structure",
+        "platform-agnostic",
+        "extensions",
+        "option-tokens",
+        "alias-tokens",
+        "palette-structure",
+        "token-tiers",
+        "naming-grammar",
+        "composite-tokens",
+        "documentation-metadata"
+      ],
+      "relationships": {
+        "prerequisites": [],
+        "referencedBy": [
+          "adr-0002",
+          "adr-0003",
+          "adr-0004",
+          "adr-0005"
+        ]
+      },
+      "keyDecisions": [
+        "Three-tier token architecture: Options → Alias → Semantic",
+        "Dot-delimited canonical paths (no hyphens, underscores, or slashes)",
+        "$extensions.cedar as the only location for non-DTCG data",
+        "Platform data on option tokens via $extensions.cedar.platformOverrides",
+        "Appearance variants via $extensions.cedar.appearances",
+        "Palette structure with inheritance from default"
+      ]
+    },
+    {
+      "number": "0002",
+      "title": "Token Normalization Layer",
+      "status": "Implemented",
+      "file": "adr-0002-token-normalization-layer.md",
+      "description": "Defines how raw Figma files are transformed into the canonical model. Documents the four-file platform convention, the Figma input contract, and the governed invariants.",
+      "topics": [
+        "normalization",
+        "figma-input",
+        "four-file-convention",
+        "platform-files",
+        "schema-mapping",
+        "fluid-spacing",
+        "merge-color-variants",
+        "governance-invariants"
+      ],
+      "relationships": {
+        "prerequisites": [
+          "adr-0001",
+          "adr-0003"
+        ],
+        "referencedBy": [
+          "adr-0005"
+        ]
+      },
+      "keyDecisions": [
+        "Four-file platform convention: web-light, web-dark, ios-light, ios-dark",
+        "Schema-backed Figma-to-canonical path mapping in src/schema/token-schema.json",
+        "Build fails on unmapped Figma paths (designer rename guard)",
+        "Platform data merged in mergeColorVariants() during normalization",
+        "color.primitives NOT written to canonical output"
+      ]
+    },
+    {
+      "number": "0003",
+      "title": "Figma Input Contract",
+      "status": "Implemented",
+      "file": "adr-0003-figma-input-contract.md",
+      "description": "Documents the structure of raw Figma inputs and the schema-backed governance contract in src/schema/token-schema.json. Includes the four-file platform input contract and process for adding new platforms or appearances.",
+      "topics": [
+        "figma-api",
+        "raw-variables",
+        "local-styles",
+        "schema-mapping",
+        "four-file-convention",
+        "platform-inputs",
+        "appearance-encoding",
+        "governance-contract"
+      ],
+      "relationships": {
+        "prerequisites": [],
+        "referencedBy": [
+          "adr-0001",
+          "adr-0002"
+        ]
+      },
+      "keyDecisions": [
+        "Explicit path mapping in src/schema/token-schema.json (no string inference)",
+        "Four Figma platform files encode platform × appearance matrix",
+        "Appearance dimension encoded in filename, not file contents",
+        "Raw Figma Variables and Local Styles as dual input sources",
+        "Schema mapping requires design + engineering review to change"
+      ]
+    },
+    {
+      "number": "0004",
+      "title": "Semantic Token Architecture",
+      "status": "Partially Implemented",
+      "file": "adr-0004-semantic-token-architecture.md",
+      "description": "Defines the three-tier token architecture (Options → Alias → Component). Updated with spike findings: color.option.* path convention, platform override governance rules.",
+      "topics": [
+        "semantic-tokens",
+        "three-tier-architecture",
+        "foundations",
+        "alias-tokens",
+        "component-tokens",
+        "platform-overrides",
+        "naming-grammar",
+        "token-categories"
+      ],
+      "relationships": {
+        "prerequisites": [
+          "adr-0001"
+        ],
+        "referencedBy": [
+          "adr-0005"
+        ]
+      },
+      "keyDecisions": [
+        "Three-tier model: Foundations (Options) → Alias → Component",
+        "Platform overrides vs new option token decision criteria",
+        "Semantic naming grammar across all token categories",
+        "TypeScript outputs organized by semantic category, not superficial type"
+      ]
+    },
+    {
+      "number": "0005",
+      "title": "Transform Layer & Platform Outputs",
+      "status": "Partially Implemented",
+      "file": "adr-0005-transform-layer-and-platform-outputs.md",
+      "description": "Defines how canonical tokens are transformed into CSS, iOS, Android, and other outputs, including the SD v5 normative pipeline constraints.",
+      "topics": [
+        "transform-layer",
+        "style-dictionary",
+        "platform-outputs",
+        "css",
+        "ios",
+        "android",
+        "alias-resolution",
+        "naming-transforms",
+        "value-transforms",
+        "sd-v5-constraints"
+      ],
+      "relationships": {
+        "prerequisites": [
+          "adr-0001",
+          "adr-0002",
+          "adr-0004"
+        ],
+        "referencedBy": []
+      },
+      "keyDecisions": [
+        "SD v5 constraints: no {ref} in $extensions.cedar, action-owns-resolution pattern",
+        "Modular output organization by semantic category",
+        "Mode-specific type generation for TypeScript",
+        "Separate output files per mode/platform",
+        "Configuration Map as machine-readable index artifact"
+      ]
+    },
+    {
+      "number": "0006",
+      "title": "State Layer System",
+      "status": "Proposed",
+      "file": "adr-0006-state-layer-system.md",
+      "description": "Defines interactive state tokens (hover, pressed, focus, disabled, selected, error) and the hybrid explicit/computed overlay approach.",
+      "topics": [
+        "interactive-states",
+        "hover",
+        "pressed",
+        "focus",
+        "disabled",
+        "selected",
+        "error",
+        "overlay-states",
+        "explicit-tokens",
+        "computed-overlays"
+      ],
+      "relationships": {
+        "prerequisites": [
+          "adr-0001"
+        ],
+        "referencedBy": []
+      },
+      "keyDecisions": [
+        "Hybrid approach: explicit state tokens with metadata for future computed overlays",
+        "State metadata: derivedFrom, stateType, overlayEquivalent",
+        "Focus uses dedicated indicator tokens, not color changes",
+        "Disabled uses opacity reduction, not separate colors",
+        "Selected is distinct semantic token, not state modifier"
+      ]
+    },
+    {
+      "number": "0007",
+      "title": "Modes and Palettes",
+      "status": "Partially Implemented",
+      "file": "adr-0007-mode-and-theme.md",
+      "description": "Defines mode architecture and palette architecture. Updated with spike findings on how appearances actually work in the pipeline (option token appearances.dark vs Figma mode axis). Light/dark modes and default/sale palettes implemented.",
+      "topics": [
+        "modes",
+        "palettes",
+        "light-dark",
+        "high-contrast",
+        "surface-scoped",
+        "platform-specific",
+        "palette-inheritance",
+        "dynamic-vs-static"
+      ],
+      "relationships": {
+        "prerequisites": [
+          "adr-0001"
+        ],
+        "referencedBy": []
+      },
+      "keyDecisions": [
+        "Environmental modes as single Figma mode axis (light, dark, high-contrast)",
+        "Platform differences as metadata, not modes",
+        "Palettes are surface-scoped, not page-level",
+        "Web: dynamic palette switching via CSS custom properties",
+        "Native: static palette variants via enums",
+        "Spike finding: appearances encoded on option tokens, not alias tokens"
+      ]
+    },
+    {
+      "number": "0008",
+      "title": "Responsive and Adaptive Tokens",
+      "status": "Partially Implemented",
+      "file": "adr-0008-responsive-adaptive-tokens.md",
+      "description": "Defines breakpoint tokens, fluid spacing, fluid typography, container query tokens, and density tokens. Fluid spacing with clamp() expressions implemented.",
+      "topics": [
+        "responsive",
+        "breakpoints",
+        "fluid-spacing",
+        "fluid-typography",
+        "container-queries",
+        "density",
+        "clamp",
+        "viewport-units",
+        "container-units"
+      ],
+      "relationships": {
+        "prerequisites": [],
+        "referencedBy": []
+      },
+      "keyDecisions": [
+        "Hybrid responsive system: fixed breakpoints + fluid tokens + container queries",
+        "Preserve existing Cedar breakpoints (xs, sm, md, lg) + add xl, xxl",
+        "Fluid spacing using clamp() with min/ideal/max structure",
+        "Container query breakpoints for component-level responsiveness",
+        "Density tokens as semantic multipliers for spacing"
+      ]
+    },
+    {
+      "number": "0009",
+      "title": "Accessibility Requirements",
+      "status": "Proposed",
+      "file": "adr-0009-accessibility-requirements.md",
+      "description": "Embeds WCAG 2.2 Level AA requirements into the token system: focus indicators, touch targets, color contrast, high contrast mode, motion preferences.",
+      "topics": [
+        "accessibility",
+        "wcag-2.2",
+        "focus-indicators",
+        "touch-targets",
+        "color-contrast",
+        "high-contrast",
+        "reduced-motion",
+        "text-spacing",
+        "minimum-font-sizes"
+      ],
+      "relationships": {
+        "prerequisites": [],
+        "referencedBy": []
+      },
+      "keyDecisions": [
+        "Accessibility-first tokens embedded in design system",
+        "Focus indicators: 2px minimum, 3:1 contrast (AAA)",
+        "Touch targets: 44×44px standard (AAA), 24×24px minimum (AA with spacing)",
+        "Color contrast metadata on tokens for automated validation",
+        "High contrast mode as mode variant with AAA contrast requirements"
+      ]
+    },
+    {
+      "number": "0010",
+      "title": "Token Documentation Architecture",
+      "status": "Implemented",
+      "file": "adr-0010-token-documentation-architecture.md",
+      "description": "Defines split-authority token docs architecture: Figma docs plus repo-owned governance metadata merged in canonical.",
+      "topics": [
+        "documentation",
+        "governance-metadata",
+        "figma-descriptions",
+        "repo-metadata",
+        "canonical-merge",
+        "typescript-generation",
+        "jsdoc",
+        "authority-boundaries"
+      ],
+      "relationships": {
+        "prerequisites": [
+          "adr-0001",
+          "adr-0002",
+          "adr-0003"
+        ],
+        "referencedBy": []
+      },
+      "keyDecisions": [
+        "Split authority: Figma for docs, repo for governance metadata",
+        "$extensions.cedar.docs for Figma descriptions",
+        "$extensions.cedar.governance for repo lifecycle/usage metadata",
+        "Option tokens can have Figma descriptions, semantic tokens cannot",
+        "TypeScript generation extracts docs.summary as JSDoc comments"
+      ]
+    },
+    {
+      "number": "0012",
+      "title": "Hybrid Alias Resolution",
+      "status": "Accepted",
+      "file": "adr-0012-hybrid-alias-resolution.md",
+      "description": "Adopts hybrid alias refs plus $extensions.cedar.resolved values with normalization input validation.",
+      "topics": [
+        "alias-resolution",
+        "resolved-values",
+        "pre-computation",
+        "normalization-validation",
+        "deterministic-values",
+        "snapshot-testing"
+      ],
+      "relationships": {
+        "prerequisites": [
+          "adr-0001",
+          "adr-0002"
+        ],
+        "referencedBy": []
+      },
+      "keyDecisions": [
+        "Keep alias $value references unchanged as canonical source of truth",
+        "Add pre-resolved values in $extensions.cedar.resolved during normalization",
+        "Transforms/actions get deterministic value source without dictionary traversal",
+        "Normalization input validation against Figma Input Contract"
+      ]
+    },
+    {
+      "number": "0011",
+      "title": "Harmonic Interval Validation",
+      "status": "Proposed",
+      "file": "adr-0011-harmonic-interval-validation.md",
+      "description": "Defines harmonic validation system with relationships section and harmonicInterval metadata for perceptual correctness checking.",
+      "topics": [
+        "harmonic-validation",
+        "perceptual-intervals",
+        "deltaL",
+        "chroma-envelope",
+        "triad-validation",
+        "sibling-parity",
+        "harmony-registry"
+      ],
+      "relationships": {
+        "prerequisites": [
+          "adr-0010"
+        ],
+        "referencedBy": []
+      },
+      "keyDecisions": [
+        "relationships is a distinct repo-authored section from usage pairingRules",
+        "harmonicInterval carries both deltaL and chromaEnvelope as named subsections",
+        "chromaEnvelope stores parabola parameters per token",
+        "siblingChromaRatio stored in harmonicInterval, not relationships",
+        "triadDeltas stored for all three pair directions",
+        "intervals field (WCAG) retained unchanged from harmonicInterval",
+        "intervalRule is foreign key into harmony-registry.json"
+      ]
+    }
+  ],
+  "topicsIndex": {
+    "canonical-model": ["adr-0001"],
+    "normalization": ["adr-0002"],
+    "figma-input": ["adr-0002", "adr-0003"],
+    "platform-outputs": ["adr-0005"],
+    "semantic-tokens": ["adr-0004"],
+    "modes": ["adr-0007"],
+    "palettes": ["adr-0007"],
+    "accessibility": ["adr-0009"],
+    "documentation": ["adr-0010"],
+    "alias-resolution": ["adr-0012"],
+    "harmonic-validation": ["adr-0011"],
+    "style-dictionary": ["adr-0005"],
+    "governance": ["adr-0002", "adr-0003", "adr-0010"],
+    "platform-overrides": ["adr-0001", "adr-0004"]
+  },
+  "statusIndex": {
+    "Partially Implemented": ["adr-0001", "adr-0004", "adr-0005", "adr-0007", "adr-0008"],
+    "Implemented": ["adr-0002", "adr-0003", "adr-0010"],
+    "Proposed": ["adr-0006", "adr-0009", "adr-0011"],
+    "Accepted": ["adr-0012"]
+  }
+}

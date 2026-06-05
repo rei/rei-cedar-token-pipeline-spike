@@ -73,6 +73,7 @@ export function isLeaf(
  *
  * Each entry maps a Figma collection name (e.g. "neutral-palette") to:
  *   - canonicalPrefix: the color.option.* path prefix for all tokens in this collection
+ *   - colorFamily: the color family for OKLCH chroma curve override (e.g., "warm-grey")
  *   - tokens: explicit Figma token path → canonical sub-path pairs
  *
  * The normalizer throws a build error for any Figma token path not declared here,
@@ -80,6 +81,7 @@ export function isLeaf(
  */
 export type TokenMappingEntry = {
   canonicalPrefix: string;
+  colorFamily?: string;
   tokens: Record<string, string>;
 };
 
@@ -175,11 +177,21 @@ export function applyTokenMapping(
   platformKey: string,
 ): Array<{
   canonicalPath: string;
-  token: { $type: string; $value: string; docs?: ReturnType<typeof parseTokenDescription> };
+  token: {
+    $type: string;
+    $value: string;
+    docs?: ReturnType<typeof parseTokenDescription>;
+    colorFamily?: string;
+  };
 }> {
   const results: Array<{
     canonicalPath: string;
-    token: { $type: string; $value: string; docs?: ReturnType<typeof parseTokenDescription> };
+    token: {
+      $type: string;
+      $value: string;
+      docs?: ReturnType<typeof parseTokenDescription>;
+      colorFamily?: string;
+    };
   }> = [];
 
   function walkCollection(node: Record<string, unknown>, figmaPath: string[]) {
@@ -203,9 +215,11 @@ export function applyTokenMapping(
           $type: string;
           $value: string;
           docs?: ReturnType<typeof parseTokenDescription>;
+          colorFamily?: string;
         } = {
           $type: (value as any).$type,
           $value: String((value as any).$value),
+          colorFamily: entry.colorFamily,
         };
         // Parse structured documentation from the Figma $description field
         const rawDescription = (value as any).$description;
@@ -245,7 +259,12 @@ export function applyTokenMapping(
 export function buildOptionTree(
   entries: Array<{
     canonicalPath: string;
-    token: { $type: string; $value: string; docs?: ReturnType<typeof parseTokenDescription> };
+    token: {
+      $type: string;
+      $value: string;
+      docs?: ReturnType<typeof parseTokenDescription>;
+      colorFamily?: string;
+    };
   }>,
 ): Record<string, unknown> {
   const root: Record<string, unknown> = {};
@@ -265,9 +284,12 @@ export function buildOptionTree(
       $value: token.$value,
     };
 
-    if (token.docs) {
+    if (token.docs || token.colorFamily) {
       tokenNode.$extensions = {
-        cedar: { docs: token.docs },
+        cedar: {
+          ...(token.docs && { docs: token.docs }),
+          ...(token.colorFamily && { colorFamily: token.colorFamily }),
+        },
       };
     }
 
@@ -608,7 +630,7 @@ export function buildSpacingClamp(
     const intercept = vMin - slope * bpMinVw; // px
 
     const clampValue = `clamp(${roundPx(vMin)}px, ${roundSlope(slope)}vw + ${roundPx(intercept)}px, ${roundPx(vMax)}px)`;
-    scaleOut[tokenKey] = { $value: clampValue, $type: "fluid" };
+    scaleOut[tokenKey] = { $value: clampValue, $type: "dimension" };
   }
 
   return { spacing: { scale: scaleOut } };

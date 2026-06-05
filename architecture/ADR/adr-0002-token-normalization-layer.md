@@ -1,7 +1,7 @@
 # ADR‑0002: Token Normalization Layer
 
 ## Status
-Draft
+Implemented
 
 ---
 

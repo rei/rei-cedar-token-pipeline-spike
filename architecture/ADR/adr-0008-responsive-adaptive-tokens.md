@@ -92,13 +92,7 @@ Two additional breakpoints support modern large displays:
   "breakpoint": {
     "md": {
       "$type": "dimension",
-      "$value": "992px",
-      "$extensions": {
-        "cedar": {
-          "min": 992,
-          "max": 1231
-        }
-      }
+      "$value": "992px"
     }
   }
 }
@@ -137,41 +131,27 @@ These values are illustrative and demonstrate how spacing can scale across a lay
 
 ### Canonical Representation
 
-Fluid spacing uses a min/ideal/max structure stored in `$extensions`, with `$value` referencing the computed output.
+Fluid spacing uses `clamp()` expressions directly in `$value`, computed from multiple breakpoint files during normalization.
 
 ```json
 {
   "spacing": {
-    "fluid": {
-      "300": {
+    "scale": {
+      "-150": {
         "$type": "dimension",
-        "$value": "{spacing.fluid.300.computed}",
-        "$extensions": {
-          "cedar": {
-            "fluid": {
-              "min": { "value": 0.75, "unit": "rem" },
-              "ideal": {
-                "value": 0.75,
-                "unit": "rem",
-                "scale": { "value": 0.44, "unit": "cqi" }
-              },
-              "max": { "value": 1.25, "unit": "rem" }
-            }
-          }
-        }
+        "$value": "clamp(6px, 0.2679vw + 4.9286px, 12px)"
       }
     }
   }
 }
 ```
 
-**Note:** `cqi` = container query inline size units (1cqi = 1% of container width)
+The clamp() expression is computed by the normalization layer from the values in the multiple breakpoint-specific spacing files (e.g., `spacing.768.json`, `spacing.992.json`, etc.).
 
 ### Transform Output (CSS)
 
 ```css
---cdr-spacing-fluid-300: clamp(0.75rem, 0.75rem + 0.44cqi, 1.25rem);
---cdr-spacing-fluid-400: clamp(1rem, 1rem + 0.66cqi, 1.75rem);
+--cdr-spacing-scale-150: clamp(6px, 0.2679vw + 4.9286px, 12px);
 ```
 
 ---
@@ -205,24 +185,9 @@ Typography scales smoothly between mobile and desktop sizes using viewport-relat
           "$value": {
             "fontFamily": "{font.family.primary}",
             "fontWeight": 400,
-            "fontSize": "{type.fluid.body.medium.fontSize}",
+            "fontSize": "clamp(1rem, 0.95rem + 0.22vw, 1.125rem)",
             "lineHeight": 1.5,
             "letterSpacing": "0em"
-          },
-          "$extensions": {
-            "cedar": {
-              "fluid": {
-                "fontSize": {
-                  "min": { "value": 1, "unit": "rem" },
-                  "ideal": {
-                    "value": 0.95,
-                    "unit": "rem",
-                    "scale": { "value": 0.22, "unit": "vw" }
-                  },
-                  "max": { "value": 1.125, "unit": "rem" }
-                }
-              }
-            }
           }
         }
       }
@@ -278,13 +243,7 @@ Container breakpoints differ from viewport breakpoints because they apply to the
     "breakpoint": {
       "md": {
         "$type": "dimension",
-        "$value": "600px",
-        "$extensions": {
-          "cedar": {
-            "min": 600,
-            "max": 899
-          }
-        }
+        "$value": "600px"
       }
     }
   }

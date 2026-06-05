@@ -8,7 +8,7 @@ Proposed
 Cedar's design system must support multiple dimensions of variability:
 
 - **Multi-platform**: Web, iOS, Android
-- **Multi-mode**: Light, Dark, High Contrast
+- **Multi-mode**: Light, Dark (additional modes defined by design as needed)
 - **Multi-palette**: Default, Sale, Member, Holiday
 - **Multi-surface**: Cards, tiles, modules, pages
 
@@ -23,15 +23,9 @@ This ADR defines Cedar's mode architecture, palette architecture, and cross-plat
 
 ---
 
-## Spike Findings
+### Spike Findings
 
-The V0 spike revealed an important architectural reality about how appearances (light/dark) are handled in the pipeline that differs from the model described in this ADR.
-
-### How appearances actually work in the spike
-
-This ADR defines three Figma modes (`light`, `dark`, `high-contrast`) as the mode axis, with mode values stored on alias tokens as `$extensions.cedar.modes.{light, dark}`.
-
-The spike found a different, validated model:
+The V0 spike validated the following implementation model:
 
 1. **Figma exports four separate files** for platform × appearance combinations — there is no single "dark mode" file for all platforms
 2. **Appearances are encoded on option tokens** as `$extensions.cedar.appearances.dark`, not on alias tokens
@@ -40,17 +34,7 @@ The spike found a different, validated model:
 
 This means the CSS Transform does not receive a "dark mode alias file" from Figma — it reads the dark hex from `color.option.*` directly.
 
-### Impact on high-contrast mode
-
-High-contrast mode has no implementation path in the current architecture. The four Figma platform files encode only light and dark. High-contrast would require either:
-- Two additional Figma files (`options.color.web-high-contrast.json`, etc.) under the four-file convention
-- A computed approach where high-contrast values are derived algorithmically from the option palette
-
-This is an open architectural question that must be resolved before high-contrast is scoped.
-
-### Impact on the mode model described in Section 7
-
-Section 7's canonical model representation (storing mode values as `$extensions.cedar.modes.*` on alias tokens) is **not implemented in the spike**. The validated model uses option token appearances instead. Section 7 should be treated as aspirational until a future ADR reconciles these two approaches.
+The canonical model in Section 7 has been updated to reflect this validated implementation.
 
 ### TypeScript Mode-Specific Type Generation (V0 Implementation)
 
@@ -89,11 +73,7 @@ Cedar adopts a separation of concerns approach:
 
 ### Figma Mode Set
 
-Cedar defines three environmental modes:
-
-- `light`
-- `dark`
-- `high-contrast`
+Cedar defines environmental modes in Figma. The specific modes (e.g., light, dark, high-contrast) are defined by design based on product requirements. This ADR documents the architecture for how modes work, not which modes exist.
 
 ### What Modes Represent
 
@@ -228,7 +208,7 @@ This inheritance model prevents palette proliferation and ensures consistency.
 
 Palette resolution occurs:
 
-1. After mode resolution (light/dark/high-contrast)
+1. After mode resolution
 2. After platform override resolution
 3. Before final value output
 
@@ -330,7 +310,7 @@ Card(palette = Palette.SALE)
 Designers work in the Semantic Token Library:
 
 1. Create semantic tokens (e.g., `color.surface.base`, `color.action.accent`)
-2. Define values across three modes: `light`, `dark`, `high-contrast`
+2. Define values across modes as defined by design requirements
 3. Add platform overrides as metadata when platform-specific values are required
 4. Publish variables to normalization pipeline
 
@@ -397,7 +377,7 @@ Contains:
 - Option tokens (primitives)
 - Alias tokens
 - Semantic tokens
-- Mode definitions (light, dark, high-contrast)
+- Mode definitions (as defined by design)
 - Platform override metadata
 
 ### Platform Component Libraries
@@ -423,21 +403,27 @@ Token ownership remains centralized to prevent drift and accidental breakage.
 
 ### Mode Representation
 
-Mode values are stored in the canonical model under mode-specific paths:
+Modes are represented in the canonical model through the `color.modes.<palette>` structure, where each palette contains semantic color tokens. Mode-specific values are encoded on option tokens via `$extensions.cedar.appearances` and resolved by the transform layer.
 
+**Canonical structure:**
 ```json
 {
   "color": {
-    "surface": {
-      "base": {
-        "$type": "color",
-        "$value": "{options.color.neutral.0}",
-        "$extensions": {
-          "cedar": {
-            "modes": {
-              "light": "{options.color.neutral.0}",
-              "dark": "{options.color.neutral.900}",
-              "high-contrast": "{options.color.neutral.0}"
+    "modes": {
+      "default": {
+        "surface": {
+          "base": {
+            "$type": "color",
+            "$value": "{color.option.neutral.warm-grey.100}",
+            "$extensions": {
+              "cedar": {
+                "ios": { "light": "color.option.neutral.warm-grey.100", "dark": "color.option.neutral.warm-grey.900" },
+                "web": { "light": "color.option.neutral.warm-grey.100", "dark": "color.option.neutral.warm-grey.900" },
+                "resolved": {
+                  "ios": { "light": "#edeae3", "dark": "#2c2a26" },
+                  "web": { "light": "#edeae3", "dark": "#2c2a26" }
+                }
+              }
             }
           }
         }
@@ -446,6 +432,38 @@ Mode values are stored in the canonical model under mode-specific paths:
   }
 }
 ```
+
+**Option token appearance encoding:**
+```json
+{
+  "color": {
+    "option": {
+      "neutral": {
+        "warm-grey": {
+          "100": {
+            "$type": "color",
+            "$value": "#edeae3",
+            "$extensions": {
+              "cedar": {
+                "appearances": {
+                  "dark": "#2c2a26"
+                },
+                "platformOverrides": {
+                  "ios": {
+                    "dark": "#2a2824"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+The transform layer reads appearance data from option tokens to resolve mode-specific values for alias tokens.
 
 ### Platform Override Representation
 
