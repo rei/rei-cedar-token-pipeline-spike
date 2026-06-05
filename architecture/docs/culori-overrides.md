@@ -50,29 +50,21 @@ Where:
 | error-red | 30 | 0.18 | 0.52 | 0.60 | 0.015 | 0.35 | 0.08 |
 | sale-red | 34 | 0.19 | 0.55 | 0.42 | 0.015 | 0.325 | 0.09 |
 
-### Hex to Family Mapping
+### Color Family Resolution
 
-Current canonical token hex values are mapped to color families:
+Color families are resolved via `$extensions.cedar.colorFamily` on canonical option tokens, populated from `src/schema/token-schema.json` during normalization. Each collection entry in the schema can declare a `colorFamily` field:
 
-```typescript
-const HEX_TO_FAMILY: Record<string, string> = {
-  // Current token values
-  '#FFFFFF': 'warm-grey',
-  '#EDEAE3': 'warm-grey',  // warm-grey-100 range
-  '#B2AB9F': 'warm-grey',  // warm-grey-300 range
-  '#736E65': 'warm-grey',  // warm-grey-600 range
-  '#2E2E2B': 'warm-grey',  // warm-grey-900 range
-  '#000000': 'warm-grey',
-  '#406EB5': 'alpine-lake-blue',
-  '#0B2D60': 'alpine-lake-blue',
-  '#FFBF59': 'warning-yellow',
-  '#FFE7B3': 'warning-yellow',
-  '#C7370F': 'error-red',
-  '#610A0A': 'error-red',
-  '#3B8349': 'success-green',
-  '#1F513F': 'success-green',
-};
+```json
+{
+  "warm-grey": {
+    "canonicalPrefix": "color.option.neutral",
+    "colorFamily": "warm-grey",
+    "tokens": { ... }
+  }
+}
 ```
+
+The `colorFamily` is attached to each token's `$extensions.cedar` during normalization, then passed through to the web CSS transform and Storybook.
 
 ### Usage
 
@@ -80,8 +72,8 @@ const HEX_TO_FAMILY: Record<string, string> = {
 ```typescript
 import { hexToCustomOklch } from './oklch-formulas';
 
-function formatOklch(hex: string): string {
-  return hexToCustomOklch(hex);
+function formatOklch(hex: string, colorFamily?: string): string {
+  return hexToCustomOklch(hex, colorFamily);
 }
 ```
 
@@ -89,9 +81,9 @@ function formatOklch(hex: string): string {
 ```typescript
 import { hexToCustomOklch } from "../../style-dictionary/actions/web/oklch-formulas";
 
-export function toWebOklch(value: string): string {
+export function toWebOklch(value: string, colorFamily?: string): string {
   if (!isHexColor(value)) return value;
-  return hexToCustomOklch(value);
+  return hexToCustomOklch(value, colorFamily);
 }
 ```
 
@@ -154,7 +146,7 @@ If Cedar's design system specifies custom Display P3 conversion formulas in the 
 
 1. Create a new file in `style-dictionary/actions/web/` or `style-dictionary/actions/ios/`
 2. Implement custom conversion function with design spec parameters
-3. Add hex-to-family mapping if needed
+3. Add `colorFamily` entries to `src/schema/token-schema.json` if needed
 4. Update the relevant transform action to use the custom function
 5. Update this document with the new override details
 6. Update relevant ADRs (ADR-0005 for transform layer, ADR-0009 for accessibility if contrast calculations affected)

@@ -2,6 +2,8 @@
 
 import { parse, converter } from 'culori';
 
+const toOklch = converter('oklch');
+
 /**
  * Custom OKLCH formulas from Cedar design spec
  *
@@ -169,14 +171,15 @@ export function hexToCustomOklch(hex: string, colorFamily?: string): string {
     // If no family specified or family not found, fall back to culori
     // This handles colors like pure white, black, or unmapped colors
     const parsed = parse(hex);
-    if (!parsed) return hex;
+    if (!parsed) {
+      throw new Error(`[oklch] Could not parse color value "${hex}".`);
+    }
 
     // For unmapped colors, use culori's direct conversion
-    const toOklch = converter('oklch');
     const oklch = toOklch(parsed) as { l?: number; c?: number; h?: number; alpha?: number } | undefined;
 
     if (!oklch || typeof oklch.l !== 'number' || typeof oklch.c !== 'number') {
-      return hex;
+      throw new Error(`[oklch] Could not convert color value "${hex}" to oklch().`);
     }
 
     const lightness = formatNumber(Math.min(100, Math.max(0, oklch.l * 100)), 3);
@@ -193,13 +196,14 @@ export function hexToCustomOklch(hex: string, colorFamily?: string): string {
 
   // Use culori to convert hex to OKLCH first to get lightness
   const parsed = parse(hex);
-  if (!parsed) return hex;
+  if (!parsed) {
+    throw new Error(`[oklch] Could not parse color value "${hex}".`);
+  }
 
-  const toOklch = converter('oklch');
   const oklch = toOklch(parsed) as { l?: number; c?: number; h?: number; alpha?: number } | undefined;
 
   if (!oklch || typeof oklch.l !== 'number') {
-    return hex;
+    throw new Error(`[oklch] Could not convert color value "${hex}" to oklch().`);
   }
 
   const l = oklch.l;

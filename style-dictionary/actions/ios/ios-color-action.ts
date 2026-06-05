@@ -55,8 +55,8 @@ function resolveOptionHex(
 const toP3 = converter('p3');
 
 function formatNumber(value: number, precision: number): string {
-  const fixed = value.toFixed(precision);
-  return fixed.startsWith('-0') ? fixed.slice(1) : fixed;
+  const rounded = Number(value.toFixed(precision));
+  return String(Object.is(rounded, -0) ? 0 : rounded);
 }
 
 function hexToP3Components(hex: string) {
