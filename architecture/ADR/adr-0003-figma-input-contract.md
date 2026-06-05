@@ -1,7 +1,7 @@
 # ADR‑0003: Figma Input Contract
 
 ## Status
-Draft
+Implemented
 
 > [!NOTE]
 > The mapping contract section reflects the V1 implementation. The Export Method section describes the V0 automated GitHub Actions export.

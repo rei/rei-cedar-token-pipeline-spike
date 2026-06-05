@@ -1,4 +1,6 @@
 :root {
   --cdr-border-base: #736e65;
+  --cdr-border-base: oklch(54% 0.0185 82);
   --cdr-border-subtle: #2e2e2b;
+  --cdr-border-subtle: oklch(30.009% 0.0127 82);
 }

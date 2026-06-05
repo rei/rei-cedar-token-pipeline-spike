@@ -1,14 +1,8 @@
-# ADR‑0005 Addendum: Style Dictionary v5 Pipeline Constraints
+# ADR‑0005 Addendum: SD v5 Pipeline Constraints (Superseded)
 
 ## Status
-Superseded on 2026-03-19
+Superseded
 
-## Note
+This addendum has been consolidated into [ADR‑0005: Transform Layer & Platform Outputs](./adr-0005-transform-layer-and-platform-outputs.md).
 
-This addendum has been consolidated into ADR‑0005.
-
-Use:
-- `architecture/ADR/adr-0005-transform-layer-and-platform-outputs.md`
-- Section: `SD v5 Pipeline Constraints (Normative)`
-
-This file is intentionally retained as a compatibility pointer for older links.
+All normative SD v5 constraints are now maintained in the base ADR. This file is retained as a compatibility pointer for existing links and references.

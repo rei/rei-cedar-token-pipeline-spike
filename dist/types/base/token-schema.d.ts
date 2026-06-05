@@ -6,7 +6,7 @@
  * This interface was referenced by `CedarTokenSchema`'s JSON-Schema
  * via the `definition` "TokenType".
  */
-export type TokenType = "color" | "number" | "string" | "boolean" | "fluid";
+export type TokenType = "color" | "number" | "string" | "boolean" | "dimension";
 /**
  * Primitive token value.
  *
@@ -52,6 +52,10 @@ export interface InputsContract {
          * Root canonical path prefix for all tokens in this collection (e.g., 'color.option.neutral')
          */
         canonicalPrefix: string;
+        /**
+         * Color family for OKLCH chroma curve override (e.g., 'warm-grey', 'alpine-lake-blue'). Used by pipeline to apply custom OKLCH formulas per culori-overrides.md.
+         */
+        colorFamily?: string;
         /**
          * Explicit map of Figma token path → canonical sub-path. Example: { 'warm-grey.100': 'warm.grey.100' }
          */

@@ -250,18 +250,18 @@ try {
   //   a. Translate every Figma token path to its canonical color.option.* path
   //   b. Fail loudly if any Figma path has no mapping entry (designer rename guard)
   //
-  // All four platform files (web-light, web-dark, ios-light, ios-dark) produce
-  // the same canonical paths — only the $value hex differs. We use web-light
-  // as the authoritative source for $value in color.option (the canonical fallback
-  // per ADR-0001). The other three files contribute only to the platformLookup
-  // table, which mergeColorVariants uses to build $resolved on alias tokens.
+  // All primitive mode files (e.g., Mode 1, Mode 2) produce the same canonical
+  // paths — only the $value hex differs. We use the first imported mode as the
+  // authoritative source for $value in color.option (the canonical fallback
+  // per ADR-0001). The other modes contribute only to the platformLookup table,
+  // which mergeColorVariants uses to build $resolved on alias tokens.
   //
   // color.primitives is NOT written to canonical/tokens.json — it was a spike artifact.
-  // The four platform files are normalization input only.
+  // The primitive mode files are normalization input only.
 
-  // platformLookup: "web-light" → { "color.option.neutral.warm.grey.900": "#hex", ... }
+  // platformLookup: "Mode 1" → { "color.option.neutral.warm.grey.900": "#hex", ... }
   const platformLookup = new Map<string, Record<string, string>>();
-  const webLightOptionEntries: Array<{
+  const canonicalFallbackEntries: Array<{
     canonicalPath: string;
     token: {
       $type: string;
@@ -269,6 +269,13 @@ try {
       docs?: ReturnType<typeof parseTokenDescription>;
     };
   }> = [];
+
+  // Select canonical fallback mode up-front: prefer web-light, otherwise first imported mode
+  const canonicalFallbackMode = optionColorFiles.find(
+    ({ file }) => extractPrimitiveMode(file) === "web-light",
+  )
+    ? "web-light"
+    : (extractPrimitiveMode(optionColorFiles[0]?.file) ?? null);
 
   for (const { file, data } of optionColorFiles) {
     const primitiveMode = extractPrimitiveMode(file)!;
@@ -295,8 +302,8 @@ try {
         lookup[canonicalPath] = token.$value;
       }
 
-      if (primitiveMode === "web-light") {
-        webLightOptionEntries.push(...mapped);
+      if (primitiveMode === canonicalFallbackMode) {
+        canonicalFallbackEntries.push(...mapped);
       }
     }
 
@@ -304,9 +311,9 @@ try {
     console.log(`  ✓ ${file} [primitives: ${primitiveMode}] (${Object.keys(data).join(", ")})`);
   }
 
-  // Build color.option tree from the web-light snapshot (canonical $value source)
-  if (webLightOptionEntries.length > 0) {
-    const optionTree = buildOptionTree(webLightOptionEntries);
+  // Build color.option tree from the canonical fallback snapshot (canonical $value source)
+  if (canonicalFallbackEntries.length > 0) {
+    const optionTree = buildOptionTree(canonicalFallbackEntries);
     deepMerge(canonical, optionTree);
   }
 

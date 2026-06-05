@@ -1,11 +1,7 @@
 # ADR‑0005: Transform Layer & Platform Outputs
 
-## Status  
+## Status
 Planned
-
-> **2026-03-19 Consolidation Note**
-> The former `adr-0005-addendum-sd-v5-constraints.md` has been consolidated into this ADR.
-> Treat the SD v5 constraints below as part of the normative ADR-0005 contract.
 
 > **V0 Implementation Note**
 > The V0/V1 spike implements modular output organization by semantic category, not superficial type grouping:
@@ -202,6 +198,32 @@ Color(.displayP3, red: 1.0, green: 0.5, blue: 0.0)
 <!-- P3 converted to nearest sRGB equivalent -->
 <color name="cdr_color_value">#FF7F00</color>
 ```
+
+#### OKLCH Color Transforms (Web)
+
+**Canonical:**
+```json
+{
+  "$type": "color",
+  "$value": "#406eb5"
+}
+```
+
+**Web CSS Output:**
+```css
+--cdr-color-value: #406eb5;
+--cdr-color-value: oklch(54.008% 0.1227 258.81);
+```
+
+**Implementation Notes:**
+- OKLCH values are generated using the [culori](https://culorijs.org/) library for accurate sRGB → OKLCH color space conversion
+- CSS outputs both hex (for fallback) and OKLCH (for modern browsers)
+- OKLCH is a perceptually uniform color space that enables better color manipulation
+- Browser support: Chrome 111+, Firefox 113+, Safari 15.4+
+- The hex fallback ensures compatibility with older browsers
+
+**Custom Formula Note:**
+The web transform uses culori for parsing/conversion but applies Cedar's design-spec OKLCH chroma curves via `style-dictionary/actions/web/oklch-formulas.ts` when a token provides `$extensions.cedar.colorFamily`; it falls back to culori's direct conversion when `colorFamily` is missing or unmapped.
 
 #### Dimension Transforms
 
@@ -847,6 +869,6 @@ The Transform Layer does **not**:
 - ADR-0001: Canonical Token Model  
 - ADR-0002: Normalization Layer  
 - ADR-0004: Semantic Token Architecture  
-- ADR-0011: Hybrid Alias Resolution
+- ADR-0012: Hybrid Alias Resolution
 - Style Dictionary Documentation  
 - DTCG Specification

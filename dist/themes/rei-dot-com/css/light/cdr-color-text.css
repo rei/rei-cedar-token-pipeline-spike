@@ -1,7 +1,12 @@
 :root {
   --cdr-text-base: #2e2e2b;
+  --cdr-text-base: oklch(30.009% 0.0127 82);
   --cdr-text-subtle: #736e65;
+  --cdr-text-subtle: oklch(54% 0.0185 82);
   --cdr-text-link: #0b2d60;
+  --cdr-text-link: oklch(30.639% 0.0855 259);
   --cdr-text-link-hover: #406eb5;
+  --cdr-text-link-hover: oklch(54.008% 0.1299 259);
   --cdr-text-sale: #c7370f;
+  --cdr-text-sale: oklch(55.138% 0.1795 30);
 }

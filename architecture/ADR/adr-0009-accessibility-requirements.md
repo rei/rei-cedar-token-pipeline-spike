@@ -315,9 +315,47 @@ All color pairings must pass automated contrast checking:
 function validateContrast(foreground, background, fontSize, fontWeight) {
   const ratio = getContrastRatio(foreground, background);
   const isLargeText = fontSize >= 18 || (fontSize >= 14 && fontWeight >= 700);
-  
+
   const requiredRatio = isLargeText ? 3 : 4.5;
-  
+
+  if (ratio < requiredRatio) {
+    throw new Error(`Contrast ratio ${ratio} fails WCAG AA (required ${requiredRatio})`);
+  }
+}
+```
+
+### OKLCH and Contrast Calculations
+
+**Important:** WCAG contrast calculations are based on sRGB relative luminance, not OKLCH. Even when web CSS outputs OKLCH values for modern browsers, contrast validation must still use sRGB-based calculations:
+
+1. **Canonical storage:** Colors are stored as hex (sRGB) in the canonical model
+2. **Web output:** CSS includes both hex (fallback) and OKLCH (modern browsers)
+3. **Contrast validation:** Always performed on sRGB values using standard WCAG formulas
+4. **OKLCH conversion:** OKLCH values are generated from sRGB using culori, but contrast ratios remain the same
+
+**Why this matters:**
+- WCAG 2.2 contrast formulas are defined for sRGB color space
+- OKLCH is perceptually uniform but doesn't change the actual contrast ratio
+- Browsers that support OKLCH will render the same perceptual contrast as sRGB
+- Automated accessibility tools (axe-core, Lighthouse) use sRGB-based calculations
+
+**Implementation:**
+```javascript
+// Convert OKLCH to sRGB for contrast validation if needed
+import { converter } from 'culori';
+
+const toRgb = converter('rgb');
+
+function validateOklchContrast(oklchForeground, oklchBackground, fontSize, fontWeight) {
+  // Convert OKLCH to sRGB for WCAG calculation
+  const fgRgb = toRgb(oklchForeground);
+  const bgRgb = toRgb(oklchBackground);
+
+  // Calculate contrast using sRGB values
+  const ratio = getContrastRatio(fgRgb, bgRgb);
+  const isLargeText = fontSize >= 18 || (fontSize >= 14 && fontWeight >= 700);
+  const requiredRatio = isLargeText ? 3 : 4.5;
+
   if (ratio < requiredRatio) {
     throw new Error(`Contrast ratio ${ratio} fails WCAG AA (required ${requiredRatio})`);
   }
@@ -781,5 +819,5 @@ Improving accessibility is a **minor version** change.
 
 - ADR-0009: Foundation Tokens
 - ADR-0010: State System
-- ADR-0011: Component Token Patterns
-- ADR-0012: Motion System
+- ADR-0012: Hybrid Alias Resolution
+- ADR-0011: Harmonic Interval Validation

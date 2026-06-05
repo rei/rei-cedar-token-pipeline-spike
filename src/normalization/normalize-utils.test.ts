@@ -501,7 +501,7 @@ describe("buildSpacingClamp", () => {
     ];
     const result = buildSpacingClamp(files);
     const token = (result as any).spacing.scale["-50"];
-    expect(token.$type).toBe("fluid");
+    expect(token.$type).toBe("dimension");
     expect(token.$value).toMatch(/^clamp\(/);
     // Min and max values should appear in the output
     expect(token.$value).toContain("2.48px");
@@ -517,7 +517,7 @@ describe("buildSpacingClamp", () => {
     const files = [bpFile(320, "-100", 4.8), bpFile(1600, "-100", 8), bpFile(2560, "-100", 8)];
     const result = buildSpacingClamp(files);
     const token = (result as any).spacing.scale["-100"];
-    expect(token.$type).toBe("fluid");
+    expect(token.$type).toBe("dimension");
     expect(token.$value).toBe("clamp(4.8px, 0.25vw + 4px, 8px)");
   });
 
@@ -534,7 +534,7 @@ describe("buildSpacingClamp", () => {
     // Max bp should be 744 (first saturation), not 2560
     // slope = (20 - 10) / (7.44 - 3.2) = 10 / 4.24 ≈ 2.3585
     // intercept = 10 - 2.3585 * 3.2 ≈ 2.4528
-    expect(token.$type).toBe("fluid");
+    expect(token.$type).toBe("dimension");
     expect(token.$value).toContain("20px"); // vMax
     expect(token.$value).toContain("10px"); // vMin
     // Saturation bp of 744 should yield a steeper slope than using 2560
@@ -572,8 +572,8 @@ describe("buildSpacingClamp", () => {
     ];
     const result = buildSpacingClamp(files);
     const scale = (result as any).spacing.scale;
-    expect(scale["-50"].$type).toBe("fluid");
-    expect(scale["-100"].$type).toBe("fluid");
+    expect(scale["-50"].$type).toBe("dimension");
+    expect(scale["-100"].$type).toBe("dimension");
     // Each token should have independent clamp values
     expect(scale["-50"].$value).not.toBe(scale["-100"].$value);
   });
@@ -607,7 +607,7 @@ describe("buildSpacingClamp", () => {
     ];
     const result = buildSpacingClamp(files);
     const token = (result as any).spacing.scale["-50"];
-    expect(token.$type).toBe("fluid");
+    expect(token.$type).toBe("dimension");
     expect(token.$value).toContain("clamp(");
   });
 
@@ -620,7 +620,7 @@ describe("buildSpacingClamp", () => {
     // Should still compute clamp correctly from the two valid files
     const result = buildSpacingClamp(files);
     const token = (result as any).spacing.scale["-50"];
-    expect(token.$type).toBe("fluid");
+    expect(token.$type).toBe("dimension");
     expect(token.$value).toContain("4px");
   });
 });

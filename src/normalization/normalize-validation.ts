@@ -51,18 +51,26 @@ export function validateFigmaInputs(params: {
     optionColorFiles.map(({ file }) => file),
   );
 
-  for (const baselineMode of ["web-light", "web-dark", "ios-light", "ios-dark"]) {
-    if (!importedPrimitiveModes.includes(baselineMode)) {
-      issues.push({
-        level: baselineMode === "web-light" ? "error" : "warn",
-        code: "MISSING_OPTION_PRIMITIVE_MODE",
-        message:
-          `No options.color.${baselineMode}.json file was found. ` +
-          (baselineMode === "web-light"
-            ? `Normalization cannot proceed without the canonical fallback mode.`
-            : `Normalization will proceed, but platform/appearance resolution may be incomplete.`),
-      });
-    }
+  // Require at least one primitive mode file to serve as canonical fallback
+  if (importedPrimitiveModes.length === 0) {
+    issues.push({
+      level: "error",
+      code: "MISSING_OPTION_PRIMITIVE_MODE",
+      message:
+        `No options.color.<mode>.json files were found. ` +
+        `Normalization cannot proceed without at least one primitive mode file.`,
+    });
+  }
+
+  // Warn if fewer than 2 modes (light/dark) are imported
+  if (importedPrimitiveModes.length < 2) {
+    issues.push({
+      level: "warn",
+      code: "MISSING_OPTION_PRIMITIVE_MODE",
+      message:
+        `Only ${importedPrimitiveModes.length} primitive mode file(s) found (${importedPrimitiveModes.join(", ")}). ` +
+        `Expected at least 2 modes (e.g., light and dark) for full platform/appearance resolution.`,
+    });
   }
 
   const importedCollections = new Set<string>();

@@ -14,7 +14,7 @@
  *   color.brand-palette.blue.600
  *
  * Spacing token structure:
- *   spacing.scale.-50   → { $value: "clamp(...)", $type: "fluid" }
+ *   spacing.scale.-50   → { $value: "clamp(...)", $type: "dimension" }
  *   spacing.component.xs → { $value: "{spacing.scale.-50}", $type: "number" }  (alias)
  *   spacing.layout.sm    → { $value: "{spacing.scale.-250}", $type: "number" } (alias)
  */
@@ -256,13 +256,21 @@ function flattenOptionPrimitives(
   const brandNode = optionSection["brand"];
   if (isRecord(brandNode)) {
     const brand = brandNode;
+    // Map generic color names to design spec color family names
+    const colorNameMap: Record<string, string> = {
+      blue: "alpine-lake-blue",
+      yellow: "warning-yellow",
+      red: "error-red",
+      green: "success-green",
+    };
     for (const [colorName, scaleNode] of Object.entries(brand)) {
       if (!isRecord(scaleNode)) continue;
+      const displayName = colorNameMap[colorName] || colorName;
       for (const [shade, leaf] of Object.entries(scaleNode)) {
         if (isLeaf(leaf)) {
           const sourceHex = resolveOptionWebHex(leaf, appearance);
           out.push({
-            name: `brand-palette.${colorName}.${shade}`,
+            name: `brand-palette.${displayName}.${shade}`,
             value: toWebOklch(sourceHex),
             sourceHex,
             docs: leaf.$extensions?.cedar?.docs,
@@ -293,8 +301,8 @@ export interface SpacingToken {
   path: string;
   /**
    * CSS value:
-   *   - scale tokens:     CSS clamp() string  (type = "fluid")
-   *   - component/layout: resolved clamp() string via alias lookup (type = "fluid")
+   *   - scale tokens:     CSS clamp() string  (type = "dimension")
+   *   - component/layout: resolved clamp() string via alias lookup (type = "dimension")
    */
   value: string;
   /** "fluid" for scale tokens; "alias" for component/layout resolved tokens */
@@ -310,8 +318,8 @@ export interface SpacingToken {
  * Returns scale tokens with their fluid clamp() values, plus component/layout
  * alias tokens resolved to their underlying clamp() values.
  *
- * Fluid tokens (type="fluid") are intended for web CSS only.
- * Non-web platforms should ignore $type="fluid" tokens entirely.
+ * Fluid tokens (detected by clamp() in $value) are intended for web CSS only.
+ * Non-web platforms should ignore clamp() tokens entirely.
  */
 export async function loadSpacingTokens(): Promise<SpacingToken[]> {
   const base = window.location.pathname.replace(/\/[^/]*$/, "/");
@@ -329,7 +337,7 @@ export async function loadSpacingTokens(): Promise<SpacingToken[]> {
   const scale = spacingSection["scale"] as Record<string, unknown> | undefined;
   if (scale) {
     for (const [key, val] of Object.entries(scale)) {
-      if (isLeaf(val) && val.$type === "fluid") {
+      if (isLeaf(val) && typeof val.$value === "string" && val.$value.startsWith("clamp(")) {
         scaleMap.set(key, val.$value as string);
         result.push({ path: `spacing.scale.${key}`, value: val.$value as string, kind: "fluid" });
       }

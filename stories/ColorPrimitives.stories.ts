@@ -554,10 +554,10 @@ export const NeutralBaseNeutrals: Story = {
 };
 
 export const BrandBlue: Story = {
-  name: "Brand / Blue",
+  name: "Brand / Alpine Lake Blue",
   render: asyncStory(async () => {
     const modesMap = await loadPrimitiveColors();
-    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes(".blue");
+    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("alpine-lake-blue");
 
     const firstMode = [...modesMap.values()][0] ?? [];
     const count = firstMode.filter(filterFn).length;
@@ -565,9 +565,9 @@ export const BrandBlue: Story = {
     return `
       <style>${BASE_STYLES}</style>
       <div class="page">
-        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Blue")}
-        ${sectionHeader("Brand Colors", "Blue", count)}
-        ${tabbedPaletteGroup("blue-tabs", "Blue Scale", modesMap, filterFn)}
+        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Alpine Lake Blue")}
+        ${sectionHeader("Brand Colors", "Alpine Lake Blue", count)}
+        ${tabbedPaletteGroup("blue-tabs", "Alpine Lake Blue Scale", modesMap, filterFn)}
       </div>
     `;
     return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
@@ -575,10 +575,10 @@ export const BrandBlue: Story = {
 };
 
 export const BrandRed: Story = {
-  name: "Brand / Red",
+  name: "Brand / Error Red",
   render: asyncStory(async () => {
     const modesMap = await loadPrimitiveColors();
-    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes(".red");
+    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("error-red");
 
     const firstMode = [...modesMap.values()][0] ?? [];
     const count = firstMode.filter(filterFn).length;
@@ -586,9 +586,9 @@ export const BrandRed: Story = {
     return `
       <style>${BASE_STYLES}</style>
       <div class="page">
-        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Red")}
-        ${sectionHeader("Brand Colors", "Red", count)}
-        ${tabbedPaletteGroup("red-tabs", "Red Scale", modesMap, filterFn)}
+        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Error Red")}
+        ${sectionHeader("Brand Colors", "Error Red", count)}
+        ${tabbedPaletteGroup("red-tabs", "Error Red Scale", modesMap, filterFn)}
       </div>
     `;
     return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
@@ -596,10 +596,10 @@ export const BrandRed: Story = {
 };
 
 export const BrandGreen: Story = {
-  name: "Brand / Green",
+  name: "Brand / Success Green",
   render: asyncStory(async () => {
     const modesMap = await loadPrimitiveColors();
-    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes(".green");
+    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("success-green");
 
     const firstMode = [...modesMap.values()][0] ?? [];
     const count = firstMode.filter(filterFn).length;
@@ -607,9 +607,9 @@ export const BrandGreen: Story = {
     return `
       <style>${BASE_STYLES}</style>
       <div class="page">
-        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Green")}
-        ${sectionHeader("Brand Colors", "Green", count)}
-        ${tabbedPaletteGroup("green-tabs", "Green Scale", modesMap, filterFn)}
+        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Success Green")}
+        ${sectionHeader("Brand Colors", "Success Green", count)}
+        ${tabbedPaletteGroup("green-tabs", "Success Green Scale", modesMap, filterFn)}
       </div>
     `;
     return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
@@ -617,10 +617,10 @@ export const BrandGreen: Story = {
 };
 
 export const BrandYellow: Story = {
-  name: "Brand / Yellow",
+  name: "Brand / Warning Yellow",
   render: asyncStory(async () => {
     const modesMap = await loadPrimitiveColors();
-    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes(".yellow");
+    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("warning-yellow");
 
     const firstMode = [...modesMap.values()][0] ?? [];
     const count = firstMode.filter(filterFn).length;
@@ -628,9 +628,9 @@ export const BrandYellow: Story = {
     return `
       <style>${BASE_STYLES}</style>
       <div class="page">
-        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Yellow")}
-        ${sectionHeader("Brand Colors", "Yellow", count)}
-        ${tabbedPaletteGroup("yellow-tabs", "Yellow Scale", modesMap, filterFn)}
+        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Warning Yellow")}
+        ${sectionHeader("Brand Colors", "Warning Yellow", count)}
+        ${tabbedPaletteGroup("yellow-tabs", "Warning Yellow Scale", modesMap, filterFn)}
       </div>
     `;
     return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
@@ -649,10 +649,10 @@ export const AllPrimitives: Story = {
 
     const warmGreyFn = (c: Swatch) => c.name.includes("warm-grey");
     const baseNeutralsFn = (c: Swatch) => c.name.includes("base-neutrals");
-    const blueFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes(".blue");
-    const redFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes(".red");
-    const greenFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes(".green");
-    const yellowFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes(".yellow");
+    const blueFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("alpine-lake-blue");
+    const redFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("error-red");
+    const greenFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("success-green");
+    const yellowFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("warning-yellow");
 
     const neutralCount = firstMode.filter(warmGreyFn).length + firstMode.filter(baseNeutralsFn).length;
     const brandCount = firstMode.filter(blueFn).length + firstMode.filter(redFn).length +
@@ -684,12 +684,12 @@ export const AllPrimitives: Story = {
           </div>
           <div class="token-section" style="position:relative;">
             <div class="deco-index">02</div>
-            ${sectionHeader("Brand Colors", "Blue · Red · Green · Yellow", blue.length + red.length + green.length + yellow.length)}
+            ${sectionHeader("Brand Colors", "Alpine Lake Blue · Error Red · Success Green · Warning Yellow", blue.length + red.length + green.length + yellow.length)}
             <div class="primitives-grid" style="margin-top:1.5rem;">
-              <div>${groupBlock("Blue", blue)}</div>
-              <div>${groupBlock("Red", red)}</div>
-              <div>${groupBlock("Green", green)}</div>
-              <div>${groupBlock("Yellow", yellow)}</div>
+              <div>${groupBlock("Alpine Lake Blue", blue)}</div>
+              <div>${groupBlock("Error Red", red)}</div>
+              <div>${groupBlock("Success Green", green)}</div>
+              <div>${groupBlock("Warning Yellow", yellow)}</div>
             </div>
           </div>
         </div>
@@ -740,25 +740,25 @@ export const AllPrimitives: Story = {
         ${sectionHeader("Web Appearances", "Brand Comparison", brandCount)}
         <div class="group-header" style="margin-top:1.5rem;">
           <span class="group-pip"></span>
-          <span class="group-name">Blue</span>
+          <span class="group-name">Alpine Lake Blue</span>
           <span class="group-rule"></span>
         </div>
         ${platformCompareTable(modesMap, blueFn)}
         <div class="group-header" style="margin-top:2rem;">
           <span class="group-pip"></span>
-          <span class="group-name">Red</span>
+          <span class="group-name">Error Red</span>
           <span class="group-rule"></span>
         </div>
         ${platformCompareTable(modesMap, redFn)}
         <div class="group-header" style="margin-top:2rem;">
           <span class="group-pip"></span>
-          <span class="group-name">Green</span>
+          <span class="group-name">Success Green</span>
           <span class="group-rule"></span>
         </div>
         ${platformCompareTable(modesMap, greenFn)}
         <div class="group-header" style="margin-top:2rem;">
           <span class="group-pip"></span>
-          <span class="group-name">Yellow</span>
+          <span class="group-name">Warning Yellow</span>
           <span class="group-rule"></span>
         </div>
         ${platformCompareTable(modesMap, yellowFn)}
