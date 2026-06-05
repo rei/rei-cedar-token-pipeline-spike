@@ -6,7 +6,7 @@
     {
       "number": "0001",
       "title": "Canonical Token Model",
-      "status": "Partially Implemented",
+      "status": "Draft",
       "file": "adr-0001-token-canonical-model.md",
       "description": "Defines the governed, platform-agnostic token shape. Includes the $extensions.cedar model for option token platform data, alias token platform references, and the SD pipeline constraint on {ref} resolution.",
       "topics": [
@@ -107,7 +107,7 @@
     {
       "number": "0004",
       "title": "Semantic Token Architecture",
-      "status": "Partially Implemented",
+      "status": "Planned",
       "file": "adr-0004-semantic-token-architecture.md",
       "description": "Defines the three-tier token architecture (Options → Alias → Component). Updated with spike findings: color.option.* path convention, platform override governance rules.",
       "topics": [
@@ -138,7 +138,7 @@
     {
       "number": "0005",
       "title": "Transform Layer & Platform Outputs",
-      "status": "Partially Implemented",
+      "status": "Planned",
       "file": "adr-0005-transform-layer-and-platform-outputs.md",
       "description": "Defines how canonical tokens are transformed into CSS, iOS, Android, and other outputs, including the SD v5 normative pipeline constraints.",
       "topics": [
@@ -204,7 +204,7 @@
     {
       "number": "0007",
       "title": "Modes and Palettes",
-      "status": "Partially Implemented",
+      "status": "Proposed",
       "file": "adr-0007-mode-and-theme.md",
       "description": "Defines mode architecture and palette architecture. Updated with spike findings on how appearances actually work in the pipeline (option token appearances.dark vs Figma mode axis). Light/dark modes and default/sale palettes implemented.",
       "topics": [
@@ -235,7 +235,7 @@
     {
       "number": "0008",
       "title": "Responsive and Adaptive Tokens",
-      "status": "Partially Implemented",
+      "status": "Proposed",
       "file": "adr-0008-responsive-adaptive-tokens.md",
       "description": "Defines breakpoint tokens, fluid spacing, fluid typography, container query tokens, and density tokens. Fluid spacing with clamp() expressions implemented.",
       "topics": [
@@ -399,9 +399,10 @@
     "platform-overrides": ["adr-0001", "adr-0004"]
   },
   "statusIndex": {
-    "Partially Implemented": ["adr-0001", "adr-0004", "adr-0005", "adr-0007", "adr-0008"],
+    "Draft": ["adr-0001"],
+    "Planned": ["adr-0004", "adr-0005"],
     "Implemented": ["adr-0002", "adr-0003", "adr-0010"],
-    "Proposed": ["adr-0006", "adr-0009", "adr-0011"],
+    "Proposed": ["adr-0006", "adr-0007", "adr-0008", "adr-0009", "adr-0011"],
     "Accepted": ["adr-0012"]
   }
 }

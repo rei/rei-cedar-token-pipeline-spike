@@ -23,7 +23,6 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { parse } from 'culori';
 import type { Action } from 'style-dictionary/types';
 import { hexToCustomOklch } from './oklch-formulas';
 
@@ -38,59 +37,12 @@ type CedarOptionNode = {
   };
 };
 
-type OklchColor = {
-  l?: number;
-  c?: number;
-  h?: number;
-  alpha?: number;
-};
-
-<<<<<<< HEAD
 function formatOklch(hex: string, colorFamily?: string): string {
   return hexToCustomOklch(hex, colorFamily);
 }
 
 function renderColorDeclarations(cssVar: string, hex: string, colorFamily?: string): string {
   return [`  ${cssVar}: ${hex};`, `  ${cssVar}: ${formatOklch(hex, colorFamily)};`].join('\n');
-=======
-const toOklch = converter("oklch");
-
-function formatNumber(value: number, precision: number): string {
-  const rounded = Number(value.toFixed(precision));
-  return String(Object.is(rounded, -0) ? 0 : rounded);
-}
-
-function formatOklch(hex: string): string {
-  const parsed = parse(hex);
-  const oklch = parsed
-    ? (toOklch(parsed) as OklchColor | undefined)
-    : undefined;
-
-  if (!oklch || typeof oklch.l !== "number" || typeof oklch.c !== "number") {
-    throw new Error(
-      `[web-css] Could not convert color value "${hex}" to oklch().`
-    );
-  }
-
-  const lightness = formatNumber(Math.min(100, Math.max(0, oklch.l * 100)), 3);
-  const chroma = formatNumber(Math.max(0, oklch.c), 4);
-  const hue =
-    typeof oklch.h === "number" && Number.isFinite(oklch.h)
-      ? formatNumber(((oklch.h % 360) + 360) % 360, 2)
-      : "0";
-  const alpha =
-    typeof oklch.alpha === "number" && oklch.alpha < 1
-      ? ` / ${formatNumber(Math.min(1, Math.max(0, oklch.alpha)), 3)}`
-      : "";
-
-  return `oklch(${lightness}% ${chroma} ${hue}${alpha})`;
-}
-
-function renderColorDeclarations(cssVar: string, hex: string): string {
-  return [`  ${cssVar}: ${hex};`, `  ${cssVar}: ${formatOklch(hex)};`].join(
-    "\n"
-  );
->>>>>>> origin/main
 }
 
 /** Navigate dictionary.tokens by dot-separated path */

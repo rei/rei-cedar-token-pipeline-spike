@@ -222,8 +222,8 @@ Color(.displayP3, red: 1.0, green: 0.5, blue: 0.0)
 - Browser support: Chrome 111+, Firefox 113+, Safari 15.4+
 - The hex fallback ensures compatibility with older browsers
 
-**Future Consideration:**
-The current implementation uses culori's direct sRGB → OKLCH conversion. Cedar's design system specifies custom OKLCH formulas with lightness curves (Cmax, Lo, Wlight, Clight-min parameters) that should replace the direct conversion to match the design spec exactly. This is tracked as a separate task.
+**Custom Formula Note:**
+The web transform uses culori for parsing/conversion but applies Cedar's design-spec OKLCH chroma curves via `style-dictionary/actions/web/oklch-formulas.ts` when a token provides `$extensions.cedar.colorFamily`; it falls back to culori's direct conversion when `colorFamily` is missing or unmapped.
 
 #### Dimension Transforms
 

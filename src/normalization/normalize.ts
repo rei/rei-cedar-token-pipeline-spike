@@ -270,17 +270,15 @@ try {
     };
   }> = [];
 
-  // Use web-light as canonical fallback if available, otherwise use first imported mode
-  let canonicalFallbackMode: string | null = null;
+  // Select canonical fallback mode up-front: prefer web-light, otherwise first imported mode
+  const canonicalFallbackMode = optionColorFiles.find(
+    ({ file }) => extractPrimitiveMode(file) === "web-light",
+  )
+    ? "web-light"
+    : (extractPrimitiveMode(optionColorFiles[0]?.file) ?? null);
 
   for (const { file, data } of optionColorFiles) {
     const primitiveMode = extractPrimitiveMode(file)!;
-
-    if (primitiveMode === "web-light") {
-      canonicalFallbackMode = primitiveMode;
-    } else if (!canonicalFallbackMode) {
-      canonicalFallbackMode = primitiveMode;
-    }
     const lookup: Record<string, string> = {};
 
     for (const [collectionName, collectionData] of Object.entries(data)) {
