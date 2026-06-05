@@ -57,7 +57,6 @@
         },
         "brand-palette": {
           "canonicalPrefix": "color.option.brand",
-          "colorFamily": "alpine-lake-blue",
           "tokens": {
             "blue.400": "blue.400",
             "blue.600": "blue.600",

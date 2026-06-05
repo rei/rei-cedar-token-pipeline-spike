@@ -201,9 +201,9 @@ export const webCssAction: Action = {
         typeof resolved.dark === "string"
       ) {
         const cssVar = toCssVar(token.path);
-        const colorFamily = (token.$extensions as any)?.cedar?.colorFamily;
-        const line = renderColorDeclarations(cssVar, resolved.light, colorFamily);
-        const darkLine = renderColorDeclarations(cssVar, resolved.dark, colorFamily);
+        // colorFamily is not available on resolved semantic tokens; skip custom OKLCH for resolved path
+        const line = renderColorDeclarations(cssVar, resolved.light);
+        const darkLine = renderColorDeclarations(cssVar, resolved.dark);
 
         pushColorByCategory(token, line, darkLine);
         return;

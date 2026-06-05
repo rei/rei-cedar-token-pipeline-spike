@@ -135,14 +135,14 @@ export function calculateChroma(l: number, family: ColorFamily): number {
     const cmin = family.clightMin;
     const normalizedL = (clampedL - family.lo) / width;
     const chroma = cmin + (family.cmax - cmin) * (1 - normalizedL * normalizedL);
-    return Math.max(0, chroma);
+    return Math.max(cmin, chroma);
   } else {
     // Dark side formula
     const width = family.wdark;
     const cmin = family.cdarkMin;
     const normalizedL = (clampedL - family.lo) / width;
     const chroma = cmin + (family.cmax - cmin) * (1 - normalizedL * normalizedL);
-    return Math.max(0, chroma);
+    return Math.max(cmin, chroma);
   }
 }
 
