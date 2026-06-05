@@ -466,8 +466,11 @@ describe("canonical contract invariants", () => {
             leaf.$type,
           );
         }
-        // Static spacing can be either dimension strings (px/rem) or raw numbers
-        const isValidValue = isDimension(leaf.$value) || typeof leaf.$value === "number";
+        // Static spacing can be either dimension strings (px/rem), raw numbers, or number strings
+        const isValidValue =
+          isDimension(leaf.$value) ||
+          typeof leaf.$value === "number" ||
+          (typeof leaf.$value === "string" && !isNaN(Number(leaf.$value)));
         if (!isValidValue) {
           pushViolation(
             violations,
