@@ -1,4 +1,4 @@
-import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-TMPKsR-w.js";import{n as r,t as i}from"./TokenOutputPanel-DlA3hEs_.js";function a(e){e.querySelectorAll(`[data-tabs-scope]`).forEach(e=>{let t=e.querySelectorAll(`.mode-tab`),n=e.querySelectorAll(`.mode-panel`);t.forEach(e=>{e.addEventListener(`click`,()=>{let r=e.dataset.mode;t.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r)),n.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r))})})})}function o(e){return()=>{let t=document.createElement(`div`);return t.style.cssText=`min-height:200px;background:#f5f2eb;`,t.innerHTML=`
+import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-BsagTFh2.js";import{n as r,t as i}from"./TokenOutputPanel-DlA3hEs_.js";function a(e){e.querySelectorAll(`[data-tabs-scope]`).forEach(e=>{let t=e.querySelectorAll(`.mode-tab`),n=e.querySelectorAll(`.mode-panel`);t.forEach(e=>{e.addEventListener(`click`,()=>{let r=e.dataset.mode;t.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r)),n.forEach(e=>e.classList.toggle(`active`,e.dataset.mode===r))})})})}function o(e){return()=>{let t=document.createElement(`div`);return t.style.cssText=`min-height:200px;background:#f5f2eb;`,t.innerHTML=`
       <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:1rem;color:#736e65">
         Loading token data…
       </div>`,e().then(e=>{typeof e==`string`?t.innerHTML=e:(t.innerHTML=``,t.appendChild(e)),a(t)}).catch(e=>{t.innerHTML=`
@@ -274,35 +274,35 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
         ${_(`Neutral Colors`,`Base Neutrals`,r)}
         ${b(`bn-tabs`,`Base Neutrals`,e,n)}
       </div>
-    `})},T={name:`Brand / Blue`,render:o(async()=>{let e=await t(),n=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.blue`),r=([...e.values()][0]??[]).filter(n).length;return`
+    `})},T={name:`Brand / Alpine Lake Blue`,render:o(async()=>{let e=await t(),n=e=>e.name.includes(`brand-palette`)&&e.name.includes(`alpine-lake-blue`),r=([...e.values()][0]??[]).filter(n).length;return`
       <style>${S}</style>
       <div class="page">
-        ${v(`Cedar Tokens`,`Color`,`Primitives`,`Brand / Blue`)}
-        ${_(`Brand Colors`,`Blue`,r)}
-        ${b(`blue-tabs`,`Blue Scale`,e,n)}
+        ${v(`Cedar Tokens`,`Color`,`Primitives`,`Brand / Alpine Lake Blue`)}
+        ${_(`Brand Colors`,`Alpine Lake Blue`,r)}
+        ${b(`blue-tabs`,`Alpine Lake Blue Scale`,e,n)}
       </div>
-    `})},E={name:`Brand / Red`,render:o(async()=>{let e=await t(),n=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.red`),r=([...e.values()][0]??[]).filter(n).length;return`
+    `})},E={name:`Brand / Error Red`,render:o(async()=>{let e=await t(),n=e=>e.name.includes(`brand-palette`)&&e.name.includes(`error-red`),r=([...e.values()][0]??[]).filter(n).length;return`
       <style>${S}</style>
       <div class="page">
-        ${v(`Cedar Tokens`,`Color`,`Primitives`,`Brand / Red`)}
-        ${_(`Brand Colors`,`Red`,r)}
-        ${b(`red-tabs`,`Red Scale`,e,n)}
+        ${v(`Cedar Tokens`,`Color`,`Primitives`,`Brand / Error Red`)}
+        ${_(`Brand Colors`,`Error Red`,r)}
+        ${b(`red-tabs`,`Error Red Scale`,e,n)}
       </div>
-    `})},D={name:`Brand / Green`,render:o(async()=>{let e=await t(),n=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.green`),r=([...e.values()][0]??[]).filter(n).length;return`
+    `})},D={name:`Brand / Success Green`,render:o(async()=>{let e=await t(),n=e=>e.name.includes(`brand-palette`)&&e.name.includes(`success-green`),r=([...e.values()][0]??[]).filter(n).length;return`
       <style>${S}</style>
       <div class="page">
-        ${v(`Cedar Tokens`,`Color`,`Primitives`,`Brand / Green`)}
-        ${_(`Brand Colors`,`Green`,r)}
-        ${b(`green-tabs`,`Green Scale`,e,n)}
+        ${v(`Cedar Tokens`,`Color`,`Primitives`,`Brand / Success Green`)}
+        ${_(`Brand Colors`,`Success Green`,r)}
+        ${b(`green-tabs`,`Success Green Scale`,e,n)}
       </div>
-    `})},O={name:`Brand / Yellow`,render:o(async()=>{let e=await t(),n=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.yellow`),r=([...e.values()][0]??[]).filter(n).length;return`
+    `})},O={name:`Brand / Warning Yellow`,render:o(async()=>{let e=await t(),n=e=>e.name.includes(`brand-palette`)&&e.name.includes(`warning-yellow`),r=([...e.values()][0]??[]).filter(n).length;return`
       <style>${S}</style>
       <div class="page">
-        ${v(`Cedar Tokens`,`Color`,`Primitives`,`Brand / Yellow`)}
-        ${_(`Brand Colors`,`Yellow`,r)}
-        ${b(`yellow-tabs`,`Yellow Scale`,e,n)}
+        ${v(`Cedar Tokens`,`Color`,`Primitives`,`Brand / Warning Yellow`)}
+        ${_(`Brand Colors`,`Warning Yellow`,r)}
+        ${b(`yellow-tabs`,`Warning Yellow Scale`,e,n)}
       </div>
-    `})},k={name:`All Primitives`,render:o(async()=>{let e=await t(),n=[...e.keys()].sort(),r=[...e.values()][0]??[],i=r.length,a=e=>e.name.includes(`warm-grey`),o=e=>e.name.includes(`base-neutrals`),c=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.blue`),l=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.red`),d=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.green`),f=e=>e.name.includes(`brand-palette`)&&e.name.includes(`.yellow`),p=r.filter(a).length+r.filter(o).length,m=r.filter(c).length+r.filter(l).length+r.filter(d).length+r.filter(f).length,h=n.map((e,t)=>`<button class="mode-tab${t===0?` active`:``}" data-mode="${e}">${e}</button>`).join(``),b=n.map((t,n)=>{let r=e.get(t)??[],i=r.filter(a),s=r.filter(o),u=r.filter(c),p=r.filter(l),m=r.filter(d),h=r.filter(f);return`
+    `})},k={name:`All Primitives`,render:o(async()=>{let e=await t(),n=[...e.keys()].sort(),r=[...e.values()][0]??[],i=r.length,a=e=>e.name.includes(`warm-grey`),o=e=>e.name.includes(`base-neutrals`),c=e=>e.name.includes(`brand-palette`)&&e.name.includes(`alpine-lake-blue`),l=e=>e.name.includes(`brand-palette`)&&e.name.includes(`error-red`),d=e=>e.name.includes(`brand-palette`)&&e.name.includes(`success-green`),f=e=>e.name.includes(`brand-palette`)&&e.name.includes(`warning-yellow`),p=r.filter(a).length+r.filter(o).length,m=r.filter(c).length+r.filter(l).length+r.filter(d).length+r.filter(f).length,h=n.map((e,t)=>`<button class="mode-tab${t===0?` active`:``}" data-mode="${e}">${e}</button>`).join(``),b=n.map((t,n)=>{let r=e.get(t)??[],i=r.filter(a),s=r.filter(o),u=r.filter(c),p=r.filter(l),m=r.filter(d),h=r.filter(f);return`
         <div class="mode-panel${n===0?` active`:``}" data-mode="${t}">
           <div class="token-section" style="position:relative;">
             <div class="deco-index">01</div>
@@ -314,12 +314,12 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
           </div>
           <div class="token-section" style="position:relative;">
             <div class="deco-index">02</div>
-            ${_(`Brand Colors`,`Blue · Red · Green · Yellow`,u.length+p.length+m.length+h.length)}
+            ${_(`Brand Colors`,`Alpine Lake Blue · Error Red · Success Green · Warning Yellow`,u.length+p.length+m.length+h.length)}
             <div class="primitives-grid" style="margin-top:1.5rem;">
-              <div>${g(`Blue`,u)}</div>
-              <div>${g(`Red`,p)}</div>
-              <div>${g(`Green`,m)}</div>
-              <div>${g(`Yellow`,h)}</div>
+              <div>${g(`Alpine Lake Blue`,u)}</div>
+              <div>${g(`Error Red`,p)}</div>
+              <div>${g(`Success Green`,m)}</div>
+              <div>${g(`Warning Yellow`,h)}</div>
             </div>
           </div>
         </div>
@@ -367,25 +367,25 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
         ${_(`Web Appearances`,`Brand Comparison`,m)}
         <div class="group-header" style="margin-top:1.5rem;">
           <span class="group-pip"></span>
-          <span class="group-name">Blue</span>
+          <span class="group-name">Alpine Lake Blue</span>
           <span class="group-rule"></span>
         </div>
         ${y(e,c)}
         <div class="group-header" style="margin-top:2rem;">
           <span class="group-pip"></span>
-          <span class="group-name">Red</span>
+          <span class="group-name">Error Red</span>
           <span class="group-rule"></span>
         </div>
         ${y(e,l)}
         <div class="group-header" style="margin-top:2rem;">
           <span class="group-pip"></span>
-          <span class="group-name">Green</span>
+          <span class="group-name">Success Green</span>
           <span class="group-rule"></span>
         </div>
         ${y(e,d)}
         <div class="group-header" style="margin-top:2rem;">
           <span class="group-pip"></span>
-          <span class="group-name">Yellow</span>
+          <span class="group-name">Warning Yellow</span>
           <span class="group-rule"></span>
         </div>
         ${y(e,f)}
@@ -427,69 +427,69 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
     return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
   })
 }`,...w.parameters?.docs?.source}}},T.parameters={...T.parameters,docs:{...T.parameters?.docs,source:{originalSource:`{
-  name: "Brand / Blue",
+  name: "Brand / Alpine Lake Blue",
   render: asyncStory(async () => {
     const modesMap = await loadPrimitiveColors();
-    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes(".blue");
+    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("alpine-lake-blue");
     const firstMode = [...modesMap.values()][0] ?? [];
     const count = firstMode.filter(filterFn).length;
     return \`
       <style>\${BASE_STYLES}</style>
       <div class="page">
-        \${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Blue")}
-        \${sectionHeader("Brand Colors", "Blue", count)}
-        \${tabbedPaletteGroup("blue-tabs", "Blue Scale", modesMap, filterFn)}
+        \${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Alpine Lake Blue")}
+        \${sectionHeader("Brand Colors", "Alpine Lake Blue", count)}
+        \${tabbedPaletteGroup("blue-tabs", "Alpine Lake Blue Scale", modesMap, filterFn)}
       </div>
     \`;
     return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
   })
 }`,...T.parameters?.docs?.source}}},E.parameters={...E.parameters,docs:{...E.parameters?.docs,source:{originalSource:`{
-  name: "Brand / Red",
+  name: "Brand / Error Red",
   render: asyncStory(async () => {
     const modesMap = await loadPrimitiveColors();
-    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes(".red");
+    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("error-red");
     const firstMode = [...modesMap.values()][0] ?? [];
     const count = firstMode.filter(filterFn).length;
     return \`
       <style>\${BASE_STYLES}</style>
       <div class="page">
-        \${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Red")}
-        \${sectionHeader("Brand Colors", "Red", count)}
-        \${tabbedPaletteGroup("red-tabs", "Red Scale", modesMap, filterFn)}
+        \${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Error Red")}
+        \${sectionHeader("Brand Colors", "Error Red", count)}
+        \${tabbedPaletteGroup("red-tabs", "Error Red Scale", modesMap, filterFn)}
       </div>
     \`;
     return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
   })
 }`,...E.parameters?.docs?.source}}},D.parameters={...D.parameters,docs:{...D.parameters?.docs,source:{originalSource:`{
-  name: "Brand / Green",
+  name: "Brand / Success Green",
   render: asyncStory(async () => {
     const modesMap = await loadPrimitiveColors();
-    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes(".green");
+    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("success-green");
     const firstMode = [...modesMap.values()][0] ?? [];
     const count = firstMode.filter(filterFn).length;
     return \`
       <style>\${BASE_STYLES}</style>
       <div class="page">
-        \${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Green")}
-        \${sectionHeader("Brand Colors", "Green", count)}
-        \${tabbedPaletteGroup("green-tabs", "Green Scale", modesMap, filterFn)}
+        \${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Success Green")}
+        \${sectionHeader("Brand Colors", "Success Green", count)}
+        \${tabbedPaletteGroup("green-tabs", "Success Green Scale", modesMap, filterFn)}
       </div>
     \`;
     return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
   })
 }`,...D.parameters?.docs?.source}}},O.parameters={...O.parameters,docs:{...O.parameters?.docs,source:{originalSource:`{
-  name: "Brand / Yellow",
+  name: "Brand / Warning Yellow",
   render: asyncStory(async () => {
     const modesMap = await loadPrimitiveColors();
-    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes(".yellow");
+    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("warning-yellow");
     const firstMode = [...modesMap.values()][0] ?? [];
     const count = firstMode.filter(filterFn).length;
     return \`
       <style>\${BASE_STYLES}</style>
       <div class="page">
-        \${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Yellow")}
-        \${sectionHeader("Brand Colors", "Yellow", count)}
-        \${tabbedPaletteGroup("yellow-tabs", "Yellow Scale", modesMap, filterFn)}
+        \${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Warning Yellow")}
+        \${sectionHeader("Brand Colors", "Warning Yellow", count)}
+        \${tabbedPaletteGroup("yellow-tabs", "Warning Yellow Scale", modesMap, filterFn)}
       </div>
     \`;
     return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
@@ -505,10 +505,10 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
     const total = firstMode.length;
     const warmGreyFn = (c: Swatch) => c.name.includes("warm-grey");
     const baseNeutralsFn = (c: Swatch) => c.name.includes("base-neutrals");
-    const blueFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes(".blue");
-    const redFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes(".red");
-    const greenFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes(".green");
-    const yellowFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes(".yellow");
+    const blueFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("alpine-lake-blue");
+    const redFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("error-red");
+    const greenFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("success-green");
+    const yellowFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("warning-yellow");
     const neutralCount = firstMode.filter(warmGreyFn).length + firstMode.filter(baseNeutralsFn).length;
     const brandCount = firstMode.filter(blueFn).length + firstMode.filter(redFn).length + firstMode.filter(greenFn).length + firstMode.filter(yellowFn).length;
 
@@ -534,12 +534,12 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
           </div>
           <div class="token-section" style="position:relative;">
             <div class="deco-index">02</div>
-            \${sectionHeader("Brand Colors", "Blue · Red · Green · Yellow", blue.length + red.length + green.length + yellow.length)}
+            \${sectionHeader("Brand Colors", "Alpine Lake Blue · Error Red · Success Green · Warning Yellow", blue.length + red.length + green.length + yellow.length)}
             <div class="primitives-grid" style="margin-top:1.5rem;">
-              <div>\${groupBlock("Blue", blue)}</div>
-              <div>\${groupBlock("Red", red)}</div>
-              <div>\${groupBlock("Green", green)}</div>
-              <div>\${groupBlock("Yellow", yellow)}</div>
+              <div>\${groupBlock("Alpine Lake Blue", blue)}</div>
+              <div>\${groupBlock("Error Red", red)}</div>
+              <div>\${groupBlock("Success Green", green)}</div>
+              <div>\${groupBlock("Warning Yellow", yellow)}</div>
             </div>
           </div>
         </div>
@@ -589,25 +589,25 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{r as t,t as n}from"./load-tokens-
         \${sectionHeader("Web Appearances", "Brand Comparison", brandCount)}
         <div class="group-header" style="margin-top:1.5rem;">
           <span class="group-pip"></span>
-          <span class="group-name">Blue</span>
+          <span class="group-name">Alpine Lake Blue</span>
           <span class="group-rule"></span>
         </div>
         \${platformCompareTable(modesMap, blueFn)}
         <div class="group-header" style="margin-top:2rem;">
           <span class="group-pip"></span>
-          <span class="group-name">Red</span>
+          <span class="group-name">Error Red</span>
           <span class="group-rule"></span>
         </div>
         \${platformCompareTable(modesMap, redFn)}
         <div class="group-header" style="margin-top:2rem;">
           <span class="group-pip"></span>
-          <span class="group-name">Green</span>
+          <span class="group-name">Success Green</span>
           <span class="group-rule"></span>
         </div>
         \${platformCompareTable(modesMap, greenFn)}
         <div class="group-header" style="margin-top:2rem;">
           <span class="group-pip"></span>
-          <span class="group-name">Yellow</span>
+          <span class="group-name">Warning Yellow</span>
           <span class="group-rule"></span>
         </div>
         \${platformCompareTable(modesMap, yellowFn)}
