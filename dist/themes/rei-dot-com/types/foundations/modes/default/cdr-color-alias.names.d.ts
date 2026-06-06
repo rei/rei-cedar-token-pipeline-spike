@@ -2,7 +2,7 @@
 
 export type CdrColorAliasDefaultTokenName =
   | "border-base"
-  | "border-subtle"
+  | "border-raised"
   | "surface-base"
   | "surface-raised"
   | "text-base"

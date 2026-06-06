@@ -13,8 +13,6 @@ export type FoundationModule =
   | "cdr-spacing-scale"
   | "cdr-spacing-static"
   | "cdr-text-family"
-  | "cdr-text-letter-spacing"
-  | "cdr-text-line-height"
   | "cdr-text-size"
   | "cdr-text-style"
   | "cdr-text-weight";

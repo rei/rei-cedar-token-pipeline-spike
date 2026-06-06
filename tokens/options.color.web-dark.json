@@ -568,7 +568,7 @@
     },
     "500": {
       "$type": "color",
-      "$value": "#91fb93",
+      "$value": "#91bf93",
       "$description": "",
       "$extensions": {
         "com.figma": {
