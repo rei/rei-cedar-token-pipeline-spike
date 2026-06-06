@@ -7,7 +7,7 @@ import {
 type TypographyArgs = Record<string, never>;
 
 const meta: Meta<TypographyArgs> = {
-  title: "Tokens/Typography",
+  title: "Tokens/Typography/Primitives",
 };
 
 export default meta;
@@ -88,15 +88,16 @@ const BASE_STYLES = `
   .cat-name { font-family: var(--font-sans); font-size: 0.625rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-muted); }
   .cat-rule { flex: 1; height: 1px; background: var(--rule); }
 
-  .token-grid { display: grid; grid-template-columns: 1fr 2fr auto; align-items: center; gap: 0 1.5rem; }
+  .token-grid { display: grid; grid-template-columns: minmax(160px, 1fr) 2fr minmax(80px, 1fr) auto; align-items: center; gap: 0 1.5rem; }
   .token-grid-header {
-    grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 2fr auto; gap: 0 1.5rem;
+    grid-column: 1 / -1; display: grid; grid-template-columns: minmax(160px, 1fr) 2fr minmax(80px, 1fr) auto; gap: 0 1.5rem;
     font-family: var(--font-sans); font-size: 0.625rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
     color: var(--ink-faint); padding-bottom: 0.5rem; border-bottom: 1px solid var(--rule-heavy);
   }
 
   .trow-cell { padding: 0.625rem 0; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.8125rem; color: var(--ink-mid); }
-  .trow-name { font-weight: 500; color: var(--ink); }
+  .trow-name { font-weight: 500; color: var(--ink); font-size: 0.6875rem; }
+  .trow-preview { overflow: hidden; color: var(--ink); }
   .trow-value { font-size: 0.75rem; color: var(--ink-muted); word-break: break-all; }
   .trow-meta { text-align: right; }
 
@@ -156,18 +157,55 @@ function catHeader(name: string): string {
   `;
 }
 
+const SAMPLE_TEXT = "The quick brown fox";
+const SAMPLE_TEXT_LONG = "Explore the outdoors in comfort and style.";
+
+/**
+ * Build the inline style for a live preview sample based on the token category.
+ */
+function previewStyle(tok: TypographyToken): string {
+  const base = "font-size:16px;line-height:1.5;font-family:system-ui,sans-serif;";
+  switch (tok.category) {
+    case "family": {
+      const stack = tok.fallback
+        ? `'${tok.value}',${tok.fallback}`
+        : `'${tok.value}',sans-serif`;
+      return `${base}font-family:${stack};`;
+    }
+    case "size":
+      return `font-family:system-ui,sans-serif;font-size:${tok.value}px;line-height:1.3;`;
+    case "weight":
+      return `${base}font-weight:${tok.value};`;
+    case "style":
+      return `${base}font-style:${tok.value};`;
+    case "line-height":
+      return `font-family:system-ui,sans-serif;font-size:14px;line-height:${tok.value}px;`;
+    case "letter-spacing":
+      return `${base}letter-spacing:${tok.value}px;`;
+    default:
+      return base;
+  }
+}
+
 function tokenTable(tokens: TypographyToken[]): string {
   const rows = tokens
     .map((tok) => {
       let displayValue = String(tok.value);
       if (tok.category === "family" && tok.fallback) {
-        displayValue = `'${tok.value}', ${tok.fallback}`;
+        displayValue = `'${tok.value}',${tok.fallback}`;
       } else if (tok.category === "size" || tok.category === "line-height") {
+        displayValue = `${tok.value}px`;
+      } else if (tok.category === "letter-spacing") {
         displayValue = `${tok.value}px`;
       }
 
+      const sample = tok.category === "line-height" ? SAMPLE_TEXT_LONG : SAMPLE_TEXT;
+
       return `
       <div class="trow-cell trow-name">${tok.name}</div>
+      <div class="trow-cell trow-preview">
+        <span style="${previewStyle(tok)}">${sample}</span>
+      </div>
       <div class="trow-cell trow-value">${displayValue}</div>
       <div class="trow-cell trow-meta">
         <span class="trow-badge ${tok.type}">${tok.type}</span>
@@ -179,85 +217,120 @@ function tokenTable(tokens: TypographyToken[]): string {
   return `
     <div class="token-grid">
       <div class="token-grid-header">
-        <div>Token String Mapping</div><div>Normalized Value</div><div style="text-align:right">Primitive Type</div>
+        <div>Token</div><div>Preview</div><div>Value</div><div style="text-align:right">Type</div>
       </div>
       ${rows}
     </div>
   `;
 }
 
-// ─── Stories ──────────────────────────────────────────────────────────────────
-export const TypographyScale: Story = {
-  name: "Typography Scales",
+// ─── Per-category story builder ───────────────────────────────────────────────
+
+function categoryStory(
+  category: TypographyToken["category"],
+  displayName: string,
+): Story {
+  return {
+    name: displayName,
+    render: asyncStory(async () => {
+      const tokens = await loadTypographyTokens();
+      const filtered = tokens.filter((t) => t.category === category);
+
+      return `
+        <style>${BASE_STYLES}</style>
+        <div class="page">
+          ${breadcrumb("Cedar Tokens", "Typography", "Primitives", displayName)}
+          <div class="page-title-row">
+            <div>
+              <div class="page-eyebrow">Option Tokens</div>
+              <div class="page-title">${displayName}</div>
+            </div>
+            <div>
+              <div class="page-meta-count">${filtered.length}</div>
+              <div class="page-meta-label">tokens</div>
+            </div>
+          </div>
+          <div style="margin-top:2rem">
+            ${tokenTable(filtered)}
+          </div>
+        </div>
+      `;
+    }),
+  };
+}
+
+// ─── Individual category stories ──────────────────────────────────────────────
+
+export const FontFamily: Story = categoryStory("family", "Font Family");
+export const FontSize: Story = categoryStory("size", "Font Size");
+export const LineHeight: Story = categoryStory("line-height", "Line Height");
+export const LetterSpacing: Story = categoryStory("letter-spacing", "Letter Spacing");
+export const FontStyle: Story = categoryStory("style", "Font Style");
+export const FontWeight: Story = categoryStory("weight", "Font Weight");
+
+// ─── Combined view ────────────────────────────────────────────────────────────
+
+export const AllPrimitives: Story = {
+  name: "All Primitives",
   render: asyncStory(async () => {
     const tokens = await loadTypographyTokens();
 
-    const families = tokens.filter((t) => t.category === "family");
-    const sizes = tokens.filter((t) => t.category === "size");
-    const lineHeights = tokens.filter((t) => t.category === "line-height");
+    const categories: { key: TypographyToken["category"]; label: string }[] = [
+      { key: "family", label: "Font Families" },
+      { key: "size", label: "Font Sizes" },
+      { key: "line-height", label: "Line Heights" },
+      { key: "letter-spacing", label: "Letter Spacing" },
+      { key: "style", label: "Font Style" },
+      { key: "weight", label: "Font Weight" },
+    ];
 
-    const letterSpacing = tokens.filter((t) => t.category === "letter-spacing");
-    const style = tokens.filter((t) => t.category === "style");
-    const weight = tokens.filter((t) => t.category === "weight");
+    const sections = categories
+      .map(({ key, label }) => {
+        const filtered = tokens.filter((t) => t.category === key);
+        if (filtered.length === 0) return "";
+        return `${catHeader(label)}\n${tokenTable(filtered)}`;
+      })
+      .join("");
 
     return `
       <style>${BASE_STYLES}</style>
       <div class="page">
-        ${breadcrumb("Cedar Tokens", "Typography", "Foundations")}
+        ${breadcrumb("Cedar Tokens", "Typography", "Primitives", "All")}
         <div class="page-title-row">
           <div>
             <div class="page-eyebrow">REI Cedar Design System</div>
-            <div class="page-title">Typography<br>Foundations</div>
+            <div class="page-title">Typography<br>Primitives</div>
           </div>
           <div>
             <div class="page-meta-count">${tokens.length}</div>
-            <div class="page-meta-label">Total Type Tokens</div>
+            <div class="page-meta-label">Total Tokens</div>
           </div>
         </div>
-
         <div class="demo-note">
-          This reference lists the normalized design variable outputs from the Figma normalization layer.
-          The wrapper variables have been cleanly processed, dropping nested keys and mapping variant 
-          properties into native structural design parameters.
+          All primitive typography option tokens from the Figma normalization layer.
         </div>
-
-        ${catHeader("Font Families")}
-        ${tokenTable(families)}
-
-        ${catHeader("Font Sizes")}
-        ${tokenTable(sizes)}
-
-        ${catHeader("Line Heights")}
-        ${tokenTable(lineHeights)}
-
-        ${catHeader("Letter Spacing")}
-        ${tokenTable(letterSpacing)}
-
-        ${catHeader("Font Style")}
-        ${tokenTable(style)}
-
-        ${catHeader("Font Weight")}
-        ${tokenTable(weight)}
+        ${sections}
       </div>
     `;
   }),
 };
 
-export const LiveTypographyPreview: Story = {
+// ─── Live rendering preview ───────────────────────────────────────────────────
+
+export const LiveRenderingPreview: Story = {
   name: "Live Rendering Preview",
   render: asyncStory(async () => {
     const tokens = await loadTypographyTokens();
 
-    // Grab configuration maps to build inline styles safely
     const graphik = tokens.find((t) => t.name.includes("family-graphik"));
-    const size600 =
-      tokens.find((t) => t.name.includes("size-600"))?.[`value`] || 24;
-    const lh600 =
-      tokens.find((t) => t.name.includes("line-height-600"))?.[`value`] || 32;
-    const size300 =
-      tokens.find((t) => t.name.includes("size-300"))?.[`value`] || 16;
-    const lh300 =
-      tokens.find((t) => t.name.includes("line-height-300"))?.[`value`] || 24;
+    const sizeHeading =
+      tokens.find((t) => t.name.includes("size-500"))?.value || 24;
+    const lhHeading =
+      tokens.find((t) => t.name.includes("line-height-5"))?.value || 32;
+    const sizeBody =
+      tokens.find((t) => t.name.includes("size-200"))?.value || 16;
+    const lhBody =
+      tokens.find((t) => t.name.includes("line-height-2"))?.value || 24;
 
     const fontFamilyStyle = graphik
       ? `'${graphik.value}', ${graphik.fallback || "sans-serif"}`
@@ -266,7 +339,7 @@ export const LiveTypographyPreview: Story = {
     return `
       <style>${BASE_STYLES}</style>
       <div class="page">
-        ${breadcrumb("Cedar Tokens", "Typography", "Live Preview")}
+        ${breadcrumb("Cedar Tokens", "Typography", "Primitives", "Live Preview")}
         <div class="page-title-row">
           <div>
             <div class="page-eyebrow">Visual Diagnostics Contract</div>
@@ -275,8 +348,7 @@ export const LiveTypographyPreview: Story = {
         </div>
 
         <div class="demo-note">
-          This container dynamically maps variables parsed by the 
-          normalization layers into live typographic stacks.
+          Live typographic rendering using actual token values from the pipeline.
         </div>
 
         ${sectionHeader(
@@ -287,14 +359,14 @@ export const LiveTypographyPreview: Story = {
 
         <div class="preview-card" style="font-family: ${fontFamilyStyle};">
           <div>
-            <span class="trow-badge number" style="margin-bottom: 0.5rem;">Heading (Size 600 / Line-Height 600)</span>
-            <h2 style="font-size: ${size600}px; line-height: ${lh600}px; font-weight: 700; letter-spacing: -0.02em;">
+            <span class="trow-badge number" style="margin-bottom: 0.5rem;">Heading (Size 500 / Line-Height 5)</span>
+            <h2 style="font-size: ${sizeHeading}px; line-height: ${lhHeading}px; font-weight: 700; letter-spacing: -0.02em;">
               Explore the great outdoors in comfort.
             </h2>
           </div>
           <div style="margin-top: 1rem;">
-            <span class="trow-badge number" style="margin-bottom: 0.5rem;">Body Text (Size 300 / Line-Height 300)</span>
-            <p style="font-size: ${size300}px; line-height: ${lh300}px; color: var(--ink-mid);">
+            <span class="trow-badge number" style="margin-bottom: 0.5rem;">Body Text (Size 200 / Line-Height 2)</span>
+            <p style="font-size: ${sizeBody}px; line-height: ${lhBody}px; color: var(--ink-mid);">
               Get expert advice, quality outdoor gear, and clothing for climbing, hiking, cycling, and more at REI. 
               Our normalization layer guarantees that variable spacing balances neatly against cross-platform target line-height specifications.
             </p>

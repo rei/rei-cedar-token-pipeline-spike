@@ -514,18 +514,13 @@ export async function loadTypographyTokens(): Promise<TypographyToken[]> {
     }
   }
 
-  // 1. Map standard single-word node keys
-  processSubGroup(textGroup.family, "family");
-  processSubGroup(textGroup.size, "size");
-  processSubGroup(textGroup.style, "style");
-  processSubGroup(textGroup.weight, "weight");
-
-  // 2. Map the split sub-object paths from your object dump
-  if (textGroup.line && textGroup.line.height) {
-    processSubGroup(textGroup.line.height, "line-height");
-  }
-  if (textGroup.letter && textGroup.letter.spacing) {
-    processSubGroup(textGroup.letter.spacing, "letter-spacing");
+  // Walk all text sub-groups dynamically — handles both flat keys (family, size)
+  // and hyphenated keys (letter-spacing, line-height) stored in canonical.
+  const categoryKeys: TypographyToken["category"][] = [
+    "family", "size", "style", "weight", "line-height", "letter-spacing",
+  ];
+  for (const cat of categoryKeys) {
+    processSubGroup(textGroup[cat], cat);
   }
 
   return tokens;
