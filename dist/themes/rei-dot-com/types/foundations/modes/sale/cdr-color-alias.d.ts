@@ -2,7 +2,7 @@
 
 export interface CdrColorAliasSaleTokens {
   "border-base": string;
-  "border-subtle": string;
+  "border-raised": string;
   "surface-base": string;
   "surface-raised": string;
   "text-base": string;

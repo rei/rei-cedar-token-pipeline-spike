@@ -4,6 +4,12 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy'
+        required: true
+        default: 'main'
+        type: string
 
 jobs:
   deploy-storybook:
@@ -16,6 +22,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref_name }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4

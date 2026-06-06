@@ -2,4 +2,4 @@
 
 export type CdrColorBorderTokenName =
   | "color-border-base"
-  | "color-border-subtle";
+  | "color-border-raised";
