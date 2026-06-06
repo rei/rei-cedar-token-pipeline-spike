@@ -1,0 +1,6 @@
+@import './light/cdr-color-surface.css';
+@import './light/cdr-color-text.css';
+@import './light/cdr-color-border.css';
+@import './light/cdr-spacing-scale.css';
+@import './light/cdr-spacing-component.css';
+@import './light/cdr-spacing-layout.css';
