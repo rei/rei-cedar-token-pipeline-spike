@@ -43,13 +43,18 @@ When we convert the Figma hex values to OKLCH, they don't match the formula outp
 
 The lightness values are shifted by 1 step. The current hex values are too light.
 
-| Step | Current Hex | Current L | Formula L | Difference |
-|------|-------------|-----------|-----------|------------|
-| 600 | `#78AE7B` | 0.70 | 0.62 | +0.08 (too light) |
-| 700 | `#57985D` | 0.62 | 0.54 | +0.08 (too light) |
-| 800 | `#398141` | 0.54 | 0.46 | +0.08 (too light) |
+**Status:** ios-light has been updated with correct values as a preview. Full fix (all modes) pending design validation (Monday).
 
-**Action needed:** Either update the hex values to match the formula L values, or confirm the current hex values are intentional and the formula parameters need adjustment.
+| Step | Current Hex (web-light) | Current L | Formula L | Correct Hex | Difference |
+|------|------------------------|-----------|-----------|-------------|------------|
+| 600 | `#78AE7B` | 0.70 | 0.62 | `#57985D` | +0.08 (too light) |
+| 700 | `#57985D` | 0.62 | 0.54 | `#398141` | +0.08 (too light) |
+| 800 | `#398141` | 0.54 | 0.48 | `#296E32` | +0.06 (too light) |
+| 900 | `#27682F` | 0.46 | 0.46 | `#27682F` | ✓ correct |
+
+**Note:** The spec document had a copy-paste error where steps 800 and 900 both showed `oklch(0.46 0.110 146)`. Step 800 should have L=0.48 (interpolated between 700's 0.54 and 900's 0.46).
+
+**Action needed:** After design validates the preview values on Monday, update the Figma variables for all modes (web-light, web-dark, ios-dark) with the correct hex values.
 
 ---
 
