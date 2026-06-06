@@ -473,7 +473,7 @@
         },
         "200": {
           "$type": "color",
-          "$value": "#e4f2f2",
+          "$value": "#e0f4eb",
           "$extensions": {
             "cedar": {
               "colorFamily": "blue-spruce-green"
@@ -482,7 +482,7 @@
         },
         "300": {
           "$type": "color",
-          "$value": "#d3eaeb",
+          "$value": "#caeede",
           "$extensions": {
             "cedar": {
               "colorFamily": "blue-spruce-green"
@@ -491,7 +491,7 @@
         },
         "400": {
           "$type": "color",
-          "$value": "#bfdfe0",
+          "$value": "#abe3ca",
           "$extensions": {
             "cedar": {
               "colorFamily": "blue-spruce-green"
@@ -500,7 +500,7 @@
         },
         "500": {
           "$type": "color",
-          "$value": "#a7d1d3",
+          "$value": "#91d5b8",
           "$extensions": {
             "cedar": {
               "colorFamily": "blue-spruce-green"
@@ -509,7 +509,7 @@
         },
         "600": {
           "$type": "color",
-          "$value": "#90c2c5",
+          "$value": "#7ccaaa",
           "$extensions": {
             "cedar": {
               "colorFamily": "blue-spruce-green"
@@ -518,7 +518,7 @@
         },
         "700": {
           "$type": "color",
-          "$value": "#6faaae",
+          "$value": "#69bf9d",
           "$extensions": {
             "cedar": {
               "colorFamily": "blue-spruce-green"
@@ -527,7 +527,7 @@
         },
         "800": {
           "$type": "color",
-          "$value": "#3b8f93",
+          "$value": "#5eb593",
           "$extensions": {
             "cedar": {
               "colorFamily": "blue-spruce-green"
@@ -536,7 +536,7 @@
         },
         "900": {
           "$type": "color",
-          "$value": "#2e7c80",
+          "$value": "#439979",
           "$extensions": {
             "cedar": {
               "colorFamily": "blue-spruce-green"
@@ -545,7 +545,7 @@
         },
         "1000": {
           "$type": "color",
-          "$value": "#1e5d60",
+          "$value": "#2a795d",
           "$extensions": {
             "cedar": {
               "colorFamily": "blue-spruce-green"
@@ -554,7 +554,7 @@
         },
         "1100": {
           "$type": "color",
-          "$value": "#113d3f",
+          "$value": "#16523d",
           "$extensions": {
             "cedar": {
               "colorFamily": "blue-spruce-green"
@@ -563,7 +563,7 @@
         },
         "1200": {
           "$type": "color",
-          "$value": "#0e2627",
+          "$value": "#132f24",
           "$extensions": {
             "cedar": {
               "colorFamily": "blue-spruce-green"
@@ -610,7 +610,7 @@
         },
         "500": {
           "$type": "color",
-          "$value": "#91fb93",
+          "$value": "#91bf93",
           "$extensions": {
             "cedar": {
               "colorFamily": "success-green"
@@ -622,7 +622,12 @@
           "$value": "#78ae7b",
           "$extensions": {
             "cedar": {
-              "colorFamily": "success-green"
+              "colorFamily": "success-green",
+              "platformOverrides": {
+                "ios": {
+                  "light": "#57985d"
+                }
+              }
             }
           }
         },
@@ -631,7 +636,12 @@
           "$value": "#57985d",
           "$extensions": {
             "cedar": {
-              "colorFamily": "success-green"
+              "colorFamily": "success-green",
+              "platformOverrides": {
+                "ios": {
+                  "light": "#398141"
+                }
+              }
             }
           }
         },
@@ -640,7 +650,12 @@
           "$value": "#398141",
           "$extensions": {
             "cedar": {
-              "colorFamily": "success-green"
+              "colorFamily": "success-green",
+              "platformOverrides": {
+                "ios": {
+                  "light": "#296e32"
+                }
+              }
             }
           }
         },
@@ -738,7 +753,7 @@
         },
         "700": {
           "$type": "color",
-          "$value": "#6f685d",
+          "$value": "#6e685d",
           "$extensions": {
             "cedar": {
               "colorFamily": "warm-grey"
@@ -922,7 +937,7 @@
         },
         "200": {
           "$type": "color",
-          "$value": "#ffd2d8",
+          "$value": "#ffded8",
           "$extensions": {
             "cedar": {
               "colorFamily": "error-red"
