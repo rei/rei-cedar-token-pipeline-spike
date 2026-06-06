@@ -72,6 +72,20 @@ export const webCssAction: Action = {
     const spacingComponent = { light: [] as string[], dark: [] as string[] };
     const spacingLayout = { light: [] as string[], dark: [] as string[] };
 
+    // Organize spacing tokens by type
+    const typographyFamily = { light: [] as string[], dark: [] as string[] };
+    const typographyLetterSpacing = {
+      light: [] as string[],
+      dark: [] as string[],
+    };
+    const typographyLineHeight = {
+      light: [] as string[],
+      dark: [] as string[],
+    };
+    const typographySize = { light: [] as string[], dark: [] as string[] };
+    const typographyStyle = { light: [] as string[], dark: [] as string[] };
+    const typographyWeight = { light: [] as string[], dark: [] as string[] };
+
     function pushColorByCategory(
       token: any,
       line: string,
@@ -206,6 +220,42 @@ export const webCssAction: Action = {
       }
     });
 
+    // Categorize spacing tokens
+    const typographyTokens = dictionary.allTokens.filter(
+      (t) => t.path[0] === "text"
+    );
+
+    typographyTokens.forEach((token) => {
+      const raw = String(token.value ?? token.$value);
+
+      const cssVar = toCssVar(token.path);
+      const cssValue = toCssValue(raw);
+      const line = `  ${cssVar}: ${cssValue};`;
+
+      // Organize by spacing type (path[1]: scale, component, layout)
+      const type = token.path[1];
+
+      if (type === "family") {
+        typographyFamily.light.push(line);
+        typographyFamily.dark.push(line);
+      } else if (type === "letter") {
+        typographyLetterSpacing.light.push(line);
+        typographyLetterSpacing.dark.push(line);
+      } else if (type === "line") {
+        typographyLineHeight.light.push(line);
+        typographyLineHeight.dark.push(line);
+      } else if (type === "size") {
+        typographySize.light.push(line);
+        typographySize.dark.push(line);
+      } else if (type === "style") {
+        typographyStyle.light.push(line);
+        typographyStyle.dark.push(line);
+      } else if (type === "weight") {
+        typographyWeight.light.push(line);
+        typographyWeight.dark.push(line);
+      }
+    });
+
     // Write modular CSS files
     const writeThemeFiles = (theme: "light" | "dark") => {
       const themeDir = path.join(buildPath, theme);
@@ -246,6 +296,48 @@ export const webCssAction: Action = {
         imports.push(`@import './${theme}/cdr-spacing-layout.css';`);
       }
 
+      // Typography files
+      if (typographyFamily[theme].length > 0) {
+        const css = `:root {\n${typographyFamily[theme].join("\n")}\n}\n`;
+        fs.writeFileSync(path.join(themeDir, "cdr-text-family.css"), css);
+        imports.push(`@import './${theme}/cdr-text-family.css';`);
+      }
+
+      if (typographyLetterSpacing[theme].length > 0) {
+        const css = `:root {\n${typographyLetterSpacing[theme].join(
+          "\n"
+        )}\n}\n`;
+        fs.writeFileSync(
+          path.join(themeDir, "cdr-text-letter-spacing.css"),
+          css
+        );
+        imports.push(`@import './${theme}/cdr-text-letter-spacing.css';`);
+      }
+
+      if (typographyLineHeight[theme].length > 0) {
+        const css = `:root {\n${typographyLineHeight[theme].join("\n")}\n}\n`;
+        fs.writeFileSync(path.join(themeDir, "cdr-text-line-height.css"), css);
+        imports.push(`@import './${theme}/cdr-text-line-height.css';`);
+      }
+
+      if (typographySize[theme].length > 0) {
+        const css = `:root {\n${typographySize[theme].join("\n")}\n}\n`;
+        fs.writeFileSync(path.join(themeDir, "cdr-text-size.css"), css);
+        imports.push(`@import './${theme}/cdr-text-size.css';`);
+      }
+
+      if (typographyStyle[theme].length > 0) {
+        const css = `:root {\n${typographyStyle[theme].join("\n")}\n}\n`;
+        fs.writeFileSync(path.join(themeDir, "cdr-text-style.css"), css);
+        imports.push(`@import './${theme}/cdr-text-style.css';`);
+      }
+
+      if (typographyWeight[theme].length > 0) {
+        const css = `:root {\n${typographyWeight[theme].join("\n")}\n}\n`;
+        fs.writeFileSync(path.join(themeDir, "cdr-text-weight.css"), css);
+        imports.push(`@import './${theme}/cdr-text-weight.css';`);
+      }
+
       // Write index file
       const indexCss = imports.join("\n") + "\n";
       fs.writeFileSync(path.join(buildPath, `cdr-${theme}.css`), indexCss);
@@ -280,6 +372,26 @@ export const webCssAction: Action = {
       console.log(
         `    ✓ cdr-spacing-layout.css (${spacingLayout.light.length} tokens)`
       );
+    if (typographyFamily.light.length > 0)
+      console.log(
+        `    ✓ cdr-text-family.css (${spacingComponent.light.length} tokens)`
+      );
+    if (typographyLetterSpacing.light.length > 0)
+      console.log(
+        `    ✓ cdr-text-letter-spacing.css (${spacingLayout.light.length} tokens)`
+      );
+    if (typographyLineHeight.light.length > 0)
+      console.log(
+        `    ✓ cdr-text-line-height.css (${spacingComponent.light.length} tokens)`
+      );
+    if (typographySize.light.length > 0)
+      console.log(
+        `    ✓ cdr-text-size.css (${spacingLayout.light.length} tokens)`
+      );
+    if (typographyWeight.light.length > 0)
+      console.log(
+        `    ✓ cdr-text-wight.css (${spacingLayout.light.length} tokens)`
+      );
 
     console.log(`  ✓ dist/themes/rei-dot-com/css/cdr-dark.css (index)`);
     if (colorSurface.dark.length > 0)
@@ -303,6 +415,26 @@ export const webCssAction: Action = {
     if (spacingLayout.dark.length > 0)
       console.log(
         `    ✓ cdr-spacing-layout.css (${spacingLayout.dark.length} tokens)`
+      );
+    if (typographyFamily.dark.length > 0)
+      console.log(
+        `    ✓ cdr-text-family.css (${spacingComponent.light.length} tokens)`
+      );
+    if (typographyLetterSpacing.dark.length > 0)
+      console.log(
+        `    ✓ cdr-text-letter-spacing.css (${spacingLayout.light.length} tokens)`
+      );
+    if (typographyLineHeight.dark.length > 0)
+      console.log(
+        `    ✓ cdr-text-line-height.css (${spacingComponent.light.length} tokens)`
+      );
+    if (typographySize.dark.length > 0)
+      console.log(
+        `    ✓ cdr-text-size.css (${spacingLayout.light.length} tokens)`
+      );
+    if (typographyWeight.dark.length > 0)
+      console.log(
+        `    ✓ cdr-text-wight.css (${spacingLayout.light.length} tokens)`
       );
   },
 

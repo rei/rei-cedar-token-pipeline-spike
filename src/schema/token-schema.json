@@ -80,6 +80,62 @@
           "canonicalPrefix": "color.option.sale-red",
           "colorFamily": "sale-red",
           "tokens": "auto"
+        },
+        "text.family": {
+          "canonicalPrefix": "text.family",
+          "tokens": {
+            "graphik": "graphik",
+            "stuart": "stuart"
+          }
+        },
+        "text.letter-spacing": {
+          "canonicalPrefix": "text.letter.spacing",
+          "tokens": {
+            "tightest": "tightest",
+            "tighter": "tighter",
+            "tight": "tight",
+            "compact": "compact",
+            "none": "none",
+            "loose": "loose",
+            "loosest": "loosest"
+          }
+        },
+        "text.line-height": {
+          "canonicalPrefix": "text.line.height",
+          "tokens": {
+            "0": "0",
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4",
+            "5": "5"
+          }
+        },
+        "text.size": {
+          "canonicalPrefix": "text.size",
+          "tokens": {
+            "100": "100",
+            "200": "200",
+            "300": "300",
+            "400": "400",
+            "500": "500"
+          }
+        },
+        "text.style": {
+          "canonicalPrefix": "text.style",
+          "tokens": {
+            "normal": "normal",
+            "italic": "italic"
+          }
+        },
+        "text.weight": {
+          "canonicalPrefix": "text.weight",
+          "tokens": {
+            "normal": "normal",
+            "medium": "medium",
+            "semibold": "semibold",
+            "bold": "bold"
+          }
         }
       }
     },

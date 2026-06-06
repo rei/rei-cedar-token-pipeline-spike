@@ -4,3 +4,9 @@
 @import './dark/cdr-spacing-scale.css';
 @import './dark/cdr-spacing-component.css';
 @import './dark/cdr-spacing-layout.css';
+@import './dark/cdr-text-family.css';
+@import './dark/cdr-text-letter-spacing.css';
+@import './dark/cdr-text-line-height.css';
+@import './dark/cdr-text-size.css';
+@import './dark/cdr-text-style.css';
+@import './dark/cdr-text-weight.css';
