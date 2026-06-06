@@ -1,12 +1,12 @@
 :root {
-  --cdr-text-base: #2e2e2b;
-  --cdr-text-base: oklch(30.009% 0.0127 82);
-  --cdr-text-subtle: #736e65;
-  --cdr-text-subtle: oklch(54% 0.0185 82);
-  --cdr-text-link: #0b2d60;
-  --cdr-text-link: oklch(30.639% 0.0855 259);
-  --cdr-text-link-hover: #406eb5;
-  --cdr-text-link-hover: oklch(54.008% 0.1299 259);
-  --cdr-text-sale: #c7370f;
-  --cdr-text-sale: oklch(55.138% 0.1795 30);
+  --cdr-text-base: #141210;
+  --cdr-text-base: oklch(18.379% 0.0052 67.5);
+  --cdr-text-subtle: #36322b;
+  --cdr-text-subtle: oklch(31.893% 0.0133 81.72);
+  --cdr-text-link: #22467f;
+  --cdr-text-link: oklch(39.927% 0.1049 259.27);
+  --cdr-text-link-hover: #305ca1;
+  --cdr-text-link-hover: oklch(47.958% 0.1217 259.1);
+  --cdr-text-sale: #8c0000;
+  --cdr-text-sale: oklch(40.195% 0.1649 29.23);
 }

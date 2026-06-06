@@ -1,274 +1,1131 @@
 {
   "spacing": {
     "scale": {
-      "-50": {
+      "50": {
         "$value": "clamp(2.48px, 0.1357vw + 2.0457px, 4px)",
-        "$type": "fluid"
+        "$type": "dimension"
       },
-      "-100": {
+      "100": {
         "$value": "clamp(4.8px, 0.25vw + 4px, 8px)",
-        "$type": "fluid"
+        "$type": "dimension"
       },
-      "-150": {
+      "150": {
         "$value": "clamp(7.12px, 0.3297vw + 6.0649px, 12px)",
-        "$type": "fluid"
+        "$type": "dimension"
       },
-      "-200": {
+      "200": {
         "$value": "clamp(9.44px, 0.4432vw + 8.0216px, 16px)",
-        "$type": "fluid"
+        "$type": "dimension"
       },
-      "-250": {
+      "250": {
         "$value": "clamp(11.76px, 0.515vw + 10.112px, 20px)",
-        "$type": "fluid"
+        "$type": "dimension"
       },
-      "-300": {
+      "300": {
         "$value": "clamp(14.08px, 0.62vw + 12.096px, 24px)",
-        "$type": "fluid"
+        "$type": "dimension"
       },
-      "-400": {
+      "400": {
         "$value": "clamp(18.4px, 0.6071vw + 16.4571px, 32px)",
-        "$type": "fluid"
+        "$type": "dimension"
       },
-      "-500": {
+      "500": {
         "$value": "clamp(22.72px, 0.7714vw + 20.2514px, 40px)",
-        "$type": "fluid"
+        "$type": "dimension"
+      }
+    },
+    "static": {
+      "zero": {
+        "$value": "0",
+        "$type": "number"
+      },
+      "sixteenth": {
+        "x": {
+          "$value": "0.10000000149011612",
+          "$type": "number"
+        }
+      },
+      "eighth": {
+        "x": {
+          "$value": "0.20000000298023224",
+          "$type": "number"
+        }
+      },
+      "quarter": {
+        "x": {
+          "$value": "0.4000000059604645",
+          "$type": "number"
+        }
+      },
+      "half": {
+        "x": {
+          "$value": "0.800000011920929",
+          "$type": "number"
+        }
+      },
+      "one": {
+        "x": {
+          "$value": "1.600000023841858",
+          "$type": "number"
+        },
+        "and": {
+          "a": {
+            "half": {
+              "x": {
+                "$value": "2.4000000953674316",
+                "$type": "number"
+              }
+            }
+          }
+        }
+      },
+      "two": {
+        "x": {
+          "$value": "3.200000047683716",
+          "$type": "number"
+        }
+      },
+      "three": {
+        "x": {
+          "$value": "4.800000190734863",
+          "$type": "number"
+        }
+      },
+      "four": {
+        "x": {
+          "$value": "6.400000095367432",
+          "$type": "number"
+        }
       }
     },
     "component": {
       "xs": {
-        "$value": "{spacing.scale.-50}",
-        "$type": "number"
+        "$type": "number",
+        "$value": "{spacing.scale.50}",
+        "$description": "",
+        "$extensions": {
+          "cedar": {
+            "ios": {
+              "dark": "{spacing.static.zero}",
+              "light": "{spacing.static.zero}"
+            },
+            "web": {
+              "dark": "{spacing.scale.50}",
+              "light": "{spacing.scale.50}"
+            }
+          }
+        }
       },
       "sm": {
-        "$value": "{spacing.scale.-100}",
-        "$type": "number"
+        "$type": "number",
+        "$value": "{spacing.scale.100}",
+        "$description": "",
+        "$extensions": {
+          "cedar": {
+            "ios": {
+              "dark": "{spacing.static.eighth.x}",
+              "light": "{spacing.static.eighth.x}"
+            },
+            "web": {
+              "dark": "{spacing.scale.100}",
+              "light": "{spacing.scale.100}"
+            }
+          }
+        }
       },
       "md": {
-        "$value": "{spacing.scale.-150}",
-        "$type": "number"
+        "$type": "number",
+        "$value": "{spacing.scale.150}",
+        "$description": "",
+        "$extensions": {
+          "cedar": {
+            "ios": {
+              "dark": "{spacing.static.quarter.x}",
+              "light": "{spacing.static.quarter.x}"
+            },
+            "web": {
+              "dark": "{spacing.scale.150}",
+              "light": "{spacing.scale.150}"
+            }
+          }
+        }
       },
       "lg": {
-        "$value": "{spacing.scale.-200}",
-        "$type": "number"
+        "$type": "number",
+        "$value": "{spacing.scale.200}",
+        "$description": "",
+        "$extensions": {
+          "cedar": {
+            "ios": {
+              "dark": "{spacing.static.half.x}",
+              "light": "{spacing.static.half.x}"
+            },
+            "web": {
+              "dark": "{spacing.scale.200}",
+              "light": "{spacing.scale.200}"
+            }
+          }
+        }
       }
     },
     "layout": {
       "sm": {
-        "$value": "{spacing.scale.-250}",
-        "$type": "number"
+        "$type": "number",
+        "$value": "{spacing.scale.250}",
+        "$description": "",
+        "$extensions": {
+          "cedar": {
+            "ios": {
+              "dark": "{spacing.static.one.x}",
+              "light": "{spacing.static.one.x}"
+            },
+            "web": {
+              "dark": "{spacing.scale.250}",
+              "light": "{spacing.scale.250}"
+            }
+          }
+        }
       },
       "md": {
-        "$value": "{spacing.scale.-300}",
-        "$type": "number"
+        "$type": "number",
+        "$value": "{spacing.scale.300}",
+        "$description": "",
+        "$extensions": {
+          "cedar": {
+            "ios": {
+              "dark": "{spacing.static.two.x}",
+              "light": "{spacing.static.two.x}"
+            },
+            "web": {
+              "dark": "{spacing.scale.300}",
+              "light": "{spacing.scale.300}"
+            }
+          }
+        }
       },
       "lg": {
-        "$value": "{spacing.scale.-400}",
-        "$type": "number"
+        "$type": "number",
+        "$value": "{spacing.scale.400}",
+        "$description": "",
+        "$extensions": {
+          "cedar": {
+            "ios": {
+              "dark": "{spacing.static.three.x}",
+              "light": "{spacing.static.three.x}"
+            },
+            "web": {
+              "dark": "{spacing.scale.400}",
+              "light": "{spacing.scale.400}"
+            }
+          }
+        }
       },
       "xl": {
-        "$value": "{spacing.scale.-500}",
-        "$type": "number"
+        "$type": "number",
+        "$value": "{spacing.scale.500}",
+        "$description": "",
+        "$extensions": {
+          "cedar": {
+            "ios": {
+              "dark": "{spacing.static.four.x}",
+              "light": "{spacing.static.four.x}"
+            },
+            "web": {
+              "dark": "{spacing.scale.500}",
+              "light": "{spacing.scale.500}"
+            }
+          }
+        }
       }
     }
   },
   "color": {
     "option": {
-      "neutral": {
-        "warm": {
-          "grey": {
-            "100": {
-              "$type": "color",
-              "$value": "#edeae3",
-              "$extensions": {
-                "cedar": {
-                  "appearances": {
-                    "dark": "#2e2e2b"
-                  },
-                  "platformOverrides": {
-                    "ios": {
-                      "dark": "#1c1c1c"
-                    }
-                  }
-                }
-              }
-            },
-            "300": {
-              "$type": "color",
-              "$value": "#b2ab9f",
-              "$extensions": {
-                "cedar": {
-                  "appearances": {
-                    "dark": "#736e65"
-                  }
-                }
-              }
-            },
-            "600": {
-              "$type": "color",
-              "$value": "#736e65",
-              "$extensions": {
-                "cedar": {
-                  "appearances": {
-                    "dark": "#b2ab9f"
-                  }
-                }
-              }
-            },
-            "900": {
-              "$type": "color",
-              "$value": "#2e2e2b",
-              "$extensions": {
-                "cedar": {
-                  "appearances": {
-                    "dark": "#edeae3"
-                  },
-                  "platformOverrides": {
-                    "ios": {
-                      "light": "#1c1c1c"
-                    }
-                  }
-                }
-              }
+      "alpine-lake-blue": {
+        "100": {
+          "$type": "color",
+          "$value": "#eff9ff",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "alpine-lake-blue"
             }
           }
         },
-        "black": {
+        "200": {
           "$type": "color",
-          "$value": "#000000"
+          "$value": "#d7e9ff",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "alpine-lake-blue"
+            }
+          }
         },
-        "white": {
+        "300": {
           "$type": "color",
-          "$value": "#ffffff"
+          "$value": "#c2d9fd",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "alpine-lake-blue"
+            }
+          }
         },
-        "overlay": {
-          "light": {
-            "$type": "color",
-            "$value": "#ffffffd9"
-          },
-          "subtle": {
-            "$type": "color",
-            "$value": "#ffffffbf"
+        "400": {
+          "$type": "color",
+          "$value": "#a9c6f3",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "alpine-lake-blue"
+            }
+          }
+        },
+        "500": {
+          "$type": "color",
+          "$value": "#91b3e6",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "alpine-lake-blue"
+            }
+          }
+        },
+        "600": {
+          "$type": "color",
+          "$value": "#7ba0d9",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "alpine-lake-blue"
+            }
+          }
+        },
+        "700": {
+          "$type": "color",
+          "$value": "#5f87c5",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "alpine-lake-blue"
+            }
+          }
+        },
+        "800": {
+          "$type": "color",
+          "$value": "#4070bc",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "alpine-lake-blue"
+            }
+          }
+        },
+        "900": {
+          "$type": "color",
+          "$value": "#305ca1",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "alpine-lake-blue"
+            }
+          }
+        },
+        "1000": {
+          "$type": "color",
+          "$value": "#22467f",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "alpine-lake-blue"
+            }
+          }
+        },
+        "1100": {
+          "$type": "color",
+          "$value": "#142d54",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "alpine-lake-blue"
+            }
+          }
+        },
+        "1200": {
+          "$type": "color",
+          "$value": "#041532",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "alpine-lake-blue"
+            }
           }
         }
       },
-      "brand": {
-        "blue": {
-          "400": {
-            "$type": "color",
-            "$value": "#406eb5",
-            "$extensions": {
-              "cedar": {
-                "appearances": {
-                  "dark": "#0b2d60"
-                },
-                "platformOverrides": {
-                  "ios": {
-                    "light": "#0a84ff",
-                    "dark": "#0040dd"
-                  }
-                }
-              }
-            }
-          },
-          "600": {
-            "$type": "color",
-            "$value": "#0b2d60",
-            "$extensions": {
-              "cedar": {
-                "appearances": {
-                  "dark": "#406eb5"
-                },
-                "platformOverrides": {
-                  "ios": {
-                    "light": "#0040dd",
-                    "dark": "#0a84ff"
-                  }
-                }
-              }
+      "info-blue": {
+        "100": {
+          "$type": "color",
+          "$value": "#f1f8f9",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "info-blue"
             }
           }
         },
-        "yellow": {
-          "400": {
-            "$type": "color",
-            "$value": "#ffbf59",
-            "$extensions": {
-              "cedar": {
-                "appearances": {
-                  "dark": "#ffe7b3"
-                }
-              }
-            }
-          },
-          "600": {
-            "$type": "color",
-            "$value": "#ffe7b3",
-            "$extensions": {
-              "cedar": {
-                "appearances": {
-                  "dark": "#ffbf59"
-                }
-              }
+        "200": {
+          "$type": "color",
+          "$value": "#e4f2f2",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "info-blue"
             }
           }
         },
-        "red": {
-          "400": {
-            "$type": "color",
-            "$value": "#c7370f",
-            "$extensions": {
-              "cedar": {
-                "appearances": {
-                  "dark": "#610a0a"
-                },
-                "platformOverrides": {
-                  "ios": {
-                    "light": "#ea6743",
-                    "dark": "#cc2424"
-                  }
-                }
-              }
-            }
-          },
-          "600": {
-            "$type": "color",
-            "$value": "#610a0a",
-            "$extensions": {
-              "cedar": {
-                "appearances": {
-                  "dark": "#c7370f"
-                },
-                "platformOverrides": {
-                  "ios": {
-                    "light": "#cc2424",
-                    "dark": "#ea6743"
-                  }
-                }
-              }
+        "300": {
+          "$type": "color",
+          "$value": "#d3eaeb",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "info-blue"
             }
           }
         },
-        "green": {
-          "400": {
-            "$type": "color",
-            "$value": "#3b8349",
-            "$extensions": {
-              "cedar": {
-                "appearances": {
-                  "dark": "#1f513f"
-                }
-              }
+        "400": {
+          "$type": "color",
+          "$value": "#bfdfe0",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "info-blue"
             }
-          },
-          "600": {
-            "$type": "color",
-            "$value": "#1f513f",
-            "$extensions": {
-              "cedar": {
-                "appearances": {
-                  "dark": "#3b8349"
-                }
-              }
+          }
+        },
+        "500": {
+          "$type": "color",
+          "$value": "#a7d1d3",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "info-blue"
+            }
+          }
+        },
+        "600": {
+          "$type": "color",
+          "$value": "#90c2c5",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "info-blue"
+            }
+          }
+        },
+        "700": {
+          "$type": "color",
+          "$value": "#6faaae",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "info-blue"
+            }
+          }
+        },
+        "800": {
+          "$type": "color",
+          "$value": "#3b8f93",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "info-blue"
+            }
+          }
+        },
+        "900": {
+          "$type": "color",
+          "$value": "#2e7c80",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "info-blue"
+            }
+          }
+        },
+        "1000": {
+          "$type": "color",
+          "$value": "#1e5d60",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "info-blue"
+            }
+          }
+        },
+        "1100": {
+          "$type": "color",
+          "$value": "#113d3f",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "info-blue"
+            }
+          }
+        },
+        "1200": {
+          "$type": "color",
+          "$value": "#0e2627",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "info-blue"
+            }
+          }
+        }
+      },
+      "blue-spruce-green": {
+        "100": {
+          "$type": "color",
+          "$value": "#f1f9f5",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "blue-spruce-green"
+            }
+          }
+        },
+        "200": {
+          "$type": "color",
+          "$value": "#e4f2f2",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "blue-spruce-green"
+            }
+          }
+        },
+        "300": {
+          "$type": "color",
+          "$value": "#d3eaeb",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "blue-spruce-green"
+            }
+          }
+        },
+        "400": {
+          "$type": "color",
+          "$value": "#bfdfe0",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "blue-spruce-green"
+            }
+          }
+        },
+        "500": {
+          "$type": "color",
+          "$value": "#a7d1d3",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "blue-spruce-green"
+            }
+          }
+        },
+        "600": {
+          "$type": "color",
+          "$value": "#90c2c5",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "blue-spruce-green"
+            }
+          }
+        },
+        "700": {
+          "$type": "color",
+          "$value": "#6faaae",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "blue-spruce-green"
+            }
+          }
+        },
+        "800": {
+          "$type": "color",
+          "$value": "#3b8f93",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "blue-spruce-green"
+            }
+          }
+        },
+        "900": {
+          "$type": "color",
+          "$value": "#2e7c80",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "blue-spruce-green"
+            }
+          }
+        },
+        "1000": {
+          "$type": "color",
+          "$value": "#1e5d60",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "blue-spruce-green"
+            }
+          }
+        },
+        "1100": {
+          "$type": "color",
+          "$value": "#113d3f",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "blue-spruce-green"
+            }
+          }
+        },
+        "1200": {
+          "$type": "color",
+          "$value": "#0e2627",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "blue-spruce-green"
+            }
+          }
+        }
+      },
+      "success-green": {
+        "100": {
+          "$type": "color",
+          "$value": "#f2fbf3",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "success-green"
+            }
+          }
+        },
+        "200": {
+          "$type": "color",
+          "$value": "#dceedc",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "success-green"
+            }
+          }
+        },
+        "300": {
+          "$type": "color",
+          "$value": "#c5e0c6",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "success-green"
+            }
+          }
+        },
+        "400": {
+          "$type": "color",
+          "$value": "#abd0ac",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "success-green"
+            }
+          }
+        },
+        "500": {
+          "$type": "color",
+          "$value": "#91fb93",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "success-green"
+            }
+          }
+        },
+        "600": {
+          "$type": "color",
+          "$value": "#78ae7b",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "success-green"
+            }
+          }
+        },
+        "700": {
+          "$type": "color",
+          "$value": "#57985d",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "success-green"
+            }
+          }
+        },
+        "800": {
+          "$type": "color",
+          "$value": "#398141",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "success-green"
+            }
+          }
+        },
+        "900": {
+          "$type": "color",
+          "$value": "#27682f",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "success-green"
+            }
+          }
+        },
+        "1000": {
+          "$type": "color",
+          "$value": "#1f4e24",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "success-green"
+            }
+          }
+        },
+        "1100": {
+          "$type": "color",
+          "$value": "#1c2e1d",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "success-green"
+            }
+          }
+        },
+        "1200": {
+          "$type": "color",
+          "$value": "#101210",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "success-green"
+            }
+          }
+        }
+      },
+      "warm-grey": {
+        "100": {
+          "$type": "color",
+          "$value": "#f1f0ed",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warm-grey"
+            }
+          }
+        },
+        "200": {
+          "$type": "color",
+          "$value": "#e5e3de",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warm-grey"
+            }
+          }
+        },
+        "300": {
+          "$type": "color",
+          "$value": "#d6d2cc",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warm-grey"
+            }
+          }
+        },
+        "400": {
+          "$type": "color",
+          "$value": "#c2bdb5",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warm-grey"
+            }
+          }
+        },
+        "500": {
+          "$type": "color",
+          "$value": "#afaaa1",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warm-grey"
+            }
+          }
+        },
+        "600": {
+          "$type": "color",
+          "$value": "#979187",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warm-grey"
+            }
+          }
+        },
+        "700": {
+          "$type": "color",
+          "$value": "#6f685d",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warm-grey"
+            }
+          }
+        },
+        "800": {
+          "$type": "color",
+          "$value": "#575248",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warm-grey"
+            }
+          }
+        },
+        "900": {
+          "$type": "color",
+          "$value": "#474239",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warm-grey"
+            }
+          }
+        },
+        "1000": {
+          "$type": "color",
+          "$value": "#36322b",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warm-grey"
+            }
+          }
+        },
+        "1100": {
+          "$type": "color",
+          "$value": "#24211c",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warm-grey"
+            }
+          }
+        },
+        "1200": {
+          "$type": "color",
+          "$value": "#141210",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warm-grey"
+            }
+          }
+        },
+        "010": {
+          "$type": "color",
+          "$value": "#fafaf9",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warm-grey"
+            }
+          }
+        }
+      },
+      "warning-yellow": {
+        "100": {
+          "$type": "color",
+          "$value": "#fffaf1",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warning-yellow"
+            }
+          }
+        },
+        "200": {
+          "$type": "color",
+          "$value": "#fff2dd",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warning-yellow"
+            }
+          }
+        },
+        "300": {
+          "$type": "color",
+          "$value": "#ffe6c3",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warning-yellow"
+            }
+          }
+        },
+        "400": {
+          "$type": "color",
+          "$value": "#ffd6a1",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warning-yellow"
+            }
+          }
+        },
+        "500": {
+          "$type": "color",
+          "$value": "#f9c37d",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warning-yellow"
+            }
+          }
+        },
+        "600": {
+          "$type": "color",
+          "$value": "#eaa94e",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warning-yellow"
+            }
+          }
+        },
+        "700": {
+          "$type": "color",
+          "$value": "#d48e13",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warning-yellow"
+            }
+          }
+        },
+        "800": {
+          "$type": "color",
+          "$value": "#bb7400",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warning-yellow"
+            }
+          }
+        },
+        "900": {
+          "$type": "color",
+          "$value": "#9d5f00",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warning-yellow"
+            }
+          }
+        },
+        "1000": {
+          "$type": "color",
+          "$value": "#774600",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warning-yellow"
+            }
+          }
+        },
+        "1100": {
+          "$type": "color",
+          "$value": "#502c00",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warning-yellow"
+            }
+          }
+        },
+        "1200": {
+          "$type": "color",
+          "$value": "#301d02",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "warning-yellow"
+            }
+          }
+        }
+      },
+      "error-red": {
+        "100": {
+          "$type": "color",
+          "$value": "#fff5f2",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "error-red"
+            }
+          }
+        },
+        "200": {
+          "$type": "color",
+          "$value": "#ffd2d8",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "error-red"
+            }
+          }
+        },
+        "300": {
+          "$type": "color",
+          "$value": "#ffc8be",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "error-red"
+            }
+          }
+        },
+        "400": {
+          "$type": "color",
+          "$value": "#fbada0",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "error-red"
+            }
+          }
+        },
+        "500": {
+          "$type": "color",
+          "$value": "#f39484",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "error-red"
+            }
+          }
+        },
+        "600": {
+          "$type": "color",
+          "$value": "#e87a69",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "error-red"
+            }
+          }
+        },
+        "700": {
+          "$type": "color",
+          "$value": "#d55948",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "error-red"
+            }
+          }
+        },
+        "800": {
+          "$type": "color",
+          "$value": "#ba2d1f",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "error-red"
+            }
+          }
+        },
+        "900": {
+          "$type": "color",
+          "$value": "#9a160a",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "error-red"
+            }
+          }
+        },
+        "1000": {
+          "$type": "color",
+          "$value": "#770400",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "error-red"
+            }
+          }
+        },
+        "1100": {
+          "$type": "color",
+          "$value": "#540000",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "error-red"
+            }
+          }
+        },
+        "1200": {
+          "$type": "color",
+          "$value": "#320100",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "error-red"
+            }
+          }
+        }
+      },
+      "sale-red": {
+        "100": {
+          "$type": "color",
+          "$value": "#fff2ef",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "sale-red"
+            }
+          }
+        },
+        "200": {
+          "$type": "color",
+          "$value": "#ffe3da",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "sale-red"
+            }
+          }
+        },
+        "300": {
+          "$type": "color",
+          "$value": "#ffd4c7",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "sale-red"
+            }
+          }
+        },
+        "400": {
+          "$type": "color",
+          "$value": "#ffc0ae",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "sale-red"
+            }
+          }
+        },
+        "500": {
+          "$type": "color",
+          "$value": "#ffa891",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "sale-red"
+            }
+          }
+        },
+        "600": {
+          "$type": "color",
+          "$value": "#fe876c",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "sale-red"
+            }
+          }
+        },
+        "700": {
+          "$type": "color",
+          "$value": "#ea6041",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "sale-red"
+            }
+          }
+        },
+        "800": {
+          "$type": "color",
+          "$value": "#c8340e",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "sale-red"
+            }
+          }
+        },
+        "900": {
+          "$type": "color",
+          "$value": "#ad1a00",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "sale-red"
+            }
+          }
+        },
+        "1000": {
+          "$type": "color",
+          "$value": "#8c0000",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "sale-red"
+            }
+          }
+        },
+        "1100": {
+          "$type": "color",
+          "$value": "#680000",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "sale-red"
+            }
+          }
+        },
+        "1200": {
+          "$type": "color",
+          "$value": "#3c0200",
+          "$extensions": {
+            "cedar": {
+              "colorFamily": "sale-red"
             }
           }
         }
@@ -278,31 +1135,26 @@
       "default": {
         "surface": {
           "base": {
-            "$value": "{color.option.neutral.white}",
+            "$value": "{color.option.warm-grey.010}",
             "$type": "color",
             "$extensions": {
               "cedar": {
-                "docs": {
-                  "summary": "Default page and container background.",
-                  "design": "First step in the surface elevation scale. Anchors the layering system — raised surfaces sit above this token, not below.",
-                  "usage": "Use as the background for the primary content area, cards, modals, and any surface that sits at the base elevation. Do not use for text or interactive elements."
-                },
                 "ios": {
-                  "dark": "color.option.neutral.white",
-                  "light": "color.option.neutral.white"
+                  "dark": "color.option.warm-grey.010",
+                  "light": "color.option.warm-grey.010"
                 },
                 "web": {
-                  "dark": "color.option.neutral.white",
-                  "light": "color.option.neutral.white"
+                  "dark": "color.option.warm-grey.010",
+                  "light": "color.option.warm-grey.010"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#ffffff",
-                    "light": "#ffffff"
+                    "dark": "#fafaf9",
+                    "light": "#fafaf9"
                   },
                   "web": {
-                    "dark": "#ffffff",
-                    "light": "#ffffff"
+                    "dark": "#fafaf9",
+                    "light": "#fafaf9"
                   }
                 },
                 "governance": {
@@ -335,31 +1187,26 @@
             }
           },
           "raised": {
-            "$value": "{color.option.neutral.warm.grey.100}",
+            "$value": "{color.option.warm-grey.100}",
             "$type": "color",
             "$extensions": {
               "cedar": {
-                "docs": {
-                  "summary": "Elevated surface background, one step above the base layer.",
-                  "design": "Second step in the surface elevation scale. Creates visual separation from surface-base through a subtle warm-grey tint.",
-                  "usage": "Use for cards, panels, and drawers that sit above the base page surface. Do not use for the root page background or inline content areas."
-                },
                 "ios": {
-                  "dark": "color.option.neutral.warm.grey.100",
-                  "light": "color.option.neutral.warm.grey.100"
+                  "dark": "color.option.warm-grey.100",
+                  "light": "color.option.warm-grey.100"
                 },
                 "web": {
-                  "dark": "color.option.neutral.warm.grey.100",
-                  "light": "color.option.neutral.warm.grey.100"
+                  "dark": "color.option.warm-grey.100",
+                  "light": "color.option.warm-grey.100"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#1c1c1c",
-                    "light": "#edeae3"
+                    "dark": "#f1f0ed",
+                    "light": "#f1f0ed"
                   },
                   "web": {
-                    "dark": "#2e2e2b",
-                    "light": "#edeae3"
+                    "dark": "#f1f0ed",
+                    "light": "#f1f0ed"
                   }
                 },
                 "governance": {
@@ -393,155 +1240,130 @@
         },
         "text": {
           "base": {
-            "$value": "{color.option.neutral.warm.grey.900}",
+            "$value": "{color.option.warm-grey.1200}",
             "$type": "color",
             "$extensions": {
               "cedar": {
-                "docs": {
-                  "summary": "Primary text color for body content and headings.",
-                  "design": "Anchors the text scale at maximum legibility. Darkest step in the warm-grey text ramp.",
-                  "usage": "Use for all default body copy, headings, and labels. Do not use for decorative text, disabled states, or secondary information — use text-subtle for those."
-                },
                 "ios": {
-                  "dark": "color.option.neutral.warm.grey.900",
-                  "light": "color.option.neutral.warm.grey.900"
+                  "dark": "color.option.warm-grey.1200",
+                  "light": "color.option.warm-grey.1200"
                 },
                 "web": {
-                  "dark": "color.option.neutral.warm.grey.900",
-                  "light": "color.option.neutral.warm.grey.900"
+                  "dark": "color.option.warm-grey.1200",
+                  "light": "color.option.warm-grey.1200"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#edeae3",
-                    "light": "#1c1c1c"
+                    "dark": "#141210",
+                    "light": "#141210"
                   },
                   "web": {
-                    "dark": "#edeae3",
-                    "light": "#2e2e2b"
+                    "dark": "#141210",
+                    "light": "#141210"
                   }
                 }
               }
             }
           },
           "subtle": {
-            "$value": "{color.option.neutral.warm.grey.600}",
+            "$value": "{color.option.warm-grey.1000}",
             "$type": "color",
             "$extensions": {
               "cedar": {
-                "docs": {
-                  "summary": "Secondary text color for supporting and supplementary content.",
-                  "design": "Mid-point in the text scale. Reduced contrast signals secondary importance while remaining accessible.",
-                  "usage": "Use for captions, helper text, metadata, and secondary labels. Do not use for primary body copy or anything requiring full legibility — use text-base for those."
-                },
                 "ios": {
-                  "dark": "color.option.neutral.warm.grey.600",
-                  "light": "color.option.neutral.warm.grey.600"
+                  "dark": "color.option.warm-grey.1000",
+                  "light": "color.option.warm-grey.1000"
                 },
                 "web": {
-                  "dark": "color.option.neutral.warm.grey.600",
-                  "light": "color.option.neutral.warm.grey.600"
+                  "dark": "color.option.warm-grey.1000",
+                  "light": "color.option.warm-grey.1000"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#b2ab9f",
-                    "light": "#736e65"
+                    "dark": "#36322b",
+                    "light": "#36322b"
                   },
                   "web": {
-                    "dark": "#b2ab9f",
-                    "light": "#736e65"
+                    "dark": "#36322b",
+                    "light": "#36322b"
                   }
                 }
               }
             }
           },
           "link": {
-            "$value": "{color.option.brand.blue.600}",
+            "$value": "{color.option.alpine-lake-blue.1000}",
             "$type": "color",
             "$extensions": {
               "cedar": {
-                "docs": {
-                  "summary": "Text color for interactive links and inline navigation.",
-                  "design": "Draws from the blue brand scale to signal interactivity. Paired with text-link-hover to form the link interaction ramp.",
-                  "usage": "Use for hyperlinks, inline anchors, and any text that navigates or triggers an action. Do not use for non-interactive text — use text-base or text-subtle instead."
-                },
                 "ios": {
-                  "dark": "color.option.brand.blue.600",
-                  "light": "color.option.brand.blue.600"
+                  "dark": "color.option.alpine-lake-blue.1000",
+                  "light": "color.option.alpine-lake-blue.1000"
                 },
                 "web": {
-                  "dark": "color.option.brand.blue.600",
-                  "light": "color.option.brand.blue.600"
+                  "dark": "color.option.alpine-lake-blue.1000",
+                  "light": "color.option.alpine-lake-blue.1000"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#0a84ff",
-                    "light": "#0040dd"
+                    "dark": "#22467f",
+                    "light": "#22467f"
                   },
                   "web": {
-                    "dark": "#406eb5",
-                    "light": "#0b2d60"
+                    "dark": "#22467f",
+                    "light": "#22467f"
                   }
                 }
               }
             }
           },
           "link-hover": {
-            "$value": "{color.option.brand.blue.400}",
+            "$value": "{color.option.alpine-lake-blue.900}",
             "$type": "color",
             "$extensions": {
               "cedar": {
-                "docs": {
-                  "summary": "Text color for links in their hovered state.",
-                  "design": "Lighter step in the blue brand scale, creating a visible but controlled shift from text-link on hover.",
-                  "usage": "Use only as the hover state for text-link. Do not use for default link text or any non-interactive element."
-                },
                 "ios": {
-                  "dark": "color.option.brand.blue.400",
-                  "light": "color.option.brand.blue.400"
+                  "dark": "color.option.alpine-lake-blue.900",
+                  "light": "color.option.alpine-lake-blue.900"
                 },
                 "web": {
-                  "dark": "color.option.brand.blue.400",
-                  "light": "color.option.brand.blue.400"
+                  "dark": "color.option.alpine-lake-blue.900",
+                  "light": "color.option.alpine-lake-blue.900"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#0040dd",
-                    "light": "#0a84ff"
+                    "dark": "#305ca1",
+                    "light": "#305ca1"
                   },
                   "web": {
-                    "dark": "#0b2d60",
-                    "light": "#406eb5"
+                    "dark": "#305ca1",
+                    "light": "#305ca1"
                   }
                 }
               }
             }
           },
           "sale": {
-            "$value": "{color.option.brand.red.400}",
+            "$value": "{color.option.sale-red.1000}",
             "$type": "color",
             "$extensions": {
               "cedar": {
-                "docs": {
-                  "summary": "Text color for sale prices and promotional messaging.",
-                  "design": "Draws from the red brand scale. Reserved solely for commerce pricing contexts to preserve its signal strength.",
-                  "usage": "Use exclusively for sale price labels and discount indicators. Do not use for error states, alerts, or general emphasis — those have dedicated tokens."
-                },
                 "ios": {
-                  "dark": "color.option.brand.red.400",
-                  "light": "color.option.brand.red.400"
+                  "dark": "color.option.sale-red.1000",
+                  "light": "color.option.sale-red.1000"
                 },
                 "web": {
-                  "dark": "color.option.brand.red.400",
-                  "light": "color.option.brand.red.400"
+                  "dark": "color.option.sale-red.1000",
+                  "light": "color.option.sale-red.1000"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#cc2424",
-                    "light": "#ea6743"
+                    "dark": "#8c0000",
+                    "light": "#8c0000"
                   },
                   "web": {
-                    "dark": "#610a0a",
-                    "light": "#c7370f"
+                    "dark": "#8c0000",
+                    "light": "#8c0000"
                   }
                 }
               }
@@ -550,62 +1372,52 @@
         },
         "border": {
           "base": {
-            "$value": "{color.option.neutral.warm.grey.300}",
+            "$value": "{color.option.warm-grey.300}",
             "$type": "color",
             "$extensions": {
               "cedar": {
-                "docs": {
-                  "summary": "Default border color for containers, inputs, and dividers.",
-                  "design": "Mid-light step in the warm-grey scale, providing enough contrast to define structure without competing with content.",
-                  "usage": "Use for input field borders, card outlines, and structural dividers. Do not use for decorative separators or low-emphasis boundaries — use border-subtle for those."
-                },
                 "ios": {
-                  "dark": "color.option.neutral.warm.grey.300",
-                  "light": "color.option.neutral.warm.grey.300"
+                  "dark": "color.option.warm-grey.300",
+                  "light": "color.option.warm-grey.300"
                 },
                 "web": {
-                  "dark": "color.option.neutral.warm.grey.300",
-                  "light": "color.option.neutral.warm.grey.300"
+                  "dark": "color.option.warm-grey.300",
+                  "light": "color.option.warm-grey.300"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#736e65",
-                    "light": "#b2ab9f"
+                    "dark": "#d6d2cc",
+                    "light": "#d6d2cc"
                   },
                   "web": {
-                    "dark": "#736e65",
-                    "light": "#b2ab9f"
+                    "dark": "#d6d2cc",
+                    "light": "#d6d2cc"
                   }
                 }
               }
             }
           },
-          "subtle": {
-            "$value": "{color.option.neutral.warm.grey.100}",
+          "raised": {
+            "$value": "{color.option.warm-grey.500}",
             "$type": "color",
             "$extensions": {
               "cedar": {
-                "docs": {
-                  "summary": "Low-emphasis border for decorative separators and understated boundaries.",
-                  "design": "Lightest step in the border scale. Provides just enough separation to guide the eye without drawing attention.",
-                  "usage": "Use for dividers between list items, section rules, and subtle layout separators. Do not use where a border needs to define a structure or interactive boundary — use border-base for those."
-                },
                 "ios": {
-                  "dark": "color.option.neutral.warm.grey.100",
-                  "light": "color.option.neutral.warm.grey.100"
+                  "dark": "color.option.warm-grey.500",
+                  "light": "color.option.warm-grey.500"
                 },
                 "web": {
-                  "dark": "color.option.neutral.warm.grey.100",
-                  "light": "color.option.neutral.warm.grey.100"
+                  "dark": "color.option.warm-grey.500",
+                  "light": "color.option.warm-grey.500"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#1c1c1c",
-                    "light": "#edeae3"
+                    "dark": "#afaaa1",
+                    "light": "#afaaa1"
                   },
                   "web": {
-                    "dark": "#2e2e2b",
-                    "light": "#edeae3"
+                    "dark": "#afaaa1",
+                    "light": "#afaaa1"
                   }
                 }
               }
@@ -624,62 +1436,52 @@
       "sale": {
         "surface": {
           "base": {
-            "$value": "{color.option.brand.red.400}",
+            "$value": "{color.option.sale-red.1000}",
             "$type": "color",
             "$extensions": {
               "cedar": {
-                "docs": {
-                  "summary": "Default page and container background.",
-                  "design": "First step in the surface elevation scale. Anchors the layering system — raised surfaces sit above this token, not below.",
-                  "usage": "Use as the background for the primary content area, cards, modals, and any surface that sits at the base elevation. Do not use for text or interactive elements."
-                },
                 "ios": {
-                  "dark": "color.option.brand.red.400",
-                  "light": "color.option.brand.red.400"
+                  "dark": "color.option.sale-red.1000",
+                  "light": "color.option.sale-red.1000"
                 },
                 "web": {
-                  "dark": "color.option.brand.red.400",
-                  "light": "color.option.brand.red.400"
+                  "dark": "color.option.sale-red.1000",
+                  "light": "color.option.sale-red.1000"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#cc2424",
-                    "light": "#ea6743"
+                    "dark": "#8c0000",
+                    "light": "#8c0000"
                   },
                   "web": {
-                    "dark": "#610a0a",
-                    "light": "#c7370f"
+                    "dark": "#8c0000",
+                    "light": "#8c0000"
                   }
                 }
               }
             }
           },
           "raised": {
-            "$value": "{color.option.neutral.warm.grey.600}",
+            "$value": "{color.option.sale-red.1100}",
             "$type": "color",
             "$extensions": {
               "cedar": {
-                "docs": {
-                  "summary": "Elevated surface background, one step above the base layer.",
-                  "design": "Second step in the surface elevation scale. Creates visual separation from surface-base through a subtle warm-grey tint.",
-                  "usage": "Use for cards, panels, and drawers that sit above the base page surface. Do not use for the root page background or inline content areas."
-                },
                 "ios": {
-                  "dark": "color.option.neutral.warm.grey.600",
-                  "light": "color.option.neutral.warm.grey.600"
+                  "dark": "color.option.sale-red.1100",
+                  "light": "color.option.sale-red.1100"
                 },
                 "web": {
-                  "dark": "color.option.neutral.warm.grey.600",
-                  "light": "color.option.neutral.warm.grey.600"
+                  "dark": "color.option.sale-red.1100",
+                  "light": "color.option.sale-red.1100"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#b2ab9f",
-                    "light": "#736e65"
+                    "dark": "#680000",
+                    "light": "#680000"
                   },
                   "web": {
-                    "dark": "#b2ab9f",
-                    "light": "#736e65"
+                    "dark": "#680000",
+                    "light": "#680000"
                   }
                 }
               }
@@ -688,155 +1490,130 @@
         },
         "text": {
           "base": {
-            "$value": "{color.option.brand.yellow.600}",
+            "$value": "{color.option.warm-grey.100}",
             "$type": "color",
             "$extensions": {
               "cedar": {
-                "docs": {
-                  "summary": "Primary text color for body content and headings.",
-                  "design": "Anchors the text scale at maximum legibility. Darkest step in the warm-grey text ramp.",
-                  "usage": "Use for all default body copy, headings, and labels. Do not use for decorative text, disabled states, or secondary information — use text-subtle for those."
-                },
                 "ios": {
-                  "dark": "color.option.brand.yellow.600",
-                  "light": "color.option.brand.yellow.600"
+                  "dark": "color.option.warm-grey.100",
+                  "light": "color.option.warm-grey.100"
                 },
                 "web": {
-                  "dark": "color.option.brand.yellow.600",
-                  "light": "color.option.brand.yellow.600"
+                  "dark": "color.option.warm-grey.100",
+                  "light": "color.option.warm-grey.100"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#ffbf59",
-                    "light": "#ffe7b3"
+                    "dark": "#f1f0ed",
+                    "light": "#f1f0ed"
                   },
                   "web": {
-                    "dark": "#ffbf59",
-                    "light": "#ffe7b3"
+                    "dark": "#f1f0ed",
+                    "light": "#f1f0ed"
                   }
                 }
               }
             }
           },
           "subtle": {
-            "$value": "{color.option.brand.yellow.400}",
+            "$value": "{color.option.sale-red.200}",
             "$type": "color",
             "$extensions": {
               "cedar": {
-                "docs": {
-                  "summary": "Secondary text color for supporting and supplementary content.",
-                  "design": "Mid-point in the text scale. Reduced contrast signals secondary importance while remaining accessible.",
-                  "usage": "Use for captions, helper text, metadata, and secondary labels. Do not use for primary body copy or anything requiring full legibility — use text-base for those."
-                },
                 "ios": {
-                  "dark": "color.option.brand.yellow.400",
-                  "light": "color.option.brand.yellow.400"
+                  "dark": "color.option.sale-red.200",
+                  "light": "color.option.sale-red.200"
                 },
                 "web": {
-                  "dark": "color.option.brand.yellow.400",
-                  "light": "color.option.brand.yellow.400"
+                  "dark": "color.option.sale-red.200",
+                  "light": "color.option.sale-red.200"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#ffe7b3",
-                    "light": "#ffbf59"
+                    "dark": "#ffe3da",
+                    "light": "#ffe3da"
                   },
                   "web": {
-                    "dark": "#ffe7b3",
-                    "light": "#ffbf59"
+                    "dark": "#ffe3da",
+                    "light": "#ffe3da"
                   }
                 }
               }
             }
           },
           "link": {
-            "$value": "{color.option.neutral.white}",
+            "$value": "{color.option.alpine-lake-blue.600}",
             "$type": "color",
             "$extensions": {
               "cedar": {
-                "docs": {
-                  "summary": "Text color for interactive links and inline navigation.",
-                  "design": "Draws from the blue brand scale to signal interactivity. Paired with text-link-hover to form the link interaction ramp.",
-                  "usage": "Use for hyperlinks, inline anchors, and any text that navigates or triggers an action. Do not use for non-interactive text — use text-base or text-subtle instead."
-                },
                 "ios": {
-                  "dark": "color.option.neutral.white",
-                  "light": "color.option.neutral.white"
+                  "dark": "color.option.alpine-lake-blue.600",
+                  "light": "color.option.alpine-lake-blue.600"
                 },
                 "web": {
-                  "dark": "color.option.neutral.white",
-                  "light": "color.option.neutral.white"
+                  "dark": "color.option.alpine-lake-blue.600",
+                  "light": "color.option.alpine-lake-blue.600"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#ffffff",
-                    "light": "#ffffff"
+                    "dark": "#7ba0d9",
+                    "light": "#7ba0d9"
                   },
                   "web": {
-                    "dark": "#ffffff",
-                    "light": "#ffffff"
+                    "dark": "#7ba0d9",
+                    "light": "#7ba0d9"
                   }
                 }
               }
             }
           },
           "link-hover": {
-            "$value": "{color.option.neutral.warm.grey.300}",
+            "$value": "{color.option.alpine-lake-blue.500}",
             "$type": "color",
             "$extensions": {
               "cedar": {
-                "docs": {
-                  "summary": "Text color for links in their hovered state.",
-                  "design": "Lighter step in the blue brand scale, creating a visible but controlled shift from text-link on hover.",
-                  "usage": "Use only as the hover state for text-link. Do not use for default link text or any non-interactive element."
-                },
                 "ios": {
-                  "dark": "color.option.neutral.warm.grey.300",
-                  "light": "color.option.neutral.warm.grey.300"
+                  "dark": "color.option.alpine-lake-blue.500",
+                  "light": "color.option.alpine-lake-blue.500"
                 },
                 "web": {
-                  "dark": "color.option.neutral.warm.grey.300",
-                  "light": "color.option.neutral.warm.grey.300"
+                  "dark": "color.option.alpine-lake-blue.500",
+                  "light": "color.option.alpine-lake-blue.500"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#736e65",
-                    "light": "#b2ab9f"
+                    "dark": "#91b3e6",
+                    "light": "#91b3e6"
                   },
                   "web": {
-                    "dark": "#736e65",
-                    "light": "#b2ab9f"
+                    "dark": "#91b3e6",
+                    "light": "#91b3e6"
                   }
                 }
               }
             }
           },
           "sale": {
-            "$value": "{color.option.brand.green.400}",
+            "$value": "{color.option.sale-red.100}",
             "$type": "color",
             "$extensions": {
               "cedar": {
-                "docs": {
-                  "summary": "Text color for sale prices and promotional messaging.",
-                  "design": "Draws from the red brand scale. Reserved solely for commerce pricing contexts to preserve its signal strength.",
-                  "usage": "Use exclusively for sale price labels and discount indicators. Do not use for error states, alerts, or general emphasis — those have dedicated tokens."
-                },
                 "ios": {
-                  "dark": "color.option.brand.green.400",
-                  "light": "color.option.brand.green.400"
+                  "dark": "color.option.sale-red.100",
+                  "light": "color.option.sale-red.100"
                 },
                 "web": {
-                  "dark": "color.option.brand.green.400",
-                  "light": "color.option.brand.green.400"
+                  "dark": "color.option.sale-red.100",
+                  "light": "color.option.sale-red.100"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#1f513f",
-                    "light": "#3b8349"
+                    "dark": "#fff2ef",
+                    "light": "#fff2ef"
                   },
                   "web": {
-                    "dark": "#1f513f",
-                    "light": "#3b8349"
+                    "dark": "#fff2ef",
+                    "light": "#fff2ef"
                   }
                 }
               }
@@ -845,62 +1622,52 @@
         },
         "border": {
           "base": {
-            "$value": "{color.option.neutral.warm.grey.100}",
+            "$value": "{color.option.sale-red.1100}",
             "$type": "color",
             "$extensions": {
               "cedar": {
-                "docs": {
-                  "summary": "Default border color for containers, inputs, and dividers.",
-                  "design": "Mid-light step in the warm-grey scale, providing enough contrast to define structure without competing with content.",
-                  "usage": "Use for input field borders, card outlines, and structural dividers. Do not use for decorative separators or low-emphasis boundaries — use border-subtle for those."
-                },
                 "ios": {
-                  "dark": "color.option.neutral.warm.grey.100",
-                  "light": "color.option.neutral.warm.grey.100"
+                  "dark": "color.option.sale-red.1100",
+                  "light": "color.option.sale-red.1100"
                 },
                 "web": {
-                  "dark": "color.option.neutral.warm.grey.100",
-                  "light": "color.option.neutral.warm.grey.100"
+                  "dark": "color.option.sale-red.1100",
+                  "light": "color.option.sale-red.1100"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#1c1c1c",
-                    "light": "#edeae3"
+                    "dark": "#680000",
+                    "light": "#680000"
                   },
                   "web": {
-                    "dark": "#2e2e2b",
-                    "light": "#edeae3"
+                    "dark": "#680000",
+                    "light": "#680000"
                   }
                 }
               }
             }
           },
-          "subtle": {
-            "$value": "{color.option.neutral.warm.grey.900}",
+          "raised": {
+            "$value": "{color.option.sale-red.1200}",
             "$type": "color",
             "$extensions": {
               "cedar": {
-                "docs": {
-                  "summary": "Low-emphasis border for decorative separators and understated boundaries.",
-                  "design": "Lightest step in the border scale. Provides just enough separation to guide the eye without drawing attention.",
-                  "usage": "Use for dividers between list items, section rules, and subtle layout separators. Do not use where a border needs to define a structure or interactive boundary — use border-base for those."
-                },
                 "ios": {
-                  "dark": "color.option.neutral.warm.grey.900",
-                  "light": "color.option.neutral.warm.grey.900"
+                  "dark": "color.option.sale-red.1200",
+                  "light": "color.option.sale-red.1200"
                 },
                 "web": {
-                  "dark": "color.option.neutral.warm.grey.900",
-                  "light": "color.option.neutral.warm.grey.900"
+                  "dark": "color.option.sale-red.1200",
+                  "light": "color.option.sale-red.1200"
                 },
                 "resolved": {
                   "ios": {
-                    "dark": "#edeae3",
-                    "light": "#1c1c1c"
+                    "dark": "#3c0200",
+                    "light": "#3c0200"
                   },
                   "web": {
-                    "dark": "#edeae3",
-                    "light": "#2e2e2b"
+                    "dark": "#3c0200",
+                    "light": "#3c0200"
                   }
                 }
               }
@@ -915,6 +1682,206 @@
               "cssAttribute": "data-palette"
             }
           }
+        }
+      }
+    }
+  },
+  "text": {
+    "family": {
+      "graphik": {
+        "$type": "string",
+        "$value": "Graphik",
+        "$extensions": {
+          "cedar": {
+            "fallback": " sans-serif"
+          }
+        }
+      },
+      "stuart": {
+        "$type": "string",
+        "$value": "Stuart",
+        "$extensions": {
+          "cedar": {
+            "fallback": "Georgia"
+          }
+        }
+      }
+    },
+    "letter-spacing": {
+      "tightest": {
+        "$type": "number",
+        "$value": -1.0240000486373901,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "tighter": {
+        "$type": "number",
+        "$value": -0.5120000243186951,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "tight": {
+        "$type": "number",
+        "$value": -0.25600001215934753,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "compact": {
+        "$type": "number",
+        "$value": -0.12800000607967377,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "none": {
+        "$type": "number",
+        "$value": 0,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "loose": {
+        "$type": "number",
+        "$value": 0.12800000607967377,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "loosest": {
+        "$type": "number",
+        "$value": 0.5120000243186951,
+        "$extensions": {
+          "cedar": {}
+        }
+      }
+    },
+    "line-height": {
+      "0": {
+        "$type": "number",
+        "$value": 16,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "1": {
+        "$type": "number",
+        "$value": 18,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "2": {
+        "$type": "number",
+        "$value": 20,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "3": {
+        "$type": "number",
+        "$value": 22,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "4": {
+        "$type": "number",
+        "$value": 24,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "5": {
+        "$type": "number",
+        "$value": 26,
+        "$extensions": {
+          "cedar": {}
+        }
+      }
+    },
+    "size": {
+      "100": {
+        "$type": "number",
+        "$value": 12,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "200": {
+        "$type": "number",
+        "$value": 14,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "300": {
+        "$type": "number",
+        "$value": 16,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "400": {
+        "$type": "number",
+        "$value": 18,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "500": {
+        "$type": "number",
+        "$value": 20,
+        "$extensions": {
+          "cedar": {}
+        }
+      }
+    },
+    "style": {
+      "normal": {
+        "$type": "string",
+        "$value": "normal",
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "italic": {
+        "$type": "string",
+        "$value": "italic",
+        "$extensions": {
+          "cedar": {}
+        }
+      }
+    },
+    "weight": {
+      "normal": {
+        "$type": "number",
+        "$value": 400,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "medium": {
+        "$type": "number",
+        "$value": 500,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "semibold": {
+        "$type": "number",
+        "$value": 600,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "bold": {
+        "$type": "number",
+        "$value": 700,
+        "$extensions": {
+          "cedar": {}
         }
       }
     }
