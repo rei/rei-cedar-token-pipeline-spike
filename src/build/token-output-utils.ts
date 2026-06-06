@@ -105,6 +105,65 @@ const MODULE_DEFINITIONS: ModuleDefinition[] = [
     // token path: spacing.static.sm → return ["sm"]
     return token.path.slice(2);
   }),
+
+  // Typography categories
+  createModuleDefinition("cdr-text-family", (token) => {
+    if (token.path[0] !== "text" || token.path[1] !== "family" || token.path.length < 3) {
+      return [];
+    }
+    // token path: text.family.graphik → return ["graphik"]
+    return token.path.slice(2);
+  }),
+
+  createModuleDefinition("cdr-text-letter-spacing", (token) => {
+    if (
+      token.path[0] !== "text" ||
+      token.path[1] !== "letter" ||
+      token.path[2] !== "spacing" ||
+      token.path.length < 4
+    ) {
+      return [];
+    }
+    // token path: text.letter.spacing.tightest → return ["tightest"]
+    return token.path.slice(2);
+  }),
+
+  createModuleDefinition("cdr-text-line-height", (token) => {
+    if (
+      token.path[0] !== "text" ||
+      token.path[1] !== "line" ||
+      token.path[2] !== "height" ||
+      token.path.length < 4
+    ) {
+      return [];
+    }
+    // token path: text.line.height.0 → return ["0"]
+    return token.path.slice(2);
+  }),
+
+  createModuleDefinition("cdr-text-size", (token) => {
+    if (token.path[0] !== "text" || token.path[1] !== "size" || token.path.length < 3) {
+      return [];
+    }
+    // token path: text.size.100 → return ["100"]
+    return token.path.slice(2);
+  }),
+
+  createModuleDefinition("cdr-text-style", (token) => {
+    if (token.path[0] !== "text" || token.path[1] !== "style" || token.path.length < 3) {
+      return [];
+    }
+    // token path: text.style.normal → return ["normal"]
+    return token.path.slice(2);
+  }),
+
+  createModuleDefinition("cdr-text-weight", (token) => {
+    if (token.path[0] !== "text" || token.path[1] !== "weight" || token.path.length < 3) {
+      return [];
+    }
+    // token path: text.weight.normal → return ["normal"]
+    return token.path.slice(2);
+  }),
 ];
 
 function collectLeafPaths(tokens: DesignTokens): string[][] {

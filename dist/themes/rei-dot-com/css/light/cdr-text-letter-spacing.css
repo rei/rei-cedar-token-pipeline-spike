@@ -1,0 +1,9 @@
+:root {
+  --cdr-text-letter-spacing-tightest: -1.0240000486373901;
+  --cdr-text-letter-spacing-tighter: -0.5120000243186951;
+  --cdr-text-letter-spacing-tight: -0.25600001215934753;
+  --cdr-text-letter-spacing-compact: -0.12800000607967377;
+  --cdr-text-letter-spacing-none: 0;
+  --cdr-text-letter-spacing-loose: 0.12800000607967377;
+  --cdr-text-letter-spacing-loosest: 0.5120000243186951;
+}

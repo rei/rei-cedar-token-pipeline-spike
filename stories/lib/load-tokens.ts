@@ -56,6 +56,21 @@ export interface PrimitiveColorToken {
   docs?: TokenDocs;
 }
 
+export interface TypographyToken {
+  name: string;
+  category:
+    | "family"
+    | "size"
+    | "line-height"
+    | "letter-spacing"
+    | "style"
+    | "weight";
+  value: string | number;
+  type: "string" | "number";
+  description?: string;
+  fallback?: string;
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -67,10 +82,8 @@ function isRecord(value: unknown): value is Record<string, unknown> {
  */
 export async function loadColorTokens(
   platform: Platform = "web",
-  mode: Mode = "light",
-): Promise<
-  Map<string, LoadedColorToken>
-> {
+  mode: Mode = "light"
+): Promise<Map<string, LoadedColorToken>> {
   const base = window.location.pathname.replace(/\/[^/]*$/, "/");
   const res = await fetch(`${base}canonical/tokens.json`);
 
@@ -84,7 +97,9 @@ export async function loadColorTokens(
   const colorSection = tree["color"] as Record<string, unknown> | undefined;
   if (!colorSection) return result;
 
-  const modesSection = colorSection["modes"] as Record<string, unknown> | undefined;
+  const modesSection = colorSection["modes"] as
+    | Record<string, unknown>
+    | undefined;
   if (modesSection) {
     // Multi-mode: color.modes.<mode>.<category>.<token>
     for (const [modeName, modeTokens] of Object.entries(modesSection)) {
@@ -95,7 +110,12 @@ export async function loadColorTokens(
         for (const [key, value] of Object.entries(group)) {
           if (isLeaf(value)) {
             const leaf = value as TokenLeaf;
-            const sourceHex = resolveColorValue(leaf, colorSection, platform, mode);
+            const sourceHex = resolveColorValue(
+              leaf,
+              colorSection,
+              platform,
+              mode
+            );
             result.set(`color.modes.${modeName}.${category}.${key}`, {
               value: formatColorForPlatform(sourceHex, platform),
               sourceHex,
@@ -114,7 +134,12 @@ export async function loadColorTokens(
       for (const [key, value] of Object.entries(group)) {
         if (isLeaf(value)) {
           const leaf = value as TokenLeaf;
-          const sourceHex = resolveColorValue(leaf, colorSection, platform, mode);
+          const sourceHex = resolveColorValue(
+            leaf,
+            colorSection,
+            platform,
+            mode
+          );
           result.set(`color.${category}.${key}`, {
             value: formatColorForPlatform(sourceHex, platform),
             sourceHex,
@@ -165,7 +190,7 @@ export async function loadPrimitiveColors(): Promise<
 
 function flattenOptionPrimitives(
   optionSection: Record<string, unknown>,
-  appearance: "light" | "dark",
+  appearance: "light" | "dark"
 ): PrimitiveColorToken[] {
   const out: PrimitiveColorToken[] = [];
 
@@ -243,14 +268,20 @@ export async function loadSpacingTokens(): Promise<SpacingToken[]> {
     for (const [key, val] of Object.entries(scale)) {
       if (isLeaf(val) && typeof val.$value === "string" && val.$value.startsWith("clamp(")) {
         scaleMap.set(key, val.$value as string);
-        result.push({ path: `spacing.scale.${key}`, value: val.$value as string, kind: "fluid" });
+        result.push({
+          path: `spacing.scale.${key}`,
+          value: val.$value as string,
+          kind: "fluid",
+        });
       }
     }
   }
 
   // Resolve alias groups: component and layout
   for (const groupName of ["component", "layout"] as const) {
-    const group = spacingSection[groupName] as Record<string, unknown> | undefined;
+    const group = spacingSection[groupName] as
+      | Record<string, unknown>
+      | undefined;
     if (!group) continue;
     for (const [key, val] of Object.entries(group)) {
       if (!isLeaf(val)) continue;
@@ -351,14 +382,17 @@ function resolveColorValue(
   leaf: TokenLeaf,
   colorSection: Record<string, unknown>,
   platform: Platform,
-  mode: Mode,
+  mode: Mode
 ): string {
   const resolved = leaf.$extensions?.cedar?.resolved?.[platform]?.[mode];
   if (typeof resolved === "string") return resolved;
   return resolveAlias(leaf.$value, colorSection, platform, mode) ?? leaf.$value;
 }
 
-function resolveOptionWebHex(node: TokenLeaf, appearance: "light" | "dark"): string {
+function resolveOptionWebHex(
+  node: TokenLeaf,
+  appearance: "light" | "dark"
+): string {
   const dark = node.$extensions?.cedar?.appearances?.dark;
   return appearance === "dark" && typeof dark === "string" ? dark : node.$value;
 }
@@ -368,7 +402,7 @@ function resolveAlias(
   colorSection: Record<string, unknown>,
   platform: Platform,
   mode: Mode,
-  seen = new Set<string>(),
+  seen = new Set<string>()
 ): string | null {
   // Extract the token path from {color.neutral-palette.blue.600} or {neutral-palette.blue.600}
   const match = alias.match(/^{(?:color\.)?(.+)}$/);
@@ -386,7 +420,13 @@ function resolveAlias(
   }
 
   if (!isLeaf(node)) return null;
-  return resolveLeafValue(node as TokenLeaf, colorSection, platform, mode, seen);
+  return resolveLeafValue(
+    node as TokenLeaf,
+    colorSection,
+    platform,
+    mode,
+    seen
+  );
 }
 
 function resolveLeafValue(
@@ -394,11 +434,15 @@ function resolveLeafValue(
   colorSection: Record<string, unknown>,
   platform: Platform,
   mode: Mode,
-  seen: Set<string>,
+  seen: Set<string>
 ): string | null {
   const rawValue = leaf.$value;
 
-  if (typeof rawValue === "string" && rawValue.startsWith("{") && rawValue.endsWith("}")) {
+  if (
+    typeof rawValue === "string" &&
+    rawValue.startsWith("{") &&
+    rawValue.endsWith("}")
+  ) {
     if (seen.has(rawValue)) return null;
     seen.add(rawValue);
     return resolveAlias(rawValue, colorSection, platform, mode, seen);
@@ -435,4 +479,49 @@ function buildRef(alias: string): string {
     .join(" ");
 
   return `${collectionLabel} → ${subpath}`;
+}
+
+/**
+ * Fetches and flattens the normalized current design variable payload for typography.
+ */
+export async function loadTypographyTokens(): Promise<TypographyToken[]> {
+  const base = window.location.pathname.replace(/\/[^/]*$/, "/");
+  const response = await fetch(`${base}canonical/tokens.json`);
+  if (!response.ok)
+    throw new Error(
+      `Failed to fetch canonical/tokens.json: ${response.status}`
+    );
+
+  const root = (await response.json()) as Record<string, any>;
+  const textGroup = root.text ?? {};
+  const tokens: TypographyToken[] = [];
+
+  // Helper tracker to process leaves safely
+  function processSubGroup(group: any, category: TypographyToken["category"]) {
+    if (!group || typeof group !== "object") return;
+    for (const [tokenKey, tokenLeaf] of Object.entries(group)) {
+      const leaf = tokenLeaf as any;
+      if (leaf && typeof leaf === "object" && "$value" in leaf) {
+        tokens.push({
+          name: `cdr-text-${category}-${tokenKey}`,
+          category,
+          value: leaf.$value,
+          type: leaf.$type || "string",
+          description: leaf.$description,
+          fallback: leaf.$extensions?.cedar?.fallback,
+        });
+      }
+    }
+  }
+
+  // Walk all text sub-groups dynamically — handles both flat keys (family, size)
+  // and hyphenated keys (letter-spacing, line-height) stored in canonical.
+  const categoryKeys: TypographyToken["category"][] = [
+    "family", "size", "style", "weight", "line-height", "letter-spacing",
+  ];
+  for (const cat of categoryKeys) {
+    processSubGroup(textGroup[cat], cat);
+  }
+
+  return tokens;
 }

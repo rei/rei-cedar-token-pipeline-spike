@@ -104,13 +104,15 @@ function partitionFiles(parsed: ParsedFile[]) {
     spacingPlatformFiles: parsed.filter(
       ({ file }) => file === "alias.spacing.web.json" || file === "alias.spacing.ios.json",
     ),
+    typographyFiles: parsed.filter(({ file }) => file.startsWith("options.text.")),
     otherFiles: parsed.filter(
       ({ file }) =>
         !SPACING_BP_RE.test(file) &&
         extractPrimitiveMode(file) === null &&
         file !== "alias.spacing.web.json" &&
         file !== "alias.spacing.ios.json" &&
-        file !== "spacing.static.default.json",
+        file !== "spacing.static.default.json" &&
+        !file.startsWith("options.text."),
     ),
   };
 }
@@ -289,6 +291,61 @@ function processMetadata(canonical: Record<string, unknown>) {
   }
 }
 
+function processTypography(canonical: Record<string, unknown>, typographyFiles: ParsedFile[]) {
+  if (typographyFiles.length === 0) return;
+
+  const typographyTree: Record<string, any> = { text: {} };
+
+  for (const { file, data } of typographyFiles) {
+    // Extract the property and variant name, discarding optional file-version suffixes (e.g., _2)
+    const match = file.match(/options\.text\.([\w-]+)\.(\w+?)(?:_\d+)?\.json$/);
+    if (!match) continue;
+
+    const [_, subProperty, variantName] = match;
+    // Hyphenated names like "letter-spacing" map to nested paths: text.letter.spacing
+    const pathSegments = subProperty.split("-");
+    let propertyData: any = (data as Record<string, any>).text;
+    for (const seg of pathSegments) {
+      propertyData = propertyData?.[seg];
+    }
+    if (!propertyData) continue;
+
+    if (!typographyTree.text[subProperty]) {
+      typographyTree.text[subProperty] = {};
+    }
+
+    for (const [tokenKey, tokenLeaf] of Object.entries(propertyData)) {
+      const leaf = tokenLeaf as Record<string, any>;
+
+      if (!typographyTree.text[subProperty][tokenKey]) {
+        typographyTree.text[subProperty][tokenKey] = {
+          $type: leaf.$type || "string",
+          $value: "",
+          $extensions: { cedar: {} },
+        };
+      }
+
+      const targetToken = typographyTree.text[subProperty][tokenKey];
+
+      if (variantName === "default") {
+        targetToken.$value = leaf.$value;
+        if (leaf.$type) targetToken.$type = leaf.$type;
+      } else {
+        targetToken.$extensions.cedar[variantName] = leaf.$value;
+      }
+
+      if (leaf.$description && !targetToken.$description) {
+        targetToken.$description = leaf.$description;
+      }
+    }
+  }
+
+  deepMerge(canonical, typographyTree);
+  console.log(
+    `  ✓ Normalized ${typographyFiles.length} typography file(s) directly into canonical text tree`,
+  );
+}
+
 function writeCanonical(canonical: Record<string, unknown>, fileCount: number) {
   fs.mkdirSync(path.dirname(outFile), { recursive: true });
   fs.writeFileSync(outFile, JSON.stringify(canonical, null, 2), "utf-8");
@@ -306,8 +363,14 @@ function writeCanonical(canonical: Record<string, unknown>, fileCount: number) {
 try {
   const tokenMapping = loadSchema();
   const parsed = readTokenFiles();
-  const { spacingBpFiles, spacingStaticFiles, spacingPlatformFiles, optionColorFiles, otherFiles } =
-    partitionFiles(parsed);
+  const {
+    spacingBpFiles,
+    spacingStaticFiles,
+    spacingPlatformFiles,
+    optionColorFiles,
+    typographyFiles,
+    otherFiles,
+  } = partitionFiles(parsed);
 
   const validationIssues = validateFigmaInputs({
     parsedFiles: parsed,
@@ -323,6 +386,7 @@ try {
   const platformLookup = processOptionColors(canonical, optionColorFiles, tokenMapping);
   processAliasFiles(canonical, otherFiles, tokenMapping);
   mergeColorVariants(canonical, platformLookup);
+  processTypography(canonical, typographyFiles);
   processMetadata(canonical);
   writeCanonical(canonical, parsed.length);
 } catch (error) {
