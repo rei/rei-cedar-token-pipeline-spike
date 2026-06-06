@@ -57,13 +57,11 @@ export interface InputsContract {
          */
         colorFamily?: string;
         /**
-         * Explicit map of Figma token path → canonical sub-path, or "auto" for identity pass-through (Figma path === canonical sub-path).
+         * Explicit map of Figma token path → canonical sub-path. Example: { 'warm-grey.100': 'warm.grey.100' }
          */
-        tokens:
-          | {
-              [k: string]: string;
-            }
-          | "auto";
+        tokens: {
+          [k: string]: string;
+        };
         [k: string]: unknown;
       };
     };
