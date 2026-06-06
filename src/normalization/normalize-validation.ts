@@ -36,7 +36,7 @@ export function validateFigmaInputs(params: {
 
   for (const collection of mappedCollections) {
     const entry = tokenMapping.collections[collection];
-    if (!entry || Object.keys(entry.tokens ?? {}).length === 0) {
+    if (!entry || (entry.tokens !== "auto" && Object.keys(entry.tokens ?? {}).length === 0)) {
       issues.push({
         level: "error",
         code: "EMPTY_COLLECTION_MAPPING",

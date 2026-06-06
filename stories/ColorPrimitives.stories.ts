@@ -508,134 +508,80 @@ function tabbedPaletteGroup(
   `;
 }
 
+// ─── Family filter helper ─────────────────────────────────────────────────────
+
+function familyFilter(family: string): (c: Swatch) => boolean {
+  return (c) => c.name.startsWith(`${family}.`);
+}
+
+// Per-family stories require static exports (Storybook limitation).
+// When color families change in the schema, update this list to match.
+// The AllPrimitives story discovers families dynamically and needs no update.
+const COLOR_FAMILIES = [
+  { key: "warm-grey", label: "Warm Grey", tabId: "wg" },
+  { key: "alpine-lake-blue", label: "Alpine Lake Blue", tabId: "alb" },
+  { key: "info-blue", label: "Info Blue", tabId: "ib" },
+  { key: "blue-spruce-green", label: "Blue Spruce Green", tabId: "bsg" },
+  { key: "success-green", label: "Success Green", tabId: "sg" },
+  { key: "warning-yellow", label: "Warning Yellow", tabId: "wy" },
+  { key: "error-red", label: "Error Red", tabId: "er" },
+  { key: "sale-red", label: "Sale Red", tabId: "sr" },
+] as const;
+
 // ─── Stories ─────────────────────────────────────────────────────────────────
 
-export const NeutralWarmGrey: Story = {
-  name: "Neutral / Warm Grey",
-  render: asyncStory(async () => {
-    const modesMap = await loadPrimitiveColors();
-    const filterFn = (c: Swatch) => c.name.includes("warm-grey");
+function familyStory(family: typeof COLOR_FAMILIES[number]): Story {
+  return {
+    name: family.label,
+    render: asyncStory(async () => {
+      const modesMap = await loadPrimitiveColors();
+      const filterFn = familyFilter(family.key);
 
-    // Count tokens in first available mode
-    const firstMode = [...modesMap.values()][0] ?? [];
-    const count = firstMode.filter(filterFn).length;
+      const firstMode = [...modesMap.values()][0] ?? [];
+      const count = firstMode.filter(filterFn).length;
 
-    return `
-      <style>${BASE_STYLES}</style>
-      <div class="page">
-        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Neutral / Warm Grey")}
-        ${sectionHeader("Neutral Colors", "Warm Grey", count)}
-        ${tabbedPaletteGroup("wg-tabs", "Warm Grey Scale", modesMap, filterFn)}
-      </div>
-    `;
-    return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
-  }),
-};
+      const page = `
+        <style>${BASE_STYLES}</style>
+        <div class="page">
+          ${breadcrumb("Cedar Tokens", "Color", "Primitives", family.label)}
+          ${sectionHeader("Option Colors", family.label, count)}
+          ${tabbedPaletteGroup(`${family.tabId}-tabs`, `${family.label} Scale`, modesMap, filterFn)}
+        </div>
+      `;
+      return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
+    }),
+  };
+}
 
-export const NeutralBaseNeutrals: Story = {
-  name: "Neutral / Base Neutrals",
-  render: asyncStory(async () => {
-    const modesMap = await loadPrimitiveColors();
-    const filterFn = (c: Swatch) => c.name.includes("base-neutrals");
+export const WarmGrey: Story = familyStory(COLOR_FAMILIES[0]);
+export const AlpineLakeBlue: Story = familyStory(COLOR_FAMILIES[1]);
+export const InfoBlue: Story = familyStory(COLOR_FAMILIES[2]);
+export const BlueSpruceGreen: Story = familyStory(COLOR_FAMILIES[3]);
+export const SuccessGreen: Story = familyStory(COLOR_FAMILIES[4]);
+export const WarningYellow: Story = familyStory(COLOR_FAMILIES[5]);
+export const ErrorRed: Story = familyStory(COLOR_FAMILIES[6]);
+export const SaleRed: Story = familyStory(COLOR_FAMILIES[7]);
 
-    const firstMode = [...modesMap.values()][0] ?? [];
-    const count = firstMode.filter(filterFn).length;
-
-    return `
-      <style>${BASE_STYLES}</style>
-      <div class="page">
-        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Neutral / Base Neutrals")}
-        ${sectionHeader("Neutral Colors", "Base Neutrals", count)}
-        ${tabbedPaletteGroup("bn-tabs", "Base Neutrals", modesMap, filterFn)}
-      </div>
-    `;
-    return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
-  }),
-};
-
-export const BrandBlue: Story = {
-  name: "Brand / Alpine Lake Blue",
-  render: asyncStory(async () => {
-    const modesMap = await loadPrimitiveColors();
-    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("alpine-lake-blue");
-
-    const firstMode = [...modesMap.values()][0] ?? [];
-    const count = firstMode.filter(filterFn).length;
-
-    return `
-      <style>${BASE_STYLES}</style>
-      <div class="page">
-        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Alpine Lake Blue")}
-        ${sectionHeader("Brand Colors", "Alpine Lake Blue", count)}
-        ${tabbedPaletteGroup("blue-tabs", "Alpine Lake Blue Scale", modesMap, filterFn)}
-      </div>
-    `;
-    return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
-  }),
-};
-
-export const BrandRed: Story = {
-  name: "Brand / Error Red",
-  render: asyncStory(async () => {
-    const modesMap = await loadPrimitiveColors();
-    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("error-red");
-
-    const firstMode = [...modesMap.values()][0] ?? [];
-    const count = firstMode.filter(filterFn).length;
-
-    return `
-      <style>${BASE_STYLES}</style>
-      <div class="page">
-        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Error Red")}
-        ${sectionHeader("Brand Colors", "Error Red", count)}
-        ${tabbedPaletteGroup("red-tabs", "Error Red Scale", modesMap, filterFn)}
-      </div>
-    `;
-    return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
-  }),
-};
-
-export const BrandGreen: Story = {
-  name: "Brand / Success Green",
-  render: asyncStory(async () => {
-    const modesMap = await loadPrimitiveColors();
-    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("success-green");
-
-    const firstMode = [...modesMap.values()][0] ?? [];
-    const count = firstMode.filter(filterFn).length;
-
-    return `
-      <style>${BASE_STYLES}</style>
-      <div class="page">
-        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Success Green")}
-        ${sectionHeader("Brand Colors", "Success Green", count)}
-        ${tabbedPaletteGroup("green-tabs", "Success Green Scale", modesMap, filterFn)}
-      </div>
-    `;
-    return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
-  }),
-};
-
-export const BrandYellow: Story = {
-  name: "Brand / Warning Yellow",
-  render: asyncStory(async () => {
-    const modesMap = await loadPrimitiveColors();
-    const filterFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("warning-yellow");
-
-    const firstMode = [...modesMap.values()][0] ?? [];
-    const count = firstMode.filter(filterFn).length;
-
-    return `
-      <style>${BASE_STYLES}</style>
-      <div class="page">
-        ${breadcrumb("Cedar Tokens", "Color", "Primitives", "Brand / Warning Yellow")}
-        ${sectionHeader("Brand Colors", "Warning Yellow", count)}
-        ${tabbedPaletteGroup("yellow-tabs", "Warning Yellow Scale", modesMap, filterFn)}
-      </div>
-    `;
-    return renderStoryWithPanel(page, buildStoryPanel(modesMap, filterFn));
-  }),
-};
+/**
+ * Discover color families dynamically from loaded token data.
+ * Token names follow the pattern "<family>.<step>", so the family
+ * is everything before the last dot. Returns unique families in
+ * insertion order, with a display label derived from the key.
+ */
+function discoverFamilies(tokens: Swatch[]): { key: string; label: string }[] {
+  const seen = new Map<string, string>();
+  for (const t of tokens) {
+    const dot = t.name.lastIndexOf(".");
+    if (dot < 0) continue;
+    const key = t.name.slice(0, dot);
+    if (!seen.has(key)) {
+      // "alpine-lake-blue" → "Alpine Lake Blue"
+      const label = key.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+      seen.set(key, label);
+    }
+  }
+  return [...seen.entries()].map(([key, label]) => ({ key, label }));
+}
 
 export const AllPrimitives: Story = {
   name: "All Primitives",
@@ -643,58 +589,49 @@ export const AllPrimitives: Story = {
     const modesMap = await loadPrimitiveColors();
     const modes = [...modesMap.keys()].sort();
 
-    // Count total tokens (using first mode as representative)
     const firstMode = [...modesMap.values()][0] ?? [];
     const total = firstMode.length;
 
-    const warmGreyFn = (c: Swatch) => c.name.includes("warm-grey");
-    const baseNeutralsFn = (c: Swatch) => c.name.includes("base-neutrals");
-    const blueFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("alpine-lake-blue");
-    const redFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("error-red");
-    const greenFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("success-green");
-    const yellowFn = (c: Swatch) => c.name.includes("brand-palette") && c.name.includes("warning-yellow");
+    // Discover families from loaded data — no hardcoded list needed
+    const families = discoverFamilies(firstMode);
+    const familyFilters = families.map((f) => ({
+      ...f,
+      filter: familyFilter(f.key),
+    }));
 
-    const neutralCount = firstMode.filter(warmGreyFn).length + firstMode.filter(baseNeutralsFn).length;
-    const brandCount = firstMode.filter(blueFn).length + firstMode.filter(redFn).length +
-      firstMode.filter(greenFn).length + firstMode.filter(yellowFn).length;
-
-    // Tabs for the full all-primitives view: each mode shows a grid of all palettes
     const allTabs = modes.map((m, i) =>
       `<button class="mode-tab${i === 0 ? " active" : ""}" data-mode="${m}">${m}</button>`
     ).join("");
 
     const allPanels = modes.map((m, i) => {
       const swatches = modesMap.get(m) ?? [];
-      const warmGrey = swatches.filter(warmGreyFn);
-      const baseNeutrals = swatches.filter(baseNeutralsFn);
-      const blue = swatches.filter(blueFn);
-      const red = swatches.filter(redFn);
-      const green = swatches.filter(greenFn);
-      const yellow = swatches.filter(yellowFn);
+
+      const familyBlocks = familyFilters.map((f) => {
+        const filtered = swatches.filter(f.filter);
+        return filtered.length > 0 ? `<div>${groupBlock(f.label, filtered)}</div>` : "";
+      }).join("");
 
       return `
         <div class="mode-panel${i === 0 ? " active" : ""}" data-mode="${m}">
           <div class="token-section" style="position:relative;">
             <div class="deco-index">01</div>
-            ${sectionHeader("Neutral Colors", "Warm Grey + Base Neutrals", warmGrey.length + baseNeutrals.length)}
+            ${sectionHeader("Option Colors", "All Families", total)}
             <div class="primitives-grid" style="margin-top:1.5rem;">
-              <div>${groupBlock("Warm Grey", warmGrey)}</div>
-              <div>${groupBlock("Base Neutrals", baseNeutrals)}</div>
-            </div>
-          </div>
-          <div class="token-section" style="position:relative;">
-            <div class="deco-index">02</div>
-            ${sectionHeader("Brand Colors", "Alpine Lake Blue · Error Red · Success Green · Warning Yellow", blue.length + red.length + green.length + yellow.length)}
-            <div class="primitives-grid" style="margin-top:1.5rem;">
-              <div>${groupBlock("Alpine Lake Blue", blue)}</div>
-              <div>${groupBlock("Error Red", red)}</div>
-              <div>${groupBlock("Success Green", green)}</div>
-              <div>${groupBlock("Warning Yellow", yellow)}</div>
+              ${familyBlocks}
             </div>
           </div>
         </div>
       `;
     }).join("");
+
+    const comparisonSections = familyFilters.map((f) => `
+      <div class="group-header" style="margin-top:2rem;">
+        <span class="group-pip"></span>
+        <span class="group-name">${f.label}</span>
+        <span class="group-rule"></span>
+      </div>
+      ${platformCompareTable(modesMap, f.filter)}
+    `).join("");
 
     const page = `
       <style>${BASE_STYLES}</style>
@@ -721,47 +658,8 @@ export const AllPrimitives: Story = {
 
         <div style="height:1.5px;background:var(--rule-heavy);margin:3.5rem 0 2.5rem;"></div>
 
-        ${sectionHeader("Web Appearances", "Neutral Comparison", neutralCount)}
-        <div class="group-header" style="margin-top:1.5rem;">
-          <span class="group-pip"></span>
-          <span class="group-name">Warm Grey</span>
-          <span class="group-rule"></span>
-        </div>
-        ${platformCompareTable(modesMap, warmGreyFn)}
-        <div class="group-header" style="margin-top:2rem;">
-          <span class="group-pip"></span>
-          <span class="group-name">Base Neutrals</span>
-          <span class="group-rule"></span>
-        </div>
-        ${platformCompareTable(modesMap, baseNeutralsFn)}
-
-        <div style="height:1.5px;background:var(--rule-heavy);margin:3.5rem 0 2.5rem;"></div>
-
-        ${sectionHeader("Web Appearances", "Brand Comparison", brandCount)}
-        <div class="group-header" style="margin-top:1.5rem;">
-          <span class="group-pip"></span>
-          <span class="group-name">Alpine Lake Blue</span>
-          <span class="group-rule"></span>
-        </div>
-        ${platformCompareTable(modesMap, blueFn)}
-        <div class="group-header" style="margin-top:2rem;">
-          <span class="group-pip"></span>
-          <span class="group-name">Error Red</span>
-          <span class="group-rule"></span>
-        </div>
-        ${platformCompareTable(modesMap, redFn)}
-        <div class="group-header" style="margin-top:2rem;">
-          <span class="group-pip"></span>
-          <span class="group-name">Success Green</span>
-          <span class="group-rule"></span>
-        </div>
-        ${platformCompareTable(modesMap, greenFn)}
-        <div class="group-header" style="margin-top:2rem;">
-          <span class="group-pip"></span>
-          <span class="group-name">Warning Yellow</span>
-          <span class="group-rule"></span>
-        </div>
-        ${platformCompareTable(modesMap, yellowFn)}
+        ${sectionHeader("Web Appearances", "Cross-Mode Comparison", total)}
+        ${comparisonSections}
       </div>
     `;
     return renderStoryWithPanel(page, buildPanelForFirstToken(modesMap));

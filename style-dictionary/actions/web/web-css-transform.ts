@@ -23,17 +23,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { Action } from 'style-dictionary/types';
 import { hexToCustomOklch } from './oklch-formulas';
-
-type CedarOptionNode = {
-  value?: unknown;
-  $value?: unknown;
-  $extensions?: {
-    cedar?: {
-      appearances?: Record<string, string>;
-      platformOverrides?: Record<string, Record<string, string>>;
-    };
-  };
-};
+import { type CedarOptionNode, getTokenAtPath, resolveOptionHex } from '../../utils/option-resolver';
 
 function formatOklch(hex: string, colorFamily?: string): string {
   return hexToCustomOklch(hex, colorFamily);
@@ -41,13 +31,6 @@ function formatOklch(hex: string, colorFamily?: string): string {
 
 function renderColorDeclarations(cssVar: string, hex: string, colorFamily?: string): string {
   return [`  ${cssVar}: ${hex};`, `  ${cssVar}: ${formatOklch(hex, colorFamily)};`].join('\n');
-}
-
-/** Navigate dictionary.tokens by dot-separated path */
-function getTokenAtPath(tokens: any, dotPath: string): any {
-  return dotPath
-    .split(".")
-    .reduce((node: any, seg: string) => node?.[seg], tokens);
 }
 
 /** Convert dot-path token name to CSS custom property */
@@ -68,19 +51,6 @@ function toCssValue(value: string): string {
   });
 }
 
-function resolveOptionHex(
-  optionNode: CedarOptionNode | undefined,
-  appearance: "light" | "dark"
-) {
-  const cedar = optionNode?.$extensions?.cedar;
-  const platformOverride = cedar?.platformOverrides?.web?.[appearance];
-  if (platformOverride) return platformOverride;
-  if (appearance === "dark" && cedar?.appearances?.dark)
-    return cedar.appearances.dark;
-
-  const val = optionNode?.value ?? optionNode?.$value;
-  return typeof val === "string" ? val : undefined;
-}
 
 export const webCssAction: Action = {
   name: "web-css",
@@ -188,8 +158,8 @@ export const webCssAction: Action = {
         );
       }
 
-      const lightHex = resolveOptionHex(lightOptionNode, "light");
-      const darkHex = resolveOptionHex(darkOptionNode, "dark");
+      const lightHex = resolveOptionHex(lightOptionNode, "web", "light");
+      const darkHex = resolveOptionHex(darkOptionNode, "web", "dark");
 
       if (!lightHex || !darkHex) {
         throw new Error(

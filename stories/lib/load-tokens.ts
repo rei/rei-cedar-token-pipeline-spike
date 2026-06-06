@@ -10,8 +10,8 @@
  *   color.modes.<mode>.surface.base
  *   color.modes.<mode>.text.link
  *   color.modes.<mode>.border.subtle
- *   color.neutral-palette.warm-grey.100
- *   color.brand-palette.blue.600
+ *   color.option.alpine-lake-blue.100
+ *   color.option.warm-grey.900
  *
  * Spacing token structure:
  *   spacing.scale.-50   → { $value: "clamp(...)", $type: "dimension" }
@@ -72,10 +72,10 @@ export async function loadColorTokens(
   Map<string, LoadedColorToken>
 > {
   const base = window.location.pathname.replace(/\/[^/]*$/, "/");
-  const res = await fetch(`${base}normalized/current.json`);
+  const res = await fetch(`${base}canonical/tokens.json`);
 
   if (!res.ok) {
-    throw new Error(`Failed to fetch current.json: ${res.status}`);
+    throw new Error(`Failed to fetch canonical/tokens.json: ${res.status}`);
   }
 
   const tree = (await res.json()) as Record<string, unknown>;
@@ -89,12 +89,9 @@ export async function loadColorTokens(
     // Multi-mode: color.modes.<mode>.<category>.<token>
     for (const [modeName, modeTokens] of Object.entries(modesSection)) {
       if (typeof modeTokens !== "object" || modeTokens === null) continue;
-      const semanticCategories = ["text", "surface", "border"];
-      for (const category of semanticCategories) {
-        const group = (modeTokens as Record<string, unknown>)[category] as
-          | Record<string, unknown>
-          | undefined;
-        if (!group) continue;
+      for (const [category, group] of Object.entries(modeTokens as Record<string, unknown>)) {
+        if (category.startsWith("$")) continue;
+        if (typeof group !== "object" || group === null) continue;
         for (const [key, value] of Object.entries(group)) {
           if (isLeaf(value)) {
             const leaf = value as TokenLeaf;
@@ -110,11 +107,10 @@ export async function loadColorTokens(
       }
     }
   } else {
-    // Fallback: legacy flat structure (color.text.*, color.surface.*, color.border.*)
-    const semanticCategories = ["text", "surface", "border"];
-    for (const category of semanticCategories) {
-      const group = colorSection[category] as Record<string, unknown> | undefined;
-      if (!group) continue;
+    // Fallback: flat structure (color.<category>.<token>)
+    for (const [category, group] of Object.entries(colorSection)) {
+      if (category.startsWith("$") || category === "option" || category === "modes") continue;
+      if (typeof group !== "object" || group === null) continue;
       for (const [key, value] of Object.entries(group)) {
         if (isLeaf(value)) {
           const leaf = value as TokenLeaf;
@@ -137,19 +133,19 @@ export async function loadColorTokens(
  * Fetch the current token snapshot and extract primitive color tokens for web appearances.
  * Returns a map of mode name → array of { name, value } objects.
  *
- * Mode names match the options.color.<mode>.json filenames:
- *   "web-light", "web-dark"
- *
- * Falls back to reading from flat color.<palette> if no per-mode structure is present.
+ * Reads directly from color.option.<family>.<step> — each family is a
+ * top-level key (e.g. alpine-lake-blue, warm-grey, info-blue).
+ * Appearance values are derived from $extensions.cedar.appearances.dark
+ * (dark mode) or $value (light mode / fallback).
  */
 export async function loadPrimitiveColors(): Promise<
   Map<string, PrimitiveColorToken[]>
 > {
   const base = window.location.pathname.replace(/\/[^/]*$/, "/");
-  const res = await fetch(`${base}normalized/current.json`);
+  const res = await fetch(`${base}canonical/tokens.json`);
 
   if (!res.ok) {
-    throw new Error(`Failed to fetch current.json: ${res.status}`);
+    throw new Error(`Failed to fetch canonical/tokens.json: ${res.status}`);
   }
 
   const tree = (await res.json()) as Record<string, unknown>;
@@ -158,40 +154,13 @@ export async function loadPrimitiveColors(): Promise<
   const colorSection = tree["color"] as Record<string, unknown> | undefined;
   if (!colorSection) return result;
 
-  const primitivesSection = colorSection["primitives"] as Record<string, unknown> | undefined;
+  const optionSection = colorSection["option"] as Record<string, unknown> | undefined;
+  if (!optionSection) return result;
 
-  if (primitivesSection) {
-    // Multi-mode: color.primitives.<mode>.<palette>.<shade>
-    for (const [mode, modeData] of Object.entries(primitivesSection)) {
-      if (!isWebMode(mode)) continue;
-      if (typeof modeData !== "object" || modeData === null) continue;
-      const tokens: PrimitiveColorToken[] = [];
-      for (const palette of ["neutral-palette", "brand-palette"]) {
-        const group = (modeData as Record<string, unknown>)[palette] as Record<string, unknown> | undefined;
-        if (group) flattenTokens(group, palette, tokens);
-      }
-      result.set(mode, tokens);
-    }
-  } else if (isRecord(colorSection["option"])) {
-    // Canonical fallback: derive web appearances from color.option.*.
-    const optionSection = colorSection["option"] as Record<string, unknown>;
-    result.set("web-light", flattenOptionPrimitives(optionSection, "light"));
-    result.set("web-dark", flattenOptionPrimitives(optionSection, "dark"));
-  } else {
-    // Fallback: flat color.<palette> (legacy structure)
-    const tokens: PrimitiveColorToken[] = [];
-    for (const palette of ["neutral-palette", "brand-palette"]) {
-      const group = colorSection[palette] as Record<string, unknown> | undefined;
-      if (group) flattenTokens(group, palette, tokens);
-    }
-    result.set("default", tokens);
-  }
+  result.set("web-light", flattenOptionPrimitives(optionSection, "light"));
+  result.set("web-dark", flattenOptionPrimitives(optionSection, "dark"));
 
   return result;
-}
-
-function isWebMode(mode: string): boolean {
-  return mode === "light" || mode === "dark" || mode.startsWith("web-");
 }
 
 function flattenOptionPrimitives(
@@ -200,83 +169,18 @@ function flattenOptionPrimitives(
 ): PrimitiveColorToken[] {
   const out: PrimitiveColorToken[] = [];
 
-  const neutralNode = optionSection["neutral"];
-  if (isRecord(neutralNode)) {
-    const neutral = neutralNode;
-    // warm grey scale -> neutral-palette.warm-grey.*
-    const warmNode = neutral["warm"];
-    const warmGreyNode = isRecord(warmNode) ? warmNode["grey"] : undefined;
-    if (isRecord(warmGreyNode)) {
-      const warmGrey = warmGreyNode;
-      for (const [shade, node] of Object.entries(warmGrey)) {
-        if (isLeaf(node)) {
-          const sourceHex = resolveOptionWebHex(node, appearance);
-          out.push({
-            name: `neutral-palette.warm-grey.${shade}`,
-            value: toWebOklch(sourceHex),
-            sourceHex,
-            docs: node.$extensions?.cedar?.docs,
-          });
-        }
-      }
-    }
+  for (const [familyName, familyNode] of Object.entries(optionSection)) {
+    if (!isRecord(familyNode)) continue;
 
-    // black/white/overlay -> neutral-palette.base-neutrals.*
-    for (const key of ["black", "white"] as const) {
-      const node = neutral[key];
-      if (isLeaf(node)) {
-        const sourceHex = resolveOptionWebHex(node, appearance);
-        out.push({
-          name: `neutral-palette.base-neutrals.${key}`,
-          value: toWebOklch(sourceHex),
-          sourceHex,
-          docs: node.$extensions?.cedar?.docs,
-        });
-      }
-    }
-
-    const overlayNode = neutral["overlay"];
-    if (isRecord(overlayNode)) {
-      const overlay = overlayNode;
-      for (const [key, node] of Object.entries(overlay)) {
-        if (isLeaf(node)) {
-          const sourceHex = resolveOptionWebHex(node, appearance);
-          out.push({
-            name: `neutral-palette.base-neutrals.overlay-${key}`,
-            value: toWebOklch(sourceHex),
-            sourceHex,
-            docs: node.$extensions?.cedar?.docs,
-          });
-        }
-      }
-    }
-  }
-
-  // brand scale -> brand-palette.<color>.*
-  const brandNode = optionSection["brand"];
-  if (isRecord(brandNode)) {
-    const brand = brandNode;
-    // Map generic color names to design spec color family names
-    const colorNameMap: Record<string, string> = {
-      blue: "alpine-lake-blue",
-      yellow: "warning-yellow",
-      red: "error-red",
-      green: "success-green",
-    };
-    for (const [colorName, scaleNode] of Object.entries(brand)) {
-      if (!isRecord(scaleNode)) continue;
-      const displayName = colorNameMap[colorName] || colorName;
-      for (const [shade, leaf] of Object.entries(scaleNode)) {
-        if (isLeaf(leaf)) {
-          const sourceHex = resolveOptionWebHex(leaf, appearance);
-          out.push({
-            name: `brand-palette.${displayName}.${shade}`,
-            value: toWebOklch(sourceHex),
-            sourceHex,
-            docs: leaf.$extensions?.cedar?.docs,
-          });
-        }
-      }
+    for (const [step, stepNode] of Object.entries(familyNode)) {
+      if (!isLeaf(stepNode)) continue;
+      const sourceHex = resolveOptionWebHex(stepNode, appearance);
+      out.push({
+        name: `${familyName}.${step}`,
+        value: toWebOklch(sourceHex),
+        sourceHex,
+        docs: stepNode.$extensions?.cedar?.docs,
+      });
     }
   }
 
@@ -323,8 +227,8 @@ export interface SpacingToken {
  */
 export async function loadSpacingTokens(): Promise<SpacingToken[]> {
   const base = window.location.pathname.replace(/\/[^/]*$/, "/");
-  const res = await fetch(`${base}normalized/current.json`);
-  if (!res.ok) throw new Error(`Failed to fetch current.json: ${res.status}`);
+  const res = await fetch(`${base}canonical/tokens.json`);
+  if (!res.ok) throw new Error(`Failed to fetch canonical/tokens.json: ${res.status}`);
 
   const tree = (await res.json()) as Record<string, unknown>;
   const spacingSection = tree["spacing"] as Record<string, unknown> | undefined;
@@ -370,23 +274,71 @@ export async function loadSpacingTokens(): Promise<SpacingToken[]> {
   return result;
 }
 
-function flattenTokens(
+// ─── Static spacing loader ─────────────────────────────────────────────────
+
+export interface StaticSpacingToken {
+  /** Dot-separated token path, e.g. "spacing.static.quarter.x" */
+  path: string;
+  /** Display name, e.g. "quarter-x" */
+  name: string;
+  /** Numeric value (from $value) */
+  value: number;
+  /** Unit — always "pt" for iOS static tokens */
+  unit: "pt";
+  /** Per-platform values from $extensions.cedar */
+  platforms?: {
+    web?: { light: string; dark: string };
+    ios?: { light: string; dark: string };
+  };
+}
+
+/**
+ * Fetch the current token snapshot and extract static spacing tokens.
+ * These are fixed-value tokens for platforms that don't support fluid clamp().
+ * Walks spacing.static.* recursively, flattening nested keys with hyphens.
+ */
+export async function loadStaticSpacingTokens(): Promise<StaticSpacingToken[]> {
+  const base = window.location.pathname.replace(/\/[^/]*$/, "/");
+  const res = await fetch(`${base}canonical/tokens.json`);
+  if (!res.ok) throw new Error(`Failed to fetch canonical/tokens.json: ${res.status}`);
+
+  const tree = (await res.json()) as Record<string, unknown>;
+  const spacingSection = tree["spacing"] as Record<string, unknown> | undefined;
+  if (!spacingSection) return [];
+
+  const staticSection = spacingSection["static"] as Record<string, unknown> | undefined;
+  if (!staticSection) return [];
+
+  const result: StaticSpacingToken[] = [];
+  flattenStaticTokens(staticSection, "spacing.static", "", result);
+  return result;
+}
+
+function flattenStaticTokens(
   node: Record<string, unknown>,
-  prefix: string,
-  out: PrimitiveColorToken[],
+  pathPrefix: string,
+  namePrefix: string,
+  out: StaticSpacingToken[],
 ): void {
   for (const [key, value] of Object.entries(node)) {
-    const path = `${prefix}.${key}`;
+    const path = `${pathPrefix}.${key}`;
+    const name = namePrefix ? `${namePrefix}-${key}` : key;
+
     if (isLeaf(value)) {
       const leaf = value as TokenLeaf;
+      const cedar = leaf.$extensions?.cedar as Record<string, unknown> | undefined;
       out.push({
-        name: path,
-        value: toWebOklch(leaf.$value),
-        sourceHex: leaf.$value,
-        docs: leaf.$extensions?.cedar?.docs,
+        path,
+        name,
+        value: parseFloat(leaf.$value) || 0,
+        unit: "pt",
+        platforms: cedar ? {
+          web: cedar.web as { light: string; dark: string } | undefined,
+          ios: cedar.ios as { light: string; dark: string } | undefined,
+        } : undefined,
       });
     } else if (typeof value === "object" && value !== null) {
-      flattenTokens(value as Record<string, unknown>, path, out);
+      flattenStaticTokens(value as Record<string, unknown>, path, name, out);
     }
   }
 }

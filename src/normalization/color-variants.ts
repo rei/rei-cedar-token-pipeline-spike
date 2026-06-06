@@ -1,3 +1,12 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { dirname } from "node:path";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const schemaPath = path.resolve(__dirname, "../schema/token-schema.json");
+const schema = JSON.parse(fs.readFileSync(schemaPath, "utf-8"));
+
 type JsonObject = Record<string, unknown>;
 
 type CedarOptionNode = JsonObject & {
@@ -65,10 +74,7 @@ export function mergeColorVariants(
       inheritsFrom?: string;
       cssAttribute?: string;
     }
-  > = {
-    default: { scope: "root", isBaseline: true },
-    sale: { scope: "surface", inheritsFrom: "default", cssAttribute: "data-palette" },
-  };
+  > = schema.inputs?.palettes ?? {};
 
   function getNodeAt(path: string): CedarOptionNode | undefined {
     const segments = path.split(".");

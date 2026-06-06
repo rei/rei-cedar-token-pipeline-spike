@@ -29,6 +29,7 @@ import {
   applyTokenMapping,
   buildOptionTree,
   parseTokenDescription,
+  fixStaticReferencePaths,
 } from "./normalize-utils.js";
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
@@ -691,6 +692,45 @@ describe("applyTokenMapping", () => {
   });
 });
 
+// ─── applyTokenMapping (auto mode) ───────────────────────────────────────────
+
+describe("applyTokenMapping — auto mode", () => {
+  const autoEntry = {
+    canonicalPrefix: "color.option.warm-grey",
+    colorFamily: "warm-grey",
+    tokens: "auto" as const,
+  };
+
+  it("uses Figma token path as canonical sub-path (identity)", () => {
+    const data = {
+      "010": { $value: "#faf9f6", $type: "color" },
+      "100": { $value: "#f5f3ef", $type: "color" },
+      "900": { $value: "#2e2e2b", $type: "color" },
+    };
+    const results = applyTokenMapping("warm-grey", data, autoEntry, "web-light");
+    const paths = results.map((r) => r.canonicalPath);
+    expect(paths).toContain("color.option.warm-grey.010");
+    expect(paths).toContain("color.option.warm-grey.100");
+    expect(paths).toContain("color.option.warm-grey.900");
+  });
+
+  it("never throws for unknown paths (all Figma paths pass through)", () => {
+    const data = {
+      "9999": { $value: "#abcdef", $type: "color" },
+    };
+    const results = applyTokenMapping("warm-grey", data, autoEntry, "web-light");
+    expect(results[0].canonicalPath).toBe("color.option.warm-grey.9999");
+  });
+
+  it("preserves colorFamily from entry", () => {
+    const data = {
+      "100": { $value: "#f5f3ef", $type: "color" },
+    };
+    const results = applyTokenMapping("warm-grey", data, autoEntry, "web-light");
+    expect(results[0].token.colorFamily).toBe("warm-grey");
+  });
+});
+
 // ─── buildOptionTree ──────────────────────────────────────────────────────────
 
 describe("buildOptionTree", () => {
@@ -911,5 +951,34 @@ describe("clean + nestUnderSections + deepMerge integration", () => {
     >;
     expect(buttonSpacing.$value).toBe("{spacing.sm}");
     expect(buttonSpacing.$type).toBe("dimension");
+  });
+});
+
+// ─── fixStaticReferencePaths ────────────────────────────────────────────────
+
+describe("fixStaticReferencePaths", () => {
+  it("replaces trailing -x with .x", () => {
+    expect(fixStaticReferencePaths("{spacing.static.two-x}")).toBe("{spacing.static.two.x}");
+  });
+
+  it("replaces all hyphens in multi-segment names", () => {
+    expect(fixStaticReferencePaths("{spacing.static.one-and-a-half-x}")).toBe(
+      "{spacing.static.one.and.a.half.x}",
+    );
+  });
+
+  it("handles single-segment names with no hyphens", () => {
+    expect(fixStaticReferencePaths("{spacing.static.sm}")).toBe("{spacing.static.sm}");
+  });
+
+  it("passes through non-spacing references unchanged", () => {
+    expect(fixStaticReferencePaths("{color.option.warm-grey.100}")).toBe(
+      "{color.option.warm-grey.100}",
+    );
+  });
+
+  it("passes through non-string values", () => {
+    expect(fixStaticReferencePaths(42)).toBe(42);
+    expect(fixStaticReferencePaths(null)).toBe(null);
   });
 });

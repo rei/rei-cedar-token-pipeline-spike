@@ -15,11 +15,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
-import type { TokenMetadataManifest, TokenMetadata } from "../src/types/token-metadata.js";
+import type { TokenMetadataManifest, TokenMetadata } from "../types/token-metadata.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const canonicalFile = path.resolve(__dirname, "canonical/tokens.json");
-const metadataFile = path.resolve(__dirname, "metadata/tokens.json");
+const repoRoot = path.resolve(__dirname, "../..");
+const canonicalFile = path.resolve(repoRoot, "canonical/tokens.json");
+const metadataFile = path.resolve(repoRoot, "metadata/tokens.json");
 
 interface ValidationIssue {
   type: "unreviewed" | "orphaned" | "incomplete" | "deprecated-missing-migration";

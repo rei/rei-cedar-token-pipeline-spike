@@ -3,52 +3,12 @@ import path from 'node:path';
 import type { Action } from 'style-dictionary/types';
 import { converter, parse } from 'culori';
 import { iosColorsetFormatter } from '../../formats/ios/ios-colorset';
-
-type CedarOptionNode = {
-  value?: unknown;
-  $value?: unknown;
-  $extensions?: {
-    cedar?: {
-      appearances?: Record<string, string>;
-      platformOverrides?: Record<string, Record<string, string>>;
-    };
-  };
-};
-
-type CedarResolvedPlatform = {
-  light: string;
-  dark: string;
-};
+import { type CedarOptionNode, getTokenAtPath, resolveOptionHex } from '../../utils/option-resolver';
 
 type CedarPlatformRefs = {
   light: string;
   dark: string;
 };
-
-/**
- * Resolve an option token node to its final hex for a given platform
- * and appearance, applying platform overrides and appearance values.
- *
- * Resolution order:
- *   1. $extensions.cedar.platformOverrides.<platform>.<appearance>  (most specific)
- *   2. $extensions.cedar.appearances.<appearance>                    (appearance variant)
- *   3. $value                                                        (web-light fallback)
- */
-function resolveOptionHex(
-  optionNode: CedarOptionNode | undefined,
-  platform: "ios" | "web",
-  appearance: "light" | "dark"
-): string | undefined {
-  const cedar = optionNode?.$extensions?.cedar;
-  const platformOverride = cedar?.platformOverrides?.[platform]?.[appearance];
-  if (platformOverride) return platformOverride;
-  if (appearance === "dark" && cedar?.appearances?.dark)
-    return cedar.appearances.dark;
-  // Fall back to $value — SD may have already resolved this to the hex string
-  // (if the token passed through alias resolution) or it may still be a hex literal.
-  const val = optionNode?.value ?? optionNode?.$value;
-  return typeof val === "string" ? val : undefined;
-}
 
 const toP3 = converter('p3');
 
@@ -89,19 +49,6 @@ function hasLightDarkStrings(
     typeof (value as { light?: unknown }).light === "string" &&
     typeof (value as { dark?: unknown }).dark === "string"
   );
-}
-
-/**
- * Navigate dictionary.tokens by a dot-separated path.
- * SD v5 stores tokens as a nested object matching the source JSON structure.
- * Option tokens (color.option.*) are present in dictionary.tokens even though
- * they're filtered out of allTokens by the platform filter.
- */
-function getTokenAtPath(tokens: any, dotPath: string): any {
-  return dotPath.split(".").reduce<unknown>((node, seg) => {
-    if (!node || typeof node !== "object") return undefined;
-    return (node as Record<string, unknown>)[seg];
-  }, tokens);
 }
 
 function writeColorset(

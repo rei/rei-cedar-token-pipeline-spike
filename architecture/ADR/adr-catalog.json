@@ -108,7 +108,7 @@
       "number": "0004",
       "title": "Semantic Token Architecture",
       "status": "Planned",
-      "file": "adr-0004-semantic-token-architecture.md",
+      "file": "proposed/adr-0004-semantic-token-architecture.md",
       "description": "Defines the three-tier token architecture (Options → Alias → Component). Updated with spike findings: color.option.* path convention, platform override governance rules.",
       "topics": [
         "semantic-tokens",
@@ -173,7 +173,7 @@
       "number": "0006",
       "title": "State Layer System",
       "status": "Proposed",
-      "file": "adr-0006-state-layer-system.md",
+      "file": "proposed/adr-0006-state-layer-system.md",
       "description": "Defines interactive state tokens (hover, pressed, focus, disabled, selected, error) and the hybrid explicit/computed overlay approach.",
       "topics": [
         "interactive-states",
@@ -265,7 +265,7 @@
       "number": "0009",
       "title": "Accessibility Requirements",
       "status": "Proposed",
-      "file": "adr-0009-accessibility-requirements.md",
+      "file": "proposed/adr-0009-accessibility-requirements.md",
       "description": "Embeds WCAG 2.2 Level AA requirements into the token system: focus indicators, touch targets, color contrast, high contrast mode, motion preferences.",
       "topics": [
         "accessibility",
@@ -354,7 +354,7 @@
       "number": "0011",
       "title": "Harmonic Interval Validation",
       "status": "Proposed",
-      "file": "adr-0011-harmonic-interval-validation.md",
+      "file": "proposed/adr-0011-harmonic-interval-validation.md",
       "description": "Defines harmonic validation system with relationships section and harmonicInterval metadata for perceptual correctness checking.",
       "topics": [
         "harmonic-validation",

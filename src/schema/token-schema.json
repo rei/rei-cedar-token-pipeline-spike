@@ -44,148 +44,54 @@
         "warm-grey": {
           "canonicalPrefix": "color.option.warm-grey",
           "colorFamily": "warm-grey",
-          "tokens": {
-            "010": "010",
-            "100": "100",
-            "200": "200",
-            "300": "300",
-            "400": "400",
-            "500": "500",
-            "600": "600",
-            "700": "700",
-            "800": "800",
-            "900": "900",
-            "1000": "1000",
-            "1100": "1100",
-            "1200": "1200"
-          }
+          "tokens": "auto"
         },
         "alpine-lake-blue": {
           "canonicalPrefix": "color.option.alpine-lake-blue",
           "colorFamily": "alpine-lake-blue",
-          "tokens": {
-            "100": "100",
-            "200": "200",
-            "300": "300",
-            "400": "400",
-            "500": "500",
-            "600": "600",
-            "700": "700",
-            "800": "800",
-            "900": "900",
-            "1000": "1000",
-            "1100": "1100",
-            "1200": "1200"
-          }
+          "tokens": "auto"
         },
         "info-blue": {
           "canonicalPrefix": "color.option.info-blue",
           "colorFamily": "info-blue",
-          "tokens": {
-            "100": "100",
-            "200": "200",
-            "300": "300",
-            "400": "400",
-            "500": "500",
-            "600": "600",
-            "700": "700",
-            "800": "800",
-            "900": "900",
-            "1000": "1000",
-            "1100": "1100",
-            "1200": "1200"
-          }
+          "tokens": "auto"
         },
         "blue-spruce-green": {
           "canonicalPrefix": "color.option.blue-spruce-green",
           "colorFamily": "blue-spruce-green",
-          "tokens": {
-            "100": "100",
-            "200": "200",
-            "300": "300",
-            "400": "400",
-            "500": "500",
-            "600": "600",
-            "700": "700",
-            "800": "800",
-            "900": "900",
-            "1000": "1000",
-            "1100": "1100",
-            "1200": "1200"
-          }
+          "tokens": "auto"
         },
         "success-green": {
           "canonicalPrefix": "color.option.success-green",
           "colorFamily": "success-green",
-          "tokens": {
-            "100": "100",
-            "200": "200",
-            "300": "300",
-            "400": "400",
-            "500": "500",
-            "600": "600",
-            "700": "700",
-            "800": "800",
-            "900": "900",
-            "1000": "1000",
-            "1100": "1100",
-            "1200": "1200"
-          }
+          "tokens": "auto"
         },
         "warning-yellow": {
           "canonicalPrefix": "color.option.warning-yellow",
           "colorFamily": "warning-yellow",
-          "tokens": {
-            "100": "100",
-            "200": "200",
-            "300": "300",
-            "400": "400",
-            "500": "500",
-            "600": "600",
-            "700": "700",
-            "800": "800",
-            "900": "900",
-            "1000": "1000",
-            "1100": "1100",
-            "1200": "1200"
-          }
+          "tokens": "auto"
         },
         "error-red": {
           "canonicalPrefix": "color.option.error-red",
           "colorFamily": "error-red",
-          "tokens": {
-            "100": "100",
-            "200": "200",
-            "300": "300",
-            "400": "400",
-            "500": "500",
-            "600": "600",
-            "700": "700",
-            "800": "800",
-            "900": "900",
-            "1000": "1000",
-            "1100": "1100",
-            "1200": "1200"
-          }
+          "tokens": "auto"
         },
         "sale-red": {
           "canonicalPrefix": "color.option.sale-red",
           "colorFamily": "sale-red",
-          "tokens": {
-            "100": "100",
-            "200": "200",
-            "300": "300",
-            "400": "400",
-            "500": "500",
-            "600": "600",
-            "700": "700",
-            "800": "800",
-            "900": "900",
-            "1000": "1000",
-            "1100": "1100",
-            "1200": "1200"
-          }
+          "tokens": "auto"
         }
+      }
+    },
+    "palettes": {
+      "default": {
+        "scope": "root",
+        "isBaseline": true
+      },
+      "sale": {
+        "scope": "surface",
+        "inheritsFrom": "default",
+        "cssAttribute": "data-palette"
       }
     }
   },
@@ -212,11 +118,16 @@
                     "description": "Color family for OKLCH chroma curve override (e.g., 'warm-grey', 'alpine-lake-blue'). Used by pipeline to apply custom OKLCH formulas per culori-overrides.md."
                   },
                   "tokens": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "type": "string"
-                    },
-                    "description": "Explicit map of Figma token path → canonical sub-path. Example: { 'warm-grey.100': 'warm.grey.100' }"
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "additionalProperties": { "type": "string" }
+                      },
+                      {
+                        "const": "auto"
+                      }
+                    ],
+                    "description": "Explicit map of Figma token path → canonical sub-path, or \"auto\" for identity pass-through (Figma path === canonical sub-path)."
                   }
                 },
                 "required": ["canonicalPrefix", "tokens"]

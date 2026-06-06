@@ -19,6 +19,9 @@ const toOklch = converter('oklch');
  *   - Lmin: 0.20
  */
 
+export const LMAX = 0.98;
+export const LMIN = 0.20;
+
 export type ColorFamily = {
   hue: number;
   cmax: number;
@@ -27,8 +30,6 @@ export type ColorFamily = {
   clightMin: number;
   wdark: number;
   cdarkMin: number;
-  lmax: number;
-  lmin: number;
 };
 
 export const COLOR_FAMILIES: Record<string, ColorFamily> = {
@@ -40,8 +41,6 @@ export const COLOR_FAMILIES: Record<string, ColorFamily> = {
     clightMin: 0.025,
     wdark: 0.30,
     cdarkMin: 0.0625,
-    lmax: 0.98,
-    lmin: 0.20,
   },
   'info-blue': {
     hue: 200,
@@ -51,8 +50,6 @@ export const COLOR_FAMILIES: Record<string, ColorFamily> = {
     clightMin: 0.0075,
     wdark: 0.30,
     cdarkMin: 0.03,
-    lmax: 0.98,
-    lmin: 0.20,
   },
   'blue-spruce-green': {
     hue: 166,
@@ -62,8 +59,6 @@ export const COLOR_FAMILIES: Record<string, ColorFamily> = {
     clightMin: 0.01,
     wdark: 0.43,
     cdarkMin: 0.04,
-    lmax: 0.98,
-    lmin: 0.20,
   },
   'success-green': {
     hue: 146,
@@ -73,8 +68,6 @@ export const COLOR_FAMILIES: Record<string, ColorFamily> = {
     clightMin: 0.015,
     wdark: 0.30,
     cdarkMin: 0.005,
-    lmax: 0.98,
-    lmin: 0.20,
   },
   'warm-grey': {
     hue: 82,
@@ -84,8 +77,6 @@ export const COLOR_FAMILIES: Record<string, ColorFamily> = {
     clightMin: 0.0015,
     wdark: 0.335,
     cdarkMin: 0.005,
-    lmax: 0.98,
-    lmin: 0.20,
   },
   'warning-yellow': {
     hue: 73,
@@ -95,8 +86,6 @@ export const COLOR_FAMILIES: Record<string, ColorFamily> = {
     clightMin: 0.015,
     wdark: 0.25,
     cdarkMin: 0.05,
-    lmax: 0.98,
-    lmin: 0.20,
   },
   'error-red': {
     hue: 30,
@@ -106,8 +95,6 @@ export const COLOR_FAMILIES: Record<string, ColorFamily> = {
     clightMin: 0.015,
     wdark: 0.35,
     cdarkMin: 0.08,
-    lmax: 0.98,
-    lmin: 0.20,
   },
   'sale-red': {
     hue: 34,
@@ -117,8 +104,6 @@ export const COLOR_FAMILIES: Record<string, ColorFamily> = {
     clightMin: 0.015,
     wdark: 0.325,
     cdarkMin: 0.09,
-    lmax: 0.98,
-    lmin: 0.20,
   },
 };
 
@@ -127,7 +112,7 @@ export const COLOR_FAMILIES: Record<string, ColorFamily> = {
  */
 export function calculateChroma(l: number, family: ColorFamily): number {
   // Clamp lightness to valid range
-  const clampedL = Math.max(family.lmin, Math.min(family.lmax, l));
+  const clampedL = Math.max(LMIN, Math.min(LMAX, l));
 
   if (clampedL >= family.lo) {
     // Light side formula

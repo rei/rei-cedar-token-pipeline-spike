@@ -84,7 +84,8 @@ export function isLeaf(node: unknown): node is {
 export type TokenMappingEntry = {
   canonicalPrefix: string;
   colorFamily?: string;
-  tokens: Record<string, string>;
+  /** Explicit Figma→canonical sub-path map, or "auto" for identity pass-through. */
+  tokens: Record<string, string> | "auto";
 };
 
 export type TokenMapping = {
@@ -208,8 +209,9 @@ export function applyTokenMapping(
       const figmaPathStr = currentFigmaPath.join(".");
 
       if (isLeaf(value)) {
-        // Look up the canonical sub-path for this Figma token path
-        const canonicalSub = entry.tokens[figmaPathStr];
+        // Look up the canonical sub-path for this Figma token path.
+        // "auto" mode: identity pass-through (Figma path === canonical sub-path).
+        const canonicalSub = entry.tokens === "auto" ? figmaPathStr : entry.tokens[figmaPathStr];
         if (canonicalSub === undefined) {
           throw new Error(
             `[token-mapping] Unknown Figma token path "${collectionName}.${figmaPathStr}" ` +
@@ -427,7 +429,8 @@ export function clean(
           // This alias points into a mapped Figma collection.
           // Rewrite to the canonical color.option.* path.
           const figmaSubPath = inner.split(".").slice(1).join("."); // drop collection name
-          const canonicalSub = mappingEntry.tokens[figmaSubPath];
+          const canonicalSub =
+            mappingEntry.tokens === "auto" ? figmaSubPath : mappingEntry.tokens[figmaSubPath];
           if (canonicalSub !== undefined) {
             $value = `{${mappingEntry.canonicalPrefix}.${canonicalSub}}`;
           } else {
@@ -745,22 +748,16 @@ export function expandHyphenatedTokens(obj: Record<string, any>): TokenNode {
 }
 
 /**
- * Detects reference pointers like "{spacing.static.two-x}"
- * and rewrites them cleanly to "{spacing.static.two.x}"
+ * Rewrite hyphens inside `{spacing.static.*}` references to dots,
+ * matching the key expansion done by `expandHyphenatedTokens`.
+ *
+ * Example: "{spacing.static.one-and-a-half-x}" → "{spacing.static.one.and.a.half.x}"
  */
 export function fixStaticReferencePaths(value: unknown): any {
   if (typeof value !== "string") return value;
+  if (!value.startsWith("{spacing.static.") || !value.endsWith("}")) return value;
 
-  // Intercept references containing standard trailing hyphens
-  if (value.startsWith("{spacing.static.") && value.endsWith("-x}")) {
-    // Replaces the last hyphen with a dot: "{spacing.static.two-x}" -> "{spacing.static.two.x}"
-    return value.replace(/-x}$/, ".x}");
-  }
-
-  // Handle multi-hyphen edge-cases if you split all hyphens (e.g., "one-and-a-half-x")
-  if (value === "{spacing.static.one-and-a-half-x}") {
-    return "{spacing.static.one.and.a.half.x}";
-  }
-
-  return value;
+  const prefix = "{spacing.static.";
+  const inner = value.slice(prefix.length, -1); // strip prefix and trailing "}"
+  return `${prefix}${inner.replace(/-/g, ".")}}`;
 }

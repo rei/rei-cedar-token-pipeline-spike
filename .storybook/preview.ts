@@ -7,6 +7,11 @@ import {
   parsePlatformModeFromUrl,
   setPlatformModeInUrl,
 } from "../src/storybook/platform-mode-context.ts";
+import { loadDistCss } from "./load-dist-css.ts";
+
+// Load pipeline-built --cdr-* custom properties from dist CSS.
+// Light tokens go to :root; dark tokens scoped to [data-mode="dark"].
+loadDistCss();
 
 const defaultPlatformMode = parsePlatformModeFromUrl();
 

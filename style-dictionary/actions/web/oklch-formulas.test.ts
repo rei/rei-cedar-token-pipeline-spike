@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
-import { hexToCustomOklch, calculateChroma, COLOR_FAMILIES } from "./oklch-formulas";
+import { hexToCustomOklch, calculateChroma, COLOR_FAMILIES, LMAX, LMIN } from "./oklch-formulas";
 
 /**
  * Read colorFamily names from token-schema.json dynamically.
@@ -38,7 +38,7 @@ describe("oklch-formulas", () => {
 
     it("returns values between Cmin and Cmax for all families across L range", () => {
       for (const [name, family] of Object.entries(COLOR_FAMILIES)) {
-        for (let l = family.lmin; l <= family.lmax; l += 0.05) {
+        for (let l = LMIN; l <= LMAX; l += 0.05) {
           const c = calculateChroma(l, family);
           const cmin = l >= family.lo ? family.clightMin : family.cdarkMin;
           expect(c, `${name} at L=${l.toFixed(2)}`).toBeGreaterThanOrEqual(cmin - 1e-10);
@@ -129,7 +129,7 @@ describe("oklch-formulas", () => {
         expect(
           COLOR_FAMILIES[familyName],
           `Missing COLOR_FAMILIES entry for "${familyName}". ` +
-          `Add formula parameters (hue, cmax, lo, wlight, clightMin, wdark, cdarkMin, lmax, lmin) ` +
+          `Add formula parameters (hue, cmax, lo, wlight, clightMin, wdark, cdarkMin) ` +
           `to COLOR_FAMILIES in oklch-formulas.ts.`
         ).toBeDefined();
       });
@@ -140,8 +140,8 @@ describe("oklch-formulas", () => {
         expect(f.hue, `${name}.hue`).toBeGreaterThanOrEqual(0);
         expect(f.hue, `${name}.hue`).toBeLessThan(360);
         expect(f.cmax, `${name}.cmax`).toBeGreaterThan(0);
-        expect(f.lo, `${name}.lo`).toBeGreaterThan(f.lmin);
-        expect(f.lo, `${name}.lo`).toBeLessThan(f.lmax);
+        expect(f.lo, `${name}.lo`).toBeGreaterThan(LMIN);
+        expect(f.lo, `${name}.lo`).toBeLessThan(LMAX);
         expect(f.wlight, `${name}.wlight`).toBeGreaterThan(0);
         expect(f.wdark, `${name}.wdark`).toBeGreaterThan(0);
         expect(f.clightMin, `${name}.clightMin`).toBeGreaterThanOrEqual(0);

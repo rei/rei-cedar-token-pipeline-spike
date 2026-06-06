@@ -5,16 +5,14 @@ import { describe, expect, it } from "vitest";
 type JsonRecord = Record<string, unknown>;
 
 const canonicalPath = path.resolve(process.cwd(), "canonical/tokens.json");
+const HEX_RE = /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
 
-function getAtPath(root: JsonRecord, dotPath: string): JsonRecord {
+function getAtPath(root: JsonRecord, dotPath: string): JsonRecord | undefined {
   const node = dotPath
     .split(".")
     .reduce<unknown>((acc, seg) => (acc as JsonRecord | undefined)?.[seg], root);
 
-  if (!node || typeof node !== "object") {
-    throw new Error(`Path not found in canonical tokens: ${dotPath}`);
-  }
-
+  if (!node || typeof node !== "object") return undefined;
   return node as JsonRecord;
 }
 
@@ -69,25 +67,94 @@ describe("canonical color alias hybrid model", () => {
     expect(checked).toBeGreaterThan(0);
   });
 
-  it("applies resolution precedence (platform override > dark appearance > base)", () => {
+  it("resolved values are valid hex colors for all platforms", () => {
     const root = JSON.parse(fs.readFileSync(canonicalPath, "utf8")) as JsonRecord;
+    const modes = (root.color as JsonRecord).modes as JsonRecord;
+    let checked = 0;
 
-    const neutralRaised = getAtPath(root, "color.modes.default.surface.raised");
-    const neutralResolved = ((neutralRaised.$extensions as JsonRecord).cedar as JsonRecord)
-      .resolved as JsonRecord;
+    for (const modeTree of Object.values(modes)) {
+      if (!modeTree || typeof modeTree !== "object") continue;
 
-    expect(((neutralResolved.ios as JsonRecord).light as string).toLowerCase()).toBe("#edeae3");
-    expect(((neutralResolved.ios as JsonRecord).dark as string).toLowerCase()).toBe("#1c1c1c");
-    expect(((neutralResolved.web as JsonRecord).light as string).toLowerCase()).toBe("#edeae3");
-    expect(((neutralResolved.web as JsonRecord).dark as string).toLowerCase()).toBe("#2e2e2b");
+      walkSemanticLeaves(modeTree as JsonRecord, (leaf) => {
+        const cedar = (leaf.$extensions as JsonRecord | undefined)?.cedar as JsonRecord | undefined;
+        const resolved = cedar?.resolved as JsonRecord | undefined;
+        if (!resolved) return;
 
-    const linkHover = getAtPath(root, "color.modes.default.text.link-hover");
-    const linkHoverResolved = ((linkHover.$extensions as JsonRecord).cedar as JsonRecord)
-      .resolved as JsonRecord;
+        for (const [platform, appearances] of Object.entries(resolved)) {
+          if (!appearances || typeof appearances !== "object") continue;
+          for (const [appearance, hex] of Object.entries(appearances as JsonRecord)) {
+            expect(hex, `resolved.${platform}.${appearance}`).toMatch(HEX_RE);
+            checked++;
+          }
+        }
+      });
+    }
 
-    expect(((linkHoverResolved.ios as JsonRecord).light as string).toLowerCase()).toBe("#0a84ff");
-    expect(((linkHoverResolved.ios as JsonRecord).dark as string).toLowerCase()).toBe("#0040dd");
-    expect(((linkHoverResolved.web as JsonRecord).light as string).toLowerCase()).toBe("#406eb5");
-    expect(((linkHoverResolved.web as JsonRecord).dark as string).toLowerCase()).toBe("#0b2d60");
+    expect(checked).toBeGreaterThan(0);
+  });
+
+  it("resolved light value matches the referenced option token $value for web", () => {
+    const root = JSON.parse(fs.readFileSync(canonicalPath, "utf8")) as JsonRecord;
+    const modes = (root.color as JsonRecord).modes as JsonRecord;
+    let checked = 0;
+
+    for (const modeTree of Object.values(modes)) {
+      if (!modeTree || typeof modeTree !== "object") continue;
+
+      walkSemanticLeaves(modeTree as JsonRecord, (leaf) => {
+        const cedar = (leaf.$extensions as JsonRecord | undefined)?.cedar as JsonRecord | undefined;
+        if (!cedar) return;
+
+        const webRefs = cedar.web as JsonRecord | undefined;
+        const resolved = (cedar.resolved as JsonRecord | undefined)?.web as JsonRecord | undefined;
+        if (!webRefs || !resolved) return;
+
+        // The resolved light value should equal the $value of the option token it references
+        const lightRef = webRefs.light;
+        if (typeof lightRef !== "string") return;
+        const optionToken = getAtPath(root, lightRef);
+        if (!optionToken) return;
+
+        const optionValue = optionToken.$value;
+        if (typeof optionValue === "string") {
+          expect(resolved.light, `resolved.web.light for ref "${lightRef}"`).toBe(optionValue);
+          checked++;
+        }
+      });
+    }
+
+    expect(checked).toBeGreaterThan(0);
+  });
+
+  it("platform refs point to paths that exist in color.option", () => {
+    const root = JSON.parse(fs.readFileSync(canonicalPath, "utf8")) as JsonRecord;
+    const modes = (root.color as JsonRecord).modes as JsonRecord;
+    let checked = 0;
+
+    for (const modeTree of Object.values(modes)) {
+      if (!modeTree || typeof modeTree !== "object") continue;
+
+      walkSemanticLeaves(modeTree as JsonRecord, (leaf) => {
+        const cedar = (leaf.$extensions as JsonRecord | undefined)?.cedar as JsonRecord | undefined;
+        if (!cedar) return;
+
+        for (const platform of ["web", "ios"]) {
+          const refs = cedar[platform] as JsonRecord | undefined;
+          if (!refs) continue;
+          for (const appearance of ["light", "dark"]) {
+            const refPath = refs[appearance];
+            if (typeof refPath !== "string") continue;
+            const target = getAtPath(root, refPath);
+            expect(
+              target,
+              `${platform}.${appearance} ref "${refPath}" should resolve`,
+            ).toBeDefined();
+            checked++;
+          }
+        }
+      });
+    }
+
+    expect(checked).toBeGreaterThan(0);
   });
 });

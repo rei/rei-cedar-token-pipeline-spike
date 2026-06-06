@@ -4,50 +4,16 @@
  * Reads every *.json file from tokens/, normalizes them into a canonical tree,
  * and writes the result to canonical/tokens.json.
  *
- * Normalization pipeline:
- *   1. Load schema with Figma Input Contract (ADR-0003, src/schema/token-schema.json)
- *   2. Parse all JSON files from tokens/
- *   3. Fluid spacing: build clamp() values from per-breakpoint files
- *   4. Option color files (options.color.*.json):
- *      a. applyTokenMapping → translate Figma collection paths to color.option.*
- *         (throws on any unmapped path — designer rename guard)
- *      b. Build platformLookup table: "web-light" → { "color.option.*": "#hex" }
- *      c. Build color.option tree from web-light (canonical $value source)
- *      d. mergeColorVariants writes appearance values + platform overrides
- *         onto option tokens; writes per-platform references and resolved values
- *         into alias $extensions.cedar
- *      color.primitives is NOT written to canonical/tokens.json
- *   5. Alias and other files:
- *      a. clean()           → strip Figma metadata; rewrite alias refs to color.option.*
- *      b. nestUnderSections → nest under section keys; color.modes.<palette>
- *      c. deepMerge         → accumulate into canonical tree
- *   6. mergeColorVariants → write option references into alias $extensions.cedar;
- *      write resolved platform values onto aliases; write appearance values +
- *      platformOverrides onto option tokens; stamp $meta
- *   7. Write canonical/tokens.json
- *
- * Input file naming convention (from Figma sync):
- *   {collection}.{section}.{mode}.json
- *   Examples:
- *   - options.color.ios-light.json  → bare color collections (neutral-palette, brand-palette)
- *   - alias.color.default.json      → semantic color tokens for "default" palette
- *   - alias.color.sale.json         → semantic color tokens for "sale" palette
- *   - spacing.default.json          → spacing dimensions
- *
- * Output canonical/tokens.json structure:
- *   {
- *     "color": {
- *       "modes": {
- *         "default": { "$meta": { ... }, "surface": { ... }, ... },
- *         "sale":    { "$meta": { ... }, "surface": { ... }, ... }
- *       },
- *       "option": {
- *         "neutral": { "warm": { "grey": { "900": { ... } } }, "white": { ... } },
- *         "brand":   { "blue": { "400": { ... } }, "red": { "400": { ... } } }
- *       }
- *     },
- *     "spacing": { ... }
- *   }
+ * Pipeline steps (each is a standalone function):
+ *   1. loadSchema        — Load Figma Input Contract from token-schema.json
+ *   2. readTokenFiles    — Parse all JSON files from tokens/
+ *   3. partitionFiles    — Separate into spacing, option-color, alias, and platform files
+ *   4. processSpacing    — Fluid clamp(), static, and platform spacing
+ *   5. processOptionColors — Build color.option tree and platform lookup table
+ *   6. processAliasFiles — Clean, nest, and merge alias/other files
+ *   7. mergeColorVariants — Attach resolved values and $meta to alias tokens
+ *   8. mergeMetadata     — Merge repo-owned governance metadata
+ *   9. writeCanonical    — Write canonical/tokens.json
  */
 
 import fs from "node:fs";
@@ -79,10 +45,13 @@ const outFile = path.resolve(__dirname, "../../canonical/tokens.json");
 const schemaFile = path.resolve(__dirname, "../../src/schema/token-schema.json");
 const metadataFile = path.resolve(__dirname, "../../metadata/tokens.json");
 
-// ─── main ─────────────────────────────────────────────────────────────────────
+type ParsedFile = { file: string; data: Record<string, unknown> };
 
-try {
-  // ── Load schema with Figma Input Contract (ADR-0003) ────────────────────────
+const SPACING_BP_RE = /^spacing.scale\.(\d+)\.json$/;
+
+// ─── Pipeline steps ──────────────────────────────────────────────────────────
+
+function loadSchema(): TokenMapping {
   if (!fs.existsSync(schemaFile)) {
     throw new Error(
       `Token schema not found at ${schemaFile}. ` +
@@ -103,10 +72,10 @@ try {
         `Fix src/schema/token-schema.json to match ADR-0003.`,
     );
   }
+  return figmaInputs as TokenMapping;
+}
 
-  const tokenMapping: TokenMapping = figmaInputs as TokenMapping;
-
-  // ── Read all token files ─────────────────────────────────────────────────────
+function readTokenFiles(): ParsedFile[] {
   const files = fs
     .readdirSync(tokensDir)
     .filter((f) => f.endsWith(".json") && f !== "canonical.json")
@@ -116,44 +85,43 @@ try {
     throw new Error(`No JSON files found in ${tokensDir}. Run the Figma sync first.`);
   }
 
-  const parsed = files.map((file) => ({
+  return files.map((file) => ({
     file,
     data: JSON.parse(fs.readFileSync(path.join(tokensDir, file), "utf-8")) as Record<
       string,
       unknown
     >,
   }));
+}
 
-  // ── Partition files by type ─────────────────────────────────────────────────
-  const SPACING_BP_RE = /^spacing.scale\.(\d+)\.json$/;
-  const spacingBpFiles = parsed.filter(({ file }) => SPACING_BP_RE.test(file));
-  const spacingStaticFiles = parsed.filter(
-    ({ file }) => file.includes("spacing") && file.includes("static"),
-  );
-  const optionColorFiles = parsed.filter(({ file }) => extractPrimitiveMode(file) !== null);
-  const otherFiles = parsed.filter(
-    ({ file }) =>
-      !SPACING_BP_RE.test(file) &&
-      extractPrimitiveMode(file) === null &&
-      file !== "alias.spacing.web.json" &&
-      file !== "alias.spacing.ios.json" &&
-      file !== "spacing.static.default.json",
-  );
-  const spacingPlatformFiles = parsed.filter(
-    ({ file }) => file === "alias.spacing.web.json" || file === "alias.spacing.ios.json",
-  );
+function partitionFiles(parsed: ParsedFile[]) {
+  return {
+    spacingBpFiles: parsed.filter(({ file }) => SPACING_BP_RE.test(file)),
+    spacingStaticFiles: parsed.filter(
+      ({ file }) => file.includes("spacing") && file.includes("static"),
+    ),
+    optionColorFiles: parsed.filter(({ file }) => extractPrimitiveMode(file) !== null),
+    spacingPlatformFiles: parsed.filter(
+      ({ file }) => file === "alias.spacing.web.json" || file === "alias.spacing.ios.json",
+    ),
+    otherFiles: parsed.filter(
+      ({ file }) =>
+        !SPACING_BP_RE.test(file) &&
+        extractPrimitiveMode(file) === null &&
+        file !== "alias.spacing.web.json" &&
+        file !== "alias.spacing.ios.json" &&
+        file !== "spacing.static.default.json",
+    ),
+  };
+}
 
-  const validationIssues = validateFigmaInputs({
-    parsedFiles: parsed,
-    optionColorFiles,
-    otherFiles,
-    tokenMapping,
-  });
-  reportValidationIssues(validationIssues);
-
-  const canonical: Record<string, unknown> = {};
-
-  // ── 1. Spacing properties ────────────────────────────────────────────────────────
+function processSpacing(
+  canonical: Record<string, unknown>,
+  spacingBpFiles: ParsedFile[],
+  spacingStaticFiles: ParsedFile[],
+  spacingPlatformFiles: ParsedFile[],
+) {
+  // Fluid spacing from breakpoint files
   if (spacingBpFiles.length > 0) {
     const parsedBps = spacingBpFiles.map(({ file, data }) => ({
       breakpoint: parseInt(SPACING_BP_RE.exec(file)![1], 10),
@@ -170,43 +138,29 @@ try {
     );
   }
 
-  // ── 1.2 Static spacing properties - iOS ─────────────────────────────────────────────────────
+  // Static spacing (iOS)
   if (spacingStaticFiles.length > 0) {
-    // Initialize the baseline spacing block if it doesn't exist
-    if (!canonical.spacing) {
-      canonical.spacing = {};
-    }
-
+    if (!canonical.spacing) canonical.spacing = {};
     const collectionToSection = buildCollectionToSection(spacingStaticFiles);
     const { data } = Object.values(clean(spacingStaticFiles, collectionToSection))[0];
-    const expandedHyphenTokens = expandHyphenatedTokens(data);
-
-    deepMerge(canonical, expandedHyphenTokens);
+    deepMerge(canonical, expandHyphenatedTokens(data));
   }
 
-  // ── 1.3 Normalize Platform Spacing Scales ─────────────────────────────────────
+  // Platform spacing scales
   if (spacingPlatformFiles.length > 0) {
-    // Initialize the baseline spacing block if it doesn't exist
-    if (!canonical.spacing) {
-      canonical.spacing = {};
-    }
-
+    if (!canonical.spacing) canonical.spacing = {};
     const spacingTarget = canonical.spacing as Record<string, any>;
 
     for (const { file, data } of spacingPlatformFiles) {
-      // Determine target platform profile ("spacing.web.json" -> "web", "spacing.web.ios" -> "ios")
       let platformName = file.split(".")[2];
       platformName = platformName.includes("web") ? "web" : "ios";
-
       const spaceSource = data as Record<string, any>;
 
       for (const [tokenGroupKey, tokenData] of Object.entries(spaceSource.spacing)) {
         const rawTokenGroup = tokenData as Record<string, any>;
 
         for (const [tokenKey, tokenData] of Object.entries(rawTokenGroup)) {
-          if (!spacingTarget[tokenGroupKey]) {
-            spacingTarget[tokenGroupKey] = {};
-          }
+          if (!spacingTarget[tokenGroupKey]) spacingTarget[tokenGroupKey] = {};
 
           if (!spacingTarget[tokenGroupKey][tokenKey]) {
             spacingTarget[tokenGroupKey][tokenKey] = {
@@ -239,38 +193,21 @@ try {
         }
       }
     }
-
     console.log(`  ✓ Normalized platform files into canonical spacing`);
   }
+}
 
-  // ── 2. Option color files → color.option + platform lookup table ────────────
-  //
-  // Each options.color.*.json file is a platform×appearance snapshot of the
-  // primitive palette. We use applyTokenMapping to:
-  //   a. Translate every Figma token path to its canonical color.option.* path
-  //   b. Fail loudly if any Figma path has no mapping entry (designer rename guard)
-  //
-  // All primitive mode files (e.g., Mode 1, Mode 2) produce the same canonical
-  // paths — only the $value hex differs. We use the first imported mode as the
-  // authoritative source for $value in color.option (the canonical fallback
-  // per ADR-0001). The other modes contribute only to the platformLookup table,
-  // which mergeColorVariants uses to build $resolved on alias tokens.
-  //
-  // color.primitives is NOT written to canonical/tokens.json — it was a spike artifact.
-  // The primitive mode files are normalization input only.
-
-  // platformLookup: "Mode 1" → { "color.option.neutral.warm.grey.900": "#hex", ... }
+function processOptionColors(
+  canonical: Record<string, unknown>,
+  optionColorFiles: ParsedFile[],
+  tokenMapping: TokenMapping,
+): Map<string, Record<string, string>> {
   const platformLookup = new Map<string, Record<string, string>>();
   const canonicalFallbackEntries: Array<{
     canonicalPath: string;
-    token: {
-      $type: string;
-      $value: string;
-      docs?: ReturnType<typeof parseTokenDescription>;
-    };
+    token: { $type: string; $value: string };
   }> = [];
 
-  // Select canonical fallback mode up-front: prefer web-light, otherwise first imported mode
   const canonicalFallbackMode = optionColorFiles.find(
     ({ file }) => extractPrimitiveMode(file) === "web-light",
   )
@@ -311,19 +248,23 @@ try {
     console.log(`  ✓ ${file} [primitives: ${primitiveMode}] (${Object.keys(data).join(", ")})`);
   }
 
-  // Build color.option tree from the canonical fallback snapshot (canonical $value source)
   if (canonicalFallbackEntries.length > 0) {
-    const optionTree = buildOptionTree(canonicalFallbackEntries);
-    deepMerge(canonical, optionTree);
+    deepMerge(canonical, buildOptionTree(canonicalFallbackEntries));
   }
 
-  // ── 3. Alias and other files ────────────────────────────────────────────────
+  return platformLookup;
+}
+
+function processAliasFiles(
+  canonical: Record<string, unknown>,
+  otherFiles: ParsedFile[],
+  tokenMapping: TokenMapping,
+) {
   const collectionToSection = buildCollectionToSection(otherFiles);
 
   for (const { file, data } of otherFiles) {
     const cleaned = clean(data, collectionToSection, tokenMapping);
     const colorMode = extractColorMode(file);
-
     const nested = nestUnderSections(
       cleaned as Record<string, unknown>,
       collectionToSection,
@@ -332,42 +273,58 @@ try {
 
     const modeLabel = colorMode ? ` [mode: ${colorMode}]` : "";
     console.log(`  ✓ ${file}${modeLabel} (${Object.keys(data).join(", ")})`);
-
     deepMerge(canonical, nested);
   }
+}
 
-  // ── 4. Attach $resolved and $meta to all alias color tokens ─────────────────
-  mergeColorVariants(canonical, platformLookup);
-
-  // ── 5. Merge repo-owned token metadata ────────────────────────────────────────
-  //
-  // Load metadata/tokens.json if it exists and merge governance into $extensions.cedar.
-  // This is optional — if the file doesn't exist, build proceeds (all tokens unmarked).
-  // For each token with metadata entry, attach under $extensions.cedar.governance.
-  //
-  // See philosophy: Figma owns values + alias refs, repo owns governance (status,
-  // badges, deprecation, usedBy, etc.). merge-metadata.ts assembles both.
-  let metadataMergedCount = 0;
+function processMetadata(canonical: Record<string, unknown>) {
   if (fs.existsSync(metadataFile)) {
     const metadata = JSON.parse(fs.readFileSync(metadataFile, "utf-8")) as TokenMetadataManifest;
-    metadataMergedCount = mergeMetadata(canonical, metadata);
-    console.log(`  ✓ metadata/tokens.json [governance: ${metadataMergedCount} token(s)]`);
+    const count = mergeMetadata(canonical, metadata);
+    console.log(`  ✓ metadata/tokens.json [governance: ${count} token(s)]`);
   } else {
     console.log(
       `  ⊘ metadata/tokens.json not found (optional). All tokens will be unmarked/unreviewed.`,
     );
   }
+}
 
-  // ── 6. Write canonical/tokens.json ─────────────────────────────────────────────
+function writeCanonical(canonical: Record<string, unknown>, fileCount: number) {
   fs.mkdirSync(path.dirname(outFile), { recursive: true });
   fs.writeFileSync(outFile, JSON.stringify(canonical, null, 2), "utf-8");
 
   console.log(`\nSuccessfully created: ${outFile}`);
   console.log(
-    `  ${files.length} file(s) merged, ${
+    `  ${fileCount} file(s) merged, ${
       Object.keys(canonical).length
     } top-level section(s): ${Object.keys(canonical).join(", ")}`,
   );
+}
+
+// ─── main ─────────────────────────────────────────────────────────────────────
+
+try {
+  const tokenMapping = loadSchema();
+  const parsed = readTokenFiles();
+  const { spacingBpFiles, spacingStaticFiles, spacingPlatformFiles, optionColorFiles, otherFiles } =
+    partitionFiles(parsed);
+
+  const validationIssues = validateFigmaInputs({
+    parsedFiles: parsed,
+    optionColorFiles,
+    otherFiles,
+    tokenMapping,
+  });
+  reportValidationIssues(validationIssues);
+
+  const canonical: Record<string, unknown> = {};
+
+  processSpacing(canonical, spacingBpFiles, spacingStaticFiles, spacingPlatformFiles);
+  const platformLookup = processOptionColors(canonical, optionColorFiles, tokenMapping);
+  processAliasFiles(canonical, otherFiles, tokenMapping);
+  mergeColorVariants(canonical, platformLookup);
+  processMetadata(canonical);
+  writeCanonical(canonical, parsed.length);
 } catch (error) {
   console.error("Error creating canonical/tokens.json:", error);
   process.exit(1);
