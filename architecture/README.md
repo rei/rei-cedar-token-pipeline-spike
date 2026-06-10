@@ -91,25 +91,33 @@ It serves as the single entry point for diagrams, ADRs, and technical notes that
 
 | Deliverable | Status |
 |---|---|
-| `canonical/tokens.json` (color tokens) | ✓ Complete |
+| `canonical/tokens.json` (color, spacing, text tokens) | ✓ Complete |
 | `src/schema/token-schema.json` | ✓ Complete |
 | `dist/themes/rei-dot-com/css/light.css` | ✓ Complete — validated with web light hex fallbacks plus OKLCH overrides |
 | `dist/themes/rei-dot-com/css/dark.css` | ✓ Complete — validated with web dark hex fallbacks plus OKLCH overrides |
 | `dist/themes/rei-dot-com/ios/Colors.xcassets` | ✓ Complete — validated with correct iOS Display P3 values |
+| `dist/themes/rei-dot-com/ios/CdrSpacing.swift` | ✓ Complete — spacing constants generated |
+| `dist/types/` (TypeScript types) | ✓ Complete — base, core, and theme types generated |
 | Fluid spacing (`clamp()`) | ✓ Complete |
-| `dist/themes/rei-dot-com/ios/ColorTokens.swift` | ○ Not started — V1 |
-| `dist/android/colors.xml` | ○ Not started — V1 |
-| `@cedar/types` package | ○ Not started — V1 |
+| Fluid typography | ○ Not started — V1 (ADR-0004 + typography gap) |
+| `dist/themes/rei-dot-com/ios/ColorTokens.swift` | ○ Not started — V1 (semantic tokens) |
+| `dist/android/colors.xml` | ○ Not started — V1 (ADR-0013) |
 | Diff engine | ○ Partial — PR #4 started, not merged |
 | Storybook token browser | ○ Partial — PR #4 started, not merged |
+| Semantic token layer (text.semantic) | ○ Not started — V1 (ADR-0004 + typography gap) |
+| State layer tokens (hover, pressed, focus, etc.) | ○ Future — ADR-0006 |
+| Accessibility token metadata | ○ Future — ADR-0009 |
+| Harmonic interval validation | ○ Future — ADR-0011 |
 
 ---
 
 ## Known V1 Migration Items
 
 - `color.modes` → `color.palettes` path rename (ADR-0001 specifies `color.palettes`; spike uses `color.modes`)
-- TypeScript canonical token types (`CanonicalColorToken`, `OptionToken`, `AliasToken`)
+- TypeScript canonical token types (`CanonicalColorToken`, `OptionToken`, `AliasToken`) — partial implementation in `dist/types/`
 - High-contrast mode implementation path (requires ADR-0007 amendment)
 - Naming grammar enforcement in normalization
 - Alias cycle detection
 - `$extensions.cedar` staleness CI check
+- Semantic typography layer (`text.semantic`) with fluid primitives (ADR-0004 + typography gap ticket)
+- Android output (ADR-0013 consumer model decision required)
