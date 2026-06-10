@@ -1,7 +1,7 @@
 # ADR‑0006: State Layer System
 
 ## Status
-Proposed
+Future
 
 ## Context
 

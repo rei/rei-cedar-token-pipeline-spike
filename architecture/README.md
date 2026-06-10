@@ -18,31 +18,23 @@ It serves as the single entry point for diagrams, ADRs, and technical notes that
 
 ## Architecture Decision Records (ADRs)
 
-### Implemented / Accepted
-
 | ADR | Title | Status | Description |
 |---|---|---|---|
 | **[ADR‑0001](./ADR/adr-0001-token-canonical-model.md)** | Canonical Token Model | Draft | Defines the governed, platform‑agnostic token shape. Includes the `$extensions.cedar` model for option token platform data, alias token platform references, and the SD pipeline constraint on `{ref}` resolution. |
 | **[ADR‑0002](./ADR/adr-0002-token-normalization-layer.md)** | Normalization Layer | Implemented | Defines how raw Figma files are transformed into the canonical model. Documents the four-file platform convention, the Figma input contract, and the governed invariants. |
 | **[ADR‑0003](./ADR/adr-0003-figma-input-contract.md)** | Figma Input Contract | Implemented | Documents the structure of raw Figma inputs and the schema-backed governance contract in `src/schema/token-schema.json`. Includes the four-file platform input contract and process for adding new platforms or appearances. |
+| **[ADR‑0004](./ADR/adr-0004-semantic-token-architecture.md)** | Semantic Token Architecture | Planned | Three-tier token architecture (Options → Alias → Component). |
 | **[ADR‑0005](./ADR/adr-0005-transform-layer-and-platform-outputs.md)** | Transform Layer & Platform Outputs | Planned | Defines how canonical tokens are transformed into CSS, iOS, Android, and other outputs, including the SD v5 normative pipeline constraints. |
+| **[ADR‑0006](./ADR/adr-0006-state-layer-system.md)** | State Layer System | Future | Interactive state tokens (hover, pressed, focus, disabled, selected, error). |
 | **[ADR‑0007](./ADR/adr-0007-mode-and-theme.md)** | Modes and Palettes | Proposed | Defines mode architecture and palette architecture. Light/dark modes and default/sale palettes implemented. |
 | **[ADR‑0008](./ADR/adr-0008-responsive-adaptive-tokens.md)** | Responsive and Adaptive Tokens | Proposed | Defines breakpoint tokens, fluid spacing, fluid typography, container query tokens, and density tokens. Fluid spacing with clamp() expressions implemented. |
+| **[ADR‑0009](./ADR/adr-0009-accessibility-requirements.md)** | Accessibility Requirements | Future | WCAG 2.2 Level AA requirements in the token system. |
 | **[ADR‑0010](./ADR/adr-0010-token-documentation-architecture.md)** | Token Documentation Architecture | Implemented | Defines split-authority token docs architecture: Figma docs plus repo-owned governance metadata merged in canonical. |
+| **[ADR‑0011](./ADR/adr-0011-harmonic-interval-validation.md)** | Harmonic Interval Validation | Future | Harmonic validation system with perceptual correctness checking. |
 | **[ADR‑0012](./ADR/adr-0012-hybrid-alias-resolution.md)** | Hybrid Alias Resolution | Accepted | Adopts hybrid alias refs plus `$extensions.cedar.resolved` values with normalization input validation. |
-
-### Proposed (not yet implemented — archived to `ADR/proposed/`)
-
-| ADR | Title | Description |
-|---|---|---|
-| **[ADR‑0004](./ADR/proposed/adr-0004-semantic-token-architecture.md)** | Semantic Token Architecture | Three-tier token architecture (Options → Alias → Component). |
-| **[ADR‑0005 Addendum](./ADR/proposed/adr-0005-addendum-sd-v5-constraints.md)** | SD v5 Pipeline Constraints | Superseded — normative constraints now live in ADR‑0005. |
-| **[ADR‑0006](./ADR/proposed/adr-0006-state-layer-system.md)** | State Layer System | Interactive state tokens (hover, pressed, focus, disabled, selected, error). |
-| **[ADR‑0009](./ADR/proposed/adr-0009-accessibility-requirements.md)** | Accessibility Requirements | WCAG 2.2 Level AA requirements in the token system. |
-| **[ADR‑0011](./ADR/proposed/adr-0011-harmonic-interval-validation.md)** | Harmonic Interval Validation | Harmonic validation system with perceptual correctness checking. |
-| **[ADR‑0013](./ADR/proposed/adr-0013-consumer-models.md)** | Cedar Token Consumer Models | Defines every consumer model Cedar commits to supporting (web, iOS, Android, Tailwind, Sass, TypeScript), what Cedar produces for each, and Layer 1/Layer 2 separation. Prerequisite to the token spike. |
-| **[ADR‑0014](./ADR/proposed/adr-0014-composite-token-values.md)** | Composite Style Values | Defines what is allowed in the token repository (atomic single-value tokens) vs what is not (composite multi-property values like Sass mixins), and where composite styles should live instead (platform libraries). |
-| **[ADR‑0015](./ADR/proposed/adr-0015-cedar-tailwind-preset.md)** | Cedar Tailwind Preset | Defines the Cedar-owned Tailwind preset (@rei/cedar-tailwind-preset) as the integration layer for Tailwind-based consumer teams. Preserves fluid spacing and palette mode runtime resolution via CSS custom properties. |
+| **[ADR‑0013](./ADR/adr-0013-consumer-models.md)** | Cedar Token Consumer Models | Proposed | Defines every consumer model Cedar commits to supporting (web, iOS, Android, Tailwind, Sass, TypeScript), what Cedar produces for each, and Layer 1/Layer 2 separation. Prerequisite to the token spike. |
+| **[ADR‑0014](./ADR/adr-0014-composite-token-values.md)** | Composite Style Values | Proposed | Defines what is allowed in the token repository (atomic single-value tokens) vs what is not (composite multi-property values like Sass mixins), and where composite styles should live instead (platform libraries). |
+| **[ADR‑0015](./ADR/adr-0015-cedar-tailwind-preset.md)** | Cedar Tailwind Preset | Proposed | Defines the Cedar-owned Tailwind preset (@rei/cedar-tailwind-preset) as the integration layer for Tailwind-based consumer teams. Preserves fluid spacing and palette mode runtime resolution via CSS custom properties. |
 
 ---
 

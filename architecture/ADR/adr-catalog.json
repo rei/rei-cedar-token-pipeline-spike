@@ -108,7 +108,7 @@
       "number": "0004",
       "title": "Semantic Token Architecture",
       "status": "Planned",
-      "file": "proposed/adr-0004-semantic-token-architecture.md",
+      "file": "adr-0004-semantic-token-architecture.md",
       "description": "Defines the three-tier token architecture (Options → Alias → Component). Updated with spike findings: color.option.* path convention, platform override governance rules.",
       "topics": [
         "semantic-tokens",
@@ -172,8 +172,8 @@
     {
       "number": "0006",
       "title": "State Layer System",
-      "status": "Proposed",
-      "file": "proposed/adr-0006-state-layer-system.md",
+      "status": "Future",
+      "file": "adr-0006-state-layer-system.md",
       "description": "Defines interactive state tokens (hover, pressed, focus, disabled, selected, error) and the hybrid explicit/computed overlay approach.",
       "topics": [
         "interactive-states",
@@ -264,8 +264,8 @@
     {
       "number": "0009",
       "title": "Accessibility Requirements",
-      "status": "Proposed",
-      "file": "proposed/adr-0009-accessibility-requirements.md",
+      "status": "Future",
+      "file": "adr-0009-accessibility-requirements.md",
       "description": "Embeds WCAG 2.2 Level AA requirements into the token system: focus indicators, touch targets, color contrast, high contrast mode, motion preferences.",
       "topics": [
         "accessibility",
@@ -353,8 +353,8 @@
     {
       "number": "0011",
       "title": "Harmonic Interval Validation",
-      "status": "Proposed",
-      "file": "proposed/adr-0011-harmonic-interval-validation.md",
+      "status": "Future",
+      "file": "adr-0011-harmonic-interval-validation.md",
       "description": "Defines harmonic validation system with relationships section and harmonicInterval metadata for perceptual correctness checking.",
       "topics": [
         "harmonic-validation",
@@ -385,7 +385,7 @@
       "number": "0013",
       "title": "Cedar Token Consumer Models",
       "status": "Proposed",
-      "file": "proposed/adr-0013-consumer-models.md",
+      "file": "adr-0013-consumer-models.md",
       "description": "Defines every consumer model Cedar commits to supporting (web, iOS, Android, Tailwind, Sass, TypeScript), what Cedar produces for each, who owns the integration layer, and where Cedar's responsibility ends. Prerequisite to the token spike.",
       "topics": [
         "consumer-models",
@@ -421,7 +421,7 @@
       "number": "0014",
       "title": "Composite Style Values",
       "status": "Proposed",
-      "file": "proposed/adr-0014-composite-token-values.md",
+      "file": "adr-0014-composite-token-values.md",
       "description": "Defines what is allowed in the token repository (atomic single-value tokens) vs what is not (composite multi-property values like Sass mixins), and where composite styles should live instead (platform libraries).",
       "topics": [
         "composite-styles",
@@ -454,7 +454,7 @@
       "number": "0015",
       "title": "Cedar Tailwind Preset",
       "status": "Proposed",
-      "file": "proposed/adr-0015-cedar-tailwind-preset.md",
+      "file": "adr-0015-cedar-tailwind-preset.md",
       "description": "Defines the Cedar-owned Tailwind preset (@rei/cedar-tailwind-preset) as the integration layer for Tailwind-based consumer teams. Preserves fluid spacing and palette mode runtime resolution via CSS custom properties.",
       "topics": [
         "tailwind",
@@ -517,7 +517,8 @@
     "Draft": ["adr-0001"],
     "Planned": ["adr-0004", "adr-0005"],
     "Implemented": ["adr-0002", "adr-0003", "adr-0010"],
-    "Proposed": ["adr-0006", "adr-0007", "adr-0008", "adr-0009", "adr-0011", "adr-0013", "adr-0014", "adr-0015"],
+    "Proposed": ["adr-0007", "adr-0008", "adr-0013", "adr-0014", "adr-0015"],
+    "Future": ["adr-0006", "adr-0009", "adr-0011"],
     "Accepted": ["adr-0012"]
   }
 }
