@@ -2,7 +2,7 @@
 
 This diagram reflects the current ADR state and pipeline architecture as of 2026-06-10.
 
-![Cedar Token Pipeline Architecture](./cedar_token_pipeline_architecture.svg)
+![Cedar Token Pipeline Architecture](../../assets/v1-architecture.svg)
 
 ## Layer Descriptions
 
