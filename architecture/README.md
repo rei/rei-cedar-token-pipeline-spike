@@ -12,7 +12,8 @@ It serves as the single entry point for diagrams, ADRs, and technical notes that
 | Document | Description |
 |---|---|
 | **[Roadmap Overview](./roadmap.md)** | Stakeholder-facing summary of pipeline direction, timing, and open decisions. For design, product, and engineering leadership. |
-| **[Token Pipeline Diagram](./diagrams/token-pipeline-current.md)** | Current architecture diagram reflecting the actual ADR state and pipeline flow. |
+| **[V1 Architecture Diagram](./diagrams/v1-architecture.md)** | Current architecture diagram reflecting the actual ADR state and pipeline flow. |
+| **[Token Pipeline Diagram](./diagrams/token-pipeline-current.md)** | Same as V1 diagram — current architecture with ADR mappings. |
 | **[V0 Architecture Diagram](./diagrams/v0-architecture.md)** | High‑level visualization of the token pipeline from Figma → Canonical → SD → Platform outputs. |
 | **[V0 Data Architecture Diagram](./diagrams/v0-data-architecture.md)** | Data‑flow diagram showing how raw Figma inputs become canonical tokens. |
 
