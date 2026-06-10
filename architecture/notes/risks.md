@@ -1,6 +1,6 @@
-# V0 Spike — Risk Matrix
+# Risk Matrix — Cedar Token Pipeline
 
-> **Updated after spike completion.** Rows marked ✓ are resolved. New risks discovered during the spike are added at the bottom.
+> **Updated for current implementation and broader vision.** Rows marked ✓ are resolved. New risks discovered during the spike and monorepo planning are added at the bottom.
 
 | Risk Category | Description | Likelihood | Impact | Risk Level | Mitigation | Spike Status |
 |---|---|---|---|---|---|---|
@@ -22,6 +22,22 @@
 | **Governance Enforcement Gap** | Governance policy requires dual review and CI checks, but enforcement artifacts are incomplete. | Medium | High | **H** | Add CODEOWNERS for schema and canonical contracts, plus CI checks for naming grammar, alias cycles, and staleness. | Open — policy is documented, enforcement is not fully implemented |
 | **Team Adoption Risk** | Developers may not understand the pipeline. | Low | Medium | **L** | Keep orchestration thin and docs current. | Partial — architecture docs exist, but a dedicated pipeline dictionary is not present |
 | **TypeScript Type Drift** | Generated types may diverge from canonical model. | Medium | Medium | **M** | Keep type generation deterministic and aligned with ADR-0001. | ✓ Mitigated — dist/types/ generated from canonical model |
+
+---
+
+## New Risks — Monorepo and Broader Vision
+
+| Risk | Description | Likelihood | Impact | Risk Level | Mitigation |
+|---|---|---|---|---|---|
+| **ADR-013/014 blocking platform libraries** | Component-schema contract and token integration boundary ADRs are not Accepted. ui-vue, ui-swift, ui-android cannot be wired without these decisions. | High | High | **H** | Draft ADR-013 and ADR-014 as Proposed with open questions; get them to at least Planned status before monorepo wiring. |
+| **Agent governance gaps** | Agents working in libs/core may not route to correct ADRs or follow governance tiers. | Medium | High | **H** | Implement AGENTS.md hierarchy with adr-catalog.json routing; write core-tokens skill before monorepo structure is finalized. |
+| **Consumer catalog format undefined** | ADR-015 not written; consumer AI experience (llms.txt, JSON-LD) has no governed contract. | Medium | High | **H** | Draft ADR-015 as Proposed; define JSON-LD @context shape and llms.txt structure before publishing to external consumers. |
+| **Typography gap blocking ADR-0014** | Semantic typography layer not implemented; composite style values decision depends on having real semantic token data to validate the schema. | Medium | High | **H** | Implement text.semantic with fluid primitives per typography gap ticket; provides real data for ADR-0013 and ADR-0014 validation. |
+| **Android consumer model undefined** | ADR-0013 doesn't specify Android token consumption pattern, transform layer, or CI validation approach. | Medium | High | **H** | Complete Android discovery before ADR-013 reaches Accepted; define Compose vs XML strategy and token consumption contract. |
+| **rei-cedar ingestion undefined** | ADR-016 not written; unclear what transforms before import from existing rei-cedar repo, what stays, what gets deleted. | High | High | **H** | Draft ADR-016 as Proposed; define migration strategy for ui-vue (described as "rei-cedar adapted"). |
+| **State/density missing from iOS** | iOS currently only knows color; ADR-006/008 amendments needed for state and density before Swift can conform to schema. | Medium | High | **H** | Draft ADR-006 and ADR-008 amendments as Proposed; define interactive state and density token structure for iOS. |
+| **NX boundary violations** | Agents or developers may violate NX boundary rules (ui-* importing each other, core importing platform deps). | Medium | High | **H** | Embed NX boundary rules in AGENTS.md and all ui-* skills; enforce via CI tags. |
+| **Agent effectiveness unknown** | No mechanism to track whether agents are correctly reading ADRs, catalog files, and following governance. | Medium | Medium | **M** | Implement PR audit block requirement, token coverage report, and agent feedback log. |
 
 ---
 
