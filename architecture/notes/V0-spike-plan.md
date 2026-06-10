@@ -190,16 +190,17 @@ Custom transform groups use the `cedar/` namespace (`cedar/ios`, `cedar/web`).
 
 | Planned Deliverable | Status |
 |---|---|
-| `canonical/tokens.json` (V0) | ✓ Complete — real REI tokens, not mock |
+| `canonical/tokens.json` (V0) | ✓ Complete — real REI tokens (color, spacing, text), not mock |
 | `src/schema/token-schema.json` | ✓ Complete — contract artifact not in original plan |
 | `dist/themes/rei-dot-com/css/light.css` | ✓ Complete — validated with correct values |
 | `dist/themes/rei-dot-com/css/dark.css` | ✓ Complete — validated with correct values |
 | `dist/themes/rei-dot-com/ios/Colors.xcassets/` | ✓ Complete — validated with correct iOS P3 values |
+| `dist/themes/rei-dot-com/ios/CdrSpacing.swift` | ✓ Complete — spacing constants generated |
+| `dist/types/` (TypeScript types) | ✓ Complete — base, core, and theme types generated |
 | Fluid spacing (`clamp()`) | ✓ Complete |
 | `schema.json` | ○ Not implemented — build-fail governance used instead |
-| `dist/themes/rei-dot-com/ios/ColorTokens.swift` | ○ Not started — V1 |
-| `dist/android/colors.xml` | ○ Not started — V1 |
-| `@cedar/types` package | ○ Not started — V1 |
+| `dist/themes/rei-dot-com/ios/ColorTokens.swift` | ○ Not started — V1 (semantic tokens) |
+| `dist/android/colors.xml` | ○ Not started — V1 (ADR-0013) |
 | Mock component library | ○ Not started — superseded by real Figma exports |
 | Mock consumer app | ○ Not started |
 | Diff engine / Storybook | ○ Partial — PR #4 started, not merged |
@@ -208,11 +209,11 @@ Custom transform groups use the `cedar/` namespace (`cedar/ios`, `cedar/web`).
 
 | Criterion | Status |
 |---|---|
-| Generate valid canonical JSON from Figma data | ✓ Yes — with real REI data |
+| Generate valid canonical JSON from Figma data | ✓ Yes — with real REI data (color, spacing, text) |
 | Transform canonical tokens into CSS | ✓ Yes — light and dark |
-| Transform canonical tokens into iOS output | ✓ Yes — Display P3 colorsets |
+| Transform canonical tokens into iOS output | ✓ Yes — Display P3 colorsets + spacing constants |
 | Transform canonical tokens into Android output | ✗ Not done |
-| Generate `@cedar/types` package | ✗ Not done |
+| Generate TypeScript types | ✓ Yes — dist/types/ with base, core, and theme types |
 | Generate component prop interfaces | ✗ Not done |
 | Validate alias tokens in Figma Dev Mode | ✗ Not done |
 | Identify gaps for V1 | ✓ Yes — see V1 migration items in README |

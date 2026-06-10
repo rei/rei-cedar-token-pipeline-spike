@@ -82,6 +82,10 @@ Every token in `canonical/tokens.json` is validated against these rules:
 | Can alias `$value` be a DTCG ref instead of hex? | ✓ Yes — validated end-to-end |
 | Do platform values (iOS vs web) differ? | ✓ Yes — intentional, handled via `platformOverrides` |
 | Can dark mode values be derived without Figma dark mode files? | ✓ Yes — via `$extensions.cedar.appearances.dark` on option tokens |
+| Can spacing tokens with fluid `clamp()` be normalized and transformed? | ✓ Yes — validated with breakpoint-based spacing |
+| Can typography primitives be normalized? | ✓ Yes — text.* tokens from Figma export |
+| Can TypeScript types be generated from canonical model? | ✓ Yes — dist/types/ with base, core, and theme types |
+| Can iOS Swift constants be generated? | ✓ Yes — CdrSpacing.swift generated |
 
 ### What was NOT validated
 
@@ -89,6 +93,9 @@ Every token in `canonical/tokens.json` is validated against these rules:
 - Semantic grammar enforcement (token naming intent/family/variant rules)
 - Alias cycle detection
 - Multi-palette token inheritance validation
+- Semantic typography layer (text.semantic) with platform variants
+- State layer tokens (hover, pressed, focus, etc.)
+- Accessibility token metadata
 
 ---
 

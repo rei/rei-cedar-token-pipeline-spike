@@ -6,7 +6,7 @@
 |---|---|---|---|---|---|---|
 | **Figma Data Quality** | Real Figma exports may not match expected structure. | Medium | High | **H** | Use real Figma exports for V0; validate ingestion early. | ✓ Mitigated — spike used real REI Figma exports successfully |
 | **Normalization Fragility** | Unexpected Figma shapes may break the pipeline. | Medium | High | **H** | `src/schema/token-schema.json` build-fail on unmapped paths. | ✓ Mitigated — build fails immediately on unmapped token path |
-| **Canonical Model Gaps** | V0 excludes composite foundations (typography, radius, shadow, prominence, etc.). | High | High | **H** | Define canonical contracts and output rules for composite foundations; implement incrementally by domain. | Partial — spacing with `clamp()` is implemented; most composite foundations remain V1 |
+| **Canonical Model Gaps** | V0 excludes composite foundations (typography, radius, shadow, prominence, etc.). | High | High | **H** | Define canonical contracts and output rules for composite foundations; implement incrementally by domain. | Partial — spacing with `clamp()` and text primitives implemented; semantic typography (text.semantic) remains V1 |
 | **Alias Resolution Errors** | Circular or unresolvable alias references. | Low | High | **M** | Build-fail on unmapped alias references. | ✓ Mitigated — normalizer throws on unmapped collection references |
 | **Governance Coverage** | V0 governance only checks shape; semantic issues slip through. | High | Medium | **H** | The Figma input contract in `src/schema/token-schema.json` is primary governance; V1 adds naming grammar. | Partial — build-fail governance works; naming grammar not yet enforced |
 | **Transform Layer Assumptions** | SD transforms may not map cleanly to platform outputs. | Medium | High | **H** | Build minimal transforms; validate outputs. | ✓ Resolved — CSS and iOS colorsets validated with correct values |
@@ -21,6 +21,7 @@
 | **Future Backward Compatibility** | V0 canonical shapes may not be forward-compatible with V1. | Medium | Medium | **M** | Keep V0 canonical minimal. | Partial — ADRs and architecture docs capture current structural deltas for consumers |
 | **Governance Enforcement Gap** | Governance policy requires dual review and CI checks, but enforcement artifacts are incomplete. | Medium | High | **H** | Add CODEOWNERS for schema and canonical contracts, plus CI checks for naming grammar, alias cycles, and staleness. | Open — policy is documented, enforcement is not fully implemented |
 | **Team Adoption Risk** | Developers may not understand the pipeline. | Low | Medium | **L** | Keep orchestration thin and docs current. | Partial — architecture docs exist, but a dedicated pipeline dictionary is not present |
+| **TypeScript Type Drift** | Generated types may diverge from canonical model. | Medium | Medium | **M** | Keep type generation deterministic and aligned with ADR-0001. | ✓ Mitigated — dist/types/ generated from canonical model |
 
 ---
 
