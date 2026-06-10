@@ -1,10 +1,10 @@
-# ADR: Composite Style Values — What Belongs in the Token Repository
+# ADR-0014: Composite Style Values — What Belongs in the Token Repository
 
 **Status:** Proposed  
 **Date:** 2026-06-09  
 **Context:** Cedar token spike — Figma-pulled token pipeline, multi-platform delivery  
 **Stakeholders:** Design system team, token spike team, DXP platform engineering, design  
-**Related:** ADR: Cedar Tailwind Preset — Multi-Platform Token Alignment Strategy
+**Related:** ADR-0015: Cedar Tailwind Preset — Multi-Platform Token Alignment Strategy
 
 ---
 

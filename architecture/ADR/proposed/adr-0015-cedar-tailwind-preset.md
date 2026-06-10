@@ -1,4 +1,4 @@
-# ADR: Cedar Tailwind Preset — Multi-Platform Token Alignment Strategy
+# ADR-0015: Cedar Tailwind Preset — Multi-Platform Token Alignment Strategy
 
 **Status:** Proposed  
 **Date:** 2026-06-08  
