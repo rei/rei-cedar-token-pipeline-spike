@@ -40,6 +40,9 @@ It serves as the single entry point for diagrams, ADRs, and technical notes that
 | **[ADR‑0006](./ADR/proposed/adr-0006-state-layer-system.md)** | State Layer System | Interactive state tokens (hover, pressed, focus, disabled, selected, error). |
 | **[ADR‑0009](./ADR/proposed/adr-0009-accessibility-requirements.md)** | Accessibility Requirements | WCAG 2.2 Level AA requirements in the token system. |
 | **[ADR‑0011](./ADR/proposed/adr-0011-harmonic-interval-validation.md)** | Harmonic Interval Validation | Harmonic validation system with perceptual correctness checking. |
+| **[ADR‑0013](./ADR/proposed/adr-0013-consumer-models.md)** | Cedar Token Consumer Models | Defines every consumer model Cedar commits to supporting (web, iOS, Android, Tailwind, Sass, TypeScript), what Cedar produces for each, and Layer 1/Layer 2 separation. Prerequisite to the token spike. |
+| **[ADR‑0014](./ADR/proposed/adr-0014-composite-token-values.md)** | Composite Style Values | Defines what is allowed in the token repository (atomic single-value tokens) vs what is not (composite multi-property values like Sass mixins), and where composite styles should live instead (platform libraries). |
+| **[ADR‑0015](./ADR/proposed/adr-0015-cedar-tailwind-preset.md)** | Cedar Tailwind Preset | Defines the Cedar-owned Tailwind preset (@rei/cedar-tailwind-preset) as the integration layer for Tailwind-based consumer teams. Preserves fluid spacing and palette mode runtime resolution via CSS custom properties. |
 
 ---
 
