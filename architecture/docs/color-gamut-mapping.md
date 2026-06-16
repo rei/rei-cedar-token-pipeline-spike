@@ -102,7 +102,8 @@ function needsP3Variant(oklch) {
 }
 
 // Generate P3 variant (no gamut clamping)
-const p3Hex = formatHex(toRgb(oklch, { space: 'p3' }));
+const toP3 = converter('p3');
+const p3 = toP3(oklch);
 ```
 
 **Token approach:**
