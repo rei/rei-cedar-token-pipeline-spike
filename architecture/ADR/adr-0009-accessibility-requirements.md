@@ -1,7 +1,7 @@
 # ADR-0009: Accessibility Requirements
 
 ## Status
-Proposed
+Future
 
 ## Context
 

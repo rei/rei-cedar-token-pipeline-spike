@@ -1,7 +1,7 @@
 # ADR-0011: Harmonic Interval Validation
 
 ## Status
-Proposed
+Future
 
 ## Context
 

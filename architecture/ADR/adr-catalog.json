@@ -108,7 +108,7 @@
       "number": "0004",
       "title": "Semantic Token Architecture",
       "status": "Planned",
-      "file": "proposed/adr-0004-semantic-token-architecture.md",
+      "file": "adr-0004-semantic-token-architecture.md",
       "description": "Defines the three-tier token architecture (Options → Alias → Component). Updated with spike findings: color.option.* path convention, platform override governance rules.",
       "topics": [
         "semantic-tokens",
@@ -172,8 +172,8 @@
     {
       "number": "0006",
       "title": "State Layer System",
-      "status": "Proposed",
-      "file": "proposed/adr-0006-state-layer-system.md",
+      "status": "Future",
+      "file": "adr-0006-state-layer-system.md",
       "description": "Defines interactive state tokens (hover, pressed, focus, disabled, selected, error) and the hybrid explicit/computed overlay approach.",
       "topics": [
         "interactive-states",
@@ -264,8 +264,8 @@
     {
       "number": "0009",
       "title": "Accessibility Requirements",
-      "status": "Proposed",
-      "file": "proposed/adr-0009-accessibility-requirements.md",
+      "status": "Future",
+      "file": "adr-0009-accessibility-requirements.md",
       "description": "Embeds WCAG 2.2 Level AA requirements into the token system: focus indicators, touch targets, color contrast, high contrast mode, motion preferences.",
       "topics": [
         "accessibility",
@@ -353,8 +353,8 @@
     {
       "number": "0011",
       "title": "Harmonic Interval Validation",
-      "status": "Proposed",
-      "file": "proposed/adr-0011-harmonic-interval-validation.md",
+      "status": "Future",
+      "file": "adr-0011-harmonic-interval-validation.md",
       "description": "Defines harmonic validation system with relationships section and harmonicInterval metadata for perceptual correctness checking.",
       "topics": [
         "harmonic-validation",
@@ -380,6 +380,108 @@
         "intervals field (WCAG) retained unchanged from harmonicInterval",
         "intervalRule is foreign key into harmony-registry.json"
       ]
+    },
+    {
+      "number": "0013",
+      "title": "Cedar Token Consumer Models",
+      "status": "Proposed",
+      "file": "adr-0013-consumer-models.md",
+      "description": "Defines every consumer model Cedar commits to supporting (web, iOS, Android, Tailwind, Sass, TypeScript), what Cedar produces for each, who owns the integration layer, and where Cedar's responsibility ends. Prerequisite to the token spike.",
+      "topics": [
+        "consumer-models",
+        "platform-outputs",
+        "css",
+        "sass",
+        "typescript",
+        "tailwind",
+        "ios",
+        "android",
+        "figma",
+        "integration-layers",
+        "composite-styles",
+        "layer-separation"
+      ],
+      "relationships": {
+        "prerequisites": [
+          "adr-0014"
+        ],
+        "referencedBy": [
+          "adr-0005"
+        ]
+      },
+      "keyDecisions": [
+        "Eight consumer models defined: Cedar components, CSS/vanilla web, Sass, TypeScript/JS, Tailwind CSS, iOS, Android, Figma",
+        "Layer 1 (token repository) produces platform-agnostic atomic values",
+        "Layer 2 (platform libraries) own composite expressions and integration adapters",
+        "Explicit out-of-scope list: React Native, CSS-in-JS, Web Components, W3C DTCG exports",
+        "Five open questions for the spike: fluid spacing on native, naming convention lock, rem-to-pt/dp conversion, palette mode on native, versioning policy"
+      ]
+    },
+    {
+      "number": "0014",
+      "title": "Composite Style Values",
+      "status": "Proposed",
+      "file": "adr-0014-composite-token-values.md",
+      "description": "Defines what is allowed in the token repository (atomic single-value tokens) vs what is not (composite multi-property values like Sass mixins), and where composite styles should live instead (platform libraries).",
+      "topics": [
+        "composite-styles",
+        "atomic-tokens",
+        "platform-agnostic",
+        "sass-mixins",
+        "platform-specific",
+        "figma-text-styles",
+        "gap-reporting",
+        "token-repository-boundaries"
+      ],
+      "relationships": {
+        "prerequisites": [],
+        "referencedBy": [
+          "adr-0013",
+          "adr-0015"
+        ]
+      },
+      "keyDecisions": [
+        "Token repository contains only atomic single-value tokens",
+        "Fluid/clamp values are atomic and allowed",
+        "Semantic alias tokens are allowed",
+        "Composite multi-property values (Sass mixins, CSS shorthand bundles) are not allowed in token repo",
+        "Figma text styles are decomposed into atomic tokens on export, not carried as composites",
+        "Composite styles live in platform-specific Cedar libraries (cedar-styles, iOS library, Android library, Tailwind preset)",
+        "Gap reporting is a first-class pipeline output"
+      ]
+    },
+    {
+      "number": "0015",
+      "title": "Cedar Tailwind Preset",
+      "status": "Proposed",
+      "file": "adr-0015-cedar-tailwind-preset.md",
+      "description": "Defines the Cedar-owned Tailwind preset (@rei/cedar-tailwind-preset) as the integration layer for Tailwind-based consumer teams. Preserves fluid spacing and palette mode runtime resolution via CSS custom properties.",
+      "topics": [
+        "tailwind",
+        "integration-layer",
+        "fluid-spacing",
+        "palette-modes",
+        "css-custom-properties",
+        "consumer-alignment",
+        "migration-path",
+        "gap-reporting"
+      ],
+      "relationships": {
+        "prerequisites": [
+          "adr-0014"
+        ],
+        "referencedBy": [
+          "adr-0013"
+        ]
+      },
+      "keyDecisions": [
+        "Cedar publishes and maintains @rei/cedar-tailwind-preset as official integration layer",
+        "Preset emits CSS custom properties at runtime (not static values) for spacing and color",
+        "All Cedar-sourced classes use cdr- prefix for clear boundary between design values and layout",
+        "Three-phase migration path: adopt preset, migrate to Cedar classes incrementally, enforce hard contract",
+        "Cedar commits to: preset maintenance alongside token releases, migration codemod, gap documentation, ESLint/Stylelint rule",
+        "Tailwind layout utilities (flex, grid, alignment) remain consumer's domain"
+      ]
     }
   ],
   "topicsIndex": {
@@ -396,13 +498,27 @@
     "harmonic-validation": ["adr-0011"],
     "style-dictionary": ["adr-0005"],
     "governance": ["adr-0002", "adr-0003", "adr-0010"],
-    "platform-overrides": ["adr-0001", "adr-0004"]
+    "platform-overrides": ["adr-0001", "adr-0004"],
+    "consumer-models": ["adr-0013"],
+    "composite-styles": ["adr-0014"],
+    "tailwind": ["adr-0015"],
+    "ios": ["adr-0013"],
+    "android": ["adr-0013"],
+    "sass": ["adr-0013"],
+    "typescript": ["adr-0013"],
+    "css": ["adr-0013"],
+    "integration-layers": ["adr-0013", "adr-0015"],
+    "atomic-tokens": ["adr-0014"],
+    "platform-agnostic": ["adr-0014"],
+    "fluid-spacing": ["adr-0015"],
+    "palette-modes": ["adr-0015"]
   },
   "statusIndex": {
     "Draft": ["adr-0001"],
     "Planned": ["adr-0004", "adr-0005"],
     "Implemented": ["adr-0002", "adr-0003", "adr-0010"],
-    "Proposed": ["adr-0006", "adr-0007", "adr-0008", "adr-0009", "adr-0011"],
+    "Proposed": ["adr-0007", "adr-0008", "adr-0013", "adr-0014", "adr-0015"],
+    "Future": ["adr-0006", "adr-0009", "adr-0011"],
     "Accepted": ["adr-0012"]
   }
 }

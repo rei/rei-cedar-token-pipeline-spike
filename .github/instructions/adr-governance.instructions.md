@@ -29,6 +29,7 @@ If an ADR predates this structure, improve incrementally without rewriting inten
 - `Proposed`
 - `Draft`
 - `Planned`
+- `Future`
 - `Accepted`
 - `Implemented`
 - `Superseded`
