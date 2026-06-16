@@ -139,7 +139,7 @@ function needsCmykVariant(oklch) {
 }
 
 // Convert to CMYK (using color management profile)
-const cmyk = rgbToCmyk(toRgb(oklch), profile: 'USWebCoatedSWOP');
+const cmyk = rgbToCmyk(toRgb(oklch), { profile: 'USWebCoatedSWOP' });
 ```
 
 **Token approach:**
