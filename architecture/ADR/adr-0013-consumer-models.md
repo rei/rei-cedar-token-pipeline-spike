@@ -254,7 +254,7 @@ object CdrTokens {
 **What they are:** The REI flagship iOS application is a large-scale production app with legacy UIKit code, new SwiftUI code, and complex color management requirements. It has significantly different requirements from new iOS projects.
 
 **Current Implementation (Flagship):**
-- **Distribution:** CocoaPods via private REI Git repo
+- **Distribution:** CocoaPods via private REI Git repo (legacy constraint being phased out)
 - **Version:** ~> 0.4.0
 - **Color Space:** sRGB (not Display P3)
 - **Color Access:** Enum-based pattern via CdrColor.color(CdrColorName.CdrColorTextPrimary)
@@ -265,53 +265,20 @@ object CdrTokens {
 - **Stylesheet Pattern:** CedarStylesheet for centralized color management
 - **Module Structure:** Single CedarTokens pod (not modular like rei-cedar-ios)
 
-**What the token spike produces for Flagship:**
-Generated CocoaPods-compatible outputs:
+**Cedar Standard (SPM):**
+- **Distribution:** Swift Package Manager
+- **Color Space:** Display P3
+- **Color Access:** Swift extension pattern via Color.cdrTextPrimary
+- **Frameworks:** SwiftUI + UIKit
+- **Objective-C Support:** Via Swift-ObjC interop (no separate headers required)
 
-```swift
-// CdrColor.swift — generated for flagship
-@objc public class CdrColor: NSObject {
-    @objc public static func color(_ name: CdrColorName) -> UIColor {
-        let colorName = colorNameString(for: name)
-        let bundle = Bundle(for: CdrColor.self)
-        guard let color = UIColor(named: colorName, in: bundle, compatibleWith: nil) else {
-            return .clear
-        }
-        return color
-    }
-    
-    @objc public static func values() -> [UIColor] {
-        return (0...222).compactMap { rawValue in
-            guard let colorName = CdrColorName(rawValue: rawValue) else { return nil }
-            return color(colorName)
-        }
-    }
-}
-```
+**Migration Considerations:**
+- Flagship migration to SPM is a consumer-side decision
+- Mobile platform leadership indicates CocoaPods is being phased out
+- Cedar provides Objective-C compatibility via standard Swift-ObjC interop
+- No separate CocoaPods output generation required
 
-```objc
-// CdrColor.h — generated for flagship Objective-C compatibility
-#import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
-
-typedef NS_ENUM(NSInteger, CdrColorName) {
-    CdrColorTextPrimary = 0,
-    CdrColorTextSecondary = 1,
-    // ... 223 color values
-};
-
-@interface CdrColor : NSObject
-
-+ (UIColor *)color:(CdrColorName)name;
-
-@end
-```
-
-**Integration layer:** Yes — the flagship app uses CedarStylesheet pattern for UIKit styling and direct XCAssets access for SwiftUI.
-
-**Cedar's boundary:** Cedar provides enum-based color access for Objective-C compatibility and sRGB color values for flagship compatibility. Composite UIKit helpers are the responsibility of the flagship app.
-
-**Token spike scope:** Generate CocoaPods-compatible outputs with enum-based access, sRGB color space, and Objective-C header files.
+**Cedar's boundary:** Cedar provides SPM distribution with Display P3 and Swift extensions. Flagship's current CocoaPods/sRGB implementation is a legacy constraint to be addressed through migration planning, not a first-class Cedar requirement. Composite UIKit helpers remain the responsibility of consumer applications.
 
 ---
 
