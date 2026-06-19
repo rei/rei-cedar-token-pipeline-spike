@@ -108,7 +108,7 @@ export const Overview: Story = {
           <h4 style="margin:0 0 0.75rem;font-size:1.1rem">Android XML (Legacy Compatibility)</h4>
           <ul style="margin:0;padding-left:1.5rem">
             <li style="margin-bottom:0.5rem">XML resources in <code style="background:#fff;padding:0.2rem 0.4rem;border-radius:4px">res/values/colors.xml</code></li>
-            <li style="margin-bottom:0.5rem">Light/dark mode via <code style="background:#fff;padding:0.2rem 0.4rem;border-radius:4px">values-night</code></li>
+            <li style="margin-bottom:0.5rem">Dark mode via <code style="background:#fff;padding:0.2rem 0.4rem;border-radius:4px">values-night</code> (planned)</li>
             <li>Traditional Android Views support</li>
           </ul>
         </div>

@@ -11,14 +11,14 @@ StyleDictionary.registerFormat({
     const uiColorExtensions = colorTokens
       .map((token: TransformedToken) => {
         const camelName = token.name.charAt(0).toUpperCase() + token.name.slice(1);
-        return `    public static let cdr${camelName} = UIColor(named: "cdr-${token.name}")`;
+        return `    public static let cdr${camelName} = UIColor(named: "cdr-${token.name}", in: Bundle.module, compatibleWith: nil)`;
       })
       .join("\n");
 
     const colorExtensions = colorTokens
       .map((token: TransformedToken) => {
         const camelName = token.name.charAt(0).toUpperCase() + token.name.slice(1);
-        return `    public static let cdr${camelName} = Color("cdr-${token.name}")`;
+        return `    public static let cdr${camelName} = Color("cdr-${token.name}", bundle: .module)`;
       })
       .join("\n");
 

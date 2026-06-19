@@ -372,6 +372,14 @@ This ADR does not address:
 - **Canonical token model:** That's covered by ADR-0001 (Canonical Token Model)
 - **Figma integration:** Figma sync-back is out of scope for Android distribution
 
+## Consequences
+
+- Enables automated token updates via standard Gradle dependency management and reduces manual copy/paste
+- Requires ongoing maintenance of the AAR packaging/publishing pipeline and versioning coordination with consumers
+- Positions Cedar as a leader in Android wide-gamut color support with OKLCH
+- Provides both Compose-first modern approach and XML legacy compatibility for gradual migration
+- Establishes automated distribution architecture that applies to all foundation categories (color, typography, spacing, etc.)
+
 ## Related Documents
 
 - ADR-0005: Transform Layer & Platform Outputs
