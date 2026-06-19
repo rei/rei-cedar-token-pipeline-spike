@@ -779,6 +779,8 @@ The Transform Layer generates platform-specific outputs aligned with modern stan
 - Wide-gamut color support for modern devices
 - Visual quality improvement
 - Default color space for Cedar iOS
+- Convert from OKLCH source values using culori library
+- OKLCH is source of truth (not hex) to preserve full gamut
 
 #### API Pattern
 
@@ -821,11 +823,14 @@ Swift extensions remain accessible from Objective-C via standard Swift-ObjC inte
 - Light/dark mode via values/values-night
 - Compatibility with existing implementations
 
-**High Spectrum Output (for New):**
-- Generate wide-gamut color values
-- Display P3 equivalent for Android
-- Visual quality improvement for modern devices
-- Requires education and demonstration
+**High Spectrum Output:**
+- Generate wide-gamut OKLCH color values for modern devices
+- Provide sRGB fallback for legacy device compatibility
+- Convert from OKLCH source values using culori library
+- OKLCH is source of truth (not hex) to preserve full gamut
+- Android XML resources are sRGB-only (platform limitation)
+- Wide-gamut colors require programmatic API (Compose Color with ColorSpaces.DisplayP3)
+- Automatic color space selection based on device capability
 
 #### Framework Variants
 
