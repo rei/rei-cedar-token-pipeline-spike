@@ -120,6 +120,13 @@ export const Overview: Story = {
           </p>
         </div>
 
+        <div style="background:#fff3cd;border-left:4px solid #ffc107;padding:1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0">
+          <h4 style="margin:0 0 0.75rem;font-size:1.1rem;color:#856404">Future Direction: Component Distribution</h4>
+          <p style="margin:0;font-size:0.9rem">
+            The Android team has expressed interest in distributed styled components (buttons, native elements) similar to the iOS demo, rather than just raw tokens. This aligns with the broader Foundation Distribution Architecture finding—consumers want higher-level abstractions that reduce cognitive load. Component-level distribution may be a future step beyond token-only delivery.
+          </p>
+        </div>
+
         <h2 style="font-size:1.8rem;margin:2rem 0 1rem">Distribution Mechanisms</h2>
         
         <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.9rem">
@@ -174,6 +181,61 @@ export const Overview: Story = {
             <li style="margin-bottom:0.5rem"><strong>Android:</strong> Basic output generation complete, CI/CD and GitLab Packages setup pending</li>
             <li><strong>Web:</strong> Full distribution via npm</li>
           </ul>
+        </div>
+
+        <h2 style="font-size:1.8rem;margin:2rem 0 1rem">Foundation Distribution Architecture</h2>
+        <p style="margin-bottom:1rem">
+          The most significant finding from the discovery effort is that native stakeholders consistently raised concerns about distribution and delivery rather than color definitions themselves. The same distribution concerns apply to all foundation categories: color, typography, spacing, radius, and shadows.
+        </p>
+
+        <div style="background:#f5f2eb;padding:1.5rem;border-radius:8px;margin:1.5rem 0">
+          <h4 style="margin:0 0 0.75rem;font-size:1.1rem">Distribution Goals</h4>
+          <ul style="margin:0;padding-left:1.5rem">
+            <li style="margin-bottom:0.5rem">Automated distribution via platform-native mechanisms</li>
+            <li style="margin-bottom:0.5rem">Versioned delivery with semantic versioning</li>
+            <li style="margin-bottom:0.5rem">CI/CD integration for automated updates</li>
+            <li style="margin-bottom:0.5rem">No manual copying or asset transfer</li>
+            <li>Platform-native consumption patterns</li>
+          </ul>
+        </div>
+
+        <h3 style="font-size:1.4rem;margin:1.5rem 0 0.75rem">Foundation Readiness Matrix</h3>
+        <p style="margin-bottom:1rem">
+          Cedar's foundation maturity varies across categories. Color has the most mature semantic authoring and native delivery models, while typography and spacing require additional discovery work.
+        </p>
+
+        <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.9rem">
+          <tr style="border-bottom:2px solid #ddd">
+            <th style="text-align:left;padding:0.75rem;background:#fafafa">Foundation</th>
+            <th style="text-align:left;padding:0.75rem;background:#fafafa">Semantic Model</th>
+            <th style="text-align:left;padding:0.75rem;background:#fafafa">Native Delivery</th>
+            <th style="text-align:left;padding:0.75rem;background:#fafafa">Readiness</th>
+          </tr>
+          <tr style="border-bottom:1px solid #eee">
+            <td style="padding:0.75rem;font-weight:500">Color</td>
+            <td style="padding:0.75rem">High</td>
+            <td style="padding:0.75rem">High</td>
+            <td style="padding:0.75rem;color:#28a745">Ready</td>
+          </tr>
+          <tr style="border-bottom:1px solid #eee">
+            <td style="padding:0.75rem;font-weight:500">Typography</td>
+            <td style="padding:0.75rem">Medium</td>
+            <td style="padding:0.75rem">Partial</td>
+            <td style="padding:0.75rem;color:#ffc107">Discovery Needed</td>
+          </tr>
+          <tr>
+            <td style="padding:0.75rem;font-weight:500">Spacing</td>
+            <td style="padding:0.75rem">Low</td>
+            <td style="padding:0.75rem">Low</td>
+            <td style="padding:0.75rem;color:#dc3545">Discovery Needed</td>
+          </tr>
+        </table>
+
+        <div style="background:#e8f4fd;border-left:4px solid #007bff;padding:1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0">
+          <h4 style="margin:0 0 0.75rem;font-size:1.1rem;color:#0056b3">Key Insight</h4>
+          <p style="margin:0;font-size:0.9rem">
+            Color was the entry point for native foundation distribution, but the distribution architecture being established applies equally to typography, spacing, radius, shadows, and future design foundations. The same automated distribution mechanisms (SPM for iOS, AAR for Android, npm for Web) will serve all foundation categories.
+          </p>
         </div>
       </div>
     `;

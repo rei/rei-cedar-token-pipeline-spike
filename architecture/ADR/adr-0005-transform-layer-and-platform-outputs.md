@@ -23,6 +23,29 @@ This ADR defines how Style Dictionary and custom transforms convert canonical to
 
 ---
 
+## Foundation Distribution Architecture
+
+The discovery effort revealed that distribution architecture is a first-class concern independent of specific foundation implementations. Native stakeholders consistently raised concerns about distribution and delivery rather than token definitions themselves.
+
+**Distribution Goals:**
+- Automated distribution via platform-native mechanisms
+- Versioned delivery with semantic versioning
+- CI/CD integration for automated updates
+- No manual copying or asset transfer
+- Platform-native consumption patterns
+
+**Foundation Scope:**
+The distribution architecture being established applies to all foundation categories:
+- Color (current implementation)
+- Typography (future implementation)
+- Spacing (future implementation)
+- Radius (future implementation)
+- Shadow (future implementation)
+
+The same automated distribution mechanisms (SPM for iOS, AAR for Android, npm for Web) will serve all foundation categories.
+
+---
+
 ## Purpose  
 The Transform Layer is responsible for:
 
@@ -33,7 +56,7 @@ The Transform Layer is responsible for:
 - producing optimized output artifacts  
 - maintaining semantic metadata for tooling  
 
-It is the **only** layer that generates platform‑specific code.
+It is the **only** layer that generates platform‑specific code for all foundation categories (color, typography, spacing, radius, shadow).
 
 ### Canonical Input Requirement
 
