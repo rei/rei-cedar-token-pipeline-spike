@@ -44,14 +44,14 @@ export const Overview: Story = {
           <tr style="border-bottom:1px solid #eee">
             <td style="padding:0.75rem;font-weight:500"><strong>Android Compose</strong></td>
             <td style="padding:0.75rem">GitLab Packages (AAR)</td>
-            <td style="padding:0.75rem">Wide-gamut (OKLCH)</td>
+            <td style="padding:0.75rem">Wide-gamut OKLCH + sRGB fallback</td>
             <td style="padding:0.75rem">Kotlin Compose objects</td>
             <td style="padding:0.75rem">Jetpack Compose (primary)</td>
           </tr>
           <tr style="border-bottom:1px solid #eee">
             <td style="padding:0.75rem;font-weight:500"><strong>Android XML</strong></td>
             <td style="padding:0.75rem">GitLab Packages (AAR)</td>
-            <td style="padding:0.75rem">Wide-gamut (OKLCH)</td>
+            <td style="padding:0.75rem">Wide-gamut OKLCH + sRGB fallback</td>
             <td style="padding:0.75rem">XML resources</td>
             <td style="padding:0.75rem">Views (legacy compatibility)</td>
           </tr>

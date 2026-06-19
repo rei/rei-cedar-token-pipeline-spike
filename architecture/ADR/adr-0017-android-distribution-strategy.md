@@ -209,12 +209,13 @@ The Android team is not rejecting modern color support—they simply haven't eva
 
 **Implementation:**
 
-- Generate wide-gamut OKLCH color values for Android
+- Generate wide-gamut OKLCH color values for modern devices
+- Provide sRGB fallback for legacy device compatibility
 - Align with Cedar's color architecture work
-- Provide modern color support for Compose and XML
 - Document device capability matrix for wide-gamut support
+- Enable automatic color space selection based on device capability
 
-**Rationale:** Cedar provides wide-gamut OKLCH color support as a leadership initiative to demonstrate Cedar's forward-looking approach to Android color support, aligning with the broader Cedar color architecture work.
+**Rationale:** Cedar provides wide-gamut OKLCH color support as a leadership initiative to demonstrate Cedar's forward-looking approach to Android color support, aligning with the broader Cedar color architecture work. sRGB fallback ensures compatibility with legacy devices that don't support wide-gamut.
 
 ### Dark Mode Support
 

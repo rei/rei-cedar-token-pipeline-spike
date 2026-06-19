@@ -312,7 +312,7 @@ Generated XML resource files for manual integration:
 
 **Cedar Standard (Compose-First):**
 - **Distribution:** AAR library via GitLab Packages
-- **Color Space:** Wide-gamut OKLCH (aligns with Cedar color architecture)
+- **Color Space:** Wide-gamut OKLCH with sRGB fallback (aligns with Cedar color architecture)
 - **Framework:** Jetpack Compose (primary) + XML (legacy compatibility)
 - **Color Access:** Kotlin Compose objects (CedarColors.cdrTextBase)
 - **Dark Mode:** Compose color schemes with dark mode support

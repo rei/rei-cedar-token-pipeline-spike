@@ -755,7 +755,7 @@ The flagship iOS and Android applications have legacy constraints that differ fr
 - **Flagship Legacy:** CocoaPods, sRGB, enum-based access, Objective-C compatibility (migration consideration)
 
 **Android:**
-- **Cedar Standard:** Automated AAR distribution, Compose-first color schemes, wide-gamut OKLCH color space, dark mode, semantic tokens
+- **Cedar Standard:** Automated AAR distribution, Compose-first color schemes, wide-gamut OKLCH with sRGB fallback, dark mode, semantic tokens
 - **Leadership Opportunity:** Android team not rejecting modern support—simply unaware it exists. Cedar can lead by providing wide-gamut OKLCH color support and Compose-first implementation.
 - **Flagship Legacy:** Manual copying, XML resources only, no dark mode, legacy colors (migration consideration)
 
