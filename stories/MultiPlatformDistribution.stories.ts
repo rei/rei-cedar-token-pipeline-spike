@@ -44,14 +44,14 @@ export const Overview: Story = {
           <tr style="border-bottom:1px solid #eee">
             <td style="padding:0.75rem;font-weight:500"><strong>Android Compose</strong></td>
             <td style="padding:0.75rem">GitLab Packages (AAR)</td>
-            <td style="padding:0.75rem">sRGB</td>
+            <td style="padding:0.75rem">Wide-gamut (OKLCH)</td>
             <td style="padding:0.75rem">Kotlin Compose objects</td>
             <td style="padding:0.75rem">Jetpack Compose (primary)</td>
           </tr>
           <tr style="border-bottom:1px solid #eee">
             <td style="padding:0.75rem;font-weight:500"><strong>Android XML</strong></td>
             <td style="padding:0.75rem">GitLab Packages (AAR)</td>
-            <td style="padding:0.75rem">sRGB</td>
+            <td style="padding:0.75rem">Wide-gamut (OKLCH)</td>
             <td style="padding:0.75rem">XML resources</td>
             <td style="padding:0.75rem">Views (legacy compatibility)</td>
           </tr>
@@ -91,7 +91,7 @@ export const Overview: Story = {
 
         <h3 style="font-size:1.4rem;margin:1.5rem 0 0.75rem">Android Implementation</h3>
         <p style="margin-bottom:1rem">
-          Cedar leads with Compose-first Android development, providing Kotlin Compose color schemes as the primary output with XML resources for legacy Views compatibility. The flagship Android application already uses Jetpack Compose, positioning Cedar to provide modern, forward-looking color support.
+          Cedar leads with Compose-first Android development, providing Kotlin Compose color schemes as the primary output with XML resources for legacy Views compatibility. The flagship Android application already uses Jetpack Compose, positioning Cedar to provide modern, forward-looking color support. Android uses wide-gamut OKLCH color space to align with Cedar's color architecture work.
         </p>
 
         <div style="background:#f5f2eb;padding:1.5rem;border-radius:8px;margin:1.5rem 0">

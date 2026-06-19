@@ -205,22 +205,16 @@ object CedarColors {
 
 **Leadership Opportunity:**
 
-The Android team is not rejecting modern color support—they simply haven't evaluated it yet. Cedar has an opportunity to lead by providing wide-gamut color support for Android, positioning Cedar as a forward-looking design system.
+The Android team is not rejecting modern color support—they simply haven't evaluated it yet. Cedar has an opportunity to lead by providing wide-gamut OKLCH color support for Android, aligning with Cedar's color architecture work and positioning Cedar as a forward-looking design system.
 
-**Initial Implementation (Q3 2026):**
+**Implementation:**
 
-- Generate sRGB values for broad compatibility
-- Match current flagship implementation
-- Ensure immediate adoption without breaking changes
+- Generate wide-gamut OKLCH color values for Android
+- Align with Cedar's color architecture work
+- Provide modern color support for Compose and XML
+- Document device capability matrix for wide-gamut support
 
-**Future Enhancement (Q4 2026):**
-
-- Add wide-gamut color support as leadership initiative
-- Demonstrate visual differences vs sRGB
-- Document device capability matrix
-- Educate Android team on benefits
-
-**Rationale:** Start with sRGB for compatibility, then add wide-gamut as a leadership initiative to demonstrate Cedar's forward-looking approach to Android color support.
+**Rationale:** Cedar provides wide-gamut OKLCH color support as a leadership initiative to demonstrate Cedar's forward-looking approach to Android color support, aligning with the broader Cedar color architecture work.
 
 ### Dark Mode Support
 
@@ -300,18 +294,18 @@ object CedarColors {
 - Removed manual copy-paste process
 - Migration documentation
 
-### Phase 4: Wide-Gamut Leadership (Q4 2026)
+### Phase 4: Wide-Gamut OKLCH Implementation (Q4 2026)
 
 **Tasks:**
-1. Demonstrate wide-gamut vs sRGB differences
-2. Educate Android team on benefits
-3. Add wide-gamut color generation
-4. Document device capability matrix
+1. Implement wide-gamut OKLCH color generation for Android
+2. Align with Cedar color architecture work
+3. Document device capability matrix for wide-gamut support
+4. Demonstrate OKLCH vs sRGB visual differences
 5. Position Cedar as leader in modern Android color support
 
 **Deliverables:**
-- Wide-gamut color support
-- Visual demonstration
+- Wide-gamut OKLCH color support
+- Visual demonstration of OKLCH benefits
 - Device capability documentation
 - Leadership positioning materials
 
@@ -349,22 +343,23 @@ object CedarColors {
 - Remove manual color copying scripts
 - Document migration completion
 
-### From sRGB to Wide-Gamut
+### From Manual Copying to OKLCH Wide-Gamut
 
 **Step 1: Education (Q4 2026)**
-- Demonstrate visual differences
+- Demonstrate OKLCH vs sRGB visual differences
 - Document device capability matrix
-- Educate Android team on leadership opportunity
+- Educate Android team on OKLCH benefits
+- Align with Cedar color architecture work
 
-**Step 2: Wide-Gamut Implementation (Q1 2027)**
-- Add wide-gamut color generation
+**Step 2: OKLCH Implementation (Q1 2027)**
+- Implement wide-gamut OKLCH color generation
 - Position as Cedar leadership initiative
 - Document benefits and use cases
 - Share findings with Android community
 
 **Step 3: Leadership Positioning (Q2 2027)**
 - Demonstrate Cedar as forward-looking Android design system
-- Publish case studies on wide-gamut benefits
+- Publish case studies on OKLCH benefits
 - Encourage industry adoption of modern Android color practices
 
 ## Non-Goals
