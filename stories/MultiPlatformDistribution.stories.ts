@@ -165,7 +165,6 @@ export const Overview: Story = {
           <li style="margin-bottom:0.5rem"><a href="/?path=/docs/architecture-adr-0005-transform-layer-and-platform-outputs--docs" style="color:#007bff;text-decoration:underline">ADR-0005: Transform Layer & Platform Outputs</a></li>
           <li style="margin-bottom:0.5rem"><a href="/?path=/docs/architecture-adr-0013-consumer-models--docs" style="color:#007bff;text-decoration:underline">ADR-0013: Consumer Models</a></li>
           <li style="margin-bottom:0.5rem"><a href="/?path=/docs/architecture-adr-0017-android-distribution-strategy--docs" style="color:#007bff;text-decoration:underline">ADR-0017: Android Distribution Strategy</a></li>
-          <li><a href="/?path=/docs/docs-android-token-distribution-requirements--docs" style="color:#007bff;text-decoration:underline">Android Token Distribution Requirements</a></li>
         </ul>
 
         <div style="background:#e8f4fd;border-left:4px solid #007bff;padding:1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0">
