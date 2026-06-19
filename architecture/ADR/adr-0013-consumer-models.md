@@ -249,7 +249,109 @@ object CdrTokens {
 
 ---
 
-### 8. Figma (Design — Source and Consumer)
+### 8. Flagship iOS (Legacy Consumer Model)
+
+**What they are:** The REI flagship iOS application is a large-scale production app with legacy UIKit code, new SwiftUI code, and complex color management requirements. It has significantly different requirements from new iOS projects.
+
+**Current Implementation (Flagship):**
+- **Distribution:** CocoaPods via private REI Git repo
+- **Version:** ~> 0.4.0
+- **Color Space:** sRGB (not Display P3)
+- **Color Access:** Enum-based pattern via CdrColor.color(CdrColorName.CdrColorTextPrimary)
+- **Frameworks:** UIKit (legacy) + SwiftUI (new)
+- **Color Surface:** 223 colors (CdrColor* + REIColor* legacy + generic names)
+- **Naming Conventions:** Dual naming (CdrColor* + REIColor*)
+- **Objective-C Support:** Required (@objc classes, header files)
+- **Stylesheet Pattern:** CedarStylesheet for centralized color management
+- **Module Structure:** Single CedarTokens pod (not modular like rei-cedar-ios)
+
+**What the token spike produces for Flagship:**
+Generated CocoaPods-compatible outputs:
+
+```swift
+// CdrColor.swift — generated for flagship
+@objc public class CdrColor: NSObject {
+    @objc public static func color(_ name: CdrColorName) -> UIColor {
+        let colorName = colorNameString(for: name)
+        let bundle = Bundle(for: CdrColor.self)
+        guard let color = UIColor(named: colorName, in: bundle, compatibleWith: nil) else {
+            return .clear
+        }
+        return color
+    }
+    
+    @objc public static func values() -> [UIColor] {
+        return (0...222).compactMap { rawValue in
+            guard let colorName = CdrColorName(rawValue: rawValue) else { return nil }
+            return color(colorName)
+        }
+    }
+}
+```
+
+```objc
+// CdrColor.h — generated for flagship Objective-C compatibility
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+
+typedef NS_ENUM(NSInteger, CdrColorName) {
+    CdrColorTextPrimary = 0,
+    CdrColorTextSecondary = 1,
+    // ... 223 color values
+};
+
+@interface CdrColor : NSObject
+
++ (UIColor *)color:(CdrColorName)name;
+
+@end
+```
+
+**Integration layer:** Yes — the flagship app uses CedarStylesheet pattern for UIKit styling and direct XCAssets access for SwiftUI.
+
+**Cedar's boundary:** Cedar provides enum-based color access for Objective-C compatibility and sRGB color values for flagship compatibility. Composite UIKit helpers are the responsibility of the flagship app.
+
+**Token spike scope:** Generate CocoaPods-compatible outputs with enum-based access, sRGB color space, and Objective-C header files.
+
+---
+
+### 9. Flagship Android (Legacy Consumer Model)
+
+**What they are:** The REI flagship Android application is a large-scale production app with legacy color management. It has significantly different requirements from new Android projects.
+
+**Current Implementation (Flagship):**
+- **Distribution:** Manual copying of legacy cedar-release.aar colors
+- **Color Space:** sRGB (team not aware of high spectrum option)
+- **Framework:** Jetpack Compose (primary) + XML Views (legacy)
+- **Color Access:** XML resources via @color/ references
+- **Color Surface:** Large number of Cedar color definitions in XML
+- **Dark Mode:** Not implemented (no values-night directory)
+- **Compose Color Schemes:** Not implemented (colors from XML)
+- **Automated Distribution:** Not implemented (manual process)
+- **Legacy Colors:** Using colors Cedar provided years ago
+
+**What the token spike produces for Flagship:**
+Generated XML resource files for manual integration:
+
+```xml
+<!-- res/values/colors.xml — generated for flagship manual integration -->
+<resources>
+  <color name="cdr_color_text_primary">#1A1A1A</color>
+  <color name="cdr_color_text_secondary">#666666</color>
+  <color name="cdr_color_background_primary">#FFFFFF</color>
+  <!-- ... additional colors -->
+</resources>
+```
+
+**Integration layer:** Limited — the flagship app uses manual copy-paste from dist to project. No automated integration layer.
+
+**Cedar's boundary:** Cedar provides XML resource files with sRGB color values for flagship compatibility. Composite style definitions are the responsibility of the flagship app.
+
+**Token spike scope:** Generate XML resource files with sRGB color space for manual integration. Note: This is a transitional approach — automated distribution and high spectrum support are planned for new projects.
+
+---
+
+### 10. Figma (Design — Source and Consumer)
 
 **What they are:** Figma is both the **source** of tokens in the new pipeline and a **consumer** of the published token contract for design tooling, documentation, and design-development handoff.
 
