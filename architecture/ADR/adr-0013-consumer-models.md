@@ -310,11 +310,22 @@ Generated XML resource files for manual integration:
 </resources>
 ```
 
+**Cedar Standard (Compose-First):**
+- **Distribution:** AAR library via GitLab Packages
+- **Color Space:** sRGB (with wide-gamut leadership opportunity)
+- **Framework:** Jetpack Compose (primary) + XML (legacy compatibility)
+- **Color Access:** Kotlin Compose objects (CedarColors.cdrTextBase)
+- **Dark Mode:** Compose color schemes with dark mode support
+- **Automated Distribution:** CI/CD pipeline for AAR generation
+
+**Leadership Opportunity:**
+The Android team is not rejecting modern color support—they simply haven't evaluated it yet. Cedar has an opportunity to lead by providing wide-gamut color support, Compose-first color schemes, and automated AAR distribution. The flagship already uses Compose, positioning Cedar to provide modern, forward-looking color support.
+
 **Integration layer:** Limited — the flagship app uses manual copy-paste from dist to project. No automated integration layer.
 
-**Cedar's boundary:** Cedar provides XML resource files with sRGB color values for flagship compatibility. Composite style definitions are the responsibility of the flagship app.
+**Cedar's boundary:** Cedar provides AAR distribution with Compose-first color schemes and XML resources for legacy compatibility. Flagship's current manual XML consumption is a legacy constraint addressed through migration planning. Composite style definitions remain the responsibility of consumer applications.
 
-**Token spike scope:** Generate XML resource files with sRGB color space for manual integration. Note: This is a transitional approach — automated distribution and high spectrum support are planned for new projects.
+**Token spike scope:** Generate XML resource files with sRGB color space for manual integration (transitional). Automated distribution and Compose-first approach planned for new projects.
 
 ---
 

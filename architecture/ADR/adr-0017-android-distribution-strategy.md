@@ -179,17 +179,7 @@ Unlike some approaches that inject code at build time, the AAR approach uses sta
 
 ### Dual Framework Support
 
-**XML Resources (for Views):**
-
-```xml
-<!-- res/values/colors.xml from AAR -->
-<resources>
-    <color name="cdr_color_surface_base">#FFFFFF</color>
-    <color name="cdr_color_text_primary">#1A1A1A</color>
-</resources>
-```
-
-**Compose Color Schemes (for Compose):**
+**Jetpack Compose (Primary):**
 
 ```kotlin
 // CedarColors.kt from AAR
@@ -199,9 +189,23 @@ object CedarColors {
 }
 ```
 
-**Decision:** Generate both XML resources and Compose color schemes in the AAR to support both frameworks.
+**XML Resources (Legacy Compatibility):**
+
+```xml
+<!-- res/values/colors.xml from AAR -->
+<resources>
+    <color name="cdr_color_surface_base">#FFFFFF</color>
+    <color name="cdr_color_text_primary">#1A1A1A</color>
+</resources>
+```
+
+**Decision:** Generate Compose color schemes as the primary output with XML resources for legacy Views compatibility. The flagship Android application already uses Jetpack Compose, positioning Cedar to provide modern, forward-looking color support.
 
 ### Color Space Strategy
+
+**Leadership Opportunity:**
+
+The Android team is not rejecting modern color support—they simply haven't evaluated it yet. Cedar has an opportunity to lead by providing wide-gamut color support for Android, positioning Cedar as a forward-looking design system.
 
 **Initial Implementation (Q3 2026):**
 
@@ -211,12 +215,12 @@ object CedarColors {
 
 **Future Enhancement (Q4 2026):**
 
-- Add high spectrum color support as opt-in
-- Generate both sRGB and high spectrum variants
+- Add wide-gamut color support as leadership initiative
+- Demonstrate visual differences vs sRGB
 - Document device capability matrix
-- Educate Android team on visual differences
+- Educate Android team on benefits
 
-**Rationale:** Start with sRGB to match current implementation, then add high spectrum as an enhancement after education and demonstration.
+**Rationale:** Start with sRGB for compatibility, then add wide-gamut as a leadership initiative to demonstrate Cedar's forward-looking approach to Android color support.
 
 ### Dark Mode Support
 
@@ -267,12 +271,27 @@ object CedarColors {
 - Published AAR library (version 0.1.0)
 - Documentation for integration
 
-### Phase 2: Flagship Integration (Q3 2026)
+### Phase 2: Compose-First Implementation (Immediate)
+
+**Tasks:**
+1. Generate Compose color schemes as primary output
+2. Generate XML resources for legacy Views compatibility
+3. Implement dark mode support for Compose
+4. Test Compose integration in flagship app
+5. Document Compose integration patterns
+
+**Deliverables:**
+- Compose color schemes in AAR library
+- XML resources for legacy compatibility
+- Dark mode support
+- Compose integration guide
+
+### Phase 3: Flagship Integration (Q3 2026)
 
 **Tasks:**
 1. Add Gradle dependency to flagship app
 2. Replace manual color copying with AAR dependency
-3. Update color references to use new token names
+3. Update color references to use Compose color schemes
 4. Test build and runtime behavior
 5. Remove legacy cedar-release.aar dependency
 
@@ -281,46 +300,34 @@ object CedarColors {
 - Removed manual copy-paste process
 - Migration documentation
 
-### Phase 3: Dark Mode Implementation (Q3 2026)
+### Phase 4: Wide-Gamut Leadership (Q4 2026)
 
 **Tasks:**
-1. Generate values-night directory
-2. Implement Compose color schemes with dark mode
-3. Test dark mode behavior in flagship app
-4. Document dark mode integration
-
-**Deliverables:**
-- Dark mode support in AAR library
-- Compose color schemes
-- Dark mode integration guide
-
-### Phase 4: High Spectrum Support (Q4 2026)
-
-**Tasks:**
-1. Demonstrate high spectrum vs sRGB differences
+1. Demonstrate wide-gamut vs sRGB differences
 2. Educate Android team on benefits
-3. Add high spectrum color generation
-4. Generate dual color space variants
-5. Document device capability matrix
+3. Add wide-gamut color generation
+4. Document device capability matrix
+5. Position Cedar as leader in modern Android color support
 
 **Deliverables:**
-- High spectrum color support
+- Wide-gamut color support
 - Visual demonstration
 - Device capability documentation
-- Education materials
+- Leadership positioning materials
 
-### Phase 5: Compose Integration (Q1 2027)
+### Phase 5: Education & Adoption (Q1 2027)
 
 **Tasks:**
-1. Prioritize Compose color scheme generation
-2. Encourage migration from XML to Compose
-3. Document Compose integration patterns
-4. Deprecate XML resource generation
+1. Share wide-gamut findings with Android community
+2. Document Cedar's Android leadership approach
+3. Encourage other teams to adopt Compose-first
+4. Provide migration guidance from XML to Compose
 
 **Deliverables:**
-- Compose-first color scheme generation
-- Compose integration guide
-- Deprecation notice for XML resources
+- Leadership case studies
+- Community education materials
+- Migration guides
+- Best practices documentation
 
 ## Migration Strategy
 
@@ -342,22 +349,23 @@ object CedarColors {
 - Remove manual color copying scripts
 - Document migration completion
 
-### From sRGB to High Spectrum
+### From sRGB to Wide-Gamut
 
 **Step 1: Education (Q4 2026)**
 - Demonstrate visual differences
 - Document device capability matrix
-- Educate Android team
+- Educate Android team on leadership opportunity
 
-**Step 2: Dual Support (Q1 2027)**
-- Generate both sRGB and high spectrum variants
-- Allow teams to choose color space
-- Document selection criteria
+**Step 2: Wide-Gamut Implementation (Q1 2027)**
+- Add wide-gamut color generation
+- Position as Cedar leadership initiative
+- Document benefits and use cases
+- Share findings with Android community
 
-**Step 3: High Spectrum Default (Q2 2027)**
-- Make high spectrum default for new projects
-- Maintain sRGB fallback for older devices
-- Deprecate sRGB-only generation
+**Step 3: Leadership Positioning (Q2 2027)**
+- Demonstrate Cedar as forward-looking Android design system
+- Publish case studies on wide-gamut benefits
+- Encourage industry adoption of modern Android color practices
 
 ## Non-Goals
 
