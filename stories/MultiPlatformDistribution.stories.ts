@@ -23,7 +23,7 @@ export const Overview: Story = {
 
         <h2 style="font-size:1.8rem;margin:2rem 0 1rem">Distribution Support Matrix</h2>
         <p style="margin-bottom:1rem">
-          The token pipeline generates platform-specific outputs for iOS, Android, and Web. iOS uses Swift Package Manager with Display P3 color space as the modern standard. Android provides both XML resources for legacy Views and Compose color schemes for modern Jetpack Compose development.
+          The token pipeline generates platform-specific outputs for iOS, Android, and Web. iOS uses Swift Package Manager with Display P3 color space as the modern standard. Android leads with Compose-first development, providing Kotlin Compose color schemes as the primary output with XML resources for legacy Views compatibility.
         </p>
 
         <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.9rem">
@@ -42,18 +42,18 @@ export const Overview: Story = {
             <td style="padding:0.75rem">All iOS projects</td>
           </tr>
           <tr style="border-bottom:1px solid #eee">
-            <td style="padding:0.75rem;font-weight:500"><strong>Android XML</strong></td>
-            <td style="padding:0.75rem">GitLab Packages (AAR)</td>
-            <td style="padding:0.75rem">sRGB</td>
-            <td style="padding:0.75rem">XML resources</td>
-            <td style="padding:0.75rem">Views (legacy)</td>
-          </tr>
-          <tr style="border-bottom:1px solid #eee">
             <td style="padding:0.75rem;font-weight:500"><strong>Android Compose</strong></td>
             <td style="padding:0.75rem">GitLab Packages (AAR)</td>
             <td style="padding:0.75rem">sRGB</td>
             <td style="padding:0.75rem">Kotlin Compose objects</td>
-            <td style="padding:0.75rem">Jetpack Compose (modern)</td>
+            <td style="padding:0.75rem">Jetpack Compose (primary)</td>
+          </tr>
+          <tr style="border-bottom:1px solid #eee">
+            <td style="padding:0.75rem;font-weight:500"><strong>Android XML</strong></td>
+            <td style="padding:0.75rem">GitLab Packages (AAR)</td>
+            <td style="padding:0.75rem">sRGB</td>
+            <td style="padding:0.75rem">XML resources</td>
+            <td style="padding:0.75rem">Views (legacy compatibility)</td>
           </tr>
           <tr>
             <td style="padding:0.75rem;font-weight:500"><strong>Web</strong></td>
@@ -89,27 +89,35 @@ export const Overview: Story = {
           </p>
         </div>
 
-        <h3 style="font-size:1.4rem;margin:1.5rem 0 0.75rem">Android Dual Framework Support</h3>
+        <h3 style="font-size:1.4rem;margin:1.5rem 0 0.75rem">Android Implementation</h3>
         <p style="margin-bottom:1rem">
-          Cedar generates both XML resources for traditional Views and Kotlin Compose objects for Jetpack Compose, packaged in a single AAR library distributed via GitLab Packages.
+          Cedar leads with Compose-first Android development, providing Kotlin Compose color schemes as the primary output with XML resources for legacy Views compatibility. The flagship Android application already uses Jetpack Compose, positioning Cedar to provide modern, forward-looking color support.
         </p>
 
         <div style="background:#f5f2eb;padding:1.5rem;border-radius:8px;margin:1.5rem 0">
-          <h4 style="margin:0 0 0.75rem;font-size:1.1rem">Android XML (Views)</h4>
+          <h4 style="margin:0 0 0.75rem;font-size:1.1rem">Android Compose (Primary)</h4>
           <ul style="margin:0 0 1rem;padding-left:1.5rem">
+            <li style="margin-bottom:0.5rem">Kotlin object: <code style="background:#fff;padding:0.2rem 0.4rem;border-radius:4px">CedarColors.cdrTextBase</code></li>
+            <li style="margin-bottom:0.5rem">Jetpack Compose Color type</li>
+            <li style="margin-bottom:0.5rem">Modern Android UI development</li>
+            <li>Primary output for new Compose projects</li>
+          </ul>
+        </div>
+
+        <div style="background:#f5f2eb;padding:1.5rem;border-radius:8px;margin:1.5rem 0">
+          <h4 style="margin:0 0 0.75rem;font-size:1.1rem">Android XML (Legacy Compatibility)</h4>
+          <ul style="margin:0;padding-left:1.5rem">
             <li style="margin-bottom:0.5rem">XML resources in <code style="background:#fff;padding:0.2rem 0.4rem;border-radius:4px">res/values/colors.xml</code></li>
             <li style="margin-bottom:0.5rem">Light/dark mode via <code style="background:#fff;padding:0.2rem 0.4rem;border-radius:4px">values-night</code></li>
             <li>Traditional Android Views support</li>
           </ul>
         </div>
 
-        <div style="background:#f5f2eb;padding:1.5rem;border-radius:8px;margin:1.5rem 0">
-          <h4 style="margin:0 0 0.75rem;font-size:1.1rem">Android Compose (Modern)</h4>
-          <ul style="margin:0;padding-left:1.5rem">
-            <li style="margin-bottom:0.5rem">Kotlin object: <code style="background:#fff;padding:0.2rem 0.4rem;border-radius:4px">CedarColors.cdrTextBase</code></li>
-            <li style="margin-bottom:0.5rem">Jetpack Compose Color type</li>
-            <li>Modern Android UI development</li>
-          </ul>
+        <div style="background:#e8f4fd;border-left:4px solid #007bff;padding:1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0">
+          <h4 style="margin:0 0 0.75rem;font-size:1.1rem;color:#0056b3">Android Leadership Opportunity</h4>
+          <p style="margin:0;font-size:0.9rem">
+            The Android team is not rejecting modern color support—they simply haven't evaluated it yet. Cedar has an opportunity to lead by providing wide-gamut color support, Compose-first color schemes, and automated AAR distribution. This positions Cedar as a forward-looking design system for modern Android development.
+          </p>
         </div>
 
         <h2 style="font-size:1.8rem;margin:2rem 0 1rem">Distribution Mechanisms</h2>

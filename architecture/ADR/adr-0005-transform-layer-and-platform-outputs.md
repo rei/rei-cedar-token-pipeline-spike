@@ -732,7 +732,8 @@ The flagship iOS and Android applications have legacy constraints that differ fr
 - **Flagship Legacy:** CocoaPods, sRGB, enum-based access, Objective-C compatibility (migration consideration)
 
 **Android:**
-- **Cedar Standard:** Automated AAR distribution, Compose color schemes, dark mode, semantic tokens
+- **Cedar Standard:** Automated AAR distribution, Compose-first color schemes, dark mode, semantic tokens
+- **Leadership Opportunity:** Android team not rejecting modern support—simply unaware it exists. Cedar can lead by providing wide-gamut color support and Compose-first implementation.
 - **Flagship Legacy:** Manual copying, XML resources only, no dark mode, legacy colors (migration consideration)
 
 The Transform Layer generates platform-specific outputs aligned with modern standards. Legacy consumer constraints are addressed through migration planning rather than dual implementation.
@@ -786,15 +787,16 @@ Swift extensions remain accessible from Objective-C via standard Swift-ObjC inte
 
 #### Framework Support
 
+**Jetpack Compose (Primary):**
+- Generate Kotlin Compose color schemes
+- Compose Color object properties
+- Modern Android UI development
+- Primary output for new Compose projects
+
 **XML Resources (Legacy Compatibility):**
 - Generate XML resources for traditional Android Views
 - Light/dark mode via values/values-night
 - Compatibility with existing implementations
-
-**Jetpack Compose (Modern):**
-- Generate Kotlin Compose color schemes
-- Compose Color object properties
-- Modern Android UI development
 
 **High Spectrum Output (for New):**
 - Generate wide-gamut color values
