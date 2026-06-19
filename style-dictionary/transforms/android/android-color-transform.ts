@@ -1,5 +1,7 @@
 import type { Transform } from 'style-dictionary/types';
-import { parse } from 'culori';
+import { converter, parse } from 'culori';
+
+const toRgb = converter('rgb');
 
 export const androidColorTransform: Transform = {
   name: 'value/android-color',
@@ -22,8 +24,16 @@ export const androidColorTransform: Transform = {
       throw new Error(`[android-color] Could not parse color value "${value}"`);
     }
 
-    // Convert to hex using culori's format function
-    const hex = (parsed as { format: (space: string) => string }).format('hex');
-    return hex;
+    // Convert to RGB and format as hex
+    const rgb = toRgb(parsed);
+    if (!rgb) {
+      throw new Error(`[android-color] Could not convert color value "${value}" to RGB`);
+    }
+
+    const r = Math.round(((rgb as { r?: number }).r ?? 0) * 255);
+    const g = Math.round(((rgb as { g?: number }).g ?? 0) * 255);
+    const b = Math.round(((rgb as { b?: number }).b ?? 0) * 255);
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
   },
 };
