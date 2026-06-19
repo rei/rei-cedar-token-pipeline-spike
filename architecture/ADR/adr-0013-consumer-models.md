@@ -273,10 +273,11 @@ object CdrTokens {
 - **Objective-C Support:** Via Swift-ObjC interop (no separate headers required)
 
 **Consumer-Specific Outputs (to reduce adoption barrier):**
-- **Objective-C Enum Generation:** Cedar can generate Objective-C enum headers for legacy Objective-C codebases
-- **Dual Naming Support:** Cedar can support consumer-specific naming conventions (e.g., CdrColor* + REIColor*) via configuration
-- **Principle:** Cedar provides outputs consumers want to reduce adoption barrier, as long as maintenance burden is reasonable
-- **Rationale:** Reducing consumer cognitive load and adoption barriers takes precedence over enforcing modern patterns. Consumer-specific outputs are generated from the token source of truth via the Transform Layer, not hardcoded logic.
+- **Objective-C Enum Generation:** Cedar can generate Objective-C enum headers for legacy Objective-C codebases (based on Cedar token names)
+- **Dual Naming Support:** Cedar can support consumer-specific naming conventions via configuration (e.g., CdrColor* pattern). Cedar generates outputs based on its own token names, not legacy patterns like REIColor* or generic names.
+- **Stylesheet Pattern Support:** Cedar can generate centralized stylesheet patterns (e.g., CedarStylesheet) for legacy color management approaches (based on Cedar token names)
+- **Principle:** Cedar provides outputs consumers want to reduce adoption barrier, as long as maintenance burden is reasonable. All outputs are based on Cedar's token names, not transformations to legacy patterns.
+- **Rationale:** Reducing consumer cognitive load and adoption barriers takes precedence over enforcing modern patterns. Consumer-specific outputs are generated from the token source of truth via the Transform Layer, not hardcoded logic. Cedar does not transform its token names to match legacy consumer patterns (e.g., REIColor*).
 
 **Migration Considerations:**
 - Flagship migration to SPM is a consumer-side decision
