@@ -44,6 +44,15 @@ The distribution architecture being established applies to all foundation catego
 
 The same automated distribution mechanisms (SPM for iOS, AAR for Android, npm for Web) will serve all foundation categories.
 
+### Principle: Consumer-Specific Outputs
+
+Cedar provides consumer-specific outputs to reduce adoption barriers, as long as the maintenance burden is reasonable. This means:
+
+- **Reduced Cognitive Load:** Consumers should not need to understand Cedar internals or maintain their own mapping layers
+- **Adoption Barrier Reduction:** Cedar generates outputs consumers want, even if they represent legacy patterns
+- **Configurable, Not Hardcoded:** Consumer-specific outputs are generated from the token source of truth via configuration, not hardcoded logic
+- **Modern Standard First:** Cedar provides modern patterns as the standard (e.g., SPM, Swift extensions), with consumer-specific outputs as optional additions
+
 ---
 
 ## Purpose  
@@ -55,6 +64,7 @@ The Transform Layer is responsible for:
 - generating theme/mode variants  
 - producing optimized output artifacts  
 - maintaining semantic metadata for tooling  
+- generating consumer-specific outputs to reduce adoption barriers (e.g., Objective-C enums for legacy codebases)
 
 It is the **only** layer that generates platform‑specific code for all foundation categories (color, typography, spacing, radius, shadow).
 

@@ -272,13 +272,19 @@ object CdrTokens {
 - **Frameworks:** SwiftUI + UIKit
 - **Objective-C Support:** Via Swift-ObjC interop (no separate headers required)
 
+**Consumer-Specific Outputs (to reduce adoption barrier):**
+- **Objective-C Enum Generation:** Cedar can generate Objective-C enum headers for legacy Objective-C codebases
+- **Dual Naming Support:** Cedar can support consumer-specific naming conventions (e.g., CdrColor* + REIColor*) via configuration
+- **Principle:** Cedar provides outputs consumers want to reduce adoption barrier, as long as maintenance burden is reasonable
+- **Rationale:** Reducing consumer cognitive load and adoption barriers takes precedence over enforcing modern patterns. Consumer-specific outputs are generated from the token source of truth via the Transform Layer, not hardcoded logic.
+
 **Migration Considerations:**
 - Flagship migration to SPM is a consumer-side decision
-- Mobile platform leadership indicates CocoaPods is being phased out
-- Cedar provides Objective-C compatibility via standard Swift-ObjC interop
-- No separate CocoaPods output generation required
+- Cedar provides Objective-C enum generation as an optional output for legacy compatibility
+- Consumer-specific naming conventions are configurable, not hardcoded
+- Cedar maintains flexibility to support diverse consumer needs
 
-**Cedar's boundary:** Cedar provides SPM distribution with Display P3 and Swift extensions. Flagship's current CocoaPods/sRGB implementation is a legacy constraint to be addressed through migration planning, not a first-class Cedar requirement. Composite UIKit helpers remain the responsibility of consumer applications.
+**Cedar's boundary:** Cedar provides SPM distribution with Display P3 and Swift extensions as the standard. Cedar also generates consumer-specific outputs (e.g., Objective-C enums, custom naming conventions) via the Transform Layer to reduce adoption barriers, as long as maintenance burden is reasonable. Composite UIKit helpers remain the responsibility of consumer applications.
 
 ---
 
