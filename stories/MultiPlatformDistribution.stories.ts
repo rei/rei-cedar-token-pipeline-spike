@@ -23,7 +23,7 @@ export const Overview: Story = {
 
         <h2 style="font-size:1.8rem;margin:2rem 0 1rem">Distribution Support Matrix</h2>
         <p style="margin-bottom:1rem">
-          The token pipeline generates platform-specific outputs for iOS, Android, and Web, with dual implementation strategies for iOS and Android to support both legacy and modern approaches.
+          The token pipeline generates platform-specific outputs for iOS, Android, and Web. iOS uses Swift Package Manager with Display P3 color space as the modern standard. Android provides both XML resources for legacy Views and Compose color schemes for modern Jetpack Compose development.
         </p>
 
         <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.9rem">
@@ -35,18 +35,11 @@ export const Overview: Story = {
             <th style="text-align:left;padding:0.75rem;background:#fafafa">Target Use</th>
           </tr>
           <tr style="border-bottom:1px solid #eee">
-            <td style="padding:0.75rem;font-weight:500"><strong>iOS SPM</strong></td>
+            <td style="padding:0.75rem;font-weight:500"><strong>iOS</strong></td>
             <td style="padding:0.75rem">Swift Package Manager</td>
             <td style="padding:0.75rem">Display P3</td>
             <td style="padding:0.75rem">Swift extensions</td>
-            <td style="padding:0.75rem">New projects (modern)</td>
-          </tr>
-          <tr style="border-bottom:1px solid #eee">
-            <td style="padding:0.75rem;font-weight:500"><strong>iOS CocoaPods</strong></td>
-            <td style="padding:0.75rem">CocoaPods</td>
-            <td style="padding:0.75rem">sRGB</td>
-            <td style="padding:0.75rem">Enum-based, Objective-C headers</td>
-            <td style="padding:0.75rem">Flagship (legacy)</td>
+            <td style="padding:0.75rem">All iOS projects</td>
           </tr>
           <tr style="border-bottom:1px solid #eee">
             <td style="padding:0.75rem;font-weight:500"><strong>Android XML</strong></td>
@@ -73,29 +66,27 @@ export const Overview: Story = {
 
         <h2 style="font-size:1.8rem;margin:2rem 0 1rem">Platform-Specific Details</h2>
 
-        <h3 style="font-size:1.4rem;margin:1.5rem 0 0.75rem">iOS Dual Implementation</h3>
+        <h3 style="font-size:1.4rem;margin:1.5rem 0 0.75rem">iOS Implementation</h3>
         <p style="margin-bottom:1rem">
-          Cedar provides two iOS implementations to support both modern SPM-based projects and legacy CocoaPods projects like the flagship app.
+          Cedar uses Swift Package Manager for iOS distribution with Display P3 color space for wider gamut support. This is the modern standard recommended by mobile platform leadership.
         </p>
 
         <div style="background:#f5f2eb;padding:1.5rem;border-radius:8px;margin:1.5rem 0">
-          <h4 style="margin:0 0 0.75rem;font-size:1.1rem">iOS SPM (Modern)</h4>
-          <ul style="margin:0 0 1rem;padding-left:1.5rem">
+          <h4 style="margin:0 0 0.75rem;font-size:1.1rem">iOS SPM</h4>
+          <ul style="margin:0;padding-left:1.5rem">
             <li style="margin-bottom:0.5rem">Display P3 color space for wider gamut</li>
             <li style="margin-bottom:0.5rem">Swift extension-based API: <code style="background:#fff;padding:0.2rem 0.4rem;border-radius:4px">Color.cdrTextBase</code></li>
             <li style="margin-bottom:0.5rem">SwiftUI and UIKit support via extensions</li>
-            <li>Automatic light/dark mode via asset catalog</li>
+            <li style="margin-bottom:0.5rem">Automatic light/dark mode via asset catalog</li>
+            <li>Objective-C compatibility for legacy integrations</li>
           </ul>
         </div>
 
-        <div style="background:#f5f2eb;padding:1.5rem;border-radius:8px;margin:1.5rem 0">
-          <h4 style="margin:0 0 0.75rem;font-size:1.1rem">iOS CocoaPods (Legacy)</h4>
-          <ul style="margin:0;padding-left:1.5rem">
-            <li style="margin-bottom:0.5rem">sRGB color space for flagship compatibility</li>
-            <li style="margin-bottom:0.5rem">Enum-based API: <code style="background:#fff;padding:0.2rem 0.4rem;border-radius:4px">CdrColor.color(.textBase)</code></li>
-            <li style="margin-bottom:0.5rem">Objective-C header for interop</li>
-            <li>Automatic light/dark mode via asset catalog</li>
-          </ul>
+        <div style="background:#fff3cd;border-left:4px solid #ffc107;padding:1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0">
+          <h4 style="margin:0 0 0.75rem;font-size:1.1rem;color:#856404">Note on CocoaPods</h4>
+          <p style="margin:0;font-size:0.9rem">
+            The flagship iOS application currently uses CocoaPods, but mobile platform leadership indicates CocoaPods is being phased out in favor of Swift Package Manager. Cedar focuses on SPM distribution as the forward-looking standard.
+          </p>
         </div>
 
         <h3 style="font-size:1.4rem;margin:1.5rem 0 0.75rem">Android Dual Framework Support</h3>
@@ -156,8 +147,7 @@ export const Overview: Story = {
         </p>
 
         <ul style="margin:1rem 0;padding-left:1.5rem">
-          <li style="margin-bottom:0.5rem"><code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">ios-spm/</code> — iOS SPM output (Display P3, Swift extensions)</li>
-          <li style="margin-bottom:0.5rem"><code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">ios-cocoapods/</code> — iOS CocoaPods output (sRGB, enum-based)</li>
+          <li style="margin-bottom:0.5rem"><code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">ios/</code> — iOS output (Display P3, Swift extensions)</li>
           <li style="margin-bottom:0.5rem"><code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">android/</code> — Android output (XML + Compose)</li>
           <li><code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">css/</code> — Web CSS output</li>
         </ul>
@@ -173,7 +163,7 @@ export const Overview: Story = {
         <div style="background:#e8f4fd;border-left:4px solid #007bff;padding:1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0">
           <h3 style="font-size:1.2rem;margin:0 0 1rem;color:#0056b3">Status</h3>
           <ul style="margin:0;padding-left:1.5rem">
-            <li style="margin-bottom:0.5rem"><strong>iOS:</strong> Dual implementation complete (SPM + CocoaPods)</li>
+            <li style="margin-bottom:0.5rem"><strong>iOS:</strong> SPM implementation complete (Display P3, Swift extensions)</li>
             <li style="margin-bottom:0.5rem"><strong>Android:</strong> Basic output generation complete, CI/CD and GitLab Packages setup pending</li>
             <li><strong>Web:</strong> Full distribution via npm</li>
           </ul>

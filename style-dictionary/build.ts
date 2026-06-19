@@ -2,13 +2,10 @@
 import fs from 'node:fs';
 import StyleDictionary from 'style-dictionary';
 import { iosConfig } from './configs/ios.js';
-import { iosSpmConfig } from './configs/ios-spm.js';
-import { iosCocoapodsConfig } from './configs/ios-cocoapods.js';
 import { androidConfig } from './configs/android.js';
 import { webConfig } from './configs/web.js';
 import { iosNameTransform } from './transforms/ios/ios-name-transform.js';
 import { iosColorsetAction } from './actions/ios/ios-color-action.js';
-import { iosSrgbColorsetAction } from './actions/ios/ios-srgb-color-action.js';
 import { androidNameTransform } from './transforms/android/android-name-transform.js';
 import { androidColorTransform } from './transforms/android/android-color-transform.js';
 // import { androidColorAction } from './actions/android/android-color-action.js';
@@ -17,7 +14,6 @@ import { webCssAction } from './actions/web/web-css-transform.js';
 // Register iOS transforms
 StyleDictionary.registerTransform(iosNameTransform);
 StyleDictionary.registerAction(iosColorsetAction);
-StyleDictionary.registerAction(iosSrgbColorsetAction);
 
 // Register Android transforms
 StyleDictionary.registerTransform(androidNameTransform);
@@ -67,25 +63,16 @@ async function buildAll() {
 
   removeLegacyOutputRoots();
 
-  const iosSpmSd = new StyleDictionary(iosSpmConfig);
-  const iosCocoapodsSd = new StyleDictionary(iosCocoapodsConfig);
+  const iosSd = new StyleDictionary(iosConfig);
   const androidSd = new StyleDictionary(androidConfig);
   const webSd = new StyleDictionary(webConfig);
 
   try {
-    await iosSpmSd.buildAllPlatforms();
-    console.log('  ✓ iOS SPM build complete (Display P3, Swift extensions)');
+    await iosSd.buildAllPlatforms();
+    console.log('  ✓ iOS build complete (Display P3, Swift extensions)');
   } catch (err) {
     console.error(err);
-    throw toBuildError('Error building iOS SPM platform', err);
-  }
-
-  try {
-    await iosCocoapodsSd.buildAllPlatforms();
-    console.log('  ✓ iOS CocoaPods build complete (sRGB, enum-based, Objective-C headers)');
-  } catch (err) {
-    console.error(err);
-    throw toBuildError('Error building iOS CocoaPods platform', err);
+    throw toBuildError('Error building iOS platform', err);
   }
 
   try {
