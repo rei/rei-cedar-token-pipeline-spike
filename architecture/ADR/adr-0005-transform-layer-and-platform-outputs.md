@@ -717,7 +717,348 @@ StyleDictionary.registerTransform({
 ### Figma JSON (for sync-back)
 - **Format:** Figma Variables API shape  
 - **File:** `figma-variables.json`  
-- **Usage:** POST to Figma API  
+- **Usage:** POST to Figma API
+
+---
+
+## Dual Implementation Support
+
+### Context
+
+The flagship iOS and Android applications have significantly different requirements from new projects:
+
+**iOS Flagship vs New Projects:**
+- Flagship: CocoaPods, sRGB, enum-based access, 223 colors, Objective-C compatibility
+- New: Swift Package Manager, Display P3, Swift extensions, semantic tokens, Swift-only
+
+**Android Flagship vs New Projects:**
+- Flagship: Manual copying, sRGB, XML resources only, no dark mode, legacy colors
+- New: Automated distribution, high spectrum support, Compose color schemes, dark mode, semantic tokens
+
+The Transform Layer must support generating multiple platform output variants to accommodate both legacy and modern approaches.
+
+### iOS Dual Output Strategy
+
+#### Distribution Mechanisms
+
+**CocoaPods Output (for Flagship):**
+- podspec generation for private REI Git repo
+- Version ~> 0.4.0 compatibility
+- Local path-based pod structure
+- Objective-C header files (@objc classes)
+- Enum-based color access pattern
+
+**Swift Package Manager Output (for New Projects):**
+- Package.swift generation
+- iOS 17+ target platform
+- Swift-only implementation
+- Swift extension color access pattern
+- Modular structure (CedarTokens + CedarComponents)
+
+#### Color Space Variants
+
+**sRGB Output (for Flagship):**
+- Generate sRGB color values in XCAssets
+- Fallback for older devices
+- Compatibility with existing implementation
+
+**Display P3 Output (for New Projects):**
+- Generate Display P3 color values in XCAssets
+- Wide-gamut color support for modern devices
+- Visual quality improvement
+
+#### API Pattern Variants
+
+**Enum-Based Access (for Flagship/Objective-C):**
+```swift
+@objc public class CdrColor: NSObject {
+    @objc public static func color(_ name: CdrColorName) -> UIColor {
+        let colorName = colorNameString(for: name)
+        let bundle = Bundle(for: CdrColor.self)
+        guard let color = UIColor(named: colorName, in: bundle, compatibleWith: nil) else {
+            return .clear
+        }
+        return color
+    }
+}
+```
+
+**Swift Extensions (for New Projects):**
+```swift
+extension UIColor {
+    static let cdrSurfacePrimary = UIColor(named: "cdr-surfaceBase")
+    static let cdrTextPrimary = UIColor(named: "cdr-textBase")
+}
+
+extension Color {
+    static let cdrSurfacePrimary = Color("cdr-surfaceBase")
+    static let cdrTextPrimary = Color("cdr-textBase")
+}
+```
+
+### Android Dual Output Strategy
+
+#### Distribution Mechanisms
+
+**Manual Copying (Legacy - Flagship):**
+- XML resource files for manual integration
+- No automated distribution
+- Legacy cedar-release.aar compatibility
+
+**AAR Library Injection (New):**
+- AAR library generation via CI/CD
+- Maven/GitHub Packages distribution
+- Gradle dependency integration
+- Automated library injection at build time
+
+#### Color Space Variants
+
+**sRGB Output (for Flagship):**
+- Generate sRGB hex values in XML resources
+- Broad compatibility
+- Current implementation
+
+**High Spectrum Output (for New):**
+- Generate wide-gamut color values
+- Display P3 equivalent for Android
+- Visual quality improvement for modern devices
+- Requires education and demonstration
+
+#### Framework Variants
+
+**XML Resources (for Views):**
+```xml
+<color name="cdr_color_surface_base">#FFFFFF</color>
+<dimen name="cdr_spacing_scale_200">16dp</dimen>
+```
+
+**Compose Color Schemes (for Compose):**
+```kotlin
+object CedarColors {
+    val SurfaceBase = Color(0xFFFFFFFF)
+    val TextPrimary = Color(0xFF1A1A1A)
+}
+```
+
+### Implementation Approach
+
+**Configuration-Based Variant Generation:**
+
+The Transform Layer uses configuration to generate multiple output variants:
+
+```javascript
+module.exports = {
+  platforms: {
+    'ios-spm': {
+      transformGroup: 'cedar/ios-spm',
+      buildPath: 'dist/themes/rei-dot-com/ios-spm/',
+      options: {
+        distribution: 'spm',
+        colorSpace: 'display-p3',
+        apiPattern: 'extensions'
+      }
+    },
+    'ios-cocoapods': {
+      transformGroup: 'cedar/ios-cocoapods',
+      buildPath: 'dist/themes/rei-dot-com/ios-cocoapods/',
+      options: {
+        distribution: 'cocoapods',
+        colorSpace: 'srgb',
+        apiPattern: 'enum'
+      }
+    },
+    'android-aar': {
+      transformGroup: 'cedar/android-aar',
+      buildPath: 'dist/themes/rei-dot-com/android-aar/',
+      options: {
+        distribution: 'aar',
+        colorSpace: 'high-spectrum',
+        framework: 'compose'
+      }
+    },
+    'android-xml': {
+      transformGroup: 'cedar/android-xml',
+      buildPath: 'dist/themes/rei-dot-com/android-xml/',
+      options: {
+        distribution: 'manual',
+        colorSpace: 'srgb',
+        framework: 'xml'
+      }
+    }
+  }
+};
+```
+
+---
+
+## Objective-C Compatibility
+
+### Requirement
+
+The flagship iOS application requires Objective-C compatibility for legacy code. This means the Transform Layer must generate:
+
+- Objective-C header files (.h)
+- @objc class declarations
+- Enum-based color access patterns
+- Swift bridging headers
+
+### Implementation
+
+**Header File Generation:**
+
+```objc
+// CdrColor.h
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+
+typedef NS_ENUM(NSInteger, CdrColorName) {
+    CdrColorTextPrimary = 0,
+    CdrColorTextSecondary = 1,
+    // ... 223 color values
+};
+
+@interface CdrColor : NSObject
+
++ (UIColor *)color:(CdrColorName)name;
+
+@end
+```
+
+**Enum-Based Access Pattern:**
+
+The enum provides type-safe color access for Objective-C code, while the Swift implementation provides the actual color resolution from XCAssets.
+
+**Swift Bridging:**
+
+```swift
+@objc public class CdrColor: NSObject {
+    @objc public static func color(_ name: CdrColorName) -> UIColor {
+        // Implementation
+    }
+}
+```
+
+This ensures Objective-C code can call `CdrColor.color(CdrColorTextPrimary)` while Swift code can use the same API or the modern extension-based API.
+
+---
+
+## Distribution Mechanisms
+
+### iOS Distribution
+
+**CocoaPods (for Flagship):**
+
+- **Podspec:** Generated for private REI Git repo
+- **Source:** `git@gitlab.com:rei/internal/product-engineering/CEDAR/rei-cedar-ios-podspec.git`
+- **Version:** ~> 0.4.0
+- **Structure:** Local path-based pods
+- **Dependencies:** CedarTokens pod with Assets/, Classes/, README.md
+
+**Swift Package Manager (for New Projects):**
+
+- **Package.swift:** Generated with CedarTokens and CedarComponents products
+- **Source:** GitHub Packages or private Git repo
+- **Version:** Semantic versioning
+- **Structure:** Modular targets (CedarTokens + CedarComponents)
+- **Dependencies:** XCAssets as resources, CedarTokens dependency for CedarComponents
+
+### Android Distribution
+
+**Manual Copying (Legacy):**
+
+- **Format:** XML resource files
+- **Delivery:** Manual copy-paste from dist to project
+- **Integration:** Manual addition to res/values/
+- **Maintenance:** Manual updates when tokens change
+
+**AAR Library Injection (New):**
+
+- **Format:** AAR library via Maven/GitHub Packages
+- **Delivery:** CI/CD pipeline integration
+- **Integration:** Gradle dependency in build.gradle
+- **Maintenance:** Automated updates via dependency management
+
+**CI/CD Pipeline Architecture:**
+
+```yaml
+# Example CI/CD configuration
+jobs:
+  build-android-tokens:
+    steps:
+      - run: npm run build:android
+      - run: ./gradlew publishToMavenLocal
+      - run: ./gradlew publish
+    outputs:
+      - android-tokens.aar
+```
+
+**Gradle Dependency Integration:**
+
+```gradle
+dependencies {
+    implementation 'com.rei.cedar:android-tokens:1.0.0'
+}
+```
+
+---
+
+## Migration Strategy
+
+### iOS Migration Path
+
+**Phase 1: Dual Support (Immediate)**
+- Generate both CocoaPods and SPM outputs
+- Generate both sRGB and Display P3 outputs
+- Generate both enum and extension APIs
+- Maintain both implementations in parallel
+
+**Phase 2: Education & Planning (Q3 2026)**
+- Demonstrate Display P3 visual impact
+- Document SPM migration benefits
+- Create migration guide for flagship app
+- Set deprecation timeline for CocoaPods
+
+**Phase 3: Flagship Migration (Q4 2026)**
+- Migrate flagship app to SPM
+- Migrate flagship app to Display P3
+- Migrate flagship app to Swift extensions
+- Remove CocoaPods output generation
+
+**Phase 4: Cleanup (Q1 2027)**
+- Remove sRGB output generation
+- Remove enum-based API generation
+- Simplify to single SPM + Display P3 + extensions implementation
+
+### Android Migration Path
+
+**Phase 1: Education & Demonstration (Immediate)**
+- Demonstrate high spectrum vs sRGB differences
+- Document Compose color scheme benefits
+- Create CI/CD pipeline prototype
+- Educate Android team on available options
+
+**Phase 2: Automated Distribution (Q3 2026)**
+- Implement CI/CD pipeline for AAR generation
+- Set up Maven/GitHub Packages distribution
+- Integrate with flagship build process
+- Replace manual copying with automated injection
+
+**Phase 3: Color Space Migration (Q4 2026)**
+- Add high spectrum color support
+- Generate both sRGB and high spectrum outputs
+- Document device capability matrix
+- Set deprecation timeline for sRGB
+
+**Phase 4: Compose Integration (Q1 2027)**
+- Add Compose color scheme generation
+- Generate both XML and Compose outputs
+- Document Compose integration guide
+- Encourage migration to Compose
+
+**Phase 5: Cleanup (Q2 2027)**
+- Remove manual XML output generation
+- Remove sRGB output generation
+- Simplify to single AAR + high spectrum + Compose implementation  
 
 
 ### Output Grouping & File Splitting

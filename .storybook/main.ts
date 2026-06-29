@@ -33,6 +33,18 @@ const config: StorybookConfig = {
       from: path.resolve(__dirname, "../dist/themes/rei-dot-com/css"),
       to: "/dist-css",
     },
+    {
+      from: path.resolve(__dirname, "../dist/themes/rei-dot-com/ios-spm"),
+      to: "/ios-spm",
+    },
+    {
+      from: path.resolve(__dirname, "../dist/themes/rei-dot-com/ios-cocoapods"),
+      to: "/ios-cocoapods",
+    },
+    {
+      from: path.resolve(__dirname, "../dist/themes/rei-dot-com/android"),
+      to: "/android",
+    },
   ],
   // Allow overriding Vite's base path at build time via STORYBOOK_BASE_URL.
   // This is needed when deploying to a GH Pages sub-path, e.g.:

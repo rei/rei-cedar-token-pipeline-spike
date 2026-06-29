@@ -41,7 +41,7 @@ export function getTokenAtPath(tokens: any, dotPath: string): any {
  */
 export function resolveOptionHex(
   optionNode: CedarOptionNode | undefined,
-  platform: "ios" | "web",
+  platform: "ios" | "web" | "android",
   appearance: "light" | "dark",
 ): string | undefined {
   const cedar = optionNode?.$extensions?.cedar;
