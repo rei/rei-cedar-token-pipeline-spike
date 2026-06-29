@@ -340,3 +340,38 @@ wide-gamut
 - [CIEDE2000 Delta E](https://en.wikipedia.org/wiki/Color_difference#CIEDE2000)
 - [sRGB vs P3 Gamut Comparison](https://blog.maximerouffy.com/posts/the-p3-color-space/)
 - [CMYK Color Management](https://www.color.org/icc1.pdf)
+
+---
+
+## Latest Design Parameters Update (June 2026)
+
+Design has provided updated color family parameters for 16 families. These parameters control the parabolic chroma formula used in the OKLCH override.
+
+**Design Source:** See the token remap CSV at `/Users/mhewson/Downloads/cedar_token_remap_v3 - Color Token Remap.csv` for the complete dataset.
+
+### Parameter Update Context
+
+The spike's current `COLOR_FAMILIES` constant in `oklch-formulas.ts` uses outdated parameters. The new design parameters include:
+
+- **7 new families**: sage-green, natural-grey, membership-text, lichen, apex-moss, golden-moss, membership-yellow
+- **Updated parameters** for existing families (alpine-lake-blue, blue-spruce-green, success-green, warning-yellow, error-red, sale-red, warm-grey, info-blue)
+- **16 total families** (up from 8 previously)
+
+### Impact on Color Gamut
+
+The updated parameters affect:
+- **Chroma peaks (Cmax)**: Higher Cmax values mean more saturated colors at peak lightness
+- **Lightness at peak (Lo)**: Determines where in the lightness scale the most saturated color appears
+- **Curve width (Wlight/Wdark)**: Controls how quickly chroma fades as you move away from the peak
+- **Chroma floors (Clight-min/Cdark-min)**: Minimum chroma at the extremes of the lightness scale
+
+These parameters directly influence whether colors fall within sRGB gamut or require P3 variants. Higher Cmax values (e.g., lichen at 0.22, sale-red at 0.19) may push colors outside sRGB gamut, requiring P3 variants for iOS.
+
+### How to Update
+
+See [culori-overrides.md](./culori-overrides.md) for the complete parameter table and implementation steps. Briefly:
+
+1. Update `COLOR_FAMILIES` in `style-dictionary/actions/web/oklch-formulas.ts`
+2. Add the 7 new families
+3. Run tests to validate
+4. Verify generated OKLCH values match design dataset

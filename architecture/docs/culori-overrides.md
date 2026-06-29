@@ -196,3 +196,118 @@ If Cedar's design system specifies custom Display P3 conversion formulas in the 
 - ADR-0005: Transform Layer & Platform Outputs
 - ADR-0009: Accessibility Requirements
 - Design Spec: OKLCH Lightness Curves (internal design documentation)
+
+---
+
+## Latest Design Parameters Update (June 2026)
+
+Design has provided updated color family parameters for 16 families. The current `COLOR_FAMILIES` constant in `oklch-formulas.ts` needs to be updated with these new parameters.
+
+**Design Source:** See the token remap CSV at `/Users/mhewson/Downloads/cedar_token_remap_v3 - Color Token Remap.csv` for the complete dataset including OKLCH and HEX values for all 16 steps (000-1500) of each family.
+
+### Updated Color Family Parameters
+
+The following table shows the complete updated parameter set:
+
+| Family | Hue | Cmax | Lo | Wlight | Clight-min | Wdark | Cdark-min |
+|--------|-----|------|----|--------|------------|-------|-----------|
+| alpine-lake-blue | 259 | 0.13 | 0.55 | 0.65 | 0.025 | 0.30 | 0.0625 |
+| blue-spruce-green | 166 | 0.10 | 0.71 | 0.265 | 0.01 | 0.43 | 0.04 |
+| sage-green | 158 | 0.055 | 0.72 | 0.26 | 0.012 | 0.47 | 0.022 |
+| natural-grey | 89 | 0.035 | 0.84 | 0.14 | 0.004 | 0.59 | 0.01 |
+| warm-grey | 82 | 0.0185 | 0.52 | 0.465 | 0.0015 | 0.335 | 0.005 |
+| sale-red | 39 | 0.19 | 0.55 | 0.44 | 0.015 | 0.315 | 0.045 |
+| membership-text | 173 | 0.10 | 0.60 | 0.36 | 0.01 | 0.3433 | 0.03 |
+| lichen | 120 | 0.22 | 0.71 | 0.1008 | 0.05 | 0.6292 | 0.05 |
+| apex-moss | 116 | 0.20 | 0.76 | 0.2393 | 0.03 | 0.52 | 0.0625 |
+| golden-moss | 104 | 0.1355 | 0.755 | 0.225 | 0.006 | 0.377 | 0.04 |
+| membership-yellow | 95 | 0.20 | 0.86 | 0.12 | 0.0115 | 0.61 | 0.05 |
+| info-blue | 200 | 0.0825 | 0.60 | 0.36 | 0.0075 | 0.30 | 0.03 |
+| success-green | 146 | 0.1154 | 0.665 | 0.4097 | 0.015 | 0.3803 | 0.005 |
+| warning-yellow | 92 | 0.155 | 0.53 | 0.33 | 0.012 | 0.29 | 0.04 |
+| error-red | 30 | 0.185 | 0.46 | 0.46 | 0.015 | 0.2432 | 0.08 |
+| greyscale | — | — | — | — | — | — | — |
+
+**Note:** The "greyscale" family is achromatic (no hue/chroma). See the design dataset for specific step values if needed.
+
+### Changes Summary
+
+**New families to add:**
+- sage-green (Hue: 158, Cmax: 0.055)
+- natural-grey (Hue: 89, Cmax: 0.035)
+- membership-text (Hue: 173, Cmax: 0.10)
+- lichen (Hue: 120, Cmax: 0.22) - **high chroma**
+- apex-moss (Hue: 116, Cmax: 0.20) - **high chroma**
+- golden-moss (Hue: 104, Cmax: 0.1355)
+- membership-yellow (Hue: 95, Cmax: 0.20) - **high chroma**
+
+**Families with updated parameters:**
+- success-green: Cmax 0.12 → 0.1154, Lo 0.54 → 0.665, Wlight 0.65 → 0.4097, Wdark 0.30 → 0.3803
+- warning-yellow: Hue 73 → 92, Cmax 0.15 → 0.155, Lo 0.62 → 0.53, Wlight 0.37 → 0.33, Wdark 0.25 → 0.29
+- error-red: Cmax 0.18 → 0.185, Lo 0.52 → 0.46, Wdark 0.35 → 0.2432, Cdark-min 0.08 → 0.08 (unchanged)
+- sale-red: Hue 34 → 39, Wlight 0.42 → 0.44, Wdark 0.325 → 0.315, Cdark-min 0.09 → 0.045
+- info-blue: Cmax 0.08 → 0.0825, Wlight 0.45 → 0.36, Wdark 0.30 → 0.30 (unchanged)
+- warm-grey: No changes (parameters match)
+
+### How to Update
+
+**Step 1: Update COLOR_FAMILIES constant**
+
+Open `style-dictionary/actions/web/oklch-formulas.ts` and replace the `COLOR_FAMILIES` constant with the updated parameters above.
+
+```typescript
+export const COLOR_FAMILIES: Record<string, ColorFamilyParams> = {
+  "alpine-lake-blue": {
+    hue: 259,
+    cmax: 0.13,
+    lo: 0.55,
+    wlight: 0.65,
+    clightMin: 0.025,
+    wdark: 0.30,
+    cdarkMin: 0.0625,
+  },
+  // ... add all 16 families from the table above
+};
+```
+
+**Step 2: Add new families to token-schema.json**
+
+For each new family, add an entry to `src/schema/token-schema.json`:
+
+```json
+{
+  "sage-green": {
+    "canonicalPrefix": "color.option.sage-green",
+    "colorFamily": "sage-green",
+    "tokens": { ... }
+  }
+}
+```
+
+**Step 3: Run tests**
+
+```bash
+npm test style-dictionary/actions/web/oklch-formulas.test.ts
+```
+
+The schema-driven test will automatically verify that every `colorFamily` in the schema has a corresponding `COLOR_FAMILIES` entry.
+
+**Step 4: Validate output**
+
+Generate tokens and verify that the OKLCH values match the design dataset:
+
+```bash
+npm run build
+```
+
+Check the output in `dist/themes/rei-dot-com/css/` to confirm the generated OKLCH values match the design's provided OKLCH values for each step.
+
+**Step 5: Coordinate with design**
+
+Share the generated output with design to validate that the math produces expected color outputs. If discrepancies exist, adjust parameters and repeat.
+
+### See Also
+
+- [Figma Color Discrepancies](../../docs/figma-color-discrepancies.md) - For tracking specific hex/OKLCH mismatches
+- [Color Gamut Mapping](./color-gamut-mapping.md) - For context on color space conversions and platform requirements
+- Story 0.6 in Token Pipeline Backlog - [token-pipeline-backlog.md](../../../../docs/token-pipeline-backlog.md)

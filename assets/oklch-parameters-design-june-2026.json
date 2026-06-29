@@ -1,0 +1,137 @@
+{
+  "alpine-lake-blue": {
+    "hue": 259,
+    "cmax": 0.13,
+    "lo": 0.55,
+    "wlight": 0.65,
+    "clightMin": 0.025,
+    "wdark": 0.30,
+    "cdarkMin": 0.0625
+  },
+  "blue-spruce-green": {
+    "hue": 166,
+    "cmax": 0.10,
+    "lo": 0.71,
+    "wlight": 0.265,
+    "clightMin": 0.01,
+    "wdark": 0.43,
+    "cdarkMin": 0.04
+  },
+  "sage-green": {
+    "hue": 158,
+    "cmax": 0.055,
+    "lo": 0.72,
+    "wlight": 0.26,
+    "clightMin": 0.012,
+    "wdark": 0.47,
+    "cdarkMin": 0.022
+  },
+  "natural-grey": {
+    "hue": 89,
+    "cmax": 0.035,
+    "lo": 0.84,
+    "wlight": 0.14,
+    "clightMin": 0.004,
+    "wdark": 0.59,
+    "cdarkMin": 0.01
+  },
+  "warm-grey": {
+    "hue": 82,
+    "cmax": 0.0185,
+    "lo": 0.52,
+    "wlight": 0.465,
+    "clightMin": 0.0015,
+    "wdark": 0.335,
+    "cdarkMin": 0.005
+  },
+  "sale-red": {
+    "hue": 39,
+    "cmax": 0.19,
+    "lo": 0.55,
+    "wlight": 0.44,
+    "clightMin": 0.015,
+    "wdark": 0.315,
+    "cdarkMin": 0.045
+  },
+  "membership-text": {
+    "hue": 173,
+    "cmax": 0.10,
+    "lo": 0.60,
+    "wlight": 0.36,
+    "clightMin": 0.01,
+    "wdark": 0.3433,
+    "cdarkMin": 0.03
+  },
+  "lichen": {
+    "hue": 120,
+    "cmax": 0.22,
+    "lo": 0.71,
+    "wlight": 0.1008,
+    "clightMin": 0.05,
+    "wdark": 0.6292,
+    "cdarkMin": 0.05
+  },
+  "apex-moss": {
+    "hue": 116,
+    "cmax": 0.20,
+    "lo": 0.76,
+    "wlight": 0.2393,
+    "clightMin": 0.03,
+    "wdark": 0.52,
+    "cdarkMin": 0.0625
+  },
+  "golden-moss": {
+    "hue": 104,
+    "cmax": 0.1355,
+    "lo": 0.755,
+    "wlight": 0.225,
+    "clightMin": 0.006,
+    "wdark": 0.377,
+    "cdarkMin": 0.04
+  },
+  "membership-yellow": {
+    "hue": 95,
+    "cmax": 0.20,
+    "lo": 0.86,
+    "wlight": 0.12,
+    "clightMin": 0.0115,
+    "wdark": 0.61,
+    "cdarkMin": 0.05
+  },
+  "info-blue": {
+    "hue": 200,
+    "cmax": 0.0825,
+    "lo": 0.60,
+    "wlight": 0.36,
+    "clightMin": 0.0075,
+    "wdark": 0.30,
+    "cdarkMin": 0.03
+  },
+  "success-green": {
+    "hue": 146,
+    "cmax": 0.1154,
+    "lo": 0.665,
+    "wlight": 0.4097,
+    "clightMin": 0.015,
+    "wdark": 0.3803,
+    "cdarkMin": 0.005
+  },
+  "warning-yellow": {
+    "hue": 92,
+    "cmax": 0.155,
+    "lo": 0.53,
+    "wlight": 0.33,
+    "clightMin": 0.012,
+    "wdark": 0.29,
+    "cdarkMin": 0.04
+  },
+  "error-red": {
+    "hue": 30,
+    "cmax": 0.185,
+    "lo": 0.46,
+    "wlight": 0.46,
+    "clightMin": 0.015,
+    "wdark": 0.2432,
+    "cdarkMin": 0.08
+  }
+}
