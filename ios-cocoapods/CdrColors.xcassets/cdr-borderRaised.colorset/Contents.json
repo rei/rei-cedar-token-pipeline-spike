@@ -1,0 +1,36 @@
+{
+  "colors": [
+    {
+      "color": {
+        "sRGB": {
+          "red": "0.6863",
+          "green": "0.6667",
+          "blue": "0.6314",
+          "alpha": "1.000"
+        }
+      },
+      "idiom": "universal"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ],
+      "color": {
+        "sRGB": {
+          "red": "0.6863",
+          "green": "0.6667",
+          "blue": "0.6314",
+          "alpha": "1.000"
+        }
+      },
+      "idiom": "universal"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
+}
