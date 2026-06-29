@@ -81,7 +81,7 @@ export const COLOR_FAMILIES: Record<string, ColorFamily> = {
   'sale-red': {
     hue: 39,
     cmax: 0.19,
-    lo: 0.55,
+    lo: 0.54,
     wlight: 0.44,
     clightMin: 0.015,
     wdark: 0.315,
@@ -89,8 +89,8 @@ export const COLOR_FAMILIES: Record<string, ColorFamily> = {
   },
   'membership-text': {
     hue: 173,
-    cmax: 0.10,
-    lo: 0.60,
+    cmax: 0.13,
+    lo: 0.62,
     wlight: 0.36,
     clightMin: 0.01,
     wdark: 0.3433,
@@ -99,7 +99,7 @@ export const COLOR_FAMILIES: Record<string, ColorFamily> = {
   'lichen': {
     hue: 120,
     cmax: 0.22,
-    lo: 0.71,
+    lo: 0.8792,
     wlight: 0.1008,
     clightMin: 0.05,
     wdark: 0.6292,
@@ -144,7 +144,7 @@ export const COLOR_FAMILIES: Record<string, ColorFamily> = {
   'success-green': {
     hue: 146,
     cmax: 0.1154,
-    lo: 0.665,
+    lo: 0.5803,
     wlight: 0.4097,
     clightMin: 0.015,
     wdark: 0.3803,
