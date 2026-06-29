@@ -1,4 +1,4 @@
-import{t as e}from"./chunk-BvrOYcoh.js";import{a as t,n,r,t as i}from"./oklch-formulas-DeV_azkS.js";var a,o,s;e((()=>{t(),a={title:`Tokens/Color/Formula`,tags:[`docs`]},o={name:`Overview`,render:()=>`
+import{t as e}from"./chunk-BvrOYcoh.js";import{a as t,n,r,t as i}from"./oklch-formulas-Du5qaBes.js";var a,o,s;e((()=>{t(),a={title:`Tokens/Color/Formula`,tags:[`docs`]},o={name:`Overview`,render:()=>`
       <div style="max-width:900px;padding:40px;font-family:system-ui,-apple-system,sans-serif;line-height:1.6;color:#333">
         <h1 style="font-size:2.5rem;margin-bottom:1rem">Color Formula</h1>
         <p style="font-size:1.1rem;color:#666;margin-bottom:2rem">
@@ -135,8 +135,18 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{a as t,n,r,t as i}from"./oklch-fo
 
         <h2 style="font-size:1.8rem;margin:2rem 0 1rem">Technical Details</h2>
         <p style="margin-bottom:1rem">
-          The formula is implemented in <code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">style-dictionary/actions/web/oklch-formulas.ts</code> and used during the CSS generation process to convert hex values to OKLCH with custom chroma curves.
+          The formula is implemented in <code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">style-dictionary/actions/web/oklch-formulas.ts</code> and produces OKLCH color values. OKLCH is the source of truth for the color system.
         </p>
+        <p style="margin-bottom:1rem">
+          <strong>Color Conversion Pipeline:</strong>
+        </p>
+        <ul style="margin:0 0 1rem;padding-left:1.5rem">
+          <li style="margin-bottom:0.5rem">Formula produces OKLCH values (source of truth)</li>
+          <li style="margin-bottom:0.5rem">Web: Uses OKLCH directly with custom formulas</li>
+          <li style="margin-bottom:0.5rem">iOS: culori converts OKLCH → Display P3 for XCAssets</li>
+          <li style="margin-bottom:0.5rem">Android: culori converts OKLCH → Display P3 for Compose (XML uses sRGB fallback)</li>
+          <li>Hex values are lossy sRGB clips of OKLCH, provided for reference only</li>
+        </ul>
         <p style="margin-bottom:1rem">
           The validation test is in <code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">src/contract/figma-color-spec.test.ts</code> and runs on every contract test suite execution.
         </p>
@@ -281,8 +291,18 @@ import{t as e}from"./chunk-BvrOYcoh.js";import{a as t,n,r,t as i}from"./oklch-fo
 
         <h2 style="font-size:1.8rem;margin:2rem 0 1rem">Technical Details</h2>
         <p style="margin-bottom:1rem">
-          The formula is implemented in <code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">style-dictionary/actions/web/oklch-formulas.ts</code> and used during the CSS generation process to convert hex values to OKLCH with custom chroma curves.
+          The formula is implemented in <code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">style-dictionary/actions/web/oklch-formulas.ts</code> and produces OKLCH color values. OKLCH is the source of truth for the color system.
         </p>
+        <p style="margin-bottom:1rem">
+          <strong>Color Conversion Pipeline:</strong>
+        </p>
+        <ul style="margin:0 0 1rem;padding-left:1.5rem">
+          <li style="margin-bottom:0.5rem">Formula produces OKLCH values (source of truth)</li>
+          <li style="margin-bottom:0.5rem">Web: Uses OKLCH directly with custom formulas</li>
+          <li style="margin-bottom:0.5rem">iOS: culori converts OKLCH → Display P3 for XCAssets</li>
+          <li style="margin-bottom:0.5rem">Android: culori converts OKLCH → Display P3 for Compose (XML uses sRGB fallback)</li>
+          <li>Hex values are lossy sRGB clips of OKLCH, provided for reference only</li>
+        </ul>
         <p style="margin-bottom:1rem">
           The validation test is in <code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">src/contract/figma-color-spec.test.ts</code> and runs on every contract test suite execution.
         </p>

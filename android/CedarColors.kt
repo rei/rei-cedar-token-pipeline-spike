@@ -10,7 +10,7 @@ object CedarColors {
     val cdrTextBase = Color(0xFF141210)
     val cdrTextSubtle = Color(0xFF36322b)
     val cdrTextLink = Color(0xFF22467f)
-    val cdrTextLink-hover = Color(0xFF305ca1)
+    val cdrTextLinkHover = Color(0xFF305ca1)
     val cdrTextSale = Color(0xFF8c0000)
     val cdrBorderBase = Color(0xFFd6d2cc)
     val cdrBorderRaised = Color(0xFFafaaa1)

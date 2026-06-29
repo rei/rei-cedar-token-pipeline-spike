@@ -5,7 +5,7 @@
     <color name="cdr_text_base">#141210</color>
     <color name="cdr_text_subtle">#36322b</color>
     <color name="cdr_text_link">#22467f</color>
-    <color name="cdr_text_link-hover">#305ca1</color>
+    <color name="cdr_text_link_hover">#305ca1</color>
     <color name="cdr_text_sale">#8c0000</color>
     <color name="cdr_border_base">#d6d2cc</color>
     <color name="cdr_border_raised">#afaaa1</color>

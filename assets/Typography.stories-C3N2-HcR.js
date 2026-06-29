@@ -1,4 +1,4 @@
-import{t as e}from"./chunk-BvrOYcoh.js";import{o as t,t as n}from"./load-tokens-CuKVjxbl.js";function r(e){return()=>{let t=document.createElement(`div`);return t.style.cssText=`min-height:200px;background:#f5f2eb;`,t.innerHTML=`
+import{t as e}from"./chunk-BvrOYcoh.js";import{o as t,t as n}from"./load-tokens-AVaqj0hW.js";function r(e){return()=>{let t=document.createElement(`div`);return t.style.cssText=`min-height:200px;background:#f5f2eb;`,t.innerHTML=`
       <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:0.85rem;color:#736e65">
         Loading normalized typography elements…
       </div>`,e().then(e=>{typeof e==`string`?t.innerHTML=e:(t.innerHTML=``,t.appendChild(e))}).catch(e=>{t.innerHTML=`
