@@ -23,7 +23,7 @@ export const Overview: Story = {
 
         <h2 style="font-size:1.8rem;margin:2rem 0 1rem">Distribution Support Matrix</h2>
         <p style="margin-bottom:1rem">
-          The token pipeline generates platform-specific outputs for iOS, Android, and Web, with dual implementation strategies for iOS and Android to support both legacy and modern approaches.
+          The token pipeline generates platform-specific outputs for iOS, Android, and Web. iOS uses Swift Package Manager with Display P3 color space as the modern standard. Android leads with Compose-first development, providing Kotlin Compose color schemes as the primary output with XML resources for legacy Views compatibility.
         </p>
 
         <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.9rem">
@@ -35,32 +35,25 @@ export const Overview: Story = {
             <th style="text-align:left;padding:0.75rem;background:#fafafa">Target Use</th>
           </tr>
           <tr style="border-bottom:1px solid #eee">
-            <td style="padding:0.75rem;font-weight:500"><strong>iOS SPM</strong></td>
+            <td style="padding:0.75rem;font-weight:500"><strong>iOS</strong></td>
             <td style="padding:0.75rem">Swift Package Manager</td>
             <td style="padding:0.75rem">Display P3</td>
             <td style="padding:0.75rem">Swift extensions</td>
-            <td style="padding:0.75rem">New projects (modern)</td>
-          </tr>
-          <tr style="border-bottom:1px solid #eee">
-            <td style="padding:0.75rem;font-weight:500"><strong>iOS CocoaPods</strong></td>
-            <td style="padding:0.75rem">CocoaPods</td>
-            <td style="padding:0.75rem">sRGB</td>
-            <td style="padding:0.75rem">Enum-based, Objective-C headers</td>
-            <td style="padding:0.75rem">Flagship (legacy)</td>
-          </tr>
-          <tr style="border-bottom:1px solid #eee">
-            <td style="padding:0.75rem;font-weight:500"><strong>Android XML</strong></td>
-            <td style="padding:0.75rem">GitLab Packages (AAR)</td>
-            <td style="padding:0.75rem">sRGB</td>
-            <td style="padding:0.75rem">XML resources</td>
-            <td style="padding:0.75rem">Views (legacy)</td>
+            <td style="padding:0.75rem">All iOS projects</td>
           </tr>
           <tr style="border-bottom:1px solid #eee">
             <td style="padding:0.75rem;font-weight:500"><strong>Android Compose</strong></td>
             <td style="padding:0.75rem">GitLab Packages (AAR)</td>
-            <td style="padding:0.75rem">sRGB</td>
+            <td style="padding:0.75rem">Wide-gamut OKLCH + sRGB fallback</td>
             <td style="padding:0.75rem">Kotlin Compose objects</td>
-            <td style="padding:0.75rem">Jetpack Compose (modern)</td>
+            <td style="padding:0.75rem">Jetpack Compose (primary)</td>
+          </tr>
+          <tr style="border-bottom:1px solid #eee">
+            <td style="padding:0.75rem;font-weight:500"><strong>Android XML</strong></td>
+            <td style="padding:0.75rem">GitLab Packages (AAR)</td>
+            <td style="padding:0.75rem">Wide-gamut OKLCH + sRGB fallback</td>
+            <td style="padding:0.75rem">XML resources</td>
+            <td style="padding:0.75rem">Views (legacy compatibility)</td>
           </tr>
           <tr>
             <td style="padding:0.75rem;font-weight:500"><strong>Web</strong></td>
@@ -73,52 +66,65 @@ export const Overview: Story = {
 
         <h2 style="font-size:1.8rem;margin:2rem 0 1rem">Platform-Specific Details</h2>
 
-        <h3 style="font-size:1.4rem;margin:1.5rem 0 0.75rem">iOS Dual Implementation</h3>
+        <h3 style="font-size:1.4rem;margin:1.5rem 0 0.75rem">iOS Implementation</h3>
         <p style="margin-bottom:1rem">
-          Cedar provides two iOS implementations to support both modern SPM-based projects and legacy CocoaPods projects like the flagship app.
+          Cedar uses Swift Package Manager for iOS distribution with Display P3 color space for wider gamut support. This is the modern standard recommended by mobile platform leadership.
         </p>
 
         <div style="background:#f5f2eb;padding:1.5rem;border-radius:8px;margin:1.5rem 0">
-          <h4 style="margin:0 0 0.75rem;font-size:1.1rem">iOS SPM (Modern)</h4>
-          <ul style="margin:0 0 1rem;padding-left:1.5rem">
+          <h4 style="margin:0 0 0.75rem;font-size:1.1rem">iOS SPM</h4>
+          <ul style="margin:0;padding-left:1.5rem">
             <li style="margin-bottom:0.5rem">Display P3 color space for wider gamut</li>
             <li style="margin-bottom:0.5rem">Swift extension-based API: <code style="background:#fff;padding:0.2rem 0.4rem;border-radius:4px">Color.cdrTextBase</code></li>
             <li style="margin-bottom:0.5rem">SwiftUI and UIKit support via extensions</li>
-            <li>Automatic light/dark mode via asset catalog</li>
+            <li style="margin-bottom:0.5rem">Automatic light/dark mode via asset catalog</li>
+            <li>Objective-C compatibility for legacy integrations</li>
           </ul>
         </div>
 
-        <div style="background:#f5f2eb;padding:1.5rem;border-radius:8px;margin:1.5rem 0">
-          <h4 style="margin:0 0 0.75rem;font-size:1.1rem">iOS CocoaPods (Legacy)</h4>
-          <ul style="margin:0;padding-left:1.5rem">
-            <li style="margin-bottom:0.5rem">sRGB color space for flagship compatibility</li>
-            <li style="margin-bottom:0.5rem">Enum-based API: <code style="background:#fff;padding:0.2rem 0.4rem;border-radius:4px">CdrColor.color(.textBase)</code></li>
-            <li style="margin-bottom:0.5rem">Objective-C header for interop</li>
-            <li>Automatic light/dark mode via asset catalog</li>
-          </ul>
+        <div style="background:#fff3cd;border-left:4px solid #ffc107;padding:1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0">
+          <h4 style="margin:0 0 0.75rem;font-size:1.1rem;color:#856404">Note on CocoaPods</h4>
+          <p style="margin:0;font-size:0.9rem">
+            The flagship iOS application currently uses CocoaPods, but mobile platform leadership indicates CocoaPods is being phased out in favor of Swift Package Manager. Cedar focuses on SPM distribution as the forward-looking standard.
+          </p>
         </div>
 
-        <h3 style="font-size:1.4rem;margin:1.5rem 0 0.75rem">Android Dual Framework Support</h3>
+        <h3 style="font-size:1.4rem;margin:1.5rem 0 0.75rem">Android Implementation</h3>
         <p style="margin-bottom:1rem">
-          Cedar generates both XML resources for traditional Views and Kotlin Compose objects for Jetpack Compose, packaged in a single AAR library distributed via GitLab Packages.
+          Cedar leads with Compose-first Android development, providing Kotlin Compose color schemes as the primary output with XML resources for legacy Views compatibility. The flagship Android application already uses Jetpack Compose, positioning Cedar to provide modern, forward-looking color support. Android uses wide-gamut OKLCH color space to align with Cedar's color architecture work.
         </p>
 
         <div style="background:#f5f2eb;padding:1.5rem;border-radius:8px;margin:1.5rem 0">
-          <h4 style="margin:0 0 0.75rem;font-size:1.1rem">Android XML (Views)</h4>
+          <h4 style="margin:0 0 0.75rem;font-size:1.1rem">Android Compose (Primary)</h4>
           <ul style="margin:0 0 1rem;padding-left:1.5rem">
+            <li style="margin-bottom:0.5rem">Kotlin object: <code style="background:#fff;padding:0.2rem 0.4rem;border-radius:4px">CedarColors.cdrTextBase</code></li>
+            <li style="margin-bottom:0.5rem">Jetpack Compose Color type</li>
+            <li style="margin-bottom:0.5rem">Modern Android UI development</li>
+            <li>Primary output for new Compose projects</li>
+          </ul>
+        </div>
+
+        <div style="background:#f5f2eb;padding:1.5rem;border-radius:8px;margin:1.5rem 0">
+          <h4 style="margin:0 0 0.75rem;font-size:1.1rem">Android XML (Legacy Compatibility)</h4>
+          <ul style="margin:0;padding-left:1.5rem">
             <li style="margin-bottom:0.5rem">XML resources in <code style="background:#fff;padding:0.2rem 0.4rem;border-radius:4px">res/values/colors.xml</code></li>
-            <li style="margin-bottom:0.5rem">Light/dark mode via <code style="background:#fff;padding:0.2rem 0.4rem;border-radius:4px">values-night</code></li>
+            <li style="margin-bottom:0.5rem">Dark mode via <code style="background:#fff;padding:0.2rem 0.4rem;border-radius:4px">values-night</code> (planned)</li>
             <li>Traditional Android Views support</li>
           </ul>
         </div>
 
-        <div style="background:#f5f2eb;padding:1.5rem;border-radius:8px;margin:1.5rem 0">
-          <h4 style="margin:0 0 0.75rem;font-size:1.1rem">Android Compose (Modern)</h4>
-          <ul style="margin:0;padding-left:1.5rem">
-            <li style="margin-bottom:0.5rem">Kotlin object: <code style="background:#fff;padding:0.2rem 0.4rem;border-radius:4px">CedarColors.cdrTextBase</code></li>
-            <li style="margin-bottom:0.5rem">Jetpack Compose Color type</li>
-            <li>Modern Android UI development</li>
-          </ul>
+        <div style="background:#e8f4fd;border-left:4px solid #007bff;padding:1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0">
+          <h4 style="margin:0 0 0.75rem;font-size:1.1rem;color:#0056b3">Android Leadership Opportunity</h4>
+          <p style="margin:0;font-size:0.9rem">
+            The Android team is not rejecting modern color support—they simply haven't evaluated it yet. Cedar has an opportunity to lead by providing wide-gamut color support, Compose-first color schemes, and automated AAR distribution. This positions Cedar as a forward-looking design system for modern Android development.
+          </p>
+        </div>
+
+        <div style="background:#fff3cd;border-left:4px solid #ffc107;padding:1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0">
+          <h4 style="margin:0 0 0.75rem;font-size:1.1rem;color:#856404">Future Direction: Component Distribution</h4>
+          <p style="margin:0;font-size:0.9rem">
+            The Android team has expressed interest in distributed styled components (buttons, native elements) similar to the iOS demo, rather than just raw tokens. This aligns with the broader Foundation Distribution Architecture finding—consumers want higher-level abstractions that reduce cognitive load. Component-level distribution may be a future step beyond token-only delivery.
+          </p>
         </div>
 
         <h2 style="font-size:1.8rem;margin:2rem 0 1rem">Distribution Mechanisms</h2>
@@ -156,8 +162,7 @@ export const Overview: Story = {
         </p>
 
         <ul style="margin:1rem 0;padding-left:1.5rem">
-          <li style="margin-bottom:0.5rem"><code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">ios-spm/</code> — iOS SPM output (Display P3, Swift extensions)</li>
-          <li style="margin-bottom:0.5rem"><code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">ios-cocoapods/</code> — iOS CocoaPods output (sRGB, enum-based)</li>
+          <li style="margin-bottom:0.5rem"><code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">ios/</code> — iOS output (Display P3, Swift extensions)</li>
           <li style="margin-bottom:0.5rem"><code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">android/</code> — Android output (XML + Compose)</li>
           <li><code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">css/</code> — Web CSS output</li>
         </ul>
@@ -167,16 +172,70 @@ export const Overview: Story = {
           <li style="margin-bottom:0.5rem"><a href="/?path=/docs/architecture-adr-0005-transform-layer-and-platform-outputs--docs" style="color:#007bff;text-decoration:underline">ADR-0005: Transform Layer & Platform Outputs</a></li>
           <li style="margin-bottom:0.5rem"><a href="/?path=/docs/architecture-adr-0013-consumer-models--docs" style="color:#007bff;text-decoration:underline">ADR-0013: Consumer Models</a></li>
           <li style="margin-bottom:0.5rem"><a href="/?path=/docs/architecture-adr-0017-android-distribution-strategy--docs" style="color:#007bff;text-decoration:underline">ADR-0017: Android Distribution Strategy</a></li>
-          <li><a href="/?path=/docs/docs-android-token-distribution-requirements--docs" style="color:#007bff;text-decoration:underline">Android Token Distribution Requirements</a></li>
         </ul>
 
         <div style="background:#e8f4fd;border-left:4px solid #007bff;padding:1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0">
           <h3 style="font-size:1.2rem;margin:0 0 1rem;color:#0056b3">Status</h3>
           <ul style="margin:0;padding-left:1.5rem">
-            <li style="margin-bottom:0.5rem"><strong>iOS:</strong> Dual implementation complete (SPM + CocoaPods)</li>
+            <li style="margin-bottom:0.5rem"><strong>iOS:</strong> SPM implementation complete (Display P3, Swift extensions)</li>
             <li style="margin-bottom:0.5rem"><strong>Android:</strong> Basic output generation complete, CI/CD and GitLab Packages setup pending</li>
             <li><strong>Web:</strong> Full distribution via npm</li>
           </ul>
+        </div>
+
+        <h2 style="font-size:1.8rem;margin:2rem 0 1rem">Foundation Distribution Architecture</h2>
+        <p style="margin-bottom:1rem">
+          The most significant finding from the discovery effort is that native stakeholders consistently raised concerns about distribution and delivery rather than color definitions themselves. The same distribution concerns apply to all foundation categories: color, typography, spacing, radius, and shadows.
+        </p>
+
+        <div style="background:#f5f2eb;padding:1.5rem;border-radius:8px;margin:1.5rem 0">
+          <h4 style="margin:0 0 0.75rem;font-size:1.1rem">Distribution Goals</h4>
+          <ul style="margin:0;padding-left:1.5rem">
+            <li style="margin-bottom:0.5rem">Automated distribution via platform-native mechanisms</li>
+            <li style="margin-bottom:0.5rem">Versioned delivery with semantic versioning</li>
+            <li style="margin-bottom:0.5rem">CI/CD integration for automated updates</li>
+            <li style="margin-bottom:0.5rem">No manual copying or asset transfer</li>
+            <li>Platform-native consumption patterns</li>
+          </ul>
+        </div>
+
+        <h3 style="font-size:1.4rem;margin:1.5rem 0 0.75rem">Foundation Readiness Matrix</h3>
+        <p style="margin-bottom:1rem">
+          Cedar's foundation maturity varies across categories. Color has the most mature semantic authoring and native delivery models, while typography and spacing require additional discovery work.
+        </p>
+
+        <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.9rem">
+          <tr style="border-bottom:2px solid #ddd">
+            <th style="text-align:left;padding:0.75rem;background:#fafafa">Foundation</th>
+            <th style="text-align:left;padding:0.75rem;background:#fafafa">Semantic Model</th>
+            <th style="text-align:left;padding:0.75rem;background:#fafafa">Native Delivery</th>
+            <th style="text-align:left;padding:0.75rem;background:#fafafa">Readiness</th>
+          </tr>
+          <tr style="border-bottom:1px solid #eee">
+            <td style="padding:0.75rem;font-weight:500">Color</td>
+            <td style="padding:0.75rem">High</td>
+            <td style="padding:0.75rem">High</td>
+            <td style="padding:0.75rem;color:#28a745">Ready</td>
+          </tr>
+          <tr style="border-bottom:1px solid #eee">
+            <td style="padding:0.75rem;font-weight:500">Typography</td>
+            <td style="padding:0.75rem">Medium</td>
+            <td style="padding:0.75rem">Partial</td>
+            <td style="padding:0.75rem;color:#ffc107">Discovery Needed</td>
+          </tr>
+          <tr>
+            <td style="padding:0.75rem;font-weight:500">Spacing</td>
+            <td style="padding:0.75rem">Low</td>
+            <td style="padding:0.75rem">Low</td>
+            <td style="padding:0.75rem;color:#dc3545">Discovery Needed</td>
+          </tr>
+        </table>
+
+        <div style="background:#e8f4fd;border-left:4px solid #007bff;padding:1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0">
+          <h4 style="margin:0 0 0.75rem;font-size:1.1rem;color:#0056b3">Key Insight</h4>
+          <p style="margin:0;font-size:0.9rem">
+            Color was the entry point for native foundation distribution, but the distribution architecture being established applies equally to typography, spacing, radius, shadows, and future design foundations. The same automated distribution mechanisms (SPM for iOS, AAR for Android, npm for Web) will serve all foundation categories.
+          </p>
         </div>
       </div>
     `;

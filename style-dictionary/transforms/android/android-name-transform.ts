@@ -1,7 +1,12 @@
 import type { Transform } from 'style-dictionary/types';
 
 const toSnakeCase = (str: string) =>
-  str.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
+  str
+    .replace(/[^a-zA-Z0-9]+/g, "_")
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .replace(/_+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .toLowerCase();
 
 export const androidNameTransform: Transform = {
   name: 'name/android-snake',

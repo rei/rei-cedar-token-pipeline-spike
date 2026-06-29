@@ -51,14 +51,24 @@
           "colorFamily": "alpine-lake-blue",
           "tokens": "auto"
         },
-        "info-blue": {
-          "canonicalPrefix": "color.option.info-blue",
-          "colorFamily": "info-blue",
-          "tokens": "auto"
-        },
         "blue-spruce-green": {
           "canonicalPrefix": "color.option.blue-spruce-green",
           "colorFamily": "blue-spruce-green",
+          "tokens": "auto"
+        },
+        "sage-green": {
+          "canonicalPrefix": "color.option.sage-green",
+          "colorFamily": "sage-green",
+          "tokens": "auto"
+        },
+        "natural-grey": {
+          "canonicalPrefix": "color.option.natural-grey",
+          "colorFamily": "natural-grey",
+          "tokens": "auto"
+        },
+        "info-blue": {
+          "canonicalPrefix": "color.option.info-blue",
+          "colorFamily": "info-blue",
           "tokens": "auto"
         },
         "success-green": {
@@ -79,6 +89,31 @@
         "sale-red": {
           "canonicalPrefix": "color.option.sale-red",
           "colorFamily": "sale-red",
+          "tokens": "auto"
+        },
+        "membership-text": {
+          "canonicalPrefix": "color.option.membership-text",
+          "colorFamily": "membership-text",
+          "tokens": "auto"
+        },
+        "lichen": {
+          "canonicalPrefix": "color.option.lichen",
+          "colorFamily": "lichen",
+          "tokens": "auto"
+        },
+        "apex-moss": {
+          "canonicalPrefix": "color.option.apex-moss",
+          "colorFamily": "apex-moss",
+          "tokens": "auto"
+        },
+        "golden-moss": {
+          "canonicalPrefix": "color.option.golden-moss",
+          "colorFamily": "golden-moss",
+          "tokens": "auto"
+        },
+        "membership-yellow": {
+          "canonicalPrefix": "color.option.membership-yellow",
+          "colorFamily": "membership-yellow",
           "tokens": "auto"
         },
         "text.family": {

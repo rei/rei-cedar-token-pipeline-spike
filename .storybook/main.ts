@@ -34,12 +34,8 @@ const config: StorybookConfig = {
       to: "/dist-css",
     },
     {
-      from: path.resolve(__dirname, "../dist/themes/rei-dot-com/ios-spm"),
-      to: "/ios-spm",
-    },
-    {
-      from: path.resolve(__dirname, "../dist/themes/rei-dot-com/ios-cocoapods"),
-      to: "/ios-cocoapods",
+      from: path.resolve(__dirname, "../dist/themes/rei-dot-com/ios"),
+      to: "/ios",
     },
     {
       from: path.resolve(__dirname, "../dist/themes/rei-dot-com/android"),

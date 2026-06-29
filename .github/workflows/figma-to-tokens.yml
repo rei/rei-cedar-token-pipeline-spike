@@ -1,6 +1,15 @@
 name: Sync Figma variables to tokens
 on:
   workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Enable debug mode (skips Figma sync, only builds)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
 
 # Allow one run at a time so baselines never interleave
 concurrency:
@@ -37,6 +46,8 @@ jobs:
         with:
           node-version: '24'
           cache: 'pnpm'
+      - name: Verify Node.js version
+        run: node --version
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -47,7 +58,16 @@ jobs:
 
       # ── 4. Figma → tokens sync ───────────────────────────────────────────────
       - name: Sync variables in Figma files to tokens
+        if: github.event.inputs.debug != 'true'
         run: pnpm run sync:figma-to-tokens -- --output tokens
+        env:
+          FILE_KEYS: ${{ secrets.FIGMA_FILE_KEYS }}
+          PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_ACTION_VARIABLES_SYNC_FIGMA_TOKEN }}
+      - name: Debug sync failure
+        if: failure() && github.event.inputs.debug != 'true'
+        run: |
+          echo "FILE_KEYS is set: $([ -n "$FILE_KEYS" ] && echo 'YES' || echo 'NO')"
+          echo "PERSONAL_ACCESS_TOKEN is set: $([ -n "$PERSONAL_ACCESS_TOKEN" ] && echo 'YES' || echo 'NO')"
         env:
           FILE_KEYS: ${{ secrets.FIGMA_FILE_KEYS }}
           PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_ACTION_VARIABLES_SYNC_FIGMA_TOKEN }}

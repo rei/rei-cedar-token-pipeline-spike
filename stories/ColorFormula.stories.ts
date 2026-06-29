@@ -152,8 +152,18 @@ export const Overview: Story = {
 
         <h2 style="font-size:1.8rem;margin:2rem 0 1rem">Technical Details</h2>
         <p style="margin-bottom:1rem">
-          The formula is implemented in <code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">style-dictionary/actions/web/oklch-formulas.ts</code> and used during the CSS generation process to convert hex values to OKLCH with custom chroma curves.
+          The formula is implemented in <code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">style-dictionary/actions/web/oklch-formulas.ts</code> and produces OKLCH color values. OKLCH is the source of truth for the color system.
         </p>
+        <p style="margin-bottom:1rem">
+          <strong>Color Conversion Pipeline:</strong>
+        </p>
+        <ul style="margin:0 0 1rem;padding-left:1.5rem">
+          <li style="margin-bottom:0.5rem">Formula produces OKLCH values (source of truth)</li>
+          <li style="margin-bottom:0.5rem">Web: Uses OKLCH directly with custom formulas</li>
+          <li style="margin-bottom:0.5rem">iOS: culori converts OKLCH → Display P3 for XCAssets</li>
+          <li style="margin-bottom:0.5rem">Android: culori converts OKLCH → Display P3 for Compose (XML uses sRGB fallback)</li>
+          <li>Hex values are lossy sRGB clips of OKLCH, provided for reference only</li>
+        </ul>
         <p style="margin-bottom:1rem">
           The validation test is in <code style="background:#f0f0f0;padding:0.2rem 0.4rem;border-radius:4px">src/contract/figma-color-spec.test.ts</code> and runs on every contract test suite execution.
         </p>
