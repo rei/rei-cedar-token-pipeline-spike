@@ -5,14 +5,7 @@ export type Platform = "web" | "ios" | "android";
 export type Responsibility = "foundations";
 
 export type FoundationModule =
-  | "cdr-color-border"
-  | "cdr-color-surface"
-  | "cdr-color-text"
   | "cdr-spacing-component"
   | "cdr-spacing-layout"
   | "cdr-spacing-scale"
-  | "cdr-spacing-static"
-  | "cdr-text-family"
-  | "cdr-text-size"
-  | "cdr-text-style"
-  | "cdr-text-weight";
+  | "cdr-spacing-static";
