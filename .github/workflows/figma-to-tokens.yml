@@ -102,6 +102,8 @@ jobs:
       # ── 8. Create (or update) the Pull Request ───────────────────────────────
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
+        env:
+          HUSKY: 0
         with:
           commit-message: 'chore: update tokens from Figma'
           title: 'chore: update tokens from Figma'
