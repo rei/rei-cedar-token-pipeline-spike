@@ -1,7 +1,9 @@
 # ADR‑0006: State Layer System
 
 ## Status
-Future
+**Superseded by [ADR-0016: Semantic Color & Interaction State Architecture](./adr-0016-semantic-color-and-state-architecture.md).**
+
+The interaction-state model is now owned by ADR-0016 (Part 4). This document is retained for historical context only; do not treat its state model as current. In particular, ADR-0016 replaces this document's `pressed`/`error` state vocabulary (`pressed`→`active`; `error` is a `feedback` family, not a state) and its overlay-opacity approach with the author-once/derive model.
 
 ## Context
 
