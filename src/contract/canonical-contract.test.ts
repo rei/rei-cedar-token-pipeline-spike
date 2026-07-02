@@ -243,13 +243,45 @@ describe("canonical contract invariants", () => {
       );
     }
 
-    if (!isObject(color.modes)) {
+    // INTERSTITIAL (parked pending ADR-0016 D3): the Figma color export has
+    // migrated from palette-modes (`color.modes.{default,sale}`) to a semantic
+    // intents-x-states model (`semantics.color.<state>.json` -> `color.<intent>`).
+    // The canonical representation of interaction state is NOT finalized — it
+    // depends on ADR-0016 open decision D3 (state-transform set), so `color.modes`
+    // is temporarily absent by design. Do NOT build normalize state-handling to
+    // this shape yet. Re-enable this assertion once D3 is ratified and the
+    // canonical state structure is defined.
+    // See: architecture/ADR/adr-0016-semantic-color-and-state-architecture.md
+    //
+    // if (!isObject(color.modes)) {
+    //   pushViolation(
+    //     violations,
+    //     "color.modes",
+    //     "MISSING_COLOR_MODES",
+    //     "color.modes exists as object",
+    //     color.modes,
+    //   );
+    // }
+
+    // Guard today's real shape: semantic intents live directly under `color`.
+    const SEMANTIC_INTENTS = [
+      "surface",
+      "action",
+      "selection",
+      "navigation",
+      "feedback",
+      "text",
+      "icon",
+      "overlay",
+    ];
+    const hasAnySemanticIntent = SEMANTIC_INTENTS.some((intent) => isObject(color[intent]));
+    if (!hasAnySemanticIntent) {
       pushViolation(
         violations,
-        "color.modes",
-        "MISSING_COLOR_MODES",
-        "color.modes exists as object",
-        color.modes,
+        "color.<intent>",
+        "MISSING_COLOR_OPTION",
+        "at least one semantic intent (surface/action/...) exists under color",
+        Object.keys(color),
       );
     }
 
