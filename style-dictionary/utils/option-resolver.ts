@@ -22,12 +22,10 @@ export type CedarOptionNode = {
  * SD v5 stores tokens as a nested object matching the source JSON structure.
  */
 export function getTokenAtPath(tokens: any, dotPath: string): any {
-  return dotPath
-    .split(".")
-    .reduce<unknown>((node, seg) => {
-      if (!node || typeof node !== "object") return undefined;
-      return (node as Record<string, unknown>)[seg];
-    }, tokens);
+  return dotPath.split(".").reduce<unknown>((node, seg) => {
+    if (!node || typeof node !== "object") return undefined;
+    return (node as Record<string, unknown>)[seg];
+  }, tokens);
 }
 
 /**
@@ -42,7 +40,7 @@ export function getTokenAtPath(tokens: any, dotPath: string): any {
 export function resolveOptionHex(
   optionNode: CedarOptionNode | undefined,
   platform: "ios" | "web",
-  appearance: "light" | "dark",
+  appearance: "light" | "dark"
 ): string | undefined {
   const cedar = optionNode?.$extensions?.cedar;
   const platformOverride = cedar?.platformOverrides?.[platform]?.[appearance];

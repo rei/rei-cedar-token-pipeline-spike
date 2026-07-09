@@ -13,6 +13,9 @@ export type FoundationModule =
   | "cdr-spacing-scale"
   | "cdr-spacing-static"
   | "cdr-text-family"
-  | "cdr-text-size"
+  | "cdr-text-letter-spacing"
+  | "cdr-text-line-height"
+  | "cdr-text-size-fluid"
+  | "cdr-text-size-static"
   | "cdr-text-style"
   | "cdr-text-weight";

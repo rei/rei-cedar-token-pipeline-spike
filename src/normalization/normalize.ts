@@ -32,6 +32,7 @@ import {
   buildOptionTree,
   expandHyphenatedTokens,
   fixStaticReferencePaths,
+  buildTextSizeClamp,
   type TokenMapping,
 } from "./normalize-utils.js";
 import { mergeColorVariants } from "./color-variants.js";
@@ -48,6 +49,7 @@ const metadataFile = path.resolve(__dirname, "../../metadata/tokens.json");
 type ParsedFile = { file: string; data: Record<string, unknown> };
 
 const SPACING_BP_RE = /^spacing.scale\.(\d+)\.json$/;
+const TEXT_SIZE_FLUID_BP_RE = /^options.text.size.fluid\.(\d+)\.json$/;
 
 // ─── Pipeline steps ──────────────────────────────────────────────────────────
 
@@ -104,7 +106,10 @@ function partitionFiles(parsed: ParsedFile[]) {
     spacingPlatformFiles: parsed.filter(
       ({ file }) => file === "alias.spacing.web.json" || file === "alias.spacing.ios.json",
     ),
-    typographyFiles: parsed.filter(({ file }) => file.startsWith("options.text.")),
+    typographyBpFiles: parsed.filter(({ file }) => TEXT_SIZE_FLUID_BP_RE.test(file)),
+    typographyFiles: parsed.filter(
+      ({ file }) => file.startsWith("options.text.") && !TEXT_SIZE_FLUID_BP_RE.test(file),
+    ),
     otherFiles: parsed.filter(
       ({ file }) =>
         !SPACING_BP_RE.test(file) &&
@@ -291,61 +296,93 @@ function processMetadata(canonical: Record<string, unknown>) {
   }
 }
 
-function processTypography(canonical: Record<string, unknown>, typographyFiles: ParsedFile[]) {
-  if (typographyFiles.length === 0) return;
+function processTypography(
+  canonical: Record<string, unknown>,
+  typographyFiles: ParsedFile[],
+  typographyBpFiles: ParsedFile[],
+) {
+  if (typographyFiles.length === 0 && typographyBpFiles.length === 0) return;
 
   const typographyTree: Record<string, any> = { text: {} };
 
+  // 1. Process and merge fluid sizes first
+  if (typographyBpFiles.length > 0) {
+    const parsedBps = typographyBpFiles.map(({ file, data }) => ({
+      breakpoint: parseInt(TEXT_SIZE_FLUID_BP_RE.exec(file)![1], 10),
+      data,
+    }));
+
+    // Calculates and immediately merges fluid clamps into the tree
+    const fluidTextSize = buildTextSizeClamp(parsedBps);
+    deepMerge(typographyTree, fluidTextSize);
+  }
+
+  // 2. Loop through other typography files (including size.static)
   for (const { file, data } of typographyFiles) {
-    // Extract the property and variant name, discarding optional file-version suffixes (e.g., _2)
-    const match = file.match(/options\.text\.([\w-]+)\.(\w+?)(?:_\d+)?\.json$/);
+    // UPDATED REGEX: Added a dot (.) to the first capture group
+    const match = file.match(/options\.text\.([\w.-]+)\.(\w+?)(?:_\d+)?\.json$/);
     if (!match) continue;
 
-    const [_, subProperty, variantName] = match;
-    // Hyphenated names like "letter-spacing" map to nested paths: text.letter.spacing
-    const pathSegments = subProperty.split("-");
+    const [_, subPropertyPath, variantName] = match;
+
+    // Split by both dots AND hyphens so "size.static" and "letter-spacing"
+    // both resolve to deep paths (text.size.static and text.letter.spacing)
+    const pathSegments = subPropertyPath.split(/[.-]/);
+
+    // Traverse the source JSON to grab the token group
     let propertyData: any = (data as Record<string, any>).text;
     for (const seg of pathSegments) {
       propertyData = propertyData?.[seg];
     }
+
     if (!propertyData) continue;
 
-    if (!typographyTree.text[subProperty]) {
-      typographyTree.text[subProperty] = {};
-    }
-
-    for (const [tokenKey, tokenLeaf] of Object.entries(propertyData)) {
-      const leaf = tokenLeaf as Record<string, any>;
-
-      if (!typographyTree.text[subProperty][tokenKey]) {
-        typographyTree.text[subProperty][tokenKey] = {
-          $type: leaf.$type || "string",
-          $value: "",
-          $extensions: { cedar: {} },
-        };
+    // Traverse the typography tree to find/create the insertion point
+    let currentLevel = typographyTree.text;
+    for (let i = 0; i < pathSegments.length; i++) {
+      const seg = pathSegments[i];
+      if (!currentLevel[seg]) {
+        currentLevel[seg] = {};
       }
 
-      const targetToken = typographyTree.text[subProperty][tokenKey];
+      // If we are at the final property level, insert the tokens
+      if (i === pathSegments.length - 1) {
+        for (const [tokenKey, tokenLeaf] of Object.entries(propertyData)) {
+          const leaf = tokenLeaf as Record<string, any>;
 
-      if (variantName === "default") {
-        targetToken.$value = leaf.$value;
-        if (leaf.$type) targetToken.$type = leaf.$type;
+          if (!currentLevel[seg][tokenKey]) {
+            currentLevel[seg][tokenKey] = {
+              $type: leaf.$type || "string",
+              $value: "",
+              $extensions: { cedar: {} },
+            };
+          }
+
+          const targetToken = currentLevel[seg][tokenKey];
+
+          if (variantName === "default") {
+            targetToken.$value = leaf.$value;
+            if (leaf.$type) targetToken.$type = leaf.$type;
+          } else {
+            targetToken.$extensions.cedar[variantName] = leaf.$value;
+          }
+
+          if (leaf.$description && !targetToken.$description) {
+            targetToken.$description = leaf.$description;
+          }
+        }
       } else {
-        targetToken.$extensions.cedar[variantName] = leaf.$value;
-      }
-
-      if (leaf.$description && !targetToken.$description) {
-        targetToken.$description = leaf.$description;
+        // Move one level deeper
+        currentLevel = currentLevel[seg];
       }
     }
   }
 
   deepMerge(canonical, typographyTree);
   console.log(
-    `  ✓ Normalized ${typographyFiles.length} typography file(s) directly into canonical text tree`,
+    `  ✓ Normalized ${typographyFiles.length} typography file(s) and fluid clamps into canonical text tree`,
   );
 }
-
 function writeCanonical(canonical: Record<string, unknown>, fileCount: number) {
   fs.mkdirSync(path.dirname(outFile), { recursive: true });
   fs.writeFileSync(outFile, JSON.stringify(canonical, null, 2), "utf-8");
@@ -369,6 +406,7 @@ try {
     spacingPlatformFiles,
     optionColorFiles,
     typographyFiles,
+    typographyBpFiles,
     otherFiles,
   } = partitionFiles(parsed);
 
@@ -386,7 +424,7 @@ try {
   const platformLookup = processOptionColors(canonical, optionColorFiles, tokenMapping);
   processAliasFiles(canonical, otherFiles, tokenMapping);
   mergeColorVariants(canonical, platformLookup);
-  processTypography(canonical, typographyFiles);
+  processTypography(canonical, typographyFiles, typographyBpFiles);
   processMetadata(canonical);
   writeCanonical(canonical, parsed.length);
 } catch (error) {

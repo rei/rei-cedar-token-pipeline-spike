@@ -1,0 +1,7 @@
+:root {
+  --cdr-text-size-fluid-100: clamp(10px, 0.5vw + 8px, 12px);
+  --cdr-text-size-fluid-200: clamp(12px, 0.6vw + 9.6px, 14px);
+  --cdr-text-size-fluid-300: clamp(14px, 0.7vw + 11.2px, 16px);
+  --cdr-text-size-fluid-400: clamp(16px, 0.8vw + 12.8px, 18px);
+  --cdr-text-size-fluid-500: clamp(18px, 0.9vw + 14.4px, 20px);
+}

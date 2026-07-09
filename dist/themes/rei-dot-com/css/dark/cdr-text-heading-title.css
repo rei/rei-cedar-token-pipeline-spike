@@ -1,0 +1,7 @@
+:root {
+--cdr-text-heading-title-font-family: Graphik;
+--cdr-text-heading-title-font-weight: 600;
+--cdr-text-heading-title-font-size: clamp(16px, 0.8vw + 12.8px, 18px);
+--cdr-text-heading-title-letter-spacing: 0;
+--cdr-text-heading-title-line-height: 22;
+}

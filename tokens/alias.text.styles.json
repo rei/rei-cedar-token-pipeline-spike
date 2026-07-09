@@ -1,0 +1,30 @@
+{
+  "text": {
+    "semantic": {
+      "heading": {
+        "title": {
+          "$type": "typography",
+          "$description": "",
+          "$value": {
+            "fontFamily": "{text.family.graphik}",
+            "fontWeight": "{text.weight.semibold}",
+            "fontSize": "{text.size.fluid.400}",
+            "letterSpacing": "{text.letter.spacing.none}",
+            "lineHeight": "{text.line.height.3}"
+          }
+        },
+        "sans": {
+          "$type": "typography",
+          "$description": "",
+          "$value": {
+            "fontFamily": "{text.family.graphik}",
+            "fontWeight": "{text.weight.bold}",
+            "fontSize": "{text.size.fluid.400}",
+            "letterSpacing": "{text.letter.spacing.tight}",
+            "lineHeight": "{text.line.height.4}"
+          }
+        }
+      }
+    }
+  }
+}
