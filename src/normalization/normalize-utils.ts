@@ -445,15 +445,16 @@ export function clean(
       let finalValue: unknown = rawValue;
 
       // Helper function to process and rewrite individual alias strings
-      const rewriteAlias = (valStr: string) => {
+      const rewriteAlias = (valStr: string, objPropKey?: string) => {
         if (valStr.startsWith("{") && valStr.endsWith("}")) {
           const inner = valStr.slice(1, -1); // "{x.y.z}" → "x.y.z"
-          const firstSegment = inner.split(".")[0]; // "x.y.z" → "x"
+          const segments = inner.split(".");
+          const firstSegment = segments[0]; // "x.y.z" → "x"
           const mappingEntry = tokenMapping?.collections[firstSegment];
 
           if (mappingEntry) {
             // Mapped collection rewrite
-            const figmaSubPath = inner.split(".").slice(1).join(".");
+            const figmaSubPath = segments.slice(1).join(".");
             const canonicalSub =
               mappingEntry.tokens === "auto" ? figmaSubPath : mappingEntry.tokens[figmaSubPath];
             if (canonicalSub !== undefined) {
@@ -467,7 +468,45 @@ export function clean(
             }
           } else {
             // Unmapped / standard collection rewrite
-            const section = collectionToSection.get(firstSegment);
+            let section = collectionToSection.get(firstSegment);
+
+            // Guard against namespace collisions: If the first segment is "text"
+            // and the context or path indicates a typography token, do not allow it
+            // to map to the "color" section. Force it to remain in the "text" section.
+            const isTypographyRef =
+              firstSegment === "text" &&
+              (currentPath[0] === "text" ||
+                value.$type === "typography" ||
+                ["fontFamily", "fontSize", "fontWeight", "lineHeight", "letterSpacing"].includes(
+                  value.$type || "",
+                ) ||
+                ["fontFamily", "fontSize", "fontWeight", "lineHeight", "letterSpacing"].includes(
+                  objPropKey || "",
+                ) ||
+                segments.some((seg) =>
+                  [
+                    "family",
+                    "fontFamily",
+                    "font-family",
+                    "size",
+                    "fontSize",
+                    "font-size",
+                    "weight",
+                    "fontWeight",
+                    "font-weight",
+                    "lineHeight",
+                    "line-height",
+                    "letterSpacing",
+                    "letter-spacing",
+                    "styles",
+                    "semantic",
+                  ].includes(seg),
+                ));
+
+            if (isTypographyRef) {
+              section = "text";
+            }
+
             if (section && section !== firstSegment) {
               return `{${section}.${inner}}`;
             }
@@ -485,7 +524,7 @@ export function clean(
         finalValue = {};
         for (const [objKey, objVal] of Object.entries(rawValue)) {
           if (typeof objVal === "string") {
-            (finalValue as Record<string, unknown>)[objKey] = rewriteAlias(objVal);
+            (finalValue as Record<string, unknown>)[objKey] = rewriteAlias(objVal, objKey);
           } else {
             (finalValue as Record<string, unknown>)[objKey] = objVal;
           }
@@ -539,6 +578,23 @@ export function clean(
   }
 
   return out as TokenNode; // Assumes TokenNode is a valid cast
+}
+
+/**
+ * Recursively scans a nested token tree to check if it contains any typography tokens.
+ * This identifies typography collections regardless of file-name or key collision.
+ */
+function hasTypographyTokens(obj: unknown): boolean {
+  if (typeof obj !== "object" || obj === null) return false;
+  if ("$type" in obj && (obj as Record<string, unknown>).$type === "typography") {
+    return true;
+  }
+  for (const val of Object.values(obj)) {
+    if (hasTypographyTokens(val)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // ─── nestUnderSections ────────────────────────────────────────────────────────
@@ -601,7 +657,13 @@ export function nestUnderSections(
   const out: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(cleaned)) {
-    const section = collectionToSection.get(key);
+    let section = collectionToSection.get(key);
+
+    // Guard: If this value contains typography tokens, force the section to "text"
+    // to prevent conflicts with color mode files mapping "text" to the "color" section.
+    if (hasTypographyTokens(value)) {
+      section = "text";
+    }
 
     // ───────────────────────────────────────────────
     // SECTION WRAPPER (e.g. "color", "spacing")

@@ -272,6 +272,11 @@ function processAliasFiles(
   for (const { file, data } of otherFiles) {
     const cleaned = clean(data, collectionToSection, tokenMapping);
     const colorMode = extractColorMode(file);
+
+    if (file.includes(".text.style")) {
+      console.log("file: ", file);
+      console.log("collectionToSection: ", collectionToSection);
+    }
     const nested = nestUnderSections(
       cleaned as Record<string, unknown>,
       collectionToSection,
@@ -307,6 +312,7 @@ function processTypography(
 
   // 1. Process and merge fluid sizes first
   if (typographyBpFiles.length > 0) {
+    console.log("Entered");
     const parsedBps = typographyBpFiles.map(({ file, data }) => ({
       breakpoint: parseInt(TEXT_SIZE_FLUID_BP_RE.exec(file)![1], 10),
       data,
