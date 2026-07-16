@@ -141,11 +141,29 @@ const MODULE_DEFINITIONS: ModuleDefinition[] = [
     return token.path.slice(2);
   }),
 
-  createModuleDefinition("cdr-text-size", (token) => {
-    if (token.path[0] !== "text" || token.path[1] !== "size" || token.path.length < 3) {
+  createModuleDefinition("cdr-text-size-static", (token) => {
+    if (
+      token.path[0] !== "text" ||
+      token.path[1] !== "size" ||
+      token.path[2] !== "static" ||
+      token.path.length < 4
+    ) {
       return [];
     }
-    // token path: text.size.100 → return ["100"]
+    // token path: text.size.static.100 → return ["100"]
+    return token.path.slice(2);
+  }),
+
+  createModuleDefinition("cdr-text-size-fluid", (token) => {
+    if (
+      token.path[0] !== "text" ||
+      token.path[1] !== "size" ||
+      token.path[2] !== "fluid" ||
+      token.path.length < 4
+    ) {
+      return [];
+    }
+    // token path: text.size.fluid.100 → return ["100"]
     return token.path.slice(2);
   }),
 

@@ -11,9 +11,11 @@ export function getPlatformSnippet(token: CedarToken, platform: Platform): strin
     case "android":
       // Android Compose: Object-based access (modern approach)
       const androidCamel = token.name
-        .split('_')
-        .map((part: string, i: number) => i === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1))
-        .join('');
+        .split("_")
+        .map((part: string, i: number) =>
+          i === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1),
+        )
+        .join("");
       return `CedarColors.${androidCamel}`;
     default:
       return `var(--${token.name})`;

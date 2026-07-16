@@ -359,6 +359,36 @@ export function buildCollectionToSection(parsed: ParsedFile[]): Map<string, stri
   return map;
 }
 
+function buildTextSemanticExtensions(baseValue: Record<string, unknown>, variableName: string) {
+  const iosValue: Record<string, unknown> = {};
+
+  // Create the iOS specific value by swapping fluid for static sizing
+  for (const [k, v] of Object.entries(baseValue)) {
+    if (typeof v === "string") {
+      iosValue[k] = v.replace(".fluid.", ".static.");
+    } else {
+      iosValue[k] = v;
+    }
+  }
+
+  return {
+    ios: {
+      light: iosValue,
+      dark: iosValue,
+    },
+    web: {
+      light: baseValue,
+      dark: baseValue,
+    },
+    governance: {
+      figma: {
+        collection: "Type / Semantic",
+        variable: variableName,
+      },
+    },
+  };
+}
+
 // ─── clean ────────────────────────────────────────────────────────────────────
 
 /**
@@ -381,10 +411,12 @@ export function buildCollectionToSection(parsed: ParsedFile[]): Map<string, stri
  * (e.g. "neutral-palette") is a collection, we prefix it with its section
  * (e.g. "color.") so the reference resolves in the nested tree.
  */
+// Helper function to build the platform and governance extensions specifically for Text Semantic tokens
 export function clean(
   node: Record<string, unknown>,
   collectionToSection: Map<string, string>,
   tokenMapping?: TokenMapping | null,
+  currentPath: string[] = [], // Added path tracking to know where we are in the tree
 ): TokenNode {
   const out: Record<string, unknown> = {};
 
@@ -392,10 +424,7 @@ export function clean(
     // Strip Figma metadata keys
     if (key === "$extensions" || key === "$description") continue;
 
-    // Mixed node guard: if an object has both $value (leaf) AND child token
-    // groups, it's a Figma API artifact where a group folder was exported with
-    // its own value alongside real child variables.  Drop the group-level leaf
-    // properties and recurse into the children only.
+    // Mixed node guard
     if (
       isLeaf(value) &&
       typeof value === "object" &&
@@ -404,73 +433,168 @@ export function clean(
         (k) => !k.startsWith("$") && typeof (value as Record<string, unknown>)[k] === "object",
       )
     ) {
-      out[key] = clean(value as Record<string, unknown>, collectionToSection, tokenMapping);
+      out[key] = clean(value as Record<string, unknown>, collectionToSection, tokenMapping, [
+        ...currentPath,
+        key,
+      ]);
       continue;
     }
 
     if (isLeaf(value)) {
-      let $value = String(value.$value);
+      let rawValue = value.$value;
+      let finalValue: unknown = rawValue;
 
-      // Rewrite alias references that point into Figma option collections
-      // to their canonical color.option.* paths.
-      //
-      // Without a mapping:  {neutral-palette.warm-grey.900} → {color.neutral-palette.warm-grey.900}
-      // With a mapping:     {neutral-palette.warm-grey.900} → {color.option.neutral.warm.grey.900}
-      //
-      // The mapping rewrite is preferred — it produces ADR-0001 compliant paths.
-      // The fallback (section prefix only) is kept for non-option alias types
-      // (e.g. spacing references) that don't go through the mapping.
-      if ($value.startsWith("{") && $value.endsWith("}")) {
-        const inner = $value.slice(1, -1); // "{x.y.z}" → "x.y.z"
-        const firstSegment = inner.split(".")[0]; // "x.y.z" → "x"
-        const mappingEntry = tokenMapping?.collections[firstSegment];
+      // Helper function to process and rewrite individual alias strings
+      const rewriteAlias = (valStr: string, objPropKey?: string) => {
+        if (valStr.startsWith("{") && valStr.endsWith("}")) {
+          const inner = valStr.slice(1, -1); // "{x.y.z}" → "x.y.z"
+          const segments = inner.split(".");
+          const firstSegment = segments[0]; // "x.y.z" → "x"
+          const mappingEntry = tokenMapping?.collections[firstSegment];
 
-        if (mappingEntry) {
-          // This alias points into a mapped Figma collection.
-          // Rewrite to the canonical color.option.* path.
-          const figmaSubPath = inner.split(".").slice(1).join("."); // drop collection name
-          const canonicalSub =
-            mappingEntry.tokens === "auto" ? figmaSubPath : mappingEntry.tokens[figmaSubPath];
-          if (canonicalSub !== undefined) {
-            $value = `{${mappingEntry.canonicalPrefix}.${canonicalSub}}`;
+          if (mappingEntry) {
+            // Mapped collection rewrite
+            const figmaSubPath = segments.slice(1).join(".");
+            const canonicalSub =
+              mappingEntry.tokens === "auto" ? figmaSubPath : mappingEntry.tokens[figmaSubPath];
+            if (canonicalSub !== undefined) {
+              return `{${mappingEntry.canonicalPrefix}.${canonicalSub}}`;
+            } else {
+              throw new Error(
+                `[clean] Alias reference "{${inner}}" has no entry in src/schema/token-schema.json (inputs.figma.collections) ` +
+                  `for collection "${firstSegment}", path "${figmaSubPath}". ` +
+                  `Add the mapping entry or update the Figma alias reference.`,
+              );
+            }
           } else {
-            // Token exists in the alias file but has no mapping entry.
-            // Throw so the gap surfaces immediately rather than producing a broken reference.
-            throw new Error(
-              `[clean] Alias reference "{${inner}}" has no entry in src/schema/token-schema.json (inputs.figma.collections) ` +
-                `for collection "${firstSegment}", path "${figmaSubPath}". ` +
-                `Add the mapping entry or update the Figma alias reference.`,
-            );
+            // Unmapped / standard collection rewrite
+            let section = collectionToSection.get(firstSegment);
+
+            // Guard against namespace collisions: If the first segment is "text"
+            // and the context or path indicates a typography token, do not allow it
+            // to map to the "color" section. Force it to remain in the "text" section.
+            const isTypographyRef =
+              firstSegment === "text" &&
+              (currentPath[0] === "text" ||
+                value.$type === "typography" ||
+                ["fontFamily", "fontSize", "fontWeight", "lineHeight", "letterSpacing"].includes(
+                  value.$type || "",
+                ) ||
+                ["fontFamily", "fontSize", "fontWeight", "lineHeight", "letterSpacing"].includes(
+                  objPropKey || "",
+                ) ||
+                segments.some((seg) =>
+                  [
+                    "family",
+                    "fontFamily",
+                    "font-family",
+                    "size",
+                    "fontSize",
+                    "font-size",
+                    "weight",
+                    "fontWeight",
+                    "font-weight",
+                    "lineHeight",
+                    "line-height",
+                    "letterSpacing",
+                    "letter-spacing",
+                    "styles",
+                    "semantic",
+                  ].includes(seg),
+                ));
+
+            if (isTypographyRef) {
+              section = "text";
+            }
+
+            if (section && section !== firstSegment) {
+              return `{${section}.${inner}}`;
+            }
           }
-        } else {
-          // Not a mapped collection — apply the legacy section-prefix rewrite
-          // (handles spacing, typography, and other non-option alias types).
-          const section = collectionToSection.get(firstSegment);
-          if (section && section !== firstSegment) {
-            $value = `{${section}.${inner}}`;
+        }
+        return valStr;
+      };
+
+      // 1. If value is a simple string, rewrite it directly
+      if (typeof rawValue === "string") {
+        finalValue = rewriteAlias(rawValue);
+      }
+      // 2. If value is a composite object (e.g. Typography token), rewrite strings inside it
+      else if (typeof rawValue === "object" && rawValue !== null) {
+        finalValue = {};
+        for (const [objKey, objVal] of Object.entries(rawValue)) {
+          if (typeof objVal === "string") {
+            (finalValue as Record<string, unknown>)[objKey] = rewriteAlias(objVal, objKey);
+          } else {
+            (finalValue as Record<string, unknown>)[objKey] = objVal;
           }
         }
       }
 
-      const tokenNode: Record<string, unknown> = { $value, $type: value.$type };
+      const tokenNode: Record<string, unknown> = {
+        $value: finalValue,
+        $type: value.$type,
+      };
+      const cedarExtensions: Record<string, unknown> = {};
+
       const rawDescription = value.$description;
       if (typeof rawDescription === "string") {
-        const docs = parseTokenDescription(rawDescription);
+        const docs = parseTokenDescription(rawDescription); // Assumes parseTokenDescription is available
         if (docs) {
-          tokenNode.$extensions = {
-            cedar: { docs },
-          };
+          cedarExtensions.docs = docs;
         }
+      }
+
+      // Inject Custom Extensions for text.semantic tokens
+      if (
+        currentPath[0] === "text" &&
+        currentPath[1] === "semantic" &&
+        value.$type === "typography" &&
+        typeof finalValue === "object" &&
+        finalValue !== null
+      ) {
+        // Construct the governance variable name (e.g., "heading.sans")
+        const variableName = [...currentPath.slice(2), key].join(".");
+
+        Object.assign(
+          cedarExtensions,
+          buildTextSemanticExtensions(finalValue as Record<string, unknown>, variableName),
+        );
+      }
+
+      // Attach $extensions if anything was added
+      if (Object.keys(cedarExtensions).length > 0) {
+        tokenNode.$extensions = { cedar: cedarExtensions };
       }
 
       out[key] = tokenNode;
     } else if (typeof value === "object" && value !== null) {
       // Recursively clean nested token groups
-      out[key] = clean(value as Record<string, unknown>, collectionToSection, tokenMapping);
+      out[key] = clean(value as Record<string, unknown>, collectionToSection, tokenMapping, [
+        ...currentPath,
+        key,
+      ]);
     }
   }
 
-  return out as TokenNode;
+  return out as TokenNode; // Assumes TokenNode is a valid cast
+}
+
+/**
+ * Recursively scans a nested token tree to check if it contains any typography tokens.
+ * This identifies typography collections regardless of file-name or key collision.
+ */
+function hasTypographyTokens(obj: unknown): boolean {
+  if (typeof obj !== "object" || obj === null) return false;
+  if ("$type" in obj && (obj as Record<string, unknown>).$type === "typography") {
+    return true;
+  }
+  for (const val of Object.values(obj)) {
+    if (hasTypographyTokens(val)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // ─── nestUnderSections ────────────────────────────────────────────────────────
@@ -533,7 +657,13 @@ export function nestUnderSections(
   const out: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(cleaned)) {
-    const section = collectionToSection.get(key);
+    let section = collectionToSection.get(key);
+
+    // Guard: If this value contains typography tokens, force the section to "text"
+    // to prevent conflicts with color mode files mapping "text" to the "color" section.
+    if (hasTypographyTokens(value)) {
+      section = "text";
+    }
 
     // ───────────────────────────────────────────────
     // SECTION WRAPPER (e.g. "color", "spacing")
@@ -658,11 +788,73 @@ export function buildSpacingClamp(
     const slope = (vMax - vMin) / (bpMaxVw - bpMinVw); // px / vw
     const intercept = vMin - slope * bpMinVw; // px
 
-    const clampValue = `clamp(${roundPx(vMin)}px, ${roundSlope(slope)}vw + ${roundPx(intercept)}px, ${roundPx(vMax)}px)`;
+    const clampValue = `clamp(${roundPx(vMin)}px, ${roundSlope(
+      slope,
+    )}vw + ${roundPx(intercept)}px, ${roundPx(vMax)}px)`;
     scaleOut[tokenKey] = { $value: clampValue, $type: "dimension" };
   }
 
   return { spacing: { scale: scaleOut } };
+}
+
+export function buildTextSizeClamp(
+  parsedFiles: Array<{ breakpoint: number; data: Record<string, unknown> }>,
+): Record<string, unknown> {
+  if (parsedFiles.length === 0) return {};
+
+  const sorted = [...parsedFiles].sort((a, b) => a.breakpoint - b.breakpoint);
+  const scaleKeys = new Set<string>();
+
+  // 1. Collect all token keys
+  for (const { data } of sorted) {
+    const fluidGroup = (data as any)?.text?.size?.fluid;
+    if (fluidGroup) Object.keys(fluidGroup).forEach((k) => scaleKeys.add(k));
+  }
+
+  const scaleOut: Record<string, unknown> = {};
+
+  // Helpers to format numbers cleanly
+  const roundPx = (num: number) => Math.round(num * 100) / 100;
+  const roundSlope = (num: number) => Math.round(num * 1000) / 1000;
+
+  // 2. Process each token independently
+  for (const tokenKey of scaleKeys) {
+    const pairs: Array<{ bp: number; val: number }> = [];
+
+    // Extract pixel values from the available breakpoint files
+    for (const { breakpoint, data } of sorted) {
+      const leaf = (data as any)?.text?.size?.fluid?.[tokenKey];
+      if (leaf && typeof leaf === "object" && "$value" in leaf) {
+        const val = typeof leaf.$value === "string" ? parseFloat(leaf.$value) : leaf.$value;
+        if (!isNaN(val)) pairs.push({ bp: breakpoint, val });
+      }
+    }
+
+    if (pairs.length === 0) continue;
+
+    // Isolate the absolute boundaries
+    const vMin = Math.min(...pairs.map((p) => p.val));
+    const vMax = Math.max(...pairs.map((p) => p.val));
+
+    if (vMin === vMax) {
+      scaleOut[tokenKey] = { $type: "dimension", $value: `${vMin}px` };
+      continue;
+    }
+
+    // 3. Reconstruct the formula based on the system's proportional math proxy
+    // Slope is strictly 5% of the minimum font size
+    const vwCoef = vMin * 0.05;
+
+    // Fluid scaling structurally begins at the 400px (4vw) boundary
+    const intercept = vMin - vwCoef * 4;
+
+    scaleOut[tokenKey] = {
+      $type: "dimension",
+      $value: `clamp(${vMin}px, ${roundSlope(vwCoef)}vw + ${roundPx(intercept)}px, ${vMax}px)`,
+    };
+  }
+
+  return { text: { size: { fluid: scaleOut } } };
 }
 
 /** Extract the spacing.scale object from a raw spacing file, if present. */

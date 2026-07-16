@@ -19,38 +19,87 @@
  *   dark:  option.$extensions.cedar.appearances.dark  (web-dark override)
  *          falling back to option.$value if no dark variant exists
  */
-import fs from 'node:fs';
-import path from 'node:path';
-import type { Action } from 'style-dictionary/types';
-import { hexToCustomOklch } from './oklch-formulas';
-import { type CedarOptionNode, getTokenAtPath, resolveOptionHex } from '../../utils/option-resolver';
+import fs from "node:fs";
+import path from "node:path";
+import type { Action } from "style-dictionary/types";
+import { hexToCustomOklch } from "./oklch-formulas";
+import {
+  type CedarOptionNode,
+  getTokenAtPath,
+  resolveOptionHex,
+} from "../../utils/option-resolver";
 
 function formatOklch(hex: string, colorFamily?: string): string {
   return hexToCustomOklch(hex, colorFamily);
 }
 
-function renderColorDeclarations(cssVar: string, hex: string, colorFamily?: string): string {
-  return [`  ${cssVar}: ${hex};`, `  ${cssVar}: ${formatOklch(hex, colorFamily)};`].join('\n');
+function renderColorDeclarations(
+  cssVar: string,
+  hex: string,
+  colorFamily?: string
+): string {
+  return [
+    `  ${cssVar}: ${hex};`,
+    `  ${cssVar}: ${formatOklch(hex, colorFamily)};`,
+  ].join("\n");
 }
 
 /** Convert dot-path token name to CSS custom property */
-function toCssVar(tokenPath: string[]): string {
-  // Drop structural scaffolding: color, modes, <palette>
-  const meaningful =
-    tokenPath[0] === "color" && tokenPath[1] === "modes"
-      ? tokenPath.slice(3)
-      : tokenPath;
+export function toCssVar(tokenPath: string[], subProperty?: string): string {
+  let meaningful = [...tokenPath];
+
+  if (meaningful[0] === "color" && meaningful[1] === "modes") {
+    meaningful = meaningful.slice(3);
+  } else if (meaningful[0] === "text" && meaningful[1] === "semantic") {
+    meaningful.splice(1, 1);
+  }
+
+  if (subProperty) {
+    const kebabSub = subProperty
+      .replace(/([a-z])([A-Z])/g, "$1-$2")
+      .toLowerCase();
+    meaningful.push(kebabSub);
+  }
+
   return `--cdr-${meaningful.join("-")}`;
 }
 
 /** Convert token ref syntax like {spacing.scale.-50} into var(--cdr-spacing-scale--50) */
-function toCssValue(value: string): string {
+export function toCssValue(value: unknown): string {
+  if (typeof value === "number") {
+    // Mitigate floating point precision issues (e.g., -0.25600001215934753 -> -0.256)
+    const rounded = Math.round(value * 1000) / 1000;
+    return String(rounded);
+  }
+
+  if (typeof value !== "string") {
+    return String(value);
+  }
+
+  // Rewrite token aliases (e.g. "{text.size.fluid.400}" -> "var(--cdr-text-size-fluid-400)")
   return value.replace(/\{([^}]+)\}/g, (_match, refPath: string) => {
     const refSegments = refPath.split(".");
     return `var(${toCssVar(refSegments)})`;
   });
 }
 
+/**
+ * Loops over composite typography tokens to generate their split CSS variables.
+ * * @param token - Resolved token payload containing path and composite $value
+ */
+export function decomposeTypographyToken(token: {
+  path: string[];
+  $value: Record<string, unknown>;
+}): Array<string> {
+  const variables: Array<string> = [];
+
+  for (const [propName, propValue] of Object.entries(token.$value)) {
+    const line = `${toCssVar(token.path, propName)}: ${toCssValue(propValue)};`;
+    variables.push(line);
+  }
+
+  return variables;
+}
 
 export const webCssAction: Action = {
   name: "web-css",
@@ -72,7 +121,7 @@ export const webCssAction: Action = {
     const spacingComponent = { light: [] as string[], dark: [] as string[] };
     const spacingLayout = { light: [] as string[], dark: [] as string[] };
 
-    // Organize spacing tokens by type
+    // Organize typography tokens by type
     const typographyFamily = { light: [] as string[], dark: [] as string[] };
     const typographyLetterSpacing = {
       light: [] as string[],
@@ -82,9 +131,24 @@ export const webCssAction: Action = {
       light: [] as string[],
       dark: [] as string[],
     };
-    const typographySize = { light: [] as string[], dark: [] as string[] };
+    const typographySizeStatic = {
+      light: [] as string[],
+      dark: [] as string[],
+    };
+    const typographySizeFluid = {
+      light: [] as string[],
+      dark: [] as string[],
+    };
     const typographyStyle = { light: [] as string[], dark: [] as string[] };
     const typographyWeight = { light: [] as string[], dark: [] as string[] };
+    const typographyHeadingSans = {
+      light: [] as string[],
+      dark: [] as string[],
+    };
+    const typographyHeadingTitle = {
+      light: [] as string[],
+      dark: [] as string[],
+    };
 
     function pushColorByCategory(
       token: any,
@@ -183,7 +247,8 @@ export const webCssAction: Action = {
       }
 
       const cssVar = toCssVar(token.path);
-      const colorFamily = (lightOptionNode.$extensions as any)?.cedar?.colorFamily;
+      const colorFamily = (lightOptionNode.$extensions as any)?.cedar
+        ?.colorFamily;
       const line = renderColorDeclarations(cssVar, lightHex, colorFamily);
       const darkLine = renderColorDeclarations(cssVar, darkHex, colorFamily);
 
@@ -220,20 +285,27 @@ export const webCssAction: Action = {
       }
     });
 
-    // Categorize spacing tokens
+    // Categorize typography tokens
     const typographyTokens = dictionary.allTokens.filter(
       (t) => t.path[0] === "text"
     );
 
     typographyTokens.forEach((token) => {
-      const raw = String(token.value ?? token.$value);
+      const tokenValue = token.value ?? token.$value;
+      const semanticTokensLines = decomposeTypographyToken({
+        path: token.path,
+        $value: tokenValue,
+      });
 
+      const raw = String(tokenValue);
       const cssVar = toCssVar(token.path);
       const cssValue = toCssValue(raw);
+
       const line = `  ${cssVar}: ${cssValue};`;
 
       // Organize by spacing type (path[1]: scale, component, layout)
       const type = token.path[1];
+      const typePostfix = type === "semantic" ? token.path[3] : token.path[2];
 
       if (type === "family") {
         typographyFamily.light.push(line);
@@ -244,15 +316,24 @@ export const webCssAction: Action = {
       } else if (type === "line") {
         typographyLineHeight.light.push(line);
         typographyLineHeight.dark.push(line);
-      } else if (type === "size") {
-        typographySize.light.push(line);
-        typographySize.dark.push(line);
+      } else if (type === "size" && typePostfix === "static") {
+        typographySizeStatic.light.push(line);
+        typographySizeStatic.dark.push(line);
+      } else if (type === "size" && typePostfix === "fluid") {
+        typographySizeFluid.light.push(line);
+        typographySizeFluid.dark.push(line);
       } else if (type === "style") {
         typographyStyle.light.push(line);
         typographyStyle.dark.push(line);
       } else if (type === "weight") {
         typographyWeight.light.push(line);
         typographyWeight.dark.push(line);
+      } else if (type === "semantic" && typePostfix === "title") {
+        typographyHeadingTitle.light = [...semanticTokensLines];
+        typographyHeadingTitle.dark = [...semanticTokensLines];
+      } else if (type === "semantic" && typePostfix === "sans") {
+        typographyHeadingSans.light = [...semanticTokensLines];
+        typographyHeadingSans.dark = [...semanticTokensLines];
       }
     });
 
@@ -320,10 +401,16 @@ export const webCssAction: Action = {
         imports.push(`@import './${theme}/cdr-text-line-height.css';`);
       }
 
-      if (typographySize[theme].length > 0) {
-        const css = `:root {\n${typographySize[theme].join("\n")}\n}\n`;
-        fs.writeFileSync(path.join(themeDir, "cdr-text-size.css"), css);
-        imports.push(`@import './${theme}/cdr-text-size.css';`);
+      if (typographySizeStatic[theme].length > 0) {
+        const css = `:root {\n${typographySizeStatic[theme].join("\n")}\n}\n`;
+        fs.writeFileSync(path.join(themeDir, "cdr-text-size-static.css"), css);
+        imports.push(`@import './${theme}/cdr-text-size-static.css';`);
+      }
+
+      if (typographySizeFluid[theme].length > 0) {
+        const css = `:root {\n${typographySizeFluid[theme].join("\n")}\n}\n`;
+        fs.writeFileSync(path.join(themeDir, "cdr-text-size-fluid.css"), css);
+        imports.push(`@import './${theme}/cdr-text-size-fluid.css';`);
       }
 
       if (typographyStyle[theme].length > 0) {
@@ -336,6 +423,21 @@ export const webCssAction: Action = {
         const css = `:root {\n${typographyWeight[theme].join("\n")}\n}\n`;
         fs.writeFileSync(path.join(themeDir, "cdr-text-weight.css"), css);
         imports.push(`@import './${theme}/cdr-text-weight.css';`);
+      }
+
+      if (typographyHeadingTitle[theme].length > 0) {
+        const css = `:root {\n${typographyHeadingTitle[theme].join("\n")}\n}\n`;
+        fs.writeFileSync(
+          path.join(themeDir, "cdr-text-heading-title.css"),
+          css
+        );
+        imports.push(`@import './${theme}/cdr-text-heading-title.css';`);
+      }
+
+      if (typographyHeadingSans[theme].length > 0) {
+        const css = `:root {\n${typographyHeadingSans[theme].join("\n")}\n}\n`;
+        fs.writeFileSync(path.join(themeDir, "cdr-text-heading-sans.css"), css);
+        imports.push(`@import './${theme}/cdr-text-heading-sans.css';`);
       }
 
       // Write index file
@@ -384,9 +486,13 @@ export const webCssAction: Action = {
       console.log(
         `    ✓ cdr-text-line-height.css (${spacingComponent.light.length} tokens)`
       );
-    if (typographySize.light.length > 0)
+    if (typographySizeStatic.light.length > 0)
       console.log(
-        `    ✓ cdr-text-size.css (${spacingLayout.light.length} tokens)`
+        `    ✓ cdr-text-size-static.css (${typographySizeStatic.light.length} tokens)`
+      );
+    if (typographySizeFluid.light.length > 0)
+      console.log(
+        `    ✓ cdr-text-size-fluid.css (${typographySizeFluid.light.length} tokens)`
       );
     if (typographyWeight.light.length > 0)
       console.log(
@@ -428,9 +534,13 @@ export const webCssAction: Action = {
       console.log(
         `    ✓ cdr-text-line-height.css (${spacingComponent.light.length} tokens)`
       );
-    if (typographySize.dark.length > 0)
+    if (typographySizeStatic.dark.length > 0)
       console.log(
-        `    ✓ cdr-text-size.css (${spacingLayout.light.length} tokens)`
+        `    ✓ cdr-text-size-static.css (${typographySizeStatic.dark.length} tokens)`
+      );
+    if (typographySizeFluid.dark.length > 0)
+      console.log(
+        `    ✓ cdr-text-size-fluid.css (${typographySizeFluid.dark.length} tokens)`
       );
     if (typographyWeight.dark.length > 0)
       console.log(

@@ -1,0 +1,28 @@
+{
+  "text": {
+    "size": {
+      "fluid": {
+        "100": {
+          "$type": "dimension",
+          "$value": "clamp(10px, 0.5vw + 8px, 12px)"
+        },
+        "200": {
+          "$type": "dimension",
+          "$value": "clamp(12px, 0.6vw + 9.6px, 14px)"
+        },
+        "300": {
+          "$type": "dimension",
+          "$value": "clamp(14px, 0.7vw + 11.2px, 16px)"
+        },
+        "400": {
+          "$type": "dimension",
+          "$value": "clamp(16px, 0.8vw + 12.8px, 18px)"
+        },
+        "500": {
+          "$type": "dimension",
+          "$value": "clamp(18px, 0.9vw + 14.4px, 20px)"
+        }
+      }
+    }
+  }
+}
