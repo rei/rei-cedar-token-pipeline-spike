@@ -970,6 +970,22 @@ The Transform Layer MAY choose to consume overrides per platform.
 
 ## Canonical JSON Structure
 
+> **⚠️ Interstitial — migration in progress (pending ADR-0016 D3).** The Figma color
+> export has migrated from the palette-modes model (`color.modes.{default,sale}`,
+> fed by `alias.color.<mode>.json`) to a **semantic intents × interaction-states**
+> model (`semantics.color.<state>.json` → `color.<intent>`, e.g. `color.surface`,
+> `color.action`). As a result the current canonical output has semantic intents
+> **directly under `color`** and **no `color.modes`** object.
+>
+> This is a deliberately transitional shape. The canonical representation of
+> interaction **state** is not finalized — it depends on
+> [ADR-0016](./adr-0016-semantic-color-and-state-architecture.md) open decision
+> **D3** (the state-transform set) and the OKLCH magnitude calibration. Until D3 is
+> ratified, do **not** build normalize state-handling to this shape, and treat the
+> `color.modes` requirement below as **parked** (the canonical contract test's
+> `color.modes` assertion is commented out with a matching TODO). The sections
+> below describe the prior `color.modes` structure for historical reference.
+
 The canonical model MUST be a deeply nested JSON object representing semantic hierarchy.
 
 Top‑level keys reflect token categories. Color tokens are organised under `color.option` (foundational option values) and `color.modes` (semantic alias tokens per palette). `color.primitives` MUST NOT appear in the canonical output — the four Figma platform files are normalization input only, consumed via the schema mapping contract (`src/schema/token-schema.json`) to build `color.option`.

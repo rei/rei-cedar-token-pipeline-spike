@@ -249,7 +249,94 @@ object CdrTokens {
 
 ---
 
-### 8. Figma (Design — Source and Consumer)
+### 8. Flagship iOS (Legacy Consumer Model)
+
+**What they are:** The REI flagship iOS application is a large-scale production app with legacy UIKit code, new SwiftUI code, and complex color management requirements. It has significantly different requirements from new iOS projects.
+
+**Current Implementation (Flagship):**
+- **Distribution:** CocoaPods via private REI Git repo (legacy constraint being phased out)
+- **Version:** ~> 0.4.0
+- **Color Space:** sRGB (not Display P3)
+- **Color Access:** Enum-based pattern via CdrColor.color(CdrColorName.CdrColorTextPrimary)
+- **Frameworks:** UIKit (legacy) + SwiftUI (new)
+- **Color Surface:** 223 colors (CdrColor* + REIColor* legacy + generic names)
+- **Naming Conventions:** Dual naming (CdrColor* + REIColor*)
+- **Objective-C Support:** Required (@objc classes, header files)
+- **Stylesheet Pattern:** CedarStylesheet for centralized color management
+- **Module Structure:** Single CedarTokens pod (not modular like rei-cedar-ios)
+
+**Cedar Standard (SPM):**
+- **Distribution:** Swift Package Manager
+- **Color Space:** Display P3
+- **Color Access:** Swift extension pattern via Color.cdrTextPrimary
+- **Frameworks:** SwiftUI + UIKit
+- **Objective-C Support:** Via Swift-ObjC interop (no separate headers required)
+
+**Consumer-Specific Outputs (to reduce adoption barrier):**
+- **Objective-C Enum Generation:** Cedar can generate Objective-C enum headers for legacy Objective-C codebases (based on Cedar token names)
+- **Dual Naming Support:** Cedar can support consumer-specific naming conventions via configuration (e.g., CdrColor* pattern). Cedar generates outputs based on its own token names, not legacy patterns like REIColor* or generic names.
+- **Stylesheet Pattern Support:** Cedar can generate centralized stylesheet patterns (e.g., CedarStylesheet) for legacy color management approaches (based on Cedar token names)
+- **Principle:** Cedar provides outputs consumers want to reduce adoption barrier, as long as maintenance burden is reasonable. All outputs are based on Cedar's token names, not transformations to legacy patterns.
+- **Rationale:** Reducing consumer cognitive load and adoption barriers takes precedence over enforcing modern patterns. Consumer-specific outputs are generated from the token source of truth via the Transform Layer, not hardcoded logic. Cedar does not transform its token names to match legacy consumer patterns (e.g., REIColor*).
+
+**Migration Considerations:**
+- Flagship migration to SPM is a consumer-side decision
+- Cedar provides Objective-C enum generation as an optional output for legacy compatibility
+- Consumer-specific naming conventions are configurable, not hardcoded
+- Cedar maintains flexibility to support diverse consumer needs
+
+**Cedar's boundary:** Cedar provides SPM distribution with Display P3 and Swift extensions as the standard. Cedar also generates consumer-specific outputs (e.g., Objective-C enums, custom naming conventions) via the Transform Layer to reduce adoption barriers, as long as maintenance burden is reasonable. Composite UIKit helpers remain the responsibility of consumer applications.
+
+---
+
+### 9. Flagship Android (Legacy Consumer Model)
+
+**What they are:** The REI flagship Android application is a large-scale production app with legacy color management. It has significantly different requirements from new Android projects.
+
+**Current Implementation (Flagship):**
+- **Distribution:** Manual copying of legacy cedar-release.aar colors
+- **Color Space:** sRGB (team not aware of high spectrum option)
+- **Framework:** Jetpack Compose (primary) + XML Views (legacy)
+- **Color Access:** XML resources via @color/ references
+- **Color Surface:** Large number of Cedar color definitions in XML
+- **Dark Mode:** Not implemented (no values-night directory)
+- **Compose Color Schemes:** Not implemented (colors from XML)
+- **Automated Distribution:** Not implemented (manual process)
+- **Legacy Colors:** Using colors Cedar provided years ago
+
+**What the token spike produces for Flagship:**
+Generated XML resource files for manual integration:
+
+```xml
+<!-- res/values/colors.xml — generated for flagship manual integration -->
+<resources>
+  <color name="cdr_color_text_primary">#1A1A1A</color>
+  <color name="cdr_color_text_secondary">#666666</color>
+  <color name="cdr_color_background_primary">#FFFFFF</color>
+  <!-- ... additional colors -->
+</resources>
+```
+
+**Cedar Standard (Compose-First):**
+- **Distribution:** AAR library via GitLab Packages
+- **Color Space:** Wide-gamut OKLCH with sRGB fallback (aligns with Cedar color architecture)
+- **Framework:** Jetpack Compose (primary) + XML (legacy compatibility)
+- **Color Access:** Kotlin Compose objects (CedarColors.cdrTextBase)
+- **Dark Mode:** Compose color schemes with dark mode support
+- **Automated Distribution:** CI/CD pipeline for AAR generation
+
+**Leadership Opportunity:**
+The Android team is not rejecting modern color support—they simply haven't evaluated it yet. Cedar has an opportunity to lead by providing wide-gamut color support, Compose-first color schemes, and automated AAR distribution. The flagship already uses Compose, positioning Cedar to provide modern, forward-looking color support.
+
+**Integration layer:** Limited — the flagship app uses manual copy-paste from dist to project. No automated integration layer.
+
+**Cedar's boundary:** Cedar provides AAR distribution with Compose-first color schemes and XML resources for legacy compatibility. Flagship's current manual XML consumption is a legacy constraint addressed through migration planning. Composite style definitions remain the responsibility of consumer applications.
+
+**Token spike scope:** Generate XML resource files with sRGB color space for manual integration (transitional). Automated distribution and Compose-first approach planned for new projects.
+
+---
+
+### 10. Figma (Design — Source and Consumer)
 
 **What they are:** Figma is both the **source** of tokens in the new pipeline and a **consumer** of the published token contract for design tooling, documentation, and design-development handoff.
 

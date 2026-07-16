@@ -23,6 +23,38 @@ This ADR defines how Style Dictionary and custom transforms convert canonical to
 
 ---
 
+## Foundation Distribution Architecture
+
+The discovery effort revealed that distribution architecture is a first-class concern independent of specific foundation implementations. Native stakeholders consistently raised concerns about distribution and delivery rather than token definitions themselves.
+
+**Distribution Goals:**
+- Automated distribution via platform-native mechanisms
+- Versioned delivery with semantic versioning
+- CI/CD integration for automated updates
+- No manual copying or asset transfer
+- Platform-native consumption patterns
+
+**Foundation Scope:**
+The distribution architecture being established applies to all foundation categories:
+- Color (current implementation)
+- Typography (future implementation)
+- Spacing (future implementation)
+- Radius (future implementation)
+- Shadow (future implementation)
+
+The same automated distribution mechanisms (SPM for iOS, AAR for Android, npm for Web) will serve all foundation categories.
+
+### Principle: Consumer-Specific Outputs
+
+Cedar provides consumer-specific outputs to reduce adoption barriers, as long as the maintenance burden is reasonable. This means:
+
+- **Reduced Cognitive Load:** Consumers should not need to understand Cedar internals or maintain their own mapping layers
+- **Adoption Barrier Reduction:** Cedar generates outputs consumers want, even if they represent legacy patterns
+- **Configurable, Not Hardcoded:** Consumer-specific outputs are generated from the token source of truth via configuration, not hardcoded logic
+- **Modern Standard First:** Cedar provides modern patterns as the standard (e.g., SPM, Swift extensions), with consumer-specific outputs as optional additions
+
+---
+
 ## Purpose  
 The Transform Layer is responsible for:
 
@@ -32,8 +64,9 @@ The Transform Layer is responsible for:
 - generating theme/mode variants  
 - producing optimized output artifacts  
 - maintaining semantic metadata for tooling  
+- generating consumer-specific outputs to reduce adoption barriers (e.g., Objective-C enums for legacy codebases)
 
-It is the **only** layer that generates platform‑specific code.
+It is the **only** layer that generates platform‑specific code for all foundation categories (color, typography, spacing, radius, shadow).
 
 ### Canonical Input Requirement
 
@@ -717,7 +750,253 @@ StyleDictionary.registerTransform({
 ### Figma JSON (for sync-back)
 - **Format:** Figma Variables API shape  
 - **File:** `figma-variables.json`  
-- **Usage:** POST to Figma API  
+- **Usage:** POST to Figma API
+
+---
+
+## Platform Implementation Strategy
+
+### Context
+
+The flagship iOS and Android applications have legacy constraints that differ from modern platform standards. Cedar focuses on forward-looking implementations while acknowledging migration considerations.
+
+**iOS:**
+- **Cedar Standard:** Swift Package Manager, Display P3, Swift extensions, semantic tokens
+- **Flagship Legacy:** CocoaPods, sRGB, enum-based access, Objective-C compatibility (migration consideration)
+
+**Android:**
+- **Cedar Standard:** Automated AAR distribution, Compose-first color schemes, wide-gamut OKLCH with sRGB fallback, dark mode, semantic tokens
+- **Leadership Opportunity:** Android team not rejecting modern support—simply unaware it exists. Cedar can lead by providing wide-gamut OKLCH color support and Compose-first implementation.
+- **Flagship Legacy:** Manual copying, XML resources only, no dark mode, legacy colors (migration consideration)
+
+The Transform Layer generates platform-specific outputs aligned with modern standards. Legacy consumer constraints are addressed through migration planning rather than dual implementation.
+
+### iOS Implementation
+
+#### Distribution Mechanism
+
+**Swift Package Manager:**
+- Package.swift generation
+- iOS 17+ target platform
+- Swift-only implementation
+- Swift extension color access pattern
+- Modular structure (CedarTokens + CedarComponents)
+
+#### Color Space
+
+**Display P3:**
+- Generate Display P3 color values in XCAssets
+- Wide-gamut color support for modern devices
+- Visual quality improvement
+- Default color space for Cedar iOS
+- Convert from OKLCH source values using culori library
+- OKLCH is source of truth (not hex) to preserve full gamut
+
+#### API Pattern
+
+**Swift Extensions:**
+```swift
+extension UIColor {
+    static let cdrSurfacePrimary = UIColor(named: "cdr-surfaceBase")
+    static let cdrTextPrimary = UIColor(named: "cdr-textBase")
+}
+
+extension Color {
+    static let cdrSurfacePrimary = Color("cdr-surfaceBase")
+    static let cdrTextPrimary = Color("cdr-textBase")
+}
+```
+
+**Objective-C Compatibility:**
+Swift extensions remain accessible from Objective-C via standard Swift-ObjC interop, supporting legacy integrations without separate enum-based APIs.
+
+### Android Implementation
+
+#### Distribution Mechanism
+
+**AAR Library Distribution:**
+- AAR library generation via CI/CD
+- GitLab Packages distribution
+- Gradle dependency integration
+- Automated library injection at build time
+
+#### Framework Support
+
+**Jetpack Compose (Primary):**
+- Generate Kotlin Compose color schemes
+- Compose Color object properties
+- Modern Android UI development
+- Primary output for new Compose projects
+
+**XML Resources (Legacy Compatibility):**
+- Generate XML resources for traditional Android Views
+- Light/dark mode via values/values-night
+- Compatibility with existing implementations
+
+**High Spectrum Output:**
+- Generate wide-gamut OKLCH color values for modern devices
+- Provide sRGB fallback for legacy device compatibility
+- Convert from OKLCH source values using culori library
+- OKLCH is source of truth (not hex) to preserve full gamut
+- Android XML resources are sRGB-only (platform limitation)
+- Wide-gamut colors require programmatic API (Compose Color with ColorSpaces.DisplayP3)
+- Automatic color space selection based on device capability
+
+#### Framework Variants
+
+**XML Resources (for Views):**
+```xml
+<color name="cdr_color_surface_base">#FFFFFF</color>
+<dimen name="cdr_spacing_scale_200">16dp</dimen>
+```
+
+**Compose Color Schemes (for Compose):**
+```kotlin
+object CedarColors {
+    val SurfaceBase = Color(0xFFFFFFFF)
+    val TextPrimary = Color(0xFF1A1A1A)
+}
+```
+
+### Implementation Approach
+
+**Configuration-Based Platform Generation:**
+
+The Transform Layer uses configuration to generate platform-specific outputs:
+
+```javascript
+module.exports = {
+  platforms: {
+    'ios': {
+      transformGroup: 'cedar/ios',
+      buildPath: 'dist/themes/rei-dot-com/ios/',
+      options: {
+        distribution: 'spm',
+        colorSpace: 'display-p3',
+        apiPattern: 'extensions'
+      }
+    },
+    'android': {
+      transformGroup: 'cedar/android',
+      buildPath: 'dist/themes/rei-dot-com/android/',
+      options: {
+        distribution: 'aar',
+        colorSpace: 'srgb',
+        framework: 'compose'
+      }
+    }
+  }
+};
+```
+
+---
+
+## Objective-C Compatibility
+
+### Requirement
+
+The flagship iOS application has legacy Objective-C code. Swift extensions remain accessible from Objective-C via standard Swift-ObjC interop, supporting legacy integrations without separate enum-based APIs or header files.
+
+### Implementation
+
+Swift extensions on UIColor and Color are automatically exposed to Objective-C through Swift's bridging mechanism. No separate Objective-C headers or enum-based APIs are required.
+
+---
+
+## Distribution
+
+### iOS Distribution
+
+**Swift Package Manager:**
+- **Package.swift:** Generated with CedarTokens and CedarComponents products
+- **Source:** GitHub repository
+- **Version:** Semantic versioning
+- **Structure:** Modular targets (CedarTokens + CedarComponents)
+- **Dependencies:** XCAssets as resources, CedarTokens dependency for CedarComponents
+
+### Android Distribution
+
+**AAR Library (GitLab Packages):**
+
+- **Format:** AAR library with XML resources and Compose color schemes
+- **Delivery:** GitLab Packages registry
+- **Integration:** Gradle dependency
+- **Maintenance:** Automated updates via dependency management
+
+**CI/CD Pipeline Architecture:**
+
+```yaml
+# Example CI/CD configuration
+jobs:
+  build-android-tokens:
+    steps:
+      - run: npm run build:android
+      - run: ./gradlew publishToMavenLocal
+      - run: ./gradlew publish
+    outputs:
+      - android-tokens.aar
+```
+
+**Gradle Dependency Integration:**
+
+```gradle
+dependencies {
+    implementation 'com.rei.cedar:android-tokens:1.0.0'
+}
+```
+
+---
+
+## Migration Strategy
+
+### iOS Migration Path
+
+**Current State:**
+- Flagship iOS app uses CocoaPods with legacy enum-based API
+- Cedar generates SPM-only output with Display P3 and Swift extensions
+
+**Migration Considerations:**
+- Flagship app migration to SPM is a consumer-side decision
+- Cedar provides Objective-C compatibility via Swift-ObjC interop
+- No separate CocoaPods output generation required
+
+**Phase 1: Education & Planning (Q3 2026)**
+- Document SPM migration benefits for flagship team
+- Create migration guide for flagship app
+- Demonstrate Display P3 visual impact
+- Provide Objective-C interop guidance
+
+**Phase 2: Flagship Migration (Q4 2026)**
+- Flagship team migrates to SPM
+- Flagship team migrates to Display P3
+- Flagship team adopts Swift extension API
+- Legacy CocoaPods consumption deprecated
+
+### Android Migration Path
+
+**Current State:**
+- Flagship Android app uses manual XML resource copying
+- Cedar generates AAR with XML resources and Compose color schemes
+
+**Migration Considerations:**
+- Flagship app migration to automated AAR distribution
+- Compose-first approach with XML for legacy Views compatibility
+
+**Phase 1: Education & Demonstration (Immediate)**
+- Document Compose color scheme benefits
+- Create CI/CD pipeline prototype
+- Educate Android team on available options
+
+**Phase 2: Automated Distribution (Q3 2026)**
+- Implement CI/CD pipeline for AAR generation
+- Set up GitLab Packages distribution
+- Integrate with flagship build process
+- Replace manual copying with automated injection
+
+**Phase 3: Compose Integration (Q4 2026)**
+- Encourage migration to Compose
+- Document Compose integration guide
+- XML resources maintained for legacy Views compatibility  
 
 
 ### Output Grouping & File Splitting

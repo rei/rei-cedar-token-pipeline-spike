@@ -153,6 +153,54 @@ This is not Cedar dictating DXP's architecture. It is Cedar taking responsibilit
 
 ---
 
+## Implementation Findings (2026-06-10)
+
+Investigation of `@rei/cdr-tokens` v14 and the climbers-app Tailwind config revealed the following:
+
+### What Already Works
+
+`@rei/cdr-tokens` v14 already exports the building blocks for programmatic Tailwind mapping:
+
+- **Grouped objects** (`CdrBreakpoint`, `CdrSpaceScale`, `CdrColorBackground`, etc.) via the main entrypoint — contain resolved runtime values
+- **Keys arrays** (`CdrSpaceKeys`, `CdrSpaceScaleKeys`, `CdrColorBackgroundKeys`, etc.) via the `/types` subpath — contain kebab-case token suffixes
+
+Keys map directly to CSS custom property names: `--cdr-{group}-{key}`. This enables a one-line mapping helper:
+
+```ts
+import { CdrSpaceScaleKeys } from '@rei/cdr-tokens/types';
+
+const keysToVars = (keys: readonly string[], prefix: string) =>
+  Object.fromEntries(keys.map(key => [key, `var(--${prefix}-${key})`]));
+
+// spacing: keysToVars(CdrSpaceScaleKeys.map(k => `scale-${k}`), 'cdr-space-scale')
+// → { 'scale-0': 'var(--cdr-space-scale-0)', 'scale-1': 'var(--cdr-space-scale-1)', ... }
+```
+
+### Consumer Pattern (climbers-app)
+
+Updated `tailwind.config.ts` to use this pattern. The config is now auto-aligned with `@rei/cdr-tokens` — adding tokens to the package automatically surfaces them in Tailwind without manual config updates.
+
+### Gaps Identified
+
+1. **Keys not exported from main entrypoint.** Keys arrays are only available via `@rei/cdr-tokens/types`, not the main entrypoint. The preset should re-export keys or the main entrypoint should include them.
+
+2. **Surface color tokens are Cedar component-level, not cdr-tokens.** The climbers-app previously referenced `--cdr-color-background-surface-*` CSS custom properties. These are defined by Cedar's component CSS (e.g., `@rei/cedar`), not by `@rei/cdr-tokens`. They are not part of the foundation token contract and should not be mapped through the Tailwind preset — they are consumed directly via Cedar's stylesheet.
+
+3. **No CSS var name export.** Grouped objects contain resolved values (hex, clamp), not CSS var references. Consumers must derive var names from keys arrays. A parallel export of CSS var names (e.g., `CdrSpaceScaleCssVars`) would simplify integration.
+
+4. **Spike naming mismatch (now fixed).** The spike pipeline was generating camelCase keys without `Cdr` prefix. Updated `renderRuntimeGroupedObjects` to produce PascalCase keys with `Cdr` prefix, matching cdr-tokens v14 convention.
+
+### Preset Architecture Recommendation
+
+The Cedar Tailwind preset (`@rei/cedar-tailwind-preset`) should:
+
+1. Import keys arrays from `@rei/cdr-tokens/types` and grouped objects from `@rei/cdr-tokens`
+2. Use the `keysToVars` pattern to generate CSS var references for spacing, color, radius
+3. Use grouped object values directly for breakpoints (build-time resolved)
+4. **Not** hardcode any token names — rely entirely on the keys/grouped exports so new tokens auto-propagate
+
+---
+
 ## Immediate Next Steps
 
 | Action | Owner | When |
