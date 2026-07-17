@@ -1,44 +1,42 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://rei.com/cedar/token-schema.json",
   "title": "Cedar Token Schema",
   "description": "Authoritative schema defining token structure, validation, and Figma Input Contract (ADR-0003). Single source of truth for design-to-engineering token governance.",
   "type": "object",
-  "additionalProperties": {
-    "$ref": "#/$defs/TokenNode"
-  },
   "inputs": {
     "figma": {
       "collections": {
-        "spacing.static": {
-          "canonicalPrefix": "spacing.static",
-          "tokens": {
-            "zero": "zero",
-            "sixteenth-x": "sixteenth.x",
-            "eighth-x": "eighth.x",
-            "three-sixteenth-x": "three.sixteenth.x",
-            "quarter-x": "quarter.x",
-            "three-eighth-x": "three.eighth.x",
-            "half-x": "half.x",
-            "three-quarter-x": "three.quarter.x",
-            "one-x": "one.x",
-            "one-and-a-half-x": "one.and.a.half.x",
-            "two-x": "two.x",
-            "three-x": "three.x",
-            "four-x": "four.x"
-          }
-        },
-        "spacing.scale": {
-          "canonicalPrefix": "spacing.scale",
-          "tokens": {
-            "50": "50",
-            "100": "100",
-            "150": "150",
-            "200": "200",
-            "250": "250",
-            "300": "300",
-            "400": "400",
-            "500": "500"
+        "spacing": {
+          "tokens": "auto",
+          "static": {
+            "canonicalPrefix": "spacing.static",
+            "tokens": {
+              "zero": "zero",
+              "sixteenth-x": "sixteenth.x",
+              "eighth-x": "eighth.x",
+              "three-sixteenth-x": "three.sixteenth.x",
+              "quarter-x": "quarter.x",
+              "three-eighth-x": "three.eighth.x",
+              "half-x": "half.x",
+              "three-quarter-x": "three.quarter.x",
+              "one-x": "one.x",
+              "one-and-a-half-x": "one.and.a.half.x",
+              "two-x": "two.x",
+              "three-x": "three.x",
+              "four-x": "four.x"
+            }
+          },
+          "scale": {
+            "canonicalPrefix": "spacing.scale",
+            "tokens": {
+              "50": "50",
+              "100": "100",
+              "150": "150",
+              "200": "200",
+              "250": "250",
+              "300": "300",
+              "400": "400",
+              "500": "500"
+            }
           }
         },
         "warm-grey": {
@@ -116,60 +114,63 @@
           "colorFamily": "membership-yellow",
           "tokens": "auto"
         },
-        "text.family": {
-          "canonicalPrefix": "text.family",
-          "tokens": {
-            "graphik": "graphik",
-            "stuart": "stuart"
-          }
-        },
-        "text.letter-spacing": {
-          "canonicalPrefix": "text.letter.spacing",
-          "tokens": {
-            "tightest": "tightest",
-            "tighter": "tighter",
-            "tight": "tight",
-            "compact": "compact",
-            "none": "none",
-            "loose": "loose",
-            "loosest": "loosest"
-          }
-        },
-        "text.line-height": {
-          "canonicalPrefix": "text.line.height",
-          "tokens": {
-            "0": "0",
-            "1": "1",
-            "2": "2",
-            "3": "3",
-            "4": "4",
-            "5": "5"
-          }
-        },
-        "text.size": {
-          "canonicalPrefix": "text.size",
-          "tokens": {
-            "100": "100",
-            "200": "200",
-            "300": "300",
-            "400": "400",
-            "500": "500"
-          }
-        },
-        "text.style": {
-          "canonicalPrefix": "text.style",
-          "tokens": {
-            "normal": "normal",
-            "italic": "italic"
-          }
-        },
-        "text.weight": {
-          "canonicalPrefix": "text.weight",
-          "tokens": {
-            "normal": "normal",
-            "medium": "medium",
-            "semibold": "semibold",
-            "bold": "bold"
+        "text": {
+          "tokens": "auto",
+          "letter-spacing": {
+            "canonicalPrefix": "text.letter.spacing",
+            "tokens": {
+              "tightest": "tightest",
+              "tighter": "tighter",
+              "tight": "tight",
+              "compact": "compact",
+              "none": "none",
+              "loose": "loose",
+              "loosest": "loosest"
+            }
+          },
+          "family": {
+            "canonicalPrefix": "text.family",
+            "tokens": {
+              "graphik": "graphik",
+              "stuart": "stuart"
+            }
+          },
+          "line-height": {
+            "canonicalPrefix": "text.line.height",
+            "tokens": {
+              "0": "0",
+              "1": "1",
+              "2": "2",
+              "3": "3",
+              "4": "4",
+              "5": "5"
+            }
+          },
+          "size": {
+            "canonicalPrefix": "text.size",
+            "tokens": {
+              "100": "100",
+              "200": "200",
+              "300": "300",
+              "400": "400",
+              "500": "500"
+            }
+          },
+          "style": {
+            "canonicalPrefix": "text.style",
+            "tokens": {
+              "normal": "normal",
+              "italic": "italic"
+            }
+          },
+          "weight": {
+            "canonicalPrefix": "text.weight",
+            "tokens": {
+              "normal": "normal",
+              "medium": "medium",
+              "semibold": "semibold",
+              "bold": "bold"
+            }
           }
         }
       }
@@ -184,194 +185,6 @@
         "inheritsFrom": "default",
         "cssAttribute": "data-palette"
       }
-    }
-  },
-  "$defs": {
-    "InputsContract": {
-      "description": "Figma Input Contract (ADR-0003) — maps Figma collection paths to canonical token paths. Single source of truth for design-to-engineering boundary.",
-      "type": "object",
-      "properties": {
-        "figma": {
-          "description": "Figma-to-canonical mapping for variable collections",
-          "type": "object",
-          "properties": {
-            "collections": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "object",
-                "properties": {
-                  "canonicalPrefix": {
-                    "type": "string",
-                    "description": "Root canonical path prefix for all tokens in this collection (e.g., 'color.option.neutral')"
-                  },
-                  "colorFamily": {
-                    "type": "string",
-                    "description": "Color family for OKLCH chroma curve override (e.g., 'warm-grey', 'alpine-lake-blue'). Used by pipeline to apply custom OKLCH formulas per culori-overrides.md."
-                  },
-                  "tokens": {
-                    "oneOf": [
-                      {
-                        "type": "object",
-                        "additionalProperties": { "type": "string" }
-                      },
-                      {
-                        "const": "auto"
-                      }
-                    ],
-                    "description": "Explicit map of Figma token path → canonical sub-path, or \"auto\" for identity pass-through (Figma path === canonical sub-path)."
-                  }
-                },
-                "required": ["canonicalPrefix", "tokens"]
-              }
-            }
-          },
-          "required": ["collections"]
-        }
-      },
-      "required": ["figma"]
-    },
-    "TokenType": {
-      "description": "Supported Cedar token types.",
-      "enum": ["color", "number", "string", "boolean", "dimension"],
-      "type": "string"
-    },
-    "TokenValue": {
-      "description": "Primitive token value.",
-      "type": ["string", "number", "boolean"]
-    },
-    "FigmaTokenExtension": {
-      "description": "Optional Figma-specific token metadata.",
-      "type": "object",
-      "properties": {
-        "hiddenFromPublishing": {
-          "type": "boolean"
-        },
-        "scopes": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "codeSyntax": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
-    "DocMetadata": {
-      "description": "Optional documentation metadata extracted from Figma or Cedar governance. Field names match the TokenDocumentation TypeScript interface.",
-      "type": "object",
-      "properties": {
-        "summary": {
-          "type": "string",
-          "description": "Brief description of the token's purpose. Extracted from Figma variable description."
-        },
-        "design": {
-          "type": "string",
-          "description": "Design rationale for this token (future use)."
-        },
-        "usage": {
-          "type": "string",
-          "description": "Guidance on when and how to use this token (future use)."
-        },
-        "aliases": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Related token names (future use)."
-        }
-      }
-    },
-    "CedarTokenExtension": {
-      "description": "Cedar-specific token metadata including documentation, platform governance, and semantic mapping.",
-      "type": "object",
-      "properties": {
-        "docs": {
-          "$ref": "#/$defs/DocMetadata"
-        },
-        "appearances": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Appearance overrides (e.g., dark mode) for option tokens"
-        },
-        "platformOverrides": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          },
-          "description": "Platform-specific value overrides for option tokens"
-        }
-      }
-    },
-    "TokenExtensions": {
-      "description": "Optional extension namespaces for a token.",
-      "type": "object",
-      "properties": {
-        "com.figma": {
-          "$ref": "#/$defs/FigmaTokenExtension"
-        },
-        "cedar": {
-          "$ref": "#/$defs/CedarTokenExtension"
-        }
-      },
-      "additionalProperties": true
-    },
-    "TokenAttributes": {
-      "description": "Core properties shared by all tokens.",
-      "type": "object",
-      "properties": {
-        "$type": {
-          "$ref": "#/$defs/TokenType"
-        },
-        "$value": {
-          "$ref": "#/$defs/TokenValue"
-        },
-        "$description": {
-          "type": "string"
-        },
-        "$extensions": {
-          "$ref": "#/$defs/TokenExtensions"
-        }
-      },
-      "required": ["$type", "$value"],
-      "additionalProperties": false
-    },
-    "Token": {
-      "description": "A leaf design token.",
-      "allOf": [
-        {
-          "$ref": "#/$defs/TokenAttributes"
-        }
-      ]
-    },
-    "TokenGroup": {
-      "description": "A recursive token group containing child groups or leaf tokens.",
-      "type": "object",
-      "propertyNames": {
-        "not": {
-          "pattern": "^\\$"
-        }
-      },
-      "additionalProperties": {
-        "$ref": "#/$defs/TokenNode"
-      }
-    },
-    "TokenNode": {
-      "description": "A token leaf or recursive token group.",
-      "oneOf": [
-        {
-          "$ref": "#/$defs/Token"
-        },
-        {
-          "$ref": "#/$defs/TokenGroup"
-        }
-      ]
     }
   }
 }

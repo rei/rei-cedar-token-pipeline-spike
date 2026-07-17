@@ -9,7 +9,10 @@ const meta: Meta<ConsumerContractArgs> = {
 export default meta;
 type Story = StoryObj<ConsumerContractArgs>;
 
-type DocsMap = Record<string, { summary?: string; usage?: string; design?: string }>;
+type DocsMap = Record<
+  string,
+  { summary?: string; usage?: string; design?: string }
+>;
 
 function asyncStory(fn: () => Promise<string>): () => HTMLElement {
   return () => {
@@ -170,9 +173,19 @@ const docs: CdrColorTextTokenDocs = {
             <div class="docs-list">
               ${docsEntries
                 .map(([tokenName, docs]) => {
-                  const summary = docs.summary ? escapeHtml(docs.summary) : "No summary";
-                  const usage = docs.usage ? `<div class=\"usage\">usage: ${escapeHtml(docs.usage)}</div>` : "";
-                  const design = docs.design ? `<div class=\"usage\">design: ${escapeHtml(docs.design)}</div>` : "";
+                  const summary = docs.summary
+                    ? escapeHtml(docs.summary)
+                    : "No summary";
+                  const usage = docs.usage
+                    ? `<div class=\"usage\">usage: ${escapeHtml(
+                        docs.usage
+                      )}</div>`
+                    : "";
+                  const design = docs.design
+                    ? `<div class=\"usage\">design: ${escapeHtml(
+                        docs.design
+                      )}</div>`
+                    : "";
                   return `
                     <div class="docs-item">
                       <div class="token-name">${escapeHtml(tokenName)}</div>
@@ -220,13 +233,17 @@ const base = getTextTokenDocs(values, docs, "color-text-base");`)} </pre>
             </div>
             <div class="docs-list">
               ${Object.entries(valueSample)
-                .map(([tokenName, value]) => `
+                .map(
+                  ([tokenName, value]) => `
                   <div class="docs-item">
                     <div class="token-name">${escapeHtml(tokenName)}</div>
                     <div class="summary">${escapeHtml(value)}</div>
-                    <div class="usage">paired docs: ${escapeHtml(docsMap[tokenName]?.usage ?? "No usage guidance yet")}</div>
+                    <div class="usage">paired docs: ${escapeHtml(
+                      docsMap[tokenName]?.usage ?? "No usage guidance yet"
+                    )}</div>
                   </div>
-                `)
+                `
+                )
                 .join("")}
             </div>
           </article>

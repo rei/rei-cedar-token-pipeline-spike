@@ -190,6 +190,7 @@ export const webCssAction: Action = {
         t.path[2] === "default" &&
         t.$type === "color"
     );
+    // TBD: Fix color tokens filtering
 
     colorTokens.forEach((token) => {
       const resolved = (token.$extensions as any)?.cedar?.resolved?.web;

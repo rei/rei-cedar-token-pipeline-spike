@@ -68,7 +68,9 @@ export function validateFigmaInputs(params: {
       level: "warn",
       code: "MISSING_OPTION_PRIMITIVE_MODE",
       message:
-        `Only ${importedPrimitiveModes.length} primitive mode file(s) found (${importedPrimitiveModes.join(", ")}). ` +
+        `Only ${
+          importedPrimitiveModes.length
+        } primitive mode file(s) found (${importedPrimitiveModes.join(", ")}). ` +
         `Expected at least 2 modes (e.g., light and dark) for full platform/appearance resolution.`,
     });
   }
