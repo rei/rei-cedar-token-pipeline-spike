@@ -458,7 +458,7 @@ export function clean(
             const canonicalSub =
               mappingEntry.tokens === "auto" ? figmaSubPath : mappingEntry.tokens[figmaSubPath];
             if (canonicalSub !== undefined) {
-              return `{${mappingEntry.canonicalPrefix}.${canonicalSub}}`;
+              return `{${mappingEntry.canonicalPrefix ?? firstSegment}.${canonicalSub}}`;
             } else {
               throw new Error(
                 `[clean] Alias reference "{${inner}}" has no entry in src/schema/token-schema.json (inputs.figma.collections) ` +
@@ -507,6 +507,7 @@ export function clean(
               section = "text";
             }
 
+            console.log("section: ", section);
             if (section && section !== firstSegment) {
               return `{${section}.${inner}}`;
             }

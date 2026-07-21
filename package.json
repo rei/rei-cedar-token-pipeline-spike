@@ -7,11 +7,11 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/themes/rei-dot-com/types/index.d.ts",
       "default": "./index.js"
     },
     "./types": {
-      "types": "./dist/types/index.d.ts"
+      "types": "./dist/themes/rei-dot-com/types/index.d.ts"
     },
     "./meta/*": "./dist/themes/rei-dot-com/meta/*",
     "./package.json": "./package.json"
@@ -35,9 +35,8 @@
     "release": "pnpm build:package && pnpm publish --access public",
     "tokens:platforms": "tsx style-dictionary/build.ts",
     "tokens:normalize": "tsx src/normalization/normalize.ts",
-    "tokens:types:base": "tsx src/build/generate-base-types.ts",
     "tokens:sd": "tsx src/build/build-style-dictionary.ts",
-    "tokens:build": "pnpm tokens:normalize && pnpm tokens:types:base && pnpm tokens:sd && pnpm tokens:platforms && pnpm postbuild:normalized",
+    "tokens:build": "pnpm tokens:normalize && pnpm tokens:sd && pnpm tokens:platforms && pnpm postbuild:normalized",
     "postbuild:normalized": "tsx scripts/postbuild-normalized.js",
     "tokens:validate:normalized": "tsx scripts/validate-normalized-json.ts",
     "test:contract": "vitest run src/contract/canonical-contract.test.ts --reporter=verbose",

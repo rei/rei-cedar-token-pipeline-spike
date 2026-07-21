@@ -53,26 +53,70 @@ function createModuleDefinition(
 
 const MODULE_DEFINITIONS: ModuleDefinition[] = [
   // Color semantic categories
+  // TBD: Review if these color categories added are correct.
+  // Let them there for the moment so StoryBook keeps working
   createModuleDefinition("cdr-color-surface", (token) => {
-    if (token.path[0] !== "color" || token.path[1] !== "modes" || token.path[3] !== "surface") {
+    if (token.path[0] !== "color" || token.path[1] !== "surface") {
       return [];
     }
-    // token path: color.modes.default.surface.base → return ["base"]
-    return token.path.slice(4);
+    // token path: color.surface.base → return ["base"]
+    return token.path.slice(2);
   }),
   createModuleDefinition("cdr-color-text", (token) => {
-    if (token.path[0] !== "color" || token.path[1] !== "modes" || token.path[3] !== "text") {
+    if (token.path[0] !== "color" || token.path[1] !== "text") {
       return [];
     }
-    // token path: color.modes.default.text.base → return ["base"]
-    return token.path.slice(4);
+    // token path: color.text.base → return ["base"]
+    return token.path.slice(2);
   }),
   createModuleDefinition("cdr-color-border", (token) => {
-    if (token.path[0] !== "color" || token.path[1] !== "modes" || token.path[3] !== "border") {
+    if (token.path[0] !== "color" || token.path[1] !== "border") {
       return [];
     }
-    // token path: color.modes.default.border.base → return ["base"]
-    return token.path.slice(4);
+    // token path: color.border.base → return ["base"]
+    return token.path.slice(2);
+  }),
+  createModuleDefinition("cdr-color-action", (token) => {
+    if (token.path[0] !== "color" || token.path[1] !== "action") {
+      return [];
+    }
+    // token path: color.action.edge → return ["edge"]
+    return token.path.slice(2);
+  }),
+  createModuleDefinition("cdr-color-selection", (token) => {
+    if (token.path[0] !== "color" || token.path[1] !== "selection") {
+      return [];
+    }
+    // token path: color.selection.on → return ["on"]
+    return token.path.slice(2);
+  }),
+  createModuleDefinition("cdr-color-feedback", (token) => {
+    if (token.path[0] !== "color" || token.path[1] !== "feedback") {
+      return [];
+    }
+    // token path: color.feedback.info → return ["info"]
+    return token.path.slice(2);
+  }),
+  createModuleDefinition("cdr-color-navigation", (token) => {
+    if (token.path[0] !== "color" || token.path[1] !== "navigation") {
+      return [];
+    }
+    // token path: color.navigation.on → return ["on"]
+    return token.path.slice(2);
+  }),
+  createModuleDefinition("cdr-color-icon", (token) => {
+    if (token.path[0] !== "color" || token.path[1] !== "icon") {
+      return [];
+    }
+    // token path: color.icon.neutral.bold → return ["neutral"]
+    return token.path.slice(2);
+  }),
+  createModuleDefinition("cdr-color-overlay", (token) => {
+    if (token.path[0] !== "color" || token.path[1] !== "overlay") {
+      return [];
+    }
+    // token path: color.icon.overlay.bold → return ["neutral"]
+    return token.path.slice(2);
   }),
 
   // Spacing semantic categories
