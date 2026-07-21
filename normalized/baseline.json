@@ -36,43 +36,43 @@
     },
     "static": {
       "zero": {
-        "$value": "0",
+        "$value": 0,
         "$type": "number"
       },
       "sixteenth": {
         "x": {
-          "$value": "0.10000000149011612",
+          "$value": 0.10000000149011612,
           "$type": "number"
         }
       },
       "eighth": {
         "x": {
-          "$value": "0.20000000298023224",
+          "$value": 0.20000000298023224,
           "$type": "number"
         }
       },
       "quarter": {
         "x": {
-          "$value": "0.4000000059604645",
+          "$value": 0.4000000059604645,
           "$type": "number"
         }
       },
       "half": {
         "x": {
-          "$value": "0.800000011920929",
+          "$value": 0.800000011920929,
           "$type": "number"
         }
       },
       "one": {
         "x": {
-          "$value": "1.600000023841858",
+          "$value": 1.600000023841858,
           "$type": "number"
         },
         "and": {
           "a": {
             "half": {
               "x": {
-                "$value": "2.4000000953674316",
+                "$value": 2.4000000953674316,
                 "$type": "number"
               }
             }
@@ -81,19 +81,19 @@
       },
       "two": {
         "x": {
-          "$value": "3.200000047683716",
+          "$value": 3.200000047683716,
           "$type": "number"
         }
       },
       "three": {
         "x": {
-          "$value": "4.800000190734863",
+          "$value": 4.800000190734863,
           "$type": "number"
         }
       },
       "four": {
         "x": {
-          "$value": "6.400000095367432",
+          "$value": 6.400000095367432,
           "$type": "number"
         }
       }
@@ -3751,6 +3751,342 @@
         "bold": {
           "$value": "{color.option.warm-grey.1200}",
           "$type": "color"
+        }
+      }
+    }
+  },
+  "text": {
+    "semantic": {
+      "heading": {
+        "title": {
+          "$value": {
+            "fontFamily": "{text.family.graphik}",
+            "fontWeight": "{text.weight.semibold}",
+            "fontSize": "{text.size.fluid.400}",
+            "letterSpacing": "{text.letter.spacing.none}",
+            "lineHeight": "{text.line.height.3}"
+          },
+          "$type": "typography",
+          "$extensions": {
+            "cedar": {
+              "ios": {
+                "light": {
+                  "fontFamily": "{text.family.graphik}",
+                  "fontWeight": "{text.weight.semibold}",
+                  "fontSize": "{text.size.static.400}",
+                  "letterSpacing": "{text.letter.spacing.none}",
+                  "lineHeight": "{text.line.height.3}"
+                },
+                "dark": {
+                  "fontFamily": "{text.family.graphik}",
+                  "fontWeight": "{text.weight.semibold}",
+                  "fontSize": "{text.size.static.400}",
+                  "letterSpacing": "{text.letter.spacing.none}",
+                  "lineHeight": "{text.line.height.3}"
+                }
+              },
+              "web": {
+                "light": {
+                  "fontFamily": "{text.family.graphik}",
+                  "fontWeight": "{text.weight.semibold}",
+                  "fontSize": "{text.size.fluid.400}",
+                  "letterSpacing": "{text.letter.spacing.none}",
+                  "lineHeight": "{text.line.height.3}"
+                },
+                "dark": {
+                  "fontFamily": "{text.family.graphik}",
+                  "fontWeight": "{text.weight.semibold}",
+                  "fontSize": "{text.size.fluid.400}",
+                  "letterSpacing": "{text.letter.spacing.none}",
+                  "lineHeight": "{text.line.height.3}"
+                }
+              },
+              "governance": {
+                "figma": {
+                  "collection": "Type / Semantic",
+                  "variable": "heading.title"
+                }
+              }
+            }
+          }
+        },
+        "sans": {
+          "$value": {
+            "fontFamily": "{text.family.graphik}",
+            "fontWeight": "{text.weight.bold}",
+            "fontSize": "{text.size.fluid.400}",
+            "letterSpacing": "{text.letter.spacing.tight}",
+            "lineHeight": "{text.line.height.4}"
+          },
+          "$type": "typography",
+          "$extensions": {
+            "cedar": {
+              "ios": {
+                "light": {
+                  "fontFamily": "{text.family.graphik}",
+                  "fontWeight": "{text.weight.bold}",
+                  "fontSize": "{text.size.static.400}",
+                  "letterSpacing": "{text.letter.spacing.tight}",
+                  "lineHeight": "{text.line.height.4}"
+                },
+                "dark": {
+                  "fontFamily": "{text.family.graphik}",
+                  "fontWeight": "{text.weight.bold}",
+                  "fontSize": "{text.size.static.400}",
+                  "letterSpacing": "{text.letter.spacing.tight}",
+                  "lineHeight": "{text.line.height.4}"
+                }
+              },
+              "web": {
+                "light": {
+                  "fontFamily": "{text.family.graphik}",
+                  "fontWeight": "{text.weight.bold}",
+                  "fontSize": "{text.size.fluid.400}",
+                  "letterSpacing": "{text.letter.spacing.tight}",
+                  "lineHeight": "{text.line.height.4}"
+                },
+                "dark": {
+                  "fontFamily": "{text.family.graphik}",
+                  "fontWeight": "{text.weight.bold}",
+                  "fontSize": "{text.size.fluid.400}",
+                  "letterSpacing": "{text.letter.spacing.tight}",
+                  "lineHeight": "{text.line.height.4}"
+                }
+              },
+              "governance": {
+                "figma": {
+                  "collection": "Type / Semantic",
+                  "variable": "heading.sans"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "size": {
+      "fluid": {
+        "100": {
+          "$type": "dimension",
+          "$value": "clamp(10px, 0.5vw + 8px, 12px)"
+        },
+        "200": {
+          "$type": "dimension",
+          "$value": "clamp(12px, 0.6vw + 9.6px, 14px)"
+        },
+        "300": {
+          "$type": "dimension",
+          "$value": "clamp(14px, 0.7vw + 11.2px, 16px)"
+        },
+        "400": {
+          "$type": "dimension",
+          "$value": "clamp(16px, 0.8vw + 12.8px, 18px)"
+        },
+        "500": {
+          "$type": "dimension",
+          "$value": "clamp(18px, 0.9vw + 14.4px, 20px)"
+        }
+      },
+      "static": {
+        "100": {
+          "$type": "number",
+          "$value": 12,
+          "$extensions": {
+            "cedar": {}
+          }
+        },
+        "200": {
+          "$type": "number",
+          "$value": 14,
+          "$extensions": {
+            "cedar": {}
+          }
+        },
+        "300": {
+          "$type": "number",
+          "$value": 16,
+          "$extensions": {
+            "cedar": {}
+          }
+        },
+        "400": {
+          "$type": "number",
+          "$value": 18,
+          "$extensions": {
+            "cedar": {}
+          }
+        },
+        "500": {
+          "$type": "number",
+          "$value": 20,
+          "$extensions": {
+            "cedar": {}
+          }
+        }
+      }
+    },
+    "family": {
+      "graphik": {
+        "$type": "string",
+        "$value": "Graphik",
+        "$extensions": {
+          "cedar": {
+            "fallback": " sans-serif"
+          }
+        }
+      },
+      "stuart": {
+        "$type": "string",
+        "$value": "Stuart",
+        "$extensions": {
+          "cedar": {
+            "fallback": "Georgia"
+          }
+        }
+      }
+    },
+    "letter": {
+      "spacing": {
+        "tightest": {
+          "$type": "number",
+          "$value": -1.0240000486373901,
+          "$extensions": {
+            "cedar": {}
+          }
+        },
+        "tighter": {
+          "$type": "number",
+          "$value": -0.5120000243186951,
+          "$extensions": {
+            "cedar": {}
+          }
+        },
+        "tight": {
+          "$type": "number",
+          "$value": -0.25600001215934753,
+          "$extensions": {
+            "cedar": {}
+          }
+        },
+        "compact": {
+          "$type": "number",
+          "$value": -0.12800000607967377,
+          "$extensions": {
+            "cedar": {}
+          }
+        },
+        "none": {
+          "$type": "number",
+          "$value": 0,
+          "$extensions": {
+            "cedar": {}
+          }
+        },
+        "loose": {
+          "$type": "number",
+          "$value": 0.12800000607967377,
+          "$extensions": {
+            "cedar": {}
+          }
+        },
+        "loosest": {
+          "$type": "number",
+          "$value": 0.5120000243186951,
+          "$extensions": {
+            "cedar": {}
+          }
+        }
+      }
+    },
+    "line": {
+      "height": {
+        "0": {
+          "$type": "number",
+          "$value": 16,
+          "$extensions": {
+            "cedar": {}
+          }
+        },
+        "1": {
+          "$type": "number",
+          "$value": 18,
+          "$extensions": {
+            "cedar": {}
+          }
+        },
+        "2": {
+          "$type": "number",
+          "$value": 20,
+          "$extensions": {
+            "cedar": {}
+          }
+        },
+        "3": {
+          "$type": "number",
+          "$value": 22,
+          "$extensions": {
+            "cedar": {}
+          }
+        },
+        "4": {
+          "$type": "number",
+          "$value": 24,
+          "$extensions": {
+            "cedar": {}
+          }
+        },
+        "5": {
+          "$type": "number",
+          "$value": 26,
+          "$extensions": {
+            "cedar": {}
+          }
+        }
+      }
+    },
+    "style": {
+      "normal": {
+        "$type": "string",
+        "$value": "normal",
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "italic": {
+        "$type": "string",
+        "$value": "italic",
+        "$extensions": {
+          "cedar": {}
+        }
+      }
+    },
+    "weight": {
+      "normal": {
+        "$type": "number",
+        "$value": 400,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "medium": {
+        "$type": "number",
+        "$value": 500,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "semibold": {
+        "$type": "number",
+        "$value": 600,
+        "$extensions": {
+          "cedar": {}
+        }
+      },
+      "bold": {
+        "$type": "number",
+        "$value": 700,
+        "$extensions": {
+          "cedar": {}
         }
       }
     }

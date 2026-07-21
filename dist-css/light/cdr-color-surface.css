@@ -1,6 +1,0 @@
-:root {
-  --cdr-surface-base: #fafaf9;
-  --cdr-surface-base: oklch(98.483% 0.0013 106.42);
-  --cdr-surface-raised: #f1f0ed;
-  --cdr-surface-raised: oklch(95.507% 0.0041 91.45);
-}
