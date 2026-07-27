@@ -14,7 +14,8 @@
       "types": "./dist/themes/rei-dot-com/types/index.d.ts"
     },
     "./meta/*": "./dist/themes/rei-dot-com/meta/*",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./css": "./dist/themes/rei-dot-com/css/cdr-light.css"
   },
   "files": [
     "dist/themes/**/*",

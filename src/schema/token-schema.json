@@ -11,7 +11,9 @@
             "canonicalPrefix": "spacing.static",
             "tokens": {
               "zero": "zero",
-              "sixteenth-x": "sixteenth.x",
+              "sixteenth": {
+                "x": "sixteenth.x"
+              },
               "eighth-x": "eighth.x",
               "three-sixteenth-x": "three.sixteenth.x",
               "quarter-x": "quarter.x",

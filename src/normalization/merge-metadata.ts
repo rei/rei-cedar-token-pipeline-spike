@@ -1,3 +1,5 @@
+import { isRecord, isTokenLeaf } from "../utils.js";
+
 /**
  * merge-metadata.ts
  *
@@ -23,21 +25,6 @@ interface TokenLeaf {
   $extensions?: {
     cedar?: Record<string, unknown>;
   };
-}
-
-function isTokenLeaf(value: unknown): value is TokenLeaf {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "$value" in value &&
-    typeof (value as any).$value !== "undefined" &&
-    "$type" in value &&
-    typeof (value as any).$type === "string"
-  );
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
 }
 
 /**

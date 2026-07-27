@@ -1,3 +1,4 @@
+import type { TokenLeaf } from "../../src/types/types.js";
 /**
  * load-tokens.ts
  *
@@ -19,21 +20,12 @@
  *   spacing.layout.sm    → { $value: "{spacing.scale.-250}", $type: "number" } (alias)
  */
 
-import type { Platform, Mode } from "../../src/storybook/platform-mode-context";
+import type {
+  Platform,
+  Mode,
+} from "../../src/storybook/platform-mode-context.js";
 import { toWebOklch } from "./web-color-format.js";
-
-interface TokenLeaf {
-  $value: string;
-  $type: string;
-  $extensions?: {
-    cedar?: {
-      docs?: TokenDocs;
-      appearances?: Record<string, string>;
-      platformOverrides?: Record<string, Record<string, string>>;
-      resolved?: Record<string, Record<string, string>>;
-    };
-  };
-}
+import { isRecord } from "../../src/utils.js";
 
 export interface TokenDocs {
   summary?: string;
@@ -71,10 +63,6 @@ export interface TypographyToken {
   fallback?: string;
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
 /**
  * Fetch the current token snapshot and extract color tokens for all modes.
  * Returns a map of token paths to their web OKLCH values, keyed as
@@ -104,7 +92,9 @@ export async function loadColorTokens(
     // Multi-mode: color.modes.<mode>.<category>.<token>
     for (const [modeName, modeTokens] of Object.entries(modesSection)) {
       if (typeof modeTokens !== "object" || modeTokens === null) continue;
-      for (const [category, group] of Object.entries(modeTokens as Record<string, unknown>)) {
+      for (const [category, group] of Object.entries(
+        modeTokens as Record<string, unknown>
+      )) {
         if (category.startsWith("$")) continue;
         if (typeof group !== "object" || group === null) continue;
         for (const [key, value] of Object.entries(group)) {
@@ -119,7 +109,7 @@ export async function loadColorTokens(
             result.set(`color.modes.${modeName}.${category}.${key}`, {
               value: formatColorForPlatform(sourceHex, platform),
               sourceHex,
-              ref: buildRef(leaf.$value),
+              ref: buildRef(String(leaf.$value)),
               docs: leaf.$extensions?.cedar?.docs,
             });
           }
@@ -129,7 +119,12 @@ export async function loadColorTokens(
   } else {
     // Fallback: flat structure (color.<category>.<token>)
     for (const [category, group] of Object.entries(colorSection)) {
-      if (category.startsWith("$") || category === "option" || category === "modes") continue;
+      if (
+        category.startsWith("$") ||
+        category === "option" ||
+        category === "modes"
+      )
+        continue;
       if (typeof group !== "object" || group === null) continue;
       for (const [key, value] of Object.entries(group)) {
         if (isLeaf(value)) {
@@ -143,7 +138,7 @@ export async function loadColorTokens(
           result.set(`color.${category}.${key}`, {
             value: formatColorForPlatform(sourceHex, platform),
             sourceHex,
-            ref: buildRef(leaf.$value),
+            ref: buildRef(String(leaf.$value)),
             docs: leaf.$extensions?.cedar?.docs,
           });
         }
@@ -179,7 +174,9 @@ export async function loadPrimitiveColors(): Promise<
   const colorSection = tree["color"] as Record<string, unknown> | undefined;
   if (!colorSection) return result;
 
-  const optionSection = colorSection["option"] as Record<string, unknown> | undefined;
+  const optionSection = colorSection["option"] as
+    | Record<string, unknown>
+    | undefined;
   if (!optionSection) return result;
 
   result.set("web-light", flattenOptionPrimitives(optionSection, "light"));
@@ -253,7 +250,8 @@ export interface SpacingToken {
 export async function loadSpacingTokens(): Promise<SpacingToken[]> {
   const base = window.location.pathname.replace(/\/[^/]*$/, "/");
   const res = await fetch(`${base}canonical/tokens.json`);
-  if (!res.ok) throw new Error(`Failed to fetch canonical/tokens.json: ${res.status}`);
+  if (!res.ok)
+    throw new Error(`Failed to fetch canonical/tokens.json: ${res.status}`);
 
   const tree = (await res.json()) as Record<string, unknown>;
   const spacingSection = tree["spacing"] as Record<string, unknown> | undefined;
@@ -266,7 +264,11 @@ export async function loadSpacingTokens(): Promise<SpacingToken[]> {
   const scale = spacingSection["scale"] as Record<string, unknown> | undefined;
   if (scale) {
     for (const [key, val] of Object.entries(scale)) {
-      if (isLeaf(val) && typeof val.$value === "string" && val.$value.startsWith("clamp(")) {
+      if (
+        isLeaf(val) &&
+        typeof val.$value === "string" &&
+        val.$value.startsWith("clamp(")
+      ) {
         scaleMap.set(key, val.$value as string);
         result.push({
           path: `spacing.scale.${key}`,
@@ -331,13 +333,16 @@ export interface StaticSpacingToken {
 export async function loadStaticSpacingTokens(): Promise<StaticSpacingToken[]> {
   const base = window.location.pathname.replace(/\/[^/]*$/, "/");
   const res = await fetch(`${base}canonical/tokens.json`);
-  if (!res.ok) throw new Error(`Failed to fetch canonical/tokens.json: ${res.status}`);
+  if (!res.ok)
+    throw new Error(`Failed to fetch canonical/tokens.json: ${res.status}`);
 
   const tree = (await res.json()) as Record<string, unknown>;
   const spacingSection = tree["spacing"] as Record<string, unknown> | undefined;
   if (!spacingSection) return [];
 
-  const staticSection = spacingSection["static"] as Record<string, unknown> | undefined;
+  const staticSection = spacingSection["static"] as
+    | Record<string, unknown>
+    | undefined;
   if (!staticSection) return [];
 
   const result: StaticSpacingToken[] = [];
@@ -349,7 +354,7 @@ function flattenStaticTokens(
   node: Record<string, unknown>,
   pathPrefix: string,
   namePrefix: string,
-  out: StaticSpacingToken[],
+  out: StaticSpacingToken[]
 ): void {
   for (const [key, value] of Object.entries(node)) {
     const path = `${pathPrefix}.${key}`;
@@ -357,16 +362,20 @@ function flattenStaticTokens(
 
     if (isLeaf(value)) {
       const leaf = value as TokenLeaf;
-      const cedar = leaf.$extensions?.cedar as Record<string, unknown> | undefined;
+      const cedar = leaf.$extensions?.cedar as
+        | Record<string, unknown>
+        | undefined;
       out.push({
         path,
         name,
-        value: parseFloat(leaf.$value) || 0,
+        value: parseFloat(String(leaf.$value)) || 0,
         unit: "pt",
-        platforms: cedar ? {
-          web: cedar.web as { light: string; dark: string } | undefined,
-          ios: cedar.ios as { light: string; dark: string } | undefined,
-        } : undefined,
+        platforms: cedar
+          ? {
+              web: cedar.web as { light: string; dark: string } | undefined,
+              ios: cedar.ios as { light: string; dark: string } | undefined,
+            }
+          : undefined,
       });
     } else if (typeof value === "object" && value !== null) {
       flattenStaticTokens(value as Record<string, unknown>, path, name, out);
@@ -386,7 +395,10 @@ function resolveColorValue(
 ): string {
   const resolved = leaf.$extensions?.cedar?.resolved?.[platform]?.[mode];
   if (typeof resolved === "string") return resolved;
-  return resolveAlias(leaf.$value, colorSection, platform, mode) ?? leaf.$value;
+  return (
+    resolveAlias(String(leaf.$value), colorSection, platform, mode) ??
+    String(leaf.$value)
+  );
 }
 
 function resolveOptionWebHex(
@@ -394,7 +406,9 @@ function resolveOptionWebHex(
   appearance: "light" | "dark"
 ): string {
   const dark = node.$extensions?.cedar?.appearances?.dark;
-  return appearance === "dark" && typeof dark === "string" ? dark : node.$value;
+  return appearance === "dark" && typeof dark === "string"
+    ? dark
+    : String(node.$value);
 }
 
 function resolveAlias(
@@ -517,7 +531,12 @@ export async function loadTypographyTokens(): Promise<TypographyToken[]> {
   // Walk all text sub-groups dynamically — handles both flat keys (family, size)
   // and hyphenated keys (letter-spacing, line-height) stored in canonical.
   const categoryKeys: TypographyToken["category"][] = [
-    "family", "size", "style", "weight", "line-height", "letter-spacing",
+    "family",
+    "size",
+    "style",
+    "weight",
+    "line-height",
+    "letter-spacing",
   ];
   for (const cat of categoryKeys) {
     processSubGroup(textGroup[cat], cat);

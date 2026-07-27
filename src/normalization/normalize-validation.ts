@@ -1,4 +1,9 @@
-import { extractColorMode, extractPrimitiveMode, type TokenMapping } from "./normalize-utils.js";
+import {
+  extractColorMode,
+  extractPrimitiveMode,
+  type TokenMapping,
+  type ParsedFile,
+} from "./normalize-utils.js";
 
 export type ValidationLevel = "warn" | "error";
 
@@ -24,12 +29,12 @@ function expectedPrimitiveModesFromFiles(files: string[]): string[] {
 }
 
 export function validateFigmaInputs(params: {
-  parsedFiles: Array<{ file: string; data: Record<string, unknown> }>;
-  optionColorFiles: Array<{ file: string; data: Record<string, unknown> }>;
-  otherFiles: Array<{ file: string; data: Record<string, unknown> }>;
+  parsedFiles: Array<ParsedFile>;
+  optionsFiles: Array<ParsedFile>;
+  otherFiles: Array<ParsedFile>;
   tokenMapping: TokenMapping;
 }): ValidationIssue[] {
-  const { parsedFiles, optionColorFiles, otherFiles, tokenMapping } = params;
+  const { parsedFiles, optionsFiles, otherFiles, tokenMapping } = params;
   const issues: ValidationIssue[] = [];
 
   const mappedCollections = new Set(Object.keys(tokenMapping.collections ?? {}));
@@ -48,7 +53,7 @@ export function validateFigmaInputs(params: {
   }
 
   const importedPrimitiveModes = expectedPrimitiveModesFromFiles(
-    optionColorFiles.map(({ file }) => file),
+    optionsFiles.map(({ file }) => file),
   );
 
   // Require at least one primitive mode file to serve as canonical fallback
@@ -77,7 +82,7 @@ export function validateFigmaInputs(params: {
 
   const importedCollections = new Set<string>();
 
-  for (const { file, data } of optionColorFiles) {
+  for (const { file, data } of optionsFiles) {
     for (const collectionName of Object.keys(data)) {
       importedCollections.add(collectionName);
       if (!mappedCollections.has(collectionName)) {
@@ -98,7 +103,7 @@ export function validateFigmaInputs(params: {
         level: "warn",
         code: "MISSING_MAPPED_COLLECTION",
         message:
-          `Mapped collection "${collectionName}" is not present in any imported options.color.*.json file. ` +
+          `Mapped collection "${collectionName}" is not present in any imported options.*.*.json file. ` +
           `If this is intentional, no action is required; otherwise verify Figma export and mapping names.`,
       });
     }
