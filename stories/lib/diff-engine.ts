@@ -1,3 +1,4 @@
+import type { TokenLeaf } from "../../src/types/types.js";
 /**
  * diff-engine.ts
  *
@@ -31,11 +32,6 @@ export type DiffKind =
   | "group-added"
   | "group-removed";
 
-export interface TokenLeaf {
-  $value: string;
-  $type: string;
-}
-
 export interface DiffEntry {
   path: string; // dot-separated path, e.g. "color.text.link"
   kind: DiffKind;
@@ -66,7 +62,7 @@ function isAlias(value: string): boolean {
 function flatten(
   node: Record<string, unknown>,
   prefix: string,
-  out: FlatMap,
+  out: FlatMap
 ): void {
   for (const [key, value] of Object.entries(node)) {
     const path = prefix ? `${prefix}.${key}` : key;
@@ -85,7 +81,7 @@ function flatten(
 function collectGroups(
   node: Record<string, unknown>,
   prefix: string,
-  out: Set<string>,
+  out: Set<string>
 ): void {
   for (const [key, value] of Object.entries(node)) {
     const path = prefix ? `${prefix}.${key}` : key;
@@ -104,7 +100,7 @@ function collectGroups(
  */
 export function computeDiff(
   baseline: Record<string, unknown>,
-  current: Record<string, unknown>,
+  current: Record<string, unknown>
 ): DiffEntry[] {
   const baseFlat: FlatMap = new Map();
   const currFlat: FlatMap = new Map();
@@ -131,8 +127,8 @@ export function computeDiff(
     } else if (b !== null && c !== null) {
       if (b.$value === c.$value) continue; // unchanged
 
-      const bIsAlias = isAlias(b.$value);
-      const cIsAlias = isAlias(c.$value);
+      const bIsAlias = isAlias(String(b.$value));
+      const cIsAlias = isAlias(String(c.$value));
 
       if (bIsAlias && cIsAlias) {
         entries.push({ path, kind: "changed-alias", baseline: b, current: c });
@@ -164,9 +160,11 @@ export function computeDiff(
   // Group-level structural diffs — only report top-level groups that are
   // entirely new or entirely removed (not just paths with individual token
   // changes already captured above).
-  const addedGroups = new Set([...currGroups].filter((g) => !baseGroups.has(g)));
+  const addedGroups = new Set(
+    [...currGroups].filter((g) => !baseGroups.has(g))
+  );
   const removedGroups = new Set(
-    [...baseGroups].filter((g) => !currGroups.has(g)),
+    [...baseGroups].filter((g) => !currGroups.has(g))
   );
 
   // Suppress child group paths whose parent group is already reported
@@ -181,7 +179,12 @@ export function computeDiff(
 
   for (const g of addedGroups) {
     if (isRedundant(g, addedGroups)) continue;
-    entries.push({ path: g, kind: "group-added", baseline: null, current: null });
+    entries.push({
+      path: g,
+      kind: "group-added",
+      baseline: null,
+      current: null,
+    });
   }
   for (const g of removedGroups) {
     if (isRedundant(g, removedGroups)) continue;
@@ -213,7 +216,7 @@ export function computeDiff(
  */
 export function groupBySectionPath(
   entries: DiffEntry[],
-  depth = 2,
+  depth = 2
 ): Map<string, DiffEntry[]> {
   const map = new Map<string, DiffEntry[]>();
   for (const entry of entries) {

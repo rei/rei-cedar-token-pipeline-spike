@@ -1,3 +1,5 @@
+import { isRecord, isTokenLeaf } from "../utils.js";
+
 /**
  * validate-metadata.ts
  *
@@ -27,24 +29,6 @@ interface ValidationIssue {
   path: string;
   message: string;
   severity: "warn" | "error";
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function isTokenLeaf(value: unknown): boolean {
-  return (
-    isRecord(value) &&
-    "$value" in value &&
-    "$type" in value &&
-    !("$meta" in value) &&
-    !(
-      "$extensions" in value &&
-      isRecord((value as any).$extensions) &&
-      "skip" in (value as any).$extensions
-    )
-  );
 }
 
 function collectCanonicalPaths(node: unknown, path: string[] = []): string[] {

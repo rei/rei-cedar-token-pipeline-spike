@@ -1,4 +1,5 @@
 import type { DesignTokens, Dictionary, TransformedToken } from "style-dictionary/types";
+import { isRecord, isTokenLeaf } from "../utils.js";
 
 export interface ModuleDefinition {
   theme: string;
@@ -8,19 +9,6 @@ export interface ModuleDefinition {
   unionTypeName: string;
   matchesToken: (token: TransformedToken) => boolean;
   getTokenName: (token: TransformedToken) => string;
-}
-
-interface TokenLeaf {
-  $value: string | number | boolean;
-  $type: string;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function isTokenLeaf(value: unknown): value is TokenLeaf {
-  return isRecord(value) && "$value" in value && "$type" in value;
 }
 
 function toPascalCase(value: string): string {

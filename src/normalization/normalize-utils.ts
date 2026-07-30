@@ -15,21 +15,9 @@ export type ParsedFile = { file: string; data: Record<string, unknown> };
 
 /**
  * Extract the semantic color mode name from a token filename.
- *
- * For alias color files the convention is `alias.color.<mode>.json`.
- * The mode is the third segment (index 2). If the file has fewer than
- * three segments (e.g. `spacing.default.json`) this returns null.
- *
- * Examples:
- *   alias.color.light.json   → "light"
- *   alias.color.default.json → "default"
- *   alias.color.sale.json    → "sale"
- *   options.color.light.json → null  (options files are primitive, not semantic)
- *   spacing.default.json     → null
  */
 export function extractColorMode(file: string): string | null {
   const parts = file.replace(/\.json$/, "").split(".");
-  // Only alias.color.<mode> files carry semantic mode information for colors
   if (parts[0] === "alias" && parts[1] === "color" && parts.length >= 3) {
     return parts[2];
   }
@@ -38,22 +26,11 @@ export function extractColorMode(file: string): string | null {
 
 /**
  * Extract the primitive platform mode from a token filename.
- *
- * For options color files the convention is `options.color.<mode>.json`.
- * The mode is the third segment (index 2). Returns null for all other files.
- *
- * Examples:
- *   options.color.light.json    → "light"
- *   options.color.web-dark.json → "web-dark"
- *   options.color.ios-light.json → "ios-light"
- *   alias.color.default.json    → null  (alias files are semantic, not primitive)
- *   spacing.default.json        → null
  */
 export function extractPrimitiveMode(file: string): string | null {
   const parts = file.replace(/\.json$/, "").split(".");
-  // Only options.color.<mode> files carry platform mode information for primitives
   if (parts[0] === "options" && parts[1] === "color" && parts.length >= 3) {
-    return parts[2]; // e.g. "light", "web-dark", "ios-light"
+    return parts[2];
   }
   return null;
 }
@@ -70,21 +47,9 @@ export function isLeaf(node: unknown): node is {
 
 // ─── TokenMapping ─────────────────────────────────────────────────────────────
 
-/**
- * Shape of src/schema/token-schema.json (`inputs.figma`) — the governed Figma Input Contract (ADR-0003).
- *
- * Each entry maps a Figma collection name (e.g. "neutral-palette") to:
- *   - canonicalPrefix: the color.option.* path prefix for all tokens in this collection
- *   - colorFamily: the color family for OKLCH chroma curve override (e.g., "warm-grey")
- *   - tokens: explicit Figma token path → canonical sub-path pairs
- *
- * The normalizer throws a build error for any Figma token path not declared here,
- * so designer renames surface immediately rather than producing corrupt paths.
- */
 export type TokenMappingEntry = {
   canonicalPrefix: string;
   colorFamily?: string;
-  /** Explicit Figma→canonical sub-path map, or "auto" for identity pass-through. */
   tokens: Record<string, string> | "auto";
 };
 
@@ -94,23 +59,6 @@ export type TokenMapping = {
 
 // ─── parseTokenDescription ──────────────────────────────────────────────────
 
-/**
- * Parse a Figma variable description into a structured TokenDocumentation object.
- *
- * Designers write a single plain-text description in Figma using this format:
- *
- *   Warm neutral, used for backgrounds.
- *   usage: Use for page and container backgrounds, never for text.
- *   design: Anchors the warm grey scale; the lightest neutral step.
- *   aliases: surface-default, surface-subtle
- *
- * Rules:
- *   - Lines before the first `key:` line are joined as `summary`.
- *   - Recognised keys: `usage`, `design`, `aliases`.
- *   - `aliases` is split on commas and trimmed into a string[].
- *   - Unrecognised `key: value` lines before any recognised key are folded into `summary`.
- *   - Returns undefined when the raw string is empty or whitespace-only.
- */
 export function parseTokenDescription(
   raw: string,
 ): { summary?: string; design?: string; usage?: string; aliases?: string[] } | undefined {
@@ -130,7 +78,6 @@ export function parseTokenDescription(
       currentKey = keyMatch[1].toLowerCase();
       fields[currentKey] = keyMatch[2].trim();
     } else if (currentKey) {
-      // Continuation line for current key
       fields[currentKey] += " " + line.trim();
     } else {
       summaryLines.push(line.trim());
@@ -161,23 +108,6 @@ export function parseTokenDescription(
 
 // ─── applyTokenMapping ────────────────────────────────────────────────────────
 
-/**
- * Given a single Figma options collection (e.g. the contents of "neutral-palette")
- * and its mapping entry, return a flat map of:
- *   canonical path segments → { $type, $value, $description }
- *
- * Throws if any Figma token path in the collection has no mapping entry —
- * this is the governed build error that surfaces designer renames early.
- *
- * Descriptions are extracted from the Figma $description field, which designers
- * can populate in Figma. These are stored in the canonical tree's $extensions.cedar.docs
- * for use in generated TypeScript types and documentation.
- *
- * @param collectionName  Figma collection key (e.g. "neutral-palette")
- * @param collectionData  The cleaned token tree for that collection
- * @param entry           The TokenMappingEntry for this collection
- * @param platformKey     e.g. "web-light" — used only in error messages
- */
 export function applyTokenMapping(
   collectionName: string,
   collectionData: Record<string, unknown>,
@@ -209,8 +139,6 @@ export function applyTokenMapping(
       const figmaPathStr = currentFigmaPath.join(".");
 
       if (isLeaf(value)) {
-        // Look up the canonical sub-path for this Figma token path.
-        // "auto" mode: identity pass-through (Figma path === canonical sub-path).
         const canonicalSub = entry.tokens === "auto" ? figmaPathStr : entry.tokens[figmaPathStr];
         if (canonicalSub === undefined) {
           throw new Error(
@@ -230,7 +158,7 @@ export function applyTokenMapping(
           $value: String((value as any).$value),
           colorFamily: entry.colorFamily,
         };
-        // Parse structured documentation from the Figma $description field
+
         const rawDescription = (value as any).$description;
         if (rawDescription && typeof rawDescription === "string") {
           const docs = parseTokenDescription(rawDescription);
@@ -252,19 +180,6 @@ export function applyTokenMapping(
 
 // ─── buildOptionTree ──────────────────────────────────────────────────────────
 
-/**
- * Convert a flat list of { canonicalPath, token } pairs into a nested object
- * tree rooted at the top-level section key.
- *
- * e.g. "color.option.neutral.warm.grey.900" with $value "#2e2e2b" and optional $description
- * becomes: { color: { option: { neutral: { warm: { grey: { "900": { $type, $value, $extensions: { cedar: { docs: ... } } } } } } } } }
- *
- * Descriptions from Figma tokens are wrapped into $extensions.cedar.docs.summary for use in
- * generated TypeScript types and documentation.
- *
- * Used to build the color.option subtree from mapped Figma option tokens, preserving
- * descriptions that designers add to Figma variables.
- */
 export function buildOptionTree(
   entries: Array<{
     canonicalPath: string;
@@ -310,24 +225,9 @@ export function buildOptionTree(
 
 // ─── buildCollectionToSection ─────────────────────────────────────────────────
 
-/**
- * Inspect every parsed file and build a map from bare collection root
- * (e.g. "neutral-palette") to the canonical section it belongs to (e.g. "color").
- *
- * The section is derived from the second segment of the filename:
- *   options.color.light.json  → section "color"
- *   alias.color.light.json    → section "color"
- *   spacing.default.json      → section "default" … but the top-level key IS
- *                               "spacing", so it maps to itself.
- *
- * Rules:
- *   - If a file's top-level key matches the filename-derived section name,
- *     it IS the section wrapper → map it and all its children to that section.
- *   - Otherwise the top-level key is a bare collection → map it to the
- *     filename-derived section.
- */
 export function buildCollectionToSection(parsed: ParsedFile[]): Map<string, string> {
   const map = new Map<string, string>();
+  const CANONICAL_SECTIONS = new Set(["spacing", "color", "text"]);
 
   for (const { file, data } of parsed) {
     const parts = file.replace(/\.json$/, "").split(".");
@@ -337,21 +237,23 @@ export function buildCollectionToSection(parsed: ParsedFile[]): Map<string, stri
       const value = data[topKey];
       if (typeof value !== "object" || value === null) continue;
 
-      // A top-level key is a section wrapper if it appears anywhere in the
-      // filename segments (e.g. "spacing" in "spacing.default.json", or
-      // "color" in "alias.color.light.json").
       const isWrapper = parts.includes(topKey);
 
       if (isWrapper) {
-        // Section wrapper (e.g. alias.color → { "color": { … } },
-        //                       spacing.default → { "spacing": { … } })
         map.set(topKey, topKey);
         for (const childKey of Object.keys(value as object)) {
-          map.set(childKey, topKey);
+          if (CANONICAL_SECTIONS.has(childKey)) {
+            map.set(childKey, childKey);
+          } else {
+            map.set(childKey, topKey);
+          }
         }
       } else {
-        // Bare collection (e.g. options.color → { "neutral-palette": { … } })
-        map.set(topKey, sectionFromFilename);
+        if (CANONICAL_SECTIONS.has(topKey)) {
+          map.set(topKey, topKey);
+        } else {
+          map.set(topKey, sectionFromFilename);
+        }
       }
     }
   }
@@ -362,7 +264,6 @@ export function buildCollectionToSection(parsed: ParsedFile[]): Map<string, stri
 function buildTextSemanticExtensions(baseValue: Record<string, unknown>, variableName: string) {
   const iosValue: Record<string, unknown> = {};
 
-  // Create the iOS specific value by swapping fluid for static sizing
   for (const [k, v] of Object.entries(baseValue)) {
     if (typeof v === "string") {
       iosValue[k] = v.replace(".fluid.", ".static.");
@@ -391,40 +292,17 @@ function buildTextSemanticExtensions(baseValue: Record<string, unknown>, variabl
 
 // ─── clean ────────────────────────────────────────────────────────────────────
 
-/**
- * Recursively strip Figma metadata and rewrite bare alias references so they
- * resolve correctly after nesting under section keys.
- *
- * Two main transformations:
- *   1. Strip $extensions and $description (Figma-specific metadata)
- *   2. Rewrite bare alias references with their section prefix if needed.
- *      This prepares aliases for the section-nested canonical tree where
- *      collections like "neutral-palette" are nested under "color".
- *
- * Examples:
- *   "{neutral-palette.warm-grey.100}" → "{color.neutral-palette.warm-grey.100}"
- *   "{spacing.sm}" → "{spacing.sm}" (already a section root, no change)
- *   "{color.text.link}" → "{color.text.link}" (already prefixed, no change)
- *
- * The collectionToSection map (built from filename analysis) tells us which
- * section each collection belongs to. If a bare reference's first segment
- * (e.g. "neutral-palette") is a collection, we prefix it with its section
- * (e.g. "color.") so the reference resolves in the nested tree.
- */
-// Helper function to build the platform and governance extensions specifically for Text Semantic tokens
 export function clean(
   node: Record<string, unknown>,
   collectionToSection: Map<string, string>,
   tokenMapping?: TokenMapping | null,
-  currentPath: string[] = [], // Added path tracking to know where we are in the tree
+  currentPath: string[] = [],
 ): TokenNode {
   const out: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(node)) {
-    // Strip Figma metadata keys
     if (key === "$extensions" || key === "$description") continue;
 
-    // Mixed node guard
     if (
       isLeaf(value) &&
       typeof value === "object" &&
@@ -444,21 +322,21 @@ export function clean(
       let rawValue = value.$value;
       let finalValue: unknown = rawValue;
 
-      // Helper function to process and rewrite individual alias strings
       const rewriteAlias = (valStr: string, objPropKey?: string) => {
         if (valStr.startsWith("{") && valStr.endsWith("}")) {
-          const inner = valStr.slice(1, -1); // "{x.y.z}" → "x.y.z"
+          const inner = valStr.slice(1, -1);
           const segments = inner.split(".");
-          const firstSegment = segments[0]; // "x.y.z" → "x"
+          const firstSegment = segments[0];
           const mappingEntry = tokenMapping?.collections[firstSegment];
 
+          let resolvedPath = inner;
+
           if (mappingEntry) {
-            // Mapped collection rewrite
             const figmaSubPath = segments.slice(1).join(".");
             const canonicalSub =
               mappingEntry.tokens === "auto" ? figmaSubPath : mappingEntry.tokens[figmaSubPath];
             if (canonicalSub !== undefined) {
-              return `{${mappingEntry.canonicalPrefix ?? firstSegment}.${canonicalSub}}`;
+              resolvedPath = `${mappingEntry.canonicalPrefix ?? firstSegment}.${canonicalSub}`;
             } else {
               throw new Error(
                 `[clean] Alias reference "{${inner}}" has no entry in src/schema/token-schema.json (inputs.figma.collections) ` +
@@ -467,12 +345,8 @@ export function clean(
               );
             }
           } else {
-            // Unmapped / standard collection rewrite
             let section = collectionToSection.get(firstSegment);
 
-            // Guard against namespace collisions: If the first segment is "text"
-            // and the context or path indicates a typography token, do not allow it
-            // to map to the "color" section. Force it to remain in the "text" section.
             const isTypographyRef =
               firstSegment === "text" &&
               (currentPath[0] === "text" ||
@@ -507,21 +381,20 @@ export function clean(
               section = "text";
             }
 
-            console.log("section: ", section);
             if (section && section !== firstSegment) {
-              return `{${section}.${inner}}`;
+              resolvedPath = `${section}.${inner}`;
             }
           }
+
+          // Ensure ALL hyphens inside the token reference path are rewritten to dots
+          return `{${resolvedPath.replace(/-/g, ".")}}`;
         }
         return valStr;
       };
 
-      // 1. If value is a simple string, rewrite it directly
       if (typeof rawValue === "string") {
         finalValue = rewriteAlias(rawValue);
-      }
-      // 2. If value is a composite object (e.g. Typography token), rewrite strings inside it
-      else if (typeof rawValue === "object" && rawValue !== null) {
+      } else if (typeof rawValue === "object" && rawValue !== null) {
         finalValue = {};
         for (const [objKey, objVal] of Object.entries(rawValue)) {
           if (typeof objVal === "string") {
@@ -540,13 +413,12 @@ export function clean(
 
       const rawDescription = value.$description;
       if (typeof rawDescription === "string") {
-        const docs = parseTokenDescription(rawDescription); // Assumes parseTokenDescription is available
+        const docs = parseTokenDescription(rawDescription);
         if (docs) {
           cedarExtensions.docs = docs;
         }
       }
 
-      // Inject Custom Extensions for text.semantic tokens
       if (
         currentPath[0] === "text" &&
         currentPath[1] === "semantic" &&
@@ -554,7 +426,6 @@ export function clean(
         typeof finalValue === "object" &&
         finalValue !== null
       ) {
-        // Construct the governance variable name (e.g., "heading.sans")
         const variableName = [...currentPath.slice(2), key].join(".");
 
         Object.assign(
@@ -563,14 +434,12 @@ export function clean(
         );
       }
 
-      // Attach $extensions if anything was added
       if (Object.keys(cedarExtensions).length > 0) {
         tokenNode.$extensions = { cedar: cedarExtensions };
       }
 
       out[key] = tokenNode;
     } else if (typeof value === "object" && value !== null) {
-      // Recursively clean nested token groups
       out[key] = clean(value as Record<string, unknown>, collectionToSection, tokenMapping, [
         ...currentPath,
         key,
@@ -578,13 +447,9 @@ export function clean(
     }
   }
 
-  return out as TokenNode; // Assumes TokenNode is a valid cast
+  return out as TokenNode;
 }
 
-/**
- * Recursively scans a nested token tree to check if it contains any typography tokens.
- * This identifies typography collections regardless of file-name or key collision.
- */
 function hasTypographyTokens(obj: unknown): boolean {
   if (typeof obj !== "object" || obj === null) return false;
   if ("$type" in obj && (obj as Record<string, unknown>).$type === "typography") {
@@ -600,77 +465,24 @@ function hasTypographyTokens(obj: unknown): boolean {
 
 // ─── nestUnderSections ────────────────────────────────────────────────────────
 
-/**
- * Restructure cleaned file output so all collections are nested under their
- * canonical section keys. This creates the final hierarchical canonical tree.
- *
- * Why nested sections?
- *   Alias and other files wrap their content under a section key:
- *   - alias.color.<mode>.json: { "color": { "surface": {...}, "text": {...} } }
- *   - spacing.alias.json:      { "spacing": { "component": {...} } }
- *
- *   nestUnderSections ensures these section wrappers are merged correctly
- *   into the canonical tree, and that alias color tokens are placed under
- *   color.modes.<palette> rather than directly under color.
- *
- *   options.color.*.json files (Figma primitive snapshots) are handled
- *   upstream by applyTokenMapping + buildOptionTree and never reach this function.
- *
- * Nesting rules (using collectionToSection map):
- *   - If map.get(key) === key:
- *     → key IS a section wrapper (e.g. "color" from alias.color.light.json).
- *       Keep at top level: { "color": { children } }
- *   - If map.get(key) !== key (and not undefined):
- *     → key is a bare collection (e.g. "neutral-palette" from options.color.light.json).
- *       Nest under its section: { "color": { "neutral-palette": {...} } }
- *
- * Multiple files can contribute to the same section (e.g. both options.color.*
- * and alias.color.* nest under "color"), so top-level keys that map to the
- * same section are merged together via deepMerge.
- *
- * Color mode nesting:
- *   When colorMode is provided (for alias.color.<mode>.json files), the
- *   semantic children of the "color" wrapper (e.g. "surface", "text",
- *   "border") are placed under color.modes.<mode> rather than directly
- *   under "color". This allows multiple modes to coexist in the canonical
- *   tree without overwriting each other.
- *
- * Example results (no colorMode):
- *   Input:  { "color": { "surface": {...}, "text": {...} } } (section wrapper)
- *   Output: { "color": { "surface": {...}, "text": {...} } } (unchanged)
- *
- *   Input:  { "spacing": { "sm": {...} } }
- *   Output: { "spacing": { "sm": {...} } } (unchanged)
- *
- * Example results (with colorMode = "sale"):
- *   Input:  { "color": { "surface": {...}, "text": {...} } }
- *   Output: { "color": { "modes": { "sale": { "surface": {...}, "text": {...} } } } }
- *
- * Note: options.color.*.json files (Figma primitives) are handled upstream via
- * applyTokenMapping + buildOptionTree and never reach nestUnderSections.
- */
-
 export function nestUnderSections(
   cleaned: Record<string, unknown>,
   collectionToSection: Map<string, string>,
   colorMode?: string | null,
 ): Record<string, unknown> {
   const out: Record<string, unknown> = {};
+  const CANONICAL_SECTIONS = new Set(["spacing", "color", "text"]);
 
   for (const [key, value] of Object.entries(cleaned)) {
     let section = collectionToSection.get(key);
 
-    // Guard: If this value contains typography tokens, force the section to "text"
-    // to prevent conflicts with color mode files mapping "text" to the "color" section.
-    if (hasTypographyTokens(value)) {
+    if (CANONICAL_SECTIONS.has(key)) {
+      section = key;
+    } else if (hasTypographyTokens(value)) {
       section = "text";
     }
 
-    // ───────────────────────────────────────────────
-    // SECTION WRAPPER (e.g. "color", "spacing")
-    // ───────────────────────────────────────────────
     if (!section || section === key) {
-      // Alias color file → nest under color.modes.<mode>
       if (colorMode && key === "color") {
         if (!out["color"]) out["color"] = {};
         deepMerge(out["color"] as Record<string, unknown>, {
@@ -679,60 +491,20 @@ export function nestUnderSections(
         continue;
       }
 
-      // Normal section wrapper
       if (!out[key]) out[key] = {};
       deepMerge(out[key] as Record<string, unknown>, value as Record<string, unknown>);
       continue;
     }
 
-    // ───────────────────────────────────────────────
-    // BARE COLLECTION (e.g. "neutral-palette")
-    // ───────────────────────────────────────────────
     if (!out[section]) out[section] = {};
-
-    // Default nesting for non-color bare collections (spacing, typography, etc.)
-    // Color option collections never reach here — they are handled upstream
-    // via applyTokenMapping + buildOptionTree before nestUnderSections is called.
-    // Nest bare collection directly under its section.
-    // Color primitives (e.g. neutral-palette) sit at color root;
-    // option tokens are handled upstream via applyTokenMapping + buildOptionTree.
     (out[section] as Record<string, unknown>)[key] = value;
   }
 
   return out;
 }
 
-// ─── deepMerge ────────────────────────────────────────────────────────────────
-
 // ─── buildSpacingClamp ────────────────────────────────────────────────────────
 
-/**
- * Given multiple per-breakpoint spacing token files (e.g. spacing.320.json,
- * spacing.1440.json, spacing.2560.json), produce a single canonical spacing
- * tree where every `spacing.scale.*` leaf has a CSS `clamp()` string as its
- * $value, and $type is "fluid".
- *
- * The non-scale collections (spacing.component.*, spacing.layout.*) come from
- * the alias file and keep their alias references unchanged.
- *
- * CSS clamp formula:
- *   clamp(<min>px, <slope>vw + <intercept>px, <max>px)
- *
- * Derivation (per token):
- *   - min breakpoint (bp_min = 320px): value = v_min
- *   - max (saturation) breakpoint (bp_max): value = v_max
- *   - 1vw = viewport_width / 100 px, so:
- *       slope = (v_max - v_min) / (bp_max/100 - bp_min/100)   [units: px/vw]
- *       intercept = v_min - slope * (bp_min / 100)             [units: px]
- *   clamp(v_min px, slope vw + intercept px, v_max px)
- *
- * The saturation breakpoint is the smallest breakpoint at which the token
- * value first equals the global maximum across all breakpoints.
- *
- * @param parsedSpacingFiles  Array of { breakpoint: number, data: RawSpacingFile }
- *   where breakpoint is the viewport width from the filename (e.g. 320 for spacing.320.json)
- *   and data is the parsed JSON (null-safe: alias file is excluded by the caller).
- */
 export function buildSpacingClamp(
   parsedSpacingFiles: Array<{
     breakpoint: number;
@@ -741,11 +513,9 @@ export function buildSpacingClamp(
 ): Record<string, unknown> {
   if (parsedSpacingFiles.length === 0) return {};
 
-  // Sort ascending by breakpoint
   const sorted = [...parsedSpacingFiles].sort((a, b) => a.breakpoint - b.breakpoint);
   const minBp = sorted[0].breakpoint;
 
-  // Collect all token keys from the scale group
   const scaleKeys = new Set<string>();
   for (const { data } of sorted) {
     const scale = getScale(data);
@@ -755,7 +525,6 @@ export function buildSpacingClamp(
   const scaleOut: Record<string, unknown> = {};
 
   for (const tokenKey of scaleKeys) {
-    // Gather (breakpoint, value) pairs for this token
     const pairs: Array<{ bp: number; val: number }> = [];
     for (const { breakpoint, data } of sorted) {
       const scale = getScale(data);
@@ -770,7 +539,6 @@ export function buildSpacingClamp(
     }
 
     if (pairs.length < 2) {
-      // Not enough data for a fluid formula — keep raw px value
       const v = pairs[0]?.val ?? 0;
       scaleOut[tokenKey] = { $value: `${roundPx(v)}px`, $type: "dimension" };
       continue;
@@ -779,15 +547,13 @@ export function buildSpacingClamp(
     const vMin = pairs[0].val;
     const vMax = Math.max(...pairs.map((p) => p.val));
 
-    // Find saturation breakpoint: first bp where value == vMax (within float tolerance)
     const satPair = pairs.find((p) => Math.abs(p.val - vMax) < 0.05);
     const maxBp = satPair?.bp ?? sorted[sorted.length - 1].breakpoint;
 
-    // Compute slope (px per vw) and intercept
-    const bpMinVw = minBp / 100; // bp in vw units (1vw = viewport/100)
+    const bpMinVw = minBp / 100;
     const bpMaxVw = maxBp / 100;
-    const slope = (vMax - vMin) / (bpMaxVw - bpMinVw); // px / vw
-    const intercept = vMin - slope * bpMinVw; // px
+    const slope = (vMax - vMin) / (bpMaxVw - bpMinVw);
+    const intercept = vMin - slope * bpMinVw;
 
     const clampValue = `clamp(${roundPx(vMin)}px, ${roundSlope(
       slope,
@@ -806,7 +572,6 @@ export function buildTextSizeClamp(
   const sorted = [...parsedFiles].sort((a, b) => a.breakpoint - b.breakpoint);
   const scaleKeys = new Set<string>();
 
-  // 1. Collect all token keys
   for (const { data } of sorted) {
     const fluidGroup = (data as any)?.text?.size?.fluid;
     if (fluidGroup) Object.keys(fluidGroup).forEach((k) => scaleKeys.add(k));
@@ -814,15 +579,12 @@ export function buildTextSizeClamp(
 
   const scaleOut: Record<string, unknown> = {};
 
-  // Helpers to format numbers cleanly
   const roundPx = (num: number) => Math.round(num * 100) / 100;
   const roundSlope = (num: number) => Math.round(num * 1000) / 1000;
 
-  // 2. Process each token independently
   for (const tokenKey of scaleKeys) {
     const pairs: Array<{ bp: number; val: number }> = [];
 
-    // Extract pixel values from the available breakpoint files
     for (const { breakpoint, data } of sorted) {
       const leaf = (data as any)?.text?.size?.fluid?.[tokenKey];
       if (leaf && typeof leaf === "object" && "$value" in leaf) {
@@ -833,7 +595,6 @@ export function buildTextSizeClamp(
 
     if (pairs.length === 0) continue;
 
-    // Isolate the absolute boundaries
     const vMin = Math.min(...pairs.map((p) => p.val));
     const vMax = Math.max(...pairs.map((p) => p.val));
 
@@ -842,11 +603,7 @@ export function buildTextSizeClamp(
       continue;
     }
 
-    // 3. Reconstruct the formula based on the system's proportional math proxy
-    // Slope is strictly 5% of the minimum font size
     const vwCoef = vMin * 0.05;
-
-    // Fluid scaling structurally begins at the 400px (4vw) boundary
     const intercept = vMin - vwCoef * 4;
 
     scaleOut[tokenKey] = {
@@ -858,7 +615,6 @@ export function buildTextSizeClamp(
   return { text: { size: { fluid: scaleOut } } };
 }
 
-/** Extract the spacing.scale object from a raw spacing file, if present. */
 function getScale(data: Record<string, unknown>): Record<string, unknown> | null {
   const spacingSection = data["spacing"];
   if (typeof spacingSection !== "object" || spacingSection === null) return null;
@@ -867,18 +623,43 @@ function getScale(data: Record<string, unknown>): Record<string, unknown> | null
   return scale as Record<string, unknown>;
 }
 
-/** Round a px value to 4 significant decimal places. */
 function roundPx(v: number): string {
-  // Use up to 4 decimal places but strip trailing zeros
   return parseFloat(v.toFixed(4)).toString();
 }
 
-/** Round a vw slope coefficient to 4 decimal places. */
 function roundSlope(v: number): string {
   return parseFloat(v.toFixed(4)).toString();
 }
 
-/** Deep-merge src into dest (dest is mutated). Later files win on conflicts. */
+function mergeExtensions(
+  destExt?: Record<string, unknown>,
+  srcExt?: Record<string, unknown>,
+): Record<string, unknown> | undefined {
+  if (!destExt && !srcExt) return undefined;
+  if (!destExt) return srcExt;
+  if (!srcExt) return destExt;
+
+  const result: Record<string, unknown> = { ...destExt };
+
+  for (const [k, v] of Object.entries(srcExt)) {
+    if (
+      typeof v === "object" &&
+      v !== null &&
+      typeof result[k] === "object" &&
+      result[k] !== null
+    ) {
+      result[k] = mergeExtensions(
+        result[k] as Record<string, unknown>,
+        v as Record<string, unknown>,
+      );
+    } else {
+      result[k] = v;
+    }
+  }
+
+  return result;
+}
+
 export function deepMerge(dest: Record<string, unknown>, src: Record<string, unknown>): void {
   for (const [key, value] of Object.entries(src)) {
     if (
@@ -890,6 +671,25 @@ export function deepMerge(dest: Record<string, unknown>, src: Record<string, unk
       !isLeaf(dest[key])
     ) {
       deepMerge(dest[key] as Record<string, unknown>, value as Record<string, unknown>);
+    } else if (isLeaf(value) && isLeaf(dest[key])) {
+      const destLeaf = dest[key] as Record<string, unknown>;
+      const srcLeaf = value as Record<string, unknown>;
+
+      const mergedExtensions = mergeExtensions(
+        destLeaf.$extensions as Record<string, unknown> | undefined,
+        srcLeaf.$extensions as Record<string, unknown> | undefined,
+      );
+
+      dest[key] = {
+        ...destLeaf,
+        ...srcLeaf,
+      };
+
+      if (mergedExtensions && Object.keys(mergedExtensions).length > 0) {
+        (dest[key] as Record<string, unknown>).$extensions = mergedExtensions;
+      } else {
+        delete (dest[key] as Record<string, unknown>).$extensions;
+      }
     } else {
       dest[key] = value;
     }
@@ -897,12 +697,10 @@ export function deepMerge(dest: Record<string, unknown>, src: Record<string, unk
 }
 
 export function expandHyphenatedTokens(obj: Record<string, any>): TokenNode {
-  // Base case: If it's not an object or it's null, return as-is
   if (typeof obj !== "object" || obj === null) {
     return obj;
   }
 
-  // W3C Design Token Guard: If it's a leaf node, don't look deeper
   if ("$value" in obj) {
     return obj as unknown as TokenNode;
   }
@@ -910,21 +708,16 @@ export function expandHyphenatedTokens(obj: Record<string, any>): TokenNode {
   const root: TokenNode = {};
 
   for (const [key, value] of Object.entries(obj)) {
-    // 1. Recursively process the child nodes first
     const processedValue = expandHyphenatedTokens(value);
-
-    // 2. Split the current key by its hyphens
     const segments = key.split("-");
     let currentLevel = root;
 
-    // 3. Walk down the tree, creating nests where needed
     segments.forEach((segment, index) => {
       const isLastSegment = index === segments.length - 1;
 
       if (isLastSegment) {
         currentLevel[segment] = processedValue;
       } else {
-        // If the next level doesn't exist yet, initialize it
         if (
           !currentLevel[segment] ||
           typeof currentLevel[segment] !== "object" ||
@@ -941,16 +734,12 @@ export function expandHyphenatedTokens(obj: Record<string, any>): TokenNode {
 }
 
 /**
- * Rewrite hyphens inside `{spacing.static.*}` references to dots,
- * matching the key expansion done by `expandHyphenatedTokens`.
- *
- * Example: "{spacing.static.one-and-a-half-x}" → "{spacing.static.one.and.a.half.x}"
+ * Rewrite hyphens inside any `{...}` reference to dots.
  */
 export function fixStaticReferencePaths(value: unknown): any {
   if (typeof value !== "string") return value;
-  if (!value.startsWith("{spacing.static.") || !value.endsWith("}")) return value;
+  if (!value.startsWith("{") || !value.endsWith("}")) return value;
 
-  const prefix = "{spacing.static.";
-  const inner = value.slice(prefix.length, -1); // strip prefix and trailing "}"
-  return `${prefix}${inner.replace(/-/g, ".")}}`;
+  const inner = value.slice(1, -1);
+  return `{${inner.replace(/-/g, ".")}}`;
 }
