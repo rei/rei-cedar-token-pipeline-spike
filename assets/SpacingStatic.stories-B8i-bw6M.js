@@ -1,4 +1,4 @@
-import{t as e}from"./chunk-BvrOYcoh.js";import{a as t,t as n}from"./load-tokens-DXw-3Exz.js";function r(e){return()=>{let t=document.createElement(`div`);return t.style.cssText=`min-height:200px;background:#f5f2eb;`,t.innerHTML=`
+import{t as e}from"./chunk-BvrOYcoh.js";import{a as t,t as n}from"./load-tokens-e7kGc85y.js";function r(e){return()=>{let t=document.createElement(`div`);return t.style.cssText=`min-height:200px;background:#f5f2eb;`,t.innerHTML=`
       <div style="padding:40px 32px;font-family:'DM Mono',monospace;font-size:.85rem;color:#736e65">
         Loading token compilation snapshots…
       </div>`,e().then(e=>{t.innerHTML=e}).catch(e=>{t.innerHTML=`
