@@ -22,12 +22,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Action } from "style-dictionary/types";
-import { hexToCustomOklch } from "./oklch-formulas";
+import { hexToCustomOklch } from "./oklch-formulas.js";
 import {
   type CedarOptionNode,
   getTokenAtPath,
   resolveOptionHex,
-} from "../../utils/option-resolver";
+} from "../../utils/option-resolver.js";
 
 function formatOklch(hex: string, colorFamily?: string): string {
   return hexToCustomOklch(hex, colorFamily);
@@ -50,6 +50,8 @@ export function toCssVar(tokenPath: string[], subProperty?: string): string {
 
   if (meaningful[0] === "color" && meaningful[1] === "modes") {
     meaningful = meaningful.slice(3);
+  } else if (meaningful[0] === "color") {
+    meaningful = meaningful.slice(1);
   } else if (meaningful[0] === "text" && meaningful[1] === "semantic") {
     meaningful.splice(1, 1);
   }
@@ -111,9 +113,25 @@ export const webCssAction: Action = {
     fs.mkdirSync(path.join(buildPath, "dark"), { recursive: true });
 
     // Organize color tokens by semantic category
-    const colorSurface = { light: [] as string[], dark: [] as string[] };
-    const colorText = { light: [] as string[], dark: [] as string[] };
-    const colorBorder = { light: [] as string[], dark: [] as string[] };
+    const colorByCategory: Record<string, { light: string[]; dark: string[] }> = {};
+    const COLOR_CATEGORIES = new Set([
+      "surface",
+      "text",
+      "border",
+      "action",
+      "selection",
+      "navigation",
+      "feedback",
+      "icon",
+      "overlay",
+    ]);
+
+    function getColorCategory(token: any): string | undefined {
+      if (token.path[0] !== "color") return undefined;
+      if (token.path[1] === "modes") return token.path[3];
+      if (token.path[1] === "option") return undefined;
+      return token.path[1];
+    }
 
     // Organize spacing tokens by type
     const spacingScale = { light: [] as string[], dark: [] as string[] };
@@ -155,42 +173,36 @@ export const webCssAction: Action = {
       line: string,
       darkLine: string
     ): boolean {
-      const category = token.path[3];
-      if (category === "surface") {
-        colorSurface.light.push(line);
-        colorSurface.dark.push(darkLine);
-        return true;
-      }
-      if (category === "text") {
-        colorText.light.push(line);
-        colorText.dark.push(darkLine);
-        return true;
-      }
-      if (category === "border") {
-        colorBorder.light.push(line);
-        colorBorder.dark.push(darkLine);
-        return true;
+      const category = getColorCategory(token);
+      if (!category || !COLOR_CATEGORIES.has(category)) {
+        console.warn(
+          `[web-css] Token ${
+            token.name
+          }: unknown semantic color category "${String(
+            category
+          )}" at path "${token.path.join(".")}"`
+        );
+        return false;
       }
 
-      console.warn(
-        `[web-css] Token ${
-          token.name
-        }: unknown semantic color category "${String(
-          category
-        )}" at path "${token.path.join(".")}"`
-      );
-      return false;
+      if (!colorByCategory[category]) {
+        colorByCategory[category] = { light: [], dark: [] };
+      }
+      colorByCategory[category].light.push(line);
+      colorByCategory[category].dark.push(darkLine);
+      return true;
     }
 
     // Categorize color tokens
     const colorTokens = dictionary.allTokens.filter(
       (t) =>
         t.path[0] === "color" &&
-        t.path[1] === "modes" &&
-        t.path[2] === "default" &&
-        t.$type === "color"
+        t.path[1] !== "option" &&
+        t.$type === "color" &&
+        (t.path[1] !== "modes" ||
+          t.path[2] === "default" ||
+          t.path[2] === "rest")
     );
-    // TBD: Fix color tokens filtering
 
     colorTokens.forEach((token) => {
       const resolved = (token.$extensions as any)?.cedar?.resolved?.web;
@@ -344,20 +356,11 @@ export const webCssAction: Action = {
       const imports: string[] = [];
 
       // Color files
-      if (colorSurface[theme].length > 0) {
-        const css = `:root {\n${colorSurface[theme].join("\n")}\n}\n`;
-        fs.writeFileSync(path.join(themeDir, "cdr-color-surface.css"), css);
-        imports.push(`@import './${theme}/cdr-color-surface.css';`);
-      }
-      if (colorText[theme].length > 0) {
-        const css = `:root {\n${colorText[theme].join("\n")}\n}\n`;
-        fs.writeFileSync(path.join(themeDir, "cdr-color-text.css"), css);
-        imports.push(`@import './${theme}/cdr-color-text.css';`);
-      }
-      if (colorBorder[theme].length > 0) {
-        const css = `:root {\n${colorBorder[theme].join("\n")}\n}\n`;
-        fs.writeFileSync(path.join(themeDir, "cdr-color-border.css"), css);
-        imports.push(`@import './${theme}/cdr-color-border.css';`);
+      for (const [category, categoryLines] of Object.entries(colorByCategory)) {
+        if (categoryLines[theme].length === 0) continue;
+        const css = `:root {\n${categoryLines[theme].join("\n")}\n}\n`;
+        fs.writeFileSync(path.join(themeDir, `cdr-color-${category}.css`), css);
+        imports.push(`@import './${theme}/cdr-color-${category}.css';`);
       }
 
       // Spacing files
@@ -451,18 +454,13 @@ export const webCssAction: Action = {
 
     // Log generated files
     console.log(`  ✓ dist/themes/rei-dot-com/css/cdr-light.css (index)`);
-    if (colorSurface.light.length > 0)
-      console.log(
-        `    ✓ cdr-color-surface.css (${colorSurface.light.length} tokens)`
-      );
-    if (colorText.light.length > 0)
-      console.log(
-        `    ✓ cdr-color-text.css (${colorText.light.length} tokens)`
-      );
-    if (colorBorder.light.length > 0)
-      console.log(
-        `    ✓ cdr-color-border.css (${colorBorder.light.length} tokens)`
-      );
+    for (const [category, lines] of Object.entries(colorByCategory)) {
+      if (lines.light.length > 0) {
+        console.log(
+          `    ✓ cdr-color-${category}.css (${lines.light.length} tokens)`
+        );
+      }
+    }
     if (spacingScale.light.length > 0)
       console.log(
         `    ✓ cdr-spacing-scale.css (${spacingScale.light.length} tokens)`
@@ -477,15 +475,15 @@ export const webCssAction: Action = {
       );
     if (typographyFamily.light.length > 0)
       console.log(
-        `    ✓ cdr-text-family.css (${spacingComponent.light.length} tokens)`
+        `    ✓ cdr-text-family.css (${typographyFamily.light.length} tokens)`
       );
     if (typographyLetterSpacing.light.length > 0)
       console.log(
-        `    ✓ cdr-text-letter-spacing.css (${spacingLayout.light.length} tokens)`
+        `    ✓ cdr-text-letter-spacing.css (${typographyLetterSpacing.light.length} tokens)`
       );
     if (typographyLineHeight.light.length > 0)
       console.log(
-        `    ✓ cdr-text-line-height.css (${spacingComponent.light.length} tokens)`
+        `    ✓ cdr-text-line-height.css (${typographyLineHeight.light.length} tokens)`
       );
     if (typographySizeStatic.light.length > 0)
       console.log(
@@ -497,20 +495,17 @@ export const webCssAction: Action = {
       );
     if (typographyWeight.light.length > 0)
       console.log(
-        `    ✓ cdr-text-wight.css (${spacingLayout.light.length} tokens)`
+        `    ✓ cdr-text-wight.css (${typographyWeight.light.length} tokens)`
       );
 
     console.log(`  ✓ dist/themes/rei-dot-com/css/cdr-dark.css (index)`);
-    if (colorSurface.dark.length > 0)
-      console.log(
-        `    ✓ cdr-color-surface.css (${colorSurface.dark.length} tokens)`
-      );
-    if (colorText.dark.length > 0)
-      console.log(`    ✓ cdr-color-text.css (${colorText.dark.length} tokens)`);
-    if (colorBorder.dark.length > 0)
-      console.log(
-        `    ✓ cdr-color-border.css (${colorBorder.dark.length} tokens)`
-      );
+    for (const [category, lines] of Object.entries(colorByCategory)) {
+      if (lines.dark.length > 0) {
+        console.log(
+          `    ✓ cdr-color-${category}.css (${lines.dark.length} tokens)`
+        );
+      }
+    }
     if (spacingScale.dark.length > 0)
       console.log(
         `    ✓ cdr-spacing-scale.css (${spacingScale.dark.length} tokens)`
@@ -525,15 +520,15 @@ export const webCssAction: Action = {
       );
     if (typographyFamily.dark.length > 0)
       console.log(
-        `    ✓ cdr-text-family.css (${spacingComponent.light.length} tokens)`
+        `    ✓ cdr-text-family.css (${typographyFamily.dark.length} tokens)`
       );
     if (typographyLetterSpacing.dark.length > 0)
       console.log(
-        `    ✓ cdr-text-letter-spacing.css (${spacingLayout.light.length} tokens)`
+        `    ✓ cdr-text-letter-spacing.css (${typographyLetterSpacing.dark.length} tokens)`
       );
     if (typographyLineHeight.dark.length > 0)
       console.log(
-        `    ✓ cdr-text-line-height.css (${spacingComponent.light.length} tokens)`
+        `    ✓ cdr-text-line-height.css (${typographyLineHeight.dark.length} tokens)`
       );
     if (typographySizeStatic.dark.length > 0)
       console.log(
@@ -545,28 +540,34 @@ export const webCssAction: Action = {
       );
     if (typographyWeight.dark.length > 0)
       console.log(
-        `    ✓ cdr-text-wight.css (${spacingLayout.light.length} tokens)`
+        `    ✓ cdr-text-wight.css (${typographyWeight.dark.length} tokens)`
       );
   },
 
   undo: (_dictionary, config) => {
     const buildPath = config.buildPath ?? "dist/themes/rei-dot-com/css/";
+
     const filesToRemove = [
       "cdr-light.css",
       "cdr-dark.css",
-      "light/cdr-color-surface.css",
-      "light/cdr-color-text.css",
-      "light/cdr-color-border.css",
       "light/cdr-spacing-scale.css",
       "light/cdr-spacing-component.css",
       "light/cdr-spacing-layout.css",
-      "dark/cdr-color-surface.css",
-      "dark/cdr-color-text.css",
-      "dark/cdr-color-border.css",
       "dark/cdr-spacing-scale.css",
       "dark/cdr-spacing-component.css",
       "dark/cdr-spacing-layout.css",
     ];
+
+    for (const theme of ["light", "dark"]) {
+      const themeDir = path.join(buildPath, theme);
+      if (!fs.existsSync(themeDir)) continue;
+      for (const file of fs.readdirSync(themeDir)) {
+        if (file.startsWith("cdr-color-")) {
+          filesToRemove.push(`${theme}/${file}`);
+        }
+      }
+    }
+
     filesToRemove.forEach((f) => {
       const p = path.join(buildPath, f);
       if (fs.existsSync(p)) fs.rmSync(p);

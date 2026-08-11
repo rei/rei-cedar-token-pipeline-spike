@@ -242,11 +242,7 @@ export function buildCollectionToSection(parsed: ParsedFile[]): Map<string, stri
       if (isWrapper) {
         map.set(topKey, topKey);
         for (const childKey of Object.keys(value as object)) {
-          if (CANONICAL_SECTIONS.has(childKey)) {
-            map.set(childKey, childKey);
-          } else {
-            map.set(childKey, topKey);
-          }
+          map.set(childKey, topKey);
         }
       } else {
         if (CANONICAL_SECTIONS.has(topKey)) {

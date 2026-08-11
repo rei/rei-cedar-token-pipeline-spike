@@ -1,3 +1,11 @@
+@import './light/cdr-color-surface.css';
+@import './light/cdr-color-action.css';
+@import './light/cdr-color-selection.css';
+@import './light/cdr-color-navigation.css';
+@import './light/cdr-color-feedback.css';
+@import './light/cdr-color-text.css';
+@import './light/cdr-color-icon.css';
+@import './light/cdr-color-overlay.css';
 @import './light/cdr-spacing-scale.css';
 @import './light/cdr-spacing-component.css';
 @import './light/cdr-spacing-layout.css';
