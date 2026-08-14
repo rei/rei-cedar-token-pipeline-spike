@@ -1,4 +1,4 @@
-import{t as e}from"./chunk-BvrOYcoh.js";import{a as t,n,r,t as i}from"./oklch-formulas-Dr7PZhXi.js";var a,o,s;e((()=>{t(),a={title:`Tokens/Color/Formula`,tags:[`docs`]},o={name:`Overview`,render:()=>`
+import{t as e}from"./chunk-BvrOYcoh.js";import{a as t,n,r,t as i}from"./oklch-formulas-CzNNimHW.js";var a,o,s;e((()=>{t(),a={title:`Tokens/Color/Formula`,tags:[`docs`]},o={name:`Overview`,render:()=>`
       <div style="max-width:900px;padding:40px;font-family:system-ui,-apple-system,sans-serif;line-height:1.6;color:#333">
         <h1 style="font-size:2.5rem;margin-bottom:1rem">Color Formula</h1>
         <p style="font-size:1.1rem;color:#666;margin-bottom:2rem">
