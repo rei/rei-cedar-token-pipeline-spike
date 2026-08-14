@@ -1,0 +1,8 @@
+:root {
+  --cdr-navigation-edge-brand: #c2bdb5;
+  --cdr-navigation-edge-brand: oklch(0.8002 0.0125 79.78);
+  --cdr-navigation-edge-neutral: #c2bdb5;
+  --cdr-navigation-edge-neutral: oklch(0.8002 0.0125 79.78);
+  --cdr-navigation-on-neutral: #b4afa6;
+  --cdr-navigation-on-neutral: oklch(0.7556 0.0139 82.40);
+}

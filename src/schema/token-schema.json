@@ -88,7 +88,7 @@
         },
         "sale-red": {
           "canonicalPrefix": "color.option.sale-red",
-          "colorFamily": "sale-red",
+          "colorFamily": "new-sale-red",
           "tokens": "auto"
         },
         "membership-text": {
@@ -98,12 +98,12 @@
         },
         "lichen": {
           "canonicalPrefix": "color.option.lichen",
-          "colorFamily": "lichen",
+          "colorFamily": "highlight-lichen",
           "tokens": "auto"
         },
         "apex-moss": {
           "canonicalPrefix": "color.option.apex-moss",
-          "colorFamily": "apex-moss",
+          "colorFamily": "appex-moss",
           "tokens": "auto"
         },
         "golden-moss": {
@@ -114,6 +114,16 @@
         "membership-yellow": {
           "canonicalPrefix": "color.option.membership-yellow",
           "colorFamily": "membership-yellow",
+          "tokens": "auto"
+        },
+        "golden-yellow": {
+          "canonicalPrefix": "color.option.golden-yellow",
+          "colorFamily": "golden-yellow",
+          "tokens": "auto"
+        },
+        "greyscale": {
+          "canonicalPrefix": "color.option.greyscale",
+          "colorFamily": "greyscale",
           "tokens": "auto"
         },
         "text": {

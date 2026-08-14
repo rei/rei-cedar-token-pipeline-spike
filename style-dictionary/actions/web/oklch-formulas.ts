@@ -42,6 +42,15 @@ export const COLOR_FAMILIES: Record<string, ColorFamily> = {
     wdark: 0.30,
     cdarkMin: 0.0625,
   },
+  'appex-moss': {
+    hue: 116,
+    cmax: 0.192,
+    lo: 0.785,
+    wlight: 0.219,
+    clightMin: 0.03,
+    wdark: 0.46,
+    cdarkMin: 0.045,
+  },
   'blue-spruce-green': {
     hue: 166,
     cmax: 0.10,
@@ -51,86 +60,41 @@ export const COLOR_FAMILIES: Record<string, ColorFamily> = {
     wdark: 0.43,
     cdarkMin: 0.04,
   },
-  'sage-green': {
-    hue: 158,
-    cmax: 0.055,
-    lo: 0.72,
-    wlight: 0.26,
-    clightMin: 0.012,
-    wdark: 0.47,
-    cdarkMin: 0.022,
-  },
-  'natural-grey': {
-    hue: 89,
-    cmax: 0.035,
-    lo: 0.84,
-    wlight: 0.14,
-    clightMin: 0.004,
-    wdark: 0.59,
-    cdarkMin: 0.01,
-  },
-  'warm-grey': {
-    hue: 82,
-    cmax: 0.0185,
-    lo: 0.52,
-    wlight: 0.465,
-    clightMin: 0.0015,
-    wdark: 0.335,
-    cdarkMin: 0.005,
-  },
-  'sale-red': {
-    hue: 39,
-    cmax: 0.19,
-    lo: 0.54,
-    wlight: 0.44,
+  'error-red': {
+    hue: 30,
+    cmax: 0.185,
+    lo: 0.53,
+    wlight: 0.46,
     clightMin: 0.015,
-    wdark: 0.315,
-    cdarkMin: 0.045,
-  },
-  'membership-text': {
-    hue: 173,
-    cmax: 0.13,
-    lo: 0.62,
-    wlight: 0.36,
-    clightMin: 0.01,
-    wdark: 0.3433,
-    cdarkMin: 0.03,
-  },
-  'lichen': {
-    hue: 120,
-    cmax: 0.22,
-    lo: 0.8792,
-    wlight: 0.1008,
-    clightMin: 0.05,
-    wdark: 0.6292,
-    cdarkMin: 0.05,
-  },
-  'apex-moss': {
-    hue: 116,
-    cmax: 0.20,
-    lo: 0.76,
-    wlight: 0.2393,
-    clightMin: 0.03,
-    wdark: 0.52,
-    cdarkMin: 0.0625,
+    wdark: 0.2432,
+    cdarkMin: 0.08,
   },
   'golden-moss': {
     hue: 104,
     cmax: 0.1355,
     lo: 0.755,
-    wlight: 0.225,
+    wlight: 0.23,
     clightMin: 0.006,
-    wdark: 0.377,
+    wdark: 0.46,
+    cdarkMin: 0.03,
+  },
+  'golden-yellow': {
+    hue: 78,
+    cmax: 0.175,
+    lo: 0.82,
+    wlight: 0.15,
+    clightMin: 0.0015,
+    wdark: 0.62,
     cdarkMin: 0.04,
   },
-  'membership-yellow': {
-    hue: 95,
-    cmax: 0.20,
-    lo: 0.86,
-    wlight: 0.12,
-    clightMin: 0.0115,
-    wdark: 0.61,
-    cdarkMin: 0.05,
+  'highlight-lichen': {
+    hue: 120,
+    cmax: 0.22,
+    lo: 0.8825,
+    wlight: 0.1008,
+    clightMin: 0.05,
+    wdark: 0.4895,
+    cdarkMin: 0.06,
   },
   'info-blue': {
     hue: 200,
@@ -141,6 +105,51 @@ export const COLOR_FAMILIES: Record<string, ColorFamily> = {
     wdark: 0.30,
     cdarkMin: 0.03,
   },
+  'membership-text': {
+    hue: 173,
+    cmax: 0.13,
+    lo: 0.62,
+    wlight: 0.36,
+    clightMin: 0.01,
+    wdark: 0.3433,
+    cdarkMin: 0.03,
+  },
+  'membership-yellow': {
+    hue: 95,
+    cmax: 0.20,
+    lo: 0.86,
+    wlight: 0.12,
+    clightMin: 0.0115,
+    wdark: 0.61,
+    cdarkMin: 0.05,
+  },
+  'natural-grey': {
+    hue: 89,
+    cmax: 0.035,
+    lo: 0.84,
+    wlight: 0.14,
+    clightMin: 0.004,
+    wdark: 0.59,
+    cdarkMin: 0.01,
+  },
+  'new-sale-red': {
+    hue: 39,
+    cmax: 0.19,
+    lo: 0.54,
+    wlight: 0.44,
+    clightMin: 0.015,
+    wdark: 0.315,
+    cdarkMin: 0.045,
+  },
+  'sage-green': {
+    hue: 158,
+    cmax: 0.055,
+    lo: 0.72,
+    wlight: 0.26,
+    clightMin: 0.012,
+    wdark: 0.47,
+    cdarkMin: 0.022,
+  },
   'success-green': {
     hue: 146,
     cmax: 0.1154,
@@ -150,25 +159,53 @@ export const COLOR_FAMILIES: Record<string, ColorFamily> = {
     wdark: 0.3803,
     cdarkMin: 0.005,
   },
+  'warm-grey': {
+    hue: 82,
+    cmax: 0.0185,
+    lo: 0.52,
+    wlight: 0.465,
+    clightMin: 0.0015,
+    wdark: 0.335,
+    cdarkMin: 0.005,
+  },
   'warning-yellow': {
     hue: 92,
     cmax: 0.155,
-    lo: 0.53,
+    lo: 0.665,
     wlight: 0.33,
     clightMin: 0.012,
-    wdark: 0.29,
+    wdark: 0.38,
     cdarkMin: 0.04,
   },
-  'error-red': {
-    hue: 30,
-    cmax: 0.185,
-    lo: 0.46,
-    wlight: 0.46,
-    clightMin: 0.015,
-    wdark: 0.2432,
-    cdarkMin: 0.08,
+  'greyscale': {
+    hue: 89.88,
+    cmax: 0,
+    lo: 0.5,
+    wlight: 0.48,
+    clightMin: 0,
+    wdark: 0.3,
+    cdarkMin: 0,
   },
 };
+
+/**
+ * Legacy aliases for color family names that changed in the v1.8 Figma update.
+ * Keeps existing token schema/tokens resolving while the canonical names move
+ * to the new design vocabulary.
+ */
+export const COLOR_FAMILY_ALIASES: Record<string, string> = {
+  'lichen': 'highlight-lichen',
+  'apex-moss': 'appex-moss',
+  'sale-red': 'new-sale-red',
+};
+
+/**
+ * Resolve a color family by its canonical or legacy alias name.
+ */
+export function resolveColorFamily(name?: string): ColorFamily | undefined {
+  if (!name) return undefined;
+  return COLOR_FAMILIES[name] ?? COLOR_FAMILIES[COLOR_FAMILY_ALIASES[name]];
+}
 
 /**
  * Calculate chroma at a given lightness using the design spec formula
@@ -203,21 +240,30 @@ function formatNumber(value: number, precision: number): string {
 }
 
 /**
- * Convert hex to OKLCH using custom design spec formulas.
+ * Format number with fixed decimal places, handling -0
+ */
+function formatFixed(value: number, precision: number): string {
+  const rounded = Number(value.toFixed(precision));
+  if (Object.is(rounded, -0) || rounded === 0) {
+    return (0).toFixed(precision);
+  }
+  return rounded.toFixed(precision);
+}
+
+/**
+ * Convert hex to OKLCH.
  *
- * Resolution tiers:
- *   1. If colorFamily is provided and found in COLOR_FAMILIES → use culori hex→L
- *      plus the parabolic chroma formula with the family's fixed hue.
- *   2. If colorFamily is provided but NOT found → log a warning and fall back
- *      to culori's default OKLCH conversion (no custom chroma).
- *   3. If colorFamily is omitted → culori passthrough (Storybook, previews, etc.)
+ * Returns the actual culori OKLCH values for the hex color. This ensures the
+ * generated OKLCH strings match the design-provided reference list exactly.
+ * For neutral greyscale colors (chroma effectively zero) the family hue is used
+ * so the hue component stays deterministic and matches the reference list.
  *
  * @param hex - The hex color value to convert
  * @param colorFamily - The color family name from token schema (e.g., 'warm-grey', 'alpine-lake-blue').
- *                      If not provided, falls back to culori's default conversion.
+ *                      If not provided, the family hue is still used for neutrals when available.
  */
 export function hexToCustomOklch(hex: string, colorFamily?: string): string {
-  const family = colorFamily ? COLOR_FAMILIES[colorFamily] : undefined;
+  const family = resolveColorFamily(colorFamily);
 
   if (colorFamily && !family) {
     console.warn(
@@ -226,7 +272,6 @@ export function hexToCustomOklch(hex: string, colorFamily?: string): string {
     );
   }
 
-  // Parse hex via culori (needed for L and alpha detection)
   const parsed = parse(hex);
   if (!parsed) {
     throw new Error(`[oklch] Could not parse color value "${hex}".`);
@@ -238,29 +283,26 @@ export function hexToCustomOklch(hex: string, colorFamily?: string): string {
     throw new Error(`[oklch] Could not convert color value "${hex}" to oklch().`);
   }
 
-  // Handle alpha if present
   const alpha = typeof oklch.alpha === 'number' && oklch.alpha < 1
     ? ` / ${formatNumber(Math.min(1, Math.max(0, oklch.alpha)), 3)}`
     : '';
 
-  if (!family) {
-    // Culori passthrough — no custom chroma
-    const lightness = formatNumber(Math.min(100, Math.max(0, oklch.l * 100)), 3);
-    const chroma = formatNumber(Math.max(0, oklch.c), 4);
-    const hue = typeof oklch.h === 'number' && Number.isFinite(oklch.h)
-      ? formatNumber(((oklch.h % 360) + 360) % 360, 2)
-      : '0';
+  const l = Math.min(1, Math.max(0, oklch.l));
+  const c = Math.max(0, oklch.c);
+  let h = oklch.h ?? 0;
 
-    return `oklch(${lightness}% ${chroma} ${hue}${alpha})`;
+  // For neutral greys, use the family hue so the output is deterministic and
+  // matches the reference list (chroma is zero so hue has no visual effect).
+  if (family && c < 1e-6) {
+    h = family.hue;
+  }
+  if (!Number.isFinite(h)) {
+    h = family?.hue ?? 0;
   }
 
-  // Custom formula path: culori L + parabolic chroma + fixed hue
-  const l = oklch.l;
-  const chroma = calculateChroma(l, family);
+  const lightness = formatFixed(l, 4);
+  const chroma = formatFixed(c, 4);
+  const hue = formatFixed((((h % 360) + 360) % 360), 2);
 
-  const lightness = formatNumber(Math.min(100, Math.max(0, l * 100)), 3);
-  const chromaFormatted = formatNumber(chroma, 4);
-  const hue = formatNumber(family.hue, 2);
-
-  return `oklch(${lightness}% ${chromaFormatted} ${hue}${alpha})`;
+  return `oklch(${lightness} ${chroma} ${hue}${alpha})`;
 }

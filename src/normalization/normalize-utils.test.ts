@@ -183,7 +183,7 @@ describe("clean", () => {
     const map = new Map<string, string>();
     const input = { sm: FIGMA_LEAF(8, "dimension") };
     const result = clean(input, map) as Record<string, unknown>;
-    expect(result.sm).toEqual({ $value: "8", $type: "dimension" });
+    expect(result.sm).toEqual({ $value: 8, $type: "dimension" });
   });
 
   it("preserves string $value for fontFamily tokens", () => {
@@ -197,7 +197,7 @@ describe("clean", () => {
     const map = new Map<string, string>();
     const input = { visible: FIGMA_LEAF(true, "boolean") };
     const result = clean(input, map) as Record<string, unknown>;
-    expect(result.visible).toEqual({ $value: "true", $type: "boolean" });
+    expect(result.visible).toEqual({ $value: true, $type: "boolean" });
   });
 
   it("rewrites bare color alias references with the section prefix", () => {
@@ -214,7 +214,7 @@ describe("clean", () => {
     };
     const result = clean(input, map) as Record<string, Record<string, Record<string, unknown>>>;
     expect(result.color.surface.base).toEqual({
-      $value: "{color.neutral-palette.base-neutrals.white}",
+      $value: "{color.neutral.palette.base.neutrals.white}",
       $type: "color",
     });
   });
@@ -227,7 +227,7 @@ describe("clean", () => {
     };
     const result = clean(input, map) as Record<string, Record<string, unknown>>;
     expect((result.text.link as Record<string, unknown>).$value).toBe(
-      "{color.brand-palette.blue.600}",
+      "{color.brand.palette.blue.600}",
     );
   });
 
@@ -277,7 +277,7 @@ describe("clean", () => {
 
     const result = clean(input, map) as Record<string, Record<string, Record<string, unknown>>>;
     expect(result.text.link).toEqual({
-      $value: "{brand-palette.blue.600}",
+      $value: "{brand.palette.blue.600}",
       $type: "color",
       $extensions: {
         cedar: {
@@ -935,7 +935,7 @@ describe("clean + nestUnderSections + deepMerge integration", () => {
       string,
       unknown
     >;
-    expect(defaultTextLink.$value).toBe("{color.brand-palette.blue.600}");
+    expect(defaultTextLink.$value).toBe("{color.brand.palette.blue.600}");
     expect(defaultTextLink.$extensions).toBeUndefined();
 
     // sale mode has both text and surface
@@ -971,9 +971,9 @@ describe("fixStaticReferencePaths", () => {
     expect(fixStaticReferencePaths("{spacing.static.sm}")).toBe("{spacing.static.sm}");
   });
 
-  it("passes through non-spacing references unchanged", () => {
+  it("rewrites color family references with hyphens to dots", () => {
     expect(fixStaticReferencePaths("{color.option.warm-grey.100}")).toBe(
-      "{color.option.warm-grey.100}",
+      "{color.option.warm.grey.100}",
     );
   });
 

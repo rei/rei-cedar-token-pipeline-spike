@@ -63,8 +63,9 @@ export function mergeColorVariants(
   platformLookup: Map<string, Record<string, string>>,
 ) {
   const color = canonical.color as JsonObject | undefined;
+  if (!color) return;
+
   const modes = color?.modes as Record<string, JsonObject> | undefined;
-  if (!modes) return;
 
   const paletteMetadata: Record<
     string,
@@ -143,69 +144,81 @@ export function mergeColorVariants(
     }
   }
 
-  for (const [modeName, modeTree] of Object.entries(modes)) {
-    const meta = paletteMetadata[modeName] ?? {
-      scope: "surface" as const,
-      inheritsFrom: "default",
-      cssAttribute: "data-palette",
-    };
+  function resolveAliasToken(token: JsonObject) {
+    const aliasRef = token.$value;
+    if (typeof aliasRef !== "string" || !aliasRef.startsWith("{")) return;
 
-    const modeTreeObject = modeTree as JsonObject & {
-      $extensions?: { cedar?: JsonObject & { $meta?: unknown } };
-    };
-    modeTreeObject.$extensions = modeTreeObject.$extensions ?? {};
-    modeTreeObject.$extensions.cedar = modeTreeObject.$extensions.cedar ?? {};
-    modeTreeObject.$extensions.cedar.$meta = meta;
+    const canonicalPath = aliasRef.slice(1, -1);
+    if (!canonicalPath.startsWith("color.option.")) return;
 
-    walkSemanticTree(modeTree, (token) => {
-      const aliasRef = token.$value;
-      if (typeof aliasRef !== "string" || !aliasRef.startsWith("{")) return;
+    const platformRefs: Record<string, Record<string, string>> = {};
 
-      const canonicalPath = aliasRef.slice(1, -1);
-      if (!canonicalPath.startsWith("color.option.")) return;
+    for (const [platformKey, lookup] of platformLookup.entries()) {
+      if (!(canonicalPath in lookup)) continue;
 
-      const platformRefs: Record<string, Record<string, string>> = {};
+      const hyphenIdx = platformKey.indexOf("-");
+      const platform = hyphenIdx !== -1 ? platformKey.slice(0, hyphenIdx) : platformKey;
+      const appearance = hyphenIdx !== -1 ? platformKey.slice(hyphenIdx + 1) : "default";
 
-      for (const [platformKey, lookup] of platformLookup.entries()) {
-        if (!(canonicalPath in lookup)) continue;
+      if (!platformRefs[platform]) platformRefs[platform] = {};
+      platformRefs[platform][appearance] = canonicalPath;
+    }
 
-        const hyphenIdx = platformKey.indexOf("-");
-        const platform = hyphenIdx !== -1 ? platformKey.slice(0, hyphenIdx) : platformKey;
-        const appearance = hyphenIdx !== -1 ? platformKey.slice(hyphenIdx + 1) : "default";
+    if (Object.keys(platformRefs).length === 0) {
+      console.warn(
+        `[mergeColorVariants] No platform references found for "${canonicalPath}". ` +
+          `Check src/schema/token-schema.json (inputs.figma.collections) and options.color.*.json files.`,
+      );
+      return;
+    }
 
-        if (!platformRefs[platform]) platformRefs[platform] = {};
-        platformRefs[platform][appearance] = canonicalPath;
+    const tokenWithExtensions = token as JsonObject & { $extensions?: { cedar?: JsonObject } };
+    tokenWithExtensions.$extensions = tokenWithExtensions.$extensions ?? {};
+    tokenWithExtensions.$extensions.cedar = tokenWithExtensions.$extensions.cedar ?? {};
+    Object.assign(tokenWithExtensions.$extensions.cedar, platformRefs);
+
+    const resolved: Record<string, Record<string, string>> = {};
+
+    for (const [platform, appearances] of Object.entries(platformRefs)) {
+      for (const [appearance, optionPath] of Object.entries(appearances)) {
+        const optionNode = getNodeAt(optionPath);
+        const resolvedValue = resolveOptionValue(optionNode, platform, appearance);
+        if (!resolvedValue) continue;
+
+        resolved[platform] = resolved[platform] ?? {};
+        resolved[platform][appearance] = resolvedValue;
       }
+    }
 
-      if (Object.keys(platformRefs).length === 0) {
-        console.warn(
-          `[mergeColorVariants] No platform references found for "${canonicalPath}". ` +
-            `Check src/schema/token-schema.json (inputs.figma.collections) and options.color.*.json files.`,
-        );
-        return;
-      }
+    if (Object.keys(resolved).length > 0) {
+      tokenWithExtensions.$extensions.cedar.resolved = resolved;
+    }
+  }
 
-      const tokenWithExtensions = token as JsonObject & { $extensions?: { cedar?: JsonObject } };
-      tokenWithExtensions.$extensions = tokenWithExtensions.$extensions ?? {};
-      tokenWithExtensions.$extensions.cedar = tokenWithExtensions.$extensions.cedar ?? {};
-      Object.assign(tokenWithExtensions.$extensions.cedar, platformRefs);
+  if (modes) {
+    for (const [modeName, modeTree] of Object.entries(modes)) {
+      const meta = paletteMetadata[modeName] ?? {
+        scope: "surface" as const,
+        inheritsFrom: "default",
+        cssAttribute: "data-palette",
+      };
 
-      const resolved: Record<string, Record<string, string>> = {};
+      const modeTreeObject = modeTree as JsonObject & {
+        $extensions?: { cedar?: JsonObject & { $meta?: unknown } };
+      };
+      modeTreeObject.$extensions = modeTreeObject.$extensions ?? {};
+      modeTreeObject.$extensions.cedar = modeTreeObject.$extensions.cedar ?? {};
+      modeTreeObject.$extensions.cedar.$meta = meta;
 
-      for (const [platform, appearances] of Object.entries(platformRefs)) {
-        for (const [appearance, optionPath] of Object.entries(appearances)) {
-          const optionNode = getNodeAt(optionPath);
-          const resolvedValue = resolveOptionValue(optionNode, platform, appearance);
-          if (!resolvedValue) continue;
+      walkSemanticTree(modeTree, resolveAliasToken);
+    }
+  }
 
-          resolved[platform] = resolved[platform] ?? {};
-          resolved[platform][appearance] = resolvedValue;
-        }
-      }
+  // Resolve aliases under the semantic-intent shape (color.surface, color.text, etc.)
+  for (const [intentName, intentTree] of Object.entries(color)) {
+    if (intentName === "option" || intentName === "modes") continue;
+    if (!intentTree || typeof intentTree !== "object") continue;
 
-      if (Object.keys(resolved).length > 0) {
-        tokenWithExtensions.$extensions.cedar.resolved = resolved;
-      }
-    });
+    walkSemanticTree(intentTree as JsonObject, resolveAliasToken);
   }
 }

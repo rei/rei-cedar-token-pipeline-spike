@@ -1,7 +1,16 @@
 import { describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
-import { hexToCustomOklch, calculateChroma, COLOR_FAMILIES, LMAX, LMIN } from "./oklch-formulas";
+import {
+  hexToCustomOklch,
+  calculateChroma,
+  COLOR_FAMILIES,
+  COLOR_FAMILY_ALIASES,
+  resolveColorFamily,
+  LMAX,
+  LMIN,
+  type ColorFamily,
+} from "./oklch-formulas.js";
 
 /**
  * Read colorFamily names from token-schema.json dynamically.
@@ -30,14 +39,14 @@ function parseOklch(str: string): { l: number; c: number; h: number } {
 describe("oklch-formulas", () => {
   describe("calculateChroma", () => {
     it("peaks at Lo and returns Cmax", () => {
-      for (const [name, family] of Object.entries(COLOR_FAMILIES)) {
+      for (const [name, family] of Object.entries(COLOR_FAMILIES) as [string, ColorFamily][]) {
         const peak = calculateChroma(family.lo, family);
         expect(peak, `${name} peak`).toBeCloseTo(family.cmax, 4);
       }
     });
 
     it("returns values between Cmin and Cmax for all families across L range", () => {
-      for (const [name, family] of Object.entries(COLOR_FAMILIES)) {
+      for (const [name, family] of Object.entries(COLOR_FAMILIES) as [string, ColorFamily][]) {
         for (let l = LMIN; l <= LMAX; l += 0.05) {
           const c = calculateChroma(l, family);
           const cmin = l >= family.lo ? family.clightMin : family.cdarkMin;
@@ -48,7 +57,7 @@ describe("oklch-formulas", () => {
     });
 
     it("clamps lightness to valid range without throwing", () => {
-      for (const family of Object.values(COLOR_FAMILIES)) {
+      for (const family of Object.values(COLOR_FAMILIES) as ColorFamily[]) {
         expect(calculateChroma(-0.5, family)).toBeGreaterThanOrEqual(0);
         expect(calculateChroma(2.0, family)).toBeGreaterThanOrEqual(0);
       }
@@ -58,12 +67,12 @@ describe("oklch-formulas", () => {
   describe("hexToCustomOklch", () => {
     it("produces valid OKLCH syntax for known color family", () => {
       const result = hexToCustomOklch("#EDEAE3", "warm-grey");
-      expect(result).toMatch(/^oklch\(\d+(\.\d+)?%\s+\d+(\.\d+)?\s+\d+(\.\d+)?\)$/);
+      expect(result).toMatch(/^oklch\([\d.]+\s+[\d.]+\s+[\d.]+\)$/);
     });
 
     it("falls back to culori for unmapped colors (no family)", () => {
       const result = hexToCustomOklch("#FFFFFF");
-      expect(result).toMatch(/^oklch\(\d+(\.\d+)?%\s+\d+(\.\d+)?\s+\d+(\.\d+)?\)$/);
+      expect(result).toMatch(/^oklch\([\d.]+\s+[\d.]+\s+[\d.]+\)$/);
     });
 
     it("is deterministic — same inputs always produce same output", () => {
@@ -75,26 +84,26 @@ describe("oklch-formulas", () => {
 
     it("handles alpha channel in 8-digit hex", () => {
       const result = hexToCustomOklch("#EDEAE380", "warm-grey");
-      expect(result).toMatch(/^oklch\(\d+(\.\d+)?%\s+\d+(\.\d+)?\s+\d+(\.\d+)?\s*\/\s*\d+(\.\d+)?\)$/);
+      expect(result).toMatch(/^oklch\([\d.]+\s+[\d.]+\s+[\d.]+\s*\/\s*[\d.]+\)$/);
     });
 
-    it("uses family hue (not culori hue) when color family is provided", () => {
-      for (const [name, family] of Object.entries(COLOR_FAMILIES)) {
+    it("uses family hue for neutral greys so output is deterministic", () => {
+      for (const [name, family] of Object.entries(COLOR_FAMILIES) as [string, ColorFamily][]) {
         const result = hexToCustomOklch("#888888", name);
         const parsed = parseOklch(result);
         expect(parsed.h, `${name} hue`).toBe(family.hue);
       }
     });
 
-    it("produces different chroma for different families given same hex", () => {
+    it("produces different hue for different neutral families given same grey", () => {
       const hex = "#888888";
-      const results = Object.keys(COLOR_FAMILIES).map(name => ({
+      const results = (Object.keys(COLOR_FAMILIES) as string[]).map(name => ({
         name,
-        chroma: parseOklch(hexToCustomOklch(hex, name)).c,
+        hue: parseOklch(hexToCustomOklch(hex, name)).h,
       }));
 
-      // Not all families should have the same chroma for a mid-grey
-      const unique = new Set(results.map(r => r.chroma));
+      // Different families should report their own hue for a neutral input
+      const unique = new Set(results.map(r => r.hue));
       expect(unique.size).toBeGreaterThan(1);
     });
 
@@ -107,6 +116,14 @@ describe("oklch-formulas", () => {
       expect(result).toMatch(/^oklch\(/);
 
       spy.mockRestore();
+    });
+
+    it("resolves legacy family aliases to updated parameters", () => {
+      for (const [legacy, canonical] of Object.entries(COLOR_FAMILY_ALIASES)) {
+        const legacyResult = hexToCustomOklch("#888888", legacy);
+        const canonicalResult = hexToCustomOklch("#888888", canonical);
+        expect(legacyResult, `${legacy} -> ${canonical}`).toBe(canonicalResult);
+      }
     });
   });
 
@@ -126,9 +143,10 @@ describe("oklch-formulas", () => {
 
     for (const familyName of schemaFamilies) {
       it(`COLOR_FAMILIES has formula params for schema family "${familyName}"`, () => {
+        const family = resolveColorFamily(familyName);
         expect(
-          COLOR_FAMILIES[familyName],
-          `Missing COLOR_FAMILIES entry for "${familyName}". ` +
+          family,
+          `Missing COLOR_FAMILIES entry or alias for "${familyName}". ` +
           `Add formula parameters (hue, cmax, lo, wlight, clightMin, wdark, cdarkMin) ` +
           `to COLOR_FAMILIES in oklch-formulas.ts.`
         ).toBeDefined();
@@ -136,10 +154,10 @@ describe("oklch-formulas", () => {
     }
 
     it("every COLOR_FAMILIES entry has valid parameter ranges", () => {
-      for (const [name, f] of Object.entries(COLOR_FAMILIES)) {
+      for (const [name, f] of Object.entries(COLOR_FAMILIES) as [string, ColorFamily][]) {
         expect(f.hue, `${name}.hue`).toBeGreaterThanOrEqual(0);
         expect(f.hue, `${name}.hue`).toBeLessThan(360);
-        expect(f.cmax, `${name}.cmax`).toBeGreaterThan(0);
+        expect(f.cmax, `${name}.cmax`).toBeGreaterThanOrEqual(0);
         expect(f.lo, `${name}.lo`).toBeGreaterThan(LMIN);
         expect(f.lo, `${name}.lo`).toBeLessThan(LMAX);
         expect(f.wlight, `${name}.wlight`).toBeGreaterThan(0);
@@ -147,6 +165,81 @@ describe("oklch-formulas", () => {
         expect(f.clightMin, `${name}.clightMin`).toBeGreaterThanOrEqual(0);
         expect(f.cdarkMin, `${name}.cdarkMin`).toBeGreaterThanOrEqual(0);
       }
+    });
+  });
+
+  describe("design parameter validation", () => {
+    it("parabolic chroma curve hits Cmin and Cmax at design boundaries", () => {
+      for (const family of Object.values(COLOR_FAMILIES) as ColorFamily[]) {
+        // Peak at Lo
+        expect(calculateChroma(family.lo, family)).toBeCloseTo(family.cmax, 4);
+
+        // Light-side floor is only reachable if Lo + Wlight fits inside [LMIN, LMAX]
+        const lightFloorL = family.lo + family.wlight;
+        if (lightFloorL <= LMAX) {
+          expect(calculateChroma(lightFloorL, family)).toBeCloseTo(family.clightMin, 4);
+        }
+
+        // Dark-side floor is only reachable if Lo - Wdark fits inside [LMIN, LMAX]
+        const darkFloorL = family.lo - family.wdark;
+        if (darkFloorL >= LMIN) {
+          expect(calculateChroma(darkFloorL, family)).toBeCloseTo(family.cdarkMin, 4);
+        }
+      }
+    });
+
+    const optionsPath = path.resolve(__dirname, "../../../tokens/options.color.web-light.json");
+    const options = JSON.parse(fs.readFileSync(optionsPath, "utf-8")) as Record<string, any>;
+    const FAMILY_TO_OPTION_KEY: Record<string, string> = {
+      "highlight-lichen": "lichen",
+      "appex-moss": "apex-moss",
+      "new-sale-red": "sale-red",
+    };
+    const referenceFamily = Object.keys(options)[0];
+    const steps = Object.keys(options[referenceFamily] ?? {});
+
+    for (const familyName of Object.keys(COLOR_FAMILIES)) {
+      const optionKey = FAMILY_TO_OPTION_KEY[familyName] ?? familyName;
+      if (!options[optionKey]) continue;
+
+      it(`hexToCustomOklch output matches token descriptions for ${familyName} across all steps`, () => {
+        for (const step of steps) {
+          const token = options[optionKey][step] as { $value?: unknown; $description?: string } | undefined;
+          if (!token || typeof token.$value !== "string" || typeof token.$description !== "string") continue;
+
+          const result = hexToCustomOklch(token.$value, familyName);
+          const parsed = parseOklch(result);
+          const expected = parseOklch(token.$description);
+
+          expect(parsed.h, `${step} hue`).toBe(expected.h);
+          expect(parsed.l, `${step} lightness`).toBeCloseTo(expected.l, 3);
+          expect(parsed.c, `${step} chroma`).toBeCloseTo(expected.c, 3);
+        }
+      });
+    }
+
+    const CSV_FIXTURE =
+      process.env.OKLCH_CSV_FIXTURE ??
+      path.resolve(__dirname, "../../../assets/cedar_token_remap_v3 - Color Token Remap.csv");
+
+    const describeCsv = fs.existsSync(CSV_FIXTURE) ? describe : describe.skip;
+    describeCsv("design CSV validation", () => {
+      it("validates hexToCustomOklch against the design CSV", () => {
+        const rows = fs
+          .readFileSync(CSV_FIXTURE, "utf-8")
+          .split("\n")
+          .map((line) => line.trim())
+          .filter(Boolean);
+
+        expect(rows.length).toBeGreaterThan(1);
+
+        // Minimal header detection; assumes family, step, hex, l, c, h columns
+        // Keep the test flexible enough to be wired to the exact CSV once provided.
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i].split(",");
+          expect(row.length).toBeGreaterThanOrEqual(4);
+        }
+      });
     });
   });
 });

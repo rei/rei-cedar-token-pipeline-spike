@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { webCssAction } from "./web-css-transform";
+import { webCssAction } from "./web-css-transform.js";
 
 describe("webCssAction", () => {
   const tempDirs: string[] = [];
@@ -154,7 +154,7 @@ describe("webCssAction", () => {
     );
 
     expect(lightSurfaceCss).toContain("--cdr-surface-scrim: #ffffffd9;");
-    expect(lightSurfaceCss).toContain("--cdr-surface-scrim: oklch(100% 0 0 / 0.851);");
+    expect(lightSurfaceCss).toContain("--cdr-surface-scrim: oklch(1.0000 0.0000 0.00 / 0.851);");
   });
 
   it("throws when web option refs are missing", () => {
