@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
-import { hexToCustomOklch, calculateChroma, COLOR_FAMILIES, LMAX, LMIN } from "./oklch-formulas";
+import { hexToCustomOklch, calculateChroma, COLOR_FAMILIES, LMAX, LMIN } from "./oklch-formulas.js";
 
 /**
  * Read colorFamily names from token-schema.json dynamically.

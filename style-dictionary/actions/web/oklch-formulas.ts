@@ -216,18 +216,22 @@ function formatNumber(value: number, precision: number): string {
  * @param colorFamily - The color family name from token schema (e.g., 'warm-grey', 'alpine-lake-blue').
  *                      If not provided, falls back to culori's default conversion.
  */
-export function hexToCustomOklch(hex: string, colorFamily?: string): string {
+export function buildCustomOklch(
+  hex: string,
+  colorFamily?: string
+): { mode: 'oklch'; l: number; c: number; h: number; alpha?: number } {
   const family = colorFamily ? COLOR_FAMILIES[colorFamily] : undefined;
 
   if (colorFamily && !family) {
     console.warn(
       `[oklch] Unknown color family "${colorFamily}". ` +
-      `Add an entry to COLOR_FAMILIES in oklch-formulas.ts. Falling back to culori default.`
+        `Add an entry to COLOR_FAMILIES in oklch-formulas.ts. Falling back to culori default.`
     );
   }
 
   // Parse hex via culori (needed for L and alpha detection)
   const parsed = parse(hex);
+
   if (!parsed) {
     throw new Error(`[oklch] Could not parse color value "${hex}".`);
   }
@@ -238,29 +242,60 @@ export function hexToCustomOklch(hex: string, colorFamily?: string): string {
     throw new Error(`[oklch] Could not convert color value "${hex}" to oklch().`);
   }
 
-  // Handle alpha if present
-  const alpha = typeof oklch.alpha === 'number' && oklch.alpha < 1
-    ? ` / ${formatNumber(Math.min(1, Math.max(0, oklch.alpha)), 3)}`
-    : '';
+  // Only carry alpha when it differs from fully opaque
+  const rawAlpha = typeof oklch.alpha === 'number' ? oklch.alpha : undefined;
+  const alpha = rawAlpha !== undefined && rawAlpha < 1 ? rawAlpha : undefined;
 
   if (!family) {
     // Culori passthrough — no custom chroma
-    const lightness = formatNumber(Math.min(100, Math.max(0, oklch.l * 100)), 3);
-    const chroma = formatNumber(Math.max(0, oklch.c), 4);
-    const hue = typeof oklch.h === 'number' && Number.isFinite(oklch.h)
-      ? formatNumber(((oklch.h % 360) + 360) % 360, 2)
-      : '0';
+    const hue =
+      typeof oklch.h === 'number' && Number.isFinite(oklch.h)
+        ? ((oklch.h % 360) + 360) % 360
+        : 0;
 
-    return `oklch(${lightness}% ${chroma} ${hue}${alpha})`;
+    return {
+      mode: 'oklch',
+      l: oklch.l,
+      c: oklch.c,
+      h: hue,
+      alpha,
+    };
   }
 
   // Custom formula path: culori L + parabolic chroma + fixed hue
-  const l = oklch.l;
-  const chroma = calculateChroma(l, family);
+  return {
+    mode: 'oklch',
+    l: oklch.l,
+    c: calculateChroma(oklch.l, family),
+    h: family.hue,
+    alpha,
+  };
+}
 
-  const lightness = formatNumber(Math.min(100, Math.max(0, l * 100)), 3);
-  const chromaFormatted = formatNumber(chroma, 4);
-  const hue = formatNumber(family.hue, 2);
+/**
+ * Convert hex to OKLCH using custom design spec formulas.
+ *
+ * Resolution tiers:
+ *   1. If colorFamily is provided and found in COLOR_FAMILIES → use culori hex→L
+ *      plus the parabolic chroma formula with the family's fixed hue.
+ *   2. If colorFamily is provided but NOT found → log a warning and fall back
+ *      to culori's default OKLCH conversion (no custom chroma).
+ *   3. If colorFamily is omitted → culori passthrough (Storybook, previews, etc.)
+ *
+ * @param hex - The hex color value to convert
+ * @param colorFamily - The color family name from token schema (e.g., 'warm-grey', 'alpine-lake-blue').
+ *                      If not provided, falls back to culori's default conversion.
+ */
+export function hexToCustomOklch(hex: string, colorFamily?: string): string {
+  const color = buildCustomOklch(hex, colorFamily);
 
-  return `oklch(${lightness}% ${chromaFormatted} ${hue}${alpha})`;
+  const lightness = formatNumber(Math.min(100, Math.max(0, color.l * 100)), 3);
+  const chroma = formatNumber(Math.max(0, color.c), 4);
+  const hue = formatNumber(color.h, 2);
+  const alpha =
+    typeof color.alpha === 'number'
+      ? ` / ${formatNumber(Math.min(1, Math.max(0, color.alpha)), 3)}`
+      : '';
+
+  return `oklch(${lightness}% ${chroma} ${hue}${alpha})`;
 }

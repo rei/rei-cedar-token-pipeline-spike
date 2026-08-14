@@ -22,12 +22,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Action } from "style-dictionary/types";
-import { hexToCustomOklch } from "./oklch-formulas";
+import { hexToCustomOklch } from "./oklch-formulas.js";
 import {
   type CedarOptionNode,
   getTokenAtPath,
   resolveOptionHex,
-} from "../../utils/option-resolver";
+} from "../../utils/option-resolver.js";
 
 function formatOklch(hex: string, colorFamily?: string): string {
   return hexToCustomOklch(hex, colorFamily);

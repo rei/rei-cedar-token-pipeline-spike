@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { iosColorsetFormatter } from './ios-colorset';
+import { iosColorsetFormatter } from './ios-colorset.js';
 
 describe('iosColorsetFormatter', () => {
   it('formats light and dark display-p3 values into an Xcode colorset', () => {

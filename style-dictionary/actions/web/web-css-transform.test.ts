@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { webCssAction } from "./web-css-transform";
+import { webCssAction } from "./web-css-transform.js";
 
 describe("webCssAction", () => {
   const tempDirs: string[] = [];
@@ -39,7 +39,7 @@ describe("webCssAction", () => {
       tokens: {},
     };
 
-    webCssAction.do?.(dictionary as any, { buildPath } as any);
+    webCssAction.do?.(dictionary as any, { buildPath } as any, {} as never, {} as never);
 
     expect(warnSpy).toHaveBeenCalledWith(
       expect.stringContaining("unknown semantic color category")
@@ -71,7 +71,7 @@ describe("webCssAction", () => {
       tokens: {},
     };
 
-    webCssAction.do?.(dictionary as any, { buildPath } as any);
+    webCssAction.do?.(dictionary as any, { buildPath } as any, {} as never, {} as never);
 
     const lightIndex = fs.readFileSync(path.join(buildPath, "cdr-light.css"), "utf8");
     const darkIndex = fs.readFileSync(path.join(buildPath, "cdr-dark.css"), "utf8");
@@ -106,7 +106,7 @@ describe("webCssAction", () => {
       tokens: {},
     };
 
-    webCssAction.do?.(dictionary as any, { buildPath } as any);
+    webCssAction.do?.(dictionary as any, { buildPath } as any, {} as never, {} as never);
 
     const lightTextCss = fs.readFileSync(
       path.join(buildPath, "light", "cdr-color-text.css"),
@@ -146,7 +146,7 @@ describe("webCssAction", () => {
       tokens: {},
     };
 
-    webCssAction.do?.(dictionary as any, { buildPath } as any);
+    webCssAction.do?.(dictionary as any, { buildPath } as any, {} as never, {} as never);
 
     const lightSurfaceCss = fs.readFileSync(
       path.join(buildPath, "light", "cdr-color-surface.css"),
@@ -175,7 +175,7 @@ describe("webCssAction", () => {
       tokens: {},
     };
 
-    expect(() => webCssAction.do?.(dictionary as any, { buildPath } as any)).toThrow(
+    expect(() => webCssAction.do?.(dictionary as any, { buildPath } as any, {} as never, {} as never)).toThrow(
       "missing $extensions.cedar.web",
     );
   });
@@ -205,7 +205,7 @@ describe("webCssAction", () => {
       tokens: {},
     };
 
-    expect(() => webCssAction.do?.(dictionary as any, { buildPath } as any)).toThrow(
+    expect(() => webCssAction.do?.(dictionary as any, { buildPath } as any, {} as never, {} as never)).toThrow(
       "Expected string refs but got light=object, dark=string",
     );
   });
@@ -264,7 +264,7 @@ describe("webCssAction", () => {
       },
     };
 
-    webCssAction.do?.(dictionary as any, { buildPath } as any);
+    webCssAction.do?.(dictionary as any, { buildPath } as any, {} as never, {} as never);
 
     const darkTextCss = fs.readFileSync(path.join(buildPath, "dark", "cdr-color-text.css"), "utf8");
     expect(darkTextCss).toContain("--cdr-text-link: #abcdef;");
