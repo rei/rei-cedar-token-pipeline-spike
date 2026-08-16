@@ -348,31 +348,62 @@ wide-gamut
 
 Design has provided updated color family parameters for 16 families. These parameters control the parabolic chroma formula used in the OKLCH override.
 
-**Design Source:** See the token remap CSV at `/Users/mhewson/Downloads/cedar_token_remap_v3 - Color Token Remap.csv` for the complete dataset.
+**Design source:** `assets/oklch-parameters-design-june-2026.json` (derived from the design CSV `cedar_token_remap_v3 - Color Token Remap.csv`).
+
+The global lightness range is **Lmax = 0.98** and **Lmin = 0.20**.
 
 ### Parameter Update Context
 
-The spike's current `COLOR_FAMILIES` constant in `oklch-formulas.ts` uses outdated parameters. The new design parameters include:
+`COLOR_FAMILIES` in `style-dictionary/actions/web/oklch-formulas.ts` has been updated to the new design parameters. The implementation also introduces `COLOR_FAMILY_ALIASES` and `resolveColorFamily()` so legacy collection names (`lichen`, `apex-moss`, `sale-red`) resolve to the new canonical families.
 
-- **7 new families**: sage-green, natural-grey, membership-text, lichen, apex-moss, golden-moss, membership-yellow
-- **Updated parameters** for existing families (alpine-lake-blue, blue-spruce-green, success-green, warning-yellow, error-red, sale-red, warm-grey, info-blue)
-- **16 total families** (up from 8 previously)
+- **16 total families**, including the new `golden-yellow` family
+- **New families**: sage-green, natural-grey, membership-text, highlight-lichen, appex-moss, golden-moss, membership-yellow, golden-yellow
+- **Renamed families**: `lichen` → `highlight-lichen`, `apex-moss` → `appex-moss`, `sale-red` → `new-sale-red`
 
 ### Impact on Color Gamut
 
 The updated parameters affect:
-- **Chroma peaks (Cmax)**: Higher Cmax values mean more saturated colors at peak lightness
-- **Lightness at peak (Lo)**: Determines where in the lightness scale the most saturated color appears
-- **Curve width (Wlight/Wdark)**: Controls how quickly chroma fades as you move away from the peak
-- **Chroma floors (Clight-min/Cdark-min)**: Minimum chroma at the extremes of the lightness scale
+- **Chroma peaks (Cmax)**: Higher Cmax values mean more saturated colors at peak lightness.
+- **Lightness at peak (Lo)**: Determines where in the lightness scale the most saturated color appears.
+- **Curve width (Wlight/Wdark)**: Controls how quickly chroma fades as you move away from the peak.
+- **Chroma floors (Clight-min/Cdark-min)**: Minimum chroma at the extremes of the lightness scale.
 
-These parameters directly influence whether colors fall within sRGB gamut or require P3 variants. Higher Cmax values (e.g., lichen at 0.22, sale-red at 0.19) may push colors outside sRGB gamut, requiring P3 variants for iOS.
+These parameters directly influence whether colors fall within sRGB gamut or require P3 variants. Higher Cmax values such as `highlight-lichen` (0.22) and `new-sale-red` (0.19) may push colors outside sRGB gamut, requiring P3 variants for iOS.
 
-### How to Update
+### Updated Parameters
 
-See [culori-overrides.md](./culori-overrides.md) for the complete parameter table and implementation steps. Briefly:
+| Family | Hue | Cmax | Lo | Wlight | Clight-min | Wdark | Cdark-min |
+|--------|-----|------|----|--------|------------|-------|-----------|
+| alpine-lake-blue | 259 | 0.13 | 0.55 | 0.65 | 0.025 | 0.30 | 0.0625 |
+| appex-moss | 116 | 0.192 | 0.785 | 0.219 | 0.03 | 0.46 | 0.045 |
+| blue-spruce-green | 166 | 0.10 | 0.71 | 0.265 | 0.01 | 0.43 | 0.04 |
+| error-red | 30 | 0.185 | 0.53 | 0.46 | 0.015 | 0.2432 | 0.08 |
+| golden-moss | 104 | 0.1355 | 0.755 | 0.23 | 0.006 | 0.46 | 0.03 |
+| golden-yellow | 78 | 0.175 | 0.82 | 0.15 | 0.0015 | 0.62 | 0.04 |
+| highlight-lichen | 120 | 0.22 | 0.8825 | 0.1008 | 0.05 | 0.4895 | 0.06 |
+| info-blue | 200 | 0.0825 | 0.60 | 0.36 | 0.0075 | 0.30 | 0.03 |
+| membership-text | 173 | 0.13 | 0.62 | 0.36 | 0.01 | 0.3433 | 0.03 |
+| membership-yellow | 95 | 0.20 | 0.86 | 0.12 | 0.0115 | 0.61 | 0.05 |
+| natural-grey | 89 | 0.035 | 0.84 | 0.14 | 0.004 | 0.59 | 0.01 |
+| new-sale-red | 39 | 0.19 | 0.54 | 0.44 | 0.015 | 0.315 | 0.045 |
+| sage-green | 158 | 0.055 | 0.72 | 0.26 | 0.012 | 0.47 | 0.022 |
+| success-green | 146 | 0.1154 | 0.5803 | 0.4097 | 0.015 | 0.3803 | 0.005 |
+| warm-grey | 82 | 0.0185 | 0.52 | 0.465 | 0.0015 | 0.335 | 0.005 |
+| warning-yellow | 92 | 0.155 | 0.665 | 0.33 | 0.012 | 0.38 | 0.04 |
 
-1. Update `COLOR_FAMILIES` in `style-dictionary/actions/web/oklch-formulas.ts`
-2. Add the 7 new families
-3. Run tests to validate
-4. Verify generated OKLCH values match design dataset
+### How to Validate
+
+See [culori-overrides.md](./culori-overrides.md) for the implementation details. To verify the math:
+
+```bash
+pnpm test style-dictionary/actions/web/oklch-formulas.test.ts
+pnpm run tokens:normalize
+```
+
+The test suite checks parabolic chroma boundaries and that `hexToCustomOklch` returns the family hue and formula-computed chroma for every step in `tokens/options.color.web-light.json`.
+
+### Gamut Implications
+
+- `highlight-lichen` and `new-sale-red` have the highest Cmax values; their dark and light extremes should be reviewed on P3 displays.
+- `golden-yellow` (Cmax 0.175, Hue 78) may also exceed sRGB at peak lightness and should be reviewed.
+- Low-chroma families such as `warm-grey` and `natural-grey` stay within sRGB by design.

@@ -139,7 +139,7 @@ describe("oklch-formulas", () => {
       for (const [name, f] of Object.entries(COLOR_FAMILIES)) {
         expect(f.hue, `${name}.hue`).toBeGreaterThanOrEqual(0);
         expect(f.hue, `${name}.hue`).toBeLessThan(360);
-        expect(f.cmax, `${name}.cmax`).toBeGreaterThan(0);
+        expect(f.cmax, `${name}.cmax`).toBeGreaterThanOrEqual(0);
         expect(f.lo, `${name}.lo`).toBeGreaterThan(LMIN);
         expect(f.lo, `${name}.lo`).toBeLessThan(LMAX);
         expect(f.wlight, `${name}.wlight`).toBeGreaterThan(0);

@@ -1,0 +1,6 @@
+:root {
+  --cdr-icon-neutral-bold: #979187;
+  --cdr-icon-neutral-bold: oklch(0.6589 0.0162 80.68);
+  --cdr-icon-neutral-disabled: #e0ded9;
+  --cdr-icon-neutral-disabled: oklch(0.9008 0.0071 88.65);
+}

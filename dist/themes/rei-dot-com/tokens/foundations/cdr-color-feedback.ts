@@ -13,7 +13,7 @@ export const CdrColorFeedback = {
   CdrColorFeedbackSuccessBold: "#d7f0d7",
   CdrColorFeedbackSuccessFaint: "#eefbee",
   CdrColorFeedbackWarningBold: "#f7e7b9",
-  CdrColorFeedbackWarningFaint: "#fdf7e2",
+  CdrColorFeedbackWarningFaint: "#fef7e1",
 } as const;
 
 // Individual named exports for backward compatibility
@@ -29,4 +29,4 @@ export const CdrColorFeedbackOnInfo = "#3d6db9";
 export const CdrColorFeedbackSuccessBold = "#d7f0d7";
 export const CdrColorFeedbackSuccessFaint = "#eefbee";
 export const CdrColorFeedbackWarningBold = "#f7e7b9";
-export const CdrColorFeedbackWarningFaint = "#fdf7e2";
+export const CdrColorFeedbackWarningFaint = "#fef7e1";
