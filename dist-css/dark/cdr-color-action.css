@@ -1,22 +1,22 @@
 :root {
   --cdr-action-brand-faint: #f1f9f5;
-  --cdr-action-brand-faint: oklch(0.9750 0.0099 164.87);
+  --cdr-action-brand-faint: oklch(97.5% 0.0099 164.87);
   --cdr-action-on-brand: #fcfcfb;
-  --cdr-action-on-brand: oklch(0.9908 0.0013 106.42);
+  --cdr-action-on-brand: oklch(99.079% 0.0013 106.42);
   --cdr-action-on-neutral: #605a4f;
-  --cdr-action-on-neutral: oklch(0.4699 0.0189 82.75);
+  --cdr-action-on-neutral: oklch(46.987% 0.0189 82.75);
   --cdr-action-on-link: #3d6db9;
-  --cdr-action-on-link: oklch(0.5389 0.1305 259.24);
+  --cdr-action-on-link: oklch(53.893% 0.1305 259.24);
   --cdr-action-edge-brand: #1a533f;
-  --cdr-action-edge-brand: oklch(0.3990 0.0685 166.27);
+  --cdr-action-edge-brand: oklch(39.897% 0.0685 166.27);
   --cdr-action-edge-neutral: #b4afa6;
-  --cdr-action-edge-neutral: oklch(0.7556 0.0139 82.40);
+  --cdr-action-edge-neutral: oklch(75.555% 0.0139 82.4);
   --cdr-action-edge-inverse: #4c473e;
-  --cdr-action-edge-inverse: oklch(0.4000 0.0161 82.35);
+  --cdr-action-edge-inverse: oklch(39.995% 0.0161 82.35);
   --cdr-action-neutral-faint: #fcfcfb;
-  --cdr-action-neutral-faint: oklch(0.9908 0.0013 106.42);
+  --cdr-action-neutral-faint: oklch(99.079% 0.0013 106.42);
   --cdr-action-sale: #c33400;
-  --cdr-action-sale: oklch(0.5409 0.1863 35.77);
+  --cdr-action-sale: oklch(54.094% 0.1863 35.77);
   --cdr-action-inverse: #605a4f;
-  --cdr-action-inverse: oklch(0.4699 0.0189 82.75);
+  --cdr-action-inverse: oklch(46.987% 0.0189 82.75);
 }

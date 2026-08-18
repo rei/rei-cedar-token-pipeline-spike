@@ -1,16 +1,16 @@
 :root {
   --cdr-text-brand: #236950;
-  --cdr-text-brand: oklch(0.4697 0.0811 165.86);
+  --cdr-text-brand: oklch(46.968% 0.0811 165.86);
   --cdr-text-inverse: #fcfcfb;
-  --cdr-text-inverse: oklch(0.9908 0.0013 106.42);
+  --cdr-text-inverse: oklch(99.079% 0.0013 106.42);
   --cdr-text-neutral-muted: #c2bdb5;
-  --cdr-text-neutral-muted: oklch(0.8002 0.0125 79.78);
+  --cdr-text-neutral-muted: oklch(80.015% 0.0125 79.78);
   --cdr-text-neutral-bold: #837c71;
-  --cdr-text-neutral-bold: oklch(0.5893 0.0185 79.29);
+  --cdr-text-neutral-bold: oklch(58.926% 0.0185 79.29);
   --cdr-text-neutral-emphasis: #171613;
-  --cdr-text-neutral-emphasis: oklch(0.2002 0.0061 91.64);
+  --cdr-text-neutral-emphasis: oklch(20.017% 0.0061 91.64);
   --cdr-text-success: #589b5e;
-  --cdr-text-success: oklch(0.6289 0.1134 146.05);
+  --cdr-text-success: oklch(62.892% 0.1134 146.05);
   --cdr-text-warning: #715700;
-  --cdr-text-warning: oklch(0.4704 0.0961 88.46);
+  --cdr-text-warning: oklch(47.036% 0.0961 88.46);
 }

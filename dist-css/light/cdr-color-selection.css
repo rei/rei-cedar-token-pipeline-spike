@@ -1,10 +1,10 @@
 :root {
   --cdr-selection-neutral-faint: #f7f7f5;
-  --cdr-selection-neutral-faint: oklch(0.9756 0.0026 106.45);
+  --cdr-selection-neutral-faint: oklch(97.558% 0.0026 106.45);
   --cdr-selection-neutral-bold: #eae7e4;
-  --cdr-selection-neutral-bold: oklch(0.9295 0.0052 67.76);
+  --cdr-selection-neutral-bold: oklch(92.946% 0.0052 67.76);
   --cdr-selection-on-neutral-bold: #837c71;
-  --cdr-selection-on-neutral-bold: oklch(0.5893 0.0185 79.29);
+  --cdr-selection-on-neutral-bold: oklch(58.926% 0.0185 79.29);
   --cdr-selection-edge-neutral: #605a4f;
-  --cdr-selection-edge-neutral: oklch(0.4699 0.0189 82.75);
+  --cdr-selection-edge-neutral: oklch(46.987% 0.0189 82.75);
 }
