@@ -1,0 +1,549 @@
+{
+  "prominence": {
+    "flat-x": {
+      "$value": "0",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "flat-x",
+        "description": {
+          "what": "X for flat level",
+          "when": "Use for flat surfaces needing minimal depth"
+        }
+      },
+      "name": "cdr-prominence-flat-x",
+      "attributes": {
+        "category": "prominence",
+        "type": "flat-x",
+        "deprecated": false
+      }
+    },
+    "flat-y": {
+      "$value": "0",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "flat-y",
+        "description": {
+          "what": "Y for flat level",
+          "when": "Use for flat surfaces needing minimal depth"
+        }
+      },
+      "name": "cdr-prominence-flat-y",
+      "attributes": {
+        "category": "prominence",
+        "type": "flat-y",
+        "deprecated": false
+      }
+    },
+    "flat-blur": {
+      "$value": "0",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "flat-blur",
+        "description": {
+          "what": "Blur for flat level",
+          "when": "Use for flat surfaces needing minimal depth"
+        }
+      },
+      "name": "cdr-prominence-flat-blur",
+      "attributes": {
+        "category": "prominence",
+        "type": "flat-blur",
+        "deprecated": false
+      }
+    },
+    "flat-spread": {
+      "$value": "0",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "flat-spread",
+        "description": {
+          "what": "Spread for flat level",
+          "when": "Use for flat surfaces needing minimal depth"
+        }
+      },
+      "name": "cdr-prominence-flat-spread",
+      "attributes": {
+        "category": "prominence",
+        "type": "flat-spread",
+        "deprecated": false
+      }
+    },
+    "flat-color": {
+      "$value": "rgba(46, 46, 43, 0.2)",
+      "$type": "color",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "flat-color",
+        "description": {
+          "what": "Color for flat level",
+          "when": "Use for flat surfaces needing minimal depth"
+        }
+      },
+      "name": "cdr-prominence-flat-color",
+      "attributes": {
+        "category": "prominence",
+        "type": "flat-color",
+        "deprecated": false
+      }
+    },
+    "raised-x": {
+      "$value": "0",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "raised-x",
+        "description": {
+          "what": "X for raised level",
+          "when": "Use for raised surfaces needing subtle elevation"
+        }
+      },
+      "name": "cdr-prominence-raised-x",
+      "attributes": {
+        "category": "prominence",
+        "type": "raised-x",
+        "deprecated": false
+      }
+    },
+    "raised-y": {
+      "$value": "0.2rem",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "raised-y",
+        "description": {
+          "what": "Y for raised level",
+          "when": "Use for raised surfaces needing subtle elevation"
+        }
+      },
+      "name": "cdr-prominence-raised-y",
+      "attributes": {
+        "category": "prominence",
+        "type": "raised-y",
+        "deprecated": false
+      }
+    },
+    "raised-blur": {
+      "$value": "0.2rem",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "raised-blur",
+        "description": {
+          "what": "Blur for raised level",
+          "when": "Use for raised surfaces needing subtle elevation"
+        }
+      },
+      "name": "cdr-prominence-raised-blur",
+      "attributes": {
+        "category": "prominence",
+        "type": "raised-blur",
+        "deprecated": false
+      }
+    },
+    "raised-spread": {
+      "$value": "0",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "raised-spread",
+        "description": {
+          "what": "Spread for raised level",
+          "when": "Use for raised surfaces needing subtle elevation"
+        }
+      },
+      "name": "cdr-prominence-raised-spread",
+      "attributes": {
+        "category": "prominence",
+        "type": "raised-spread",
+        "deprecated": false
+      }
+    },
+    "raised-color": {
+      "$value": "rgba(46, 46, 43, 0.2)",
+      "$type": "color",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "raised-color",
+        "description": {
+          "what": "Color for raised level",
+          "when": "Use for raised surfaces needing subtle elevation"
+        }
+      },
+      "name": "cdr-prominence-raised-color",
+      "attributes": {
+        "category": "prominence",
+        "type": "raised-color",
+        "deprecated": false
+      }
+    },
+    "elevated-x": {
+      "$value": "0",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "elevated-x",
+        "description": {
+          "what": "X for elevated level",
+          "when": "Use for elevated surfaces needing medium depth"
+        }
+      },
+      "name": "cdr-prominence-elevated-x",
+      "attributes": {
+        "category": "prominence",
+        "type": "elevated-x",
+        "deprecated": false
+      }
+    },
+    "elevated-y": {
+      "$value": "0.4rem",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "elevated-y",
+        "description": {
+          "what": "Y for elevated level",
+          "when": "Use for elevated surfaces needing medium depth"
+        }
+      },
+      "name": "cdr-prominence-elevated-y",
+      "attributes": {
+        "category": "prominence",
+        "type": "elevated-y",
+        "deprecated": false
+      }
+    },
+    "elevated-blur": {
+      "$value": "0.4rem",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "elevated-blur",
+        "description": {
+          "what": "Blur for elevated level",
+          "when": "Use for elevated surfaces needing medium depth"
+        }
+      },
+      "name": "cdr-prominence-elevated-blur",
+      "attributes": {
+        "category": "prominence",
+        "type": "elevated-blur",
+        "deprecated": false
+      }
+    },
+    "elevated-spread": {
+      "$value": "0",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "elevated-spread",
+        "description": {
+          "what": "Spread for elevated level",
+          "when": "Use for elevated surfaces needing medium depth"
+        }
+      },
+      "name": "cdr-prominence-elevated-spread",
+      "attributes": {
+        "category": "prominence",
+        "type": "elevated-spread",
+        "deprecated": false
+      }
+    },
+    "elevated-color": {
+      "$value": "rgba(46, 46, 43, 0.2)",
+      "$type": "color",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "elevated-color",
+        "description": {
+          "what": "Color for elevated level",
+          "when": "Use for elevated surfaces needing medium depth"
+        }
+      },
+      "name": "cdr-prominence-elevated-color",
+      "attributes": {
+        "category": "prominence",
+        "type": "elevated-color",
+        "deprecated": false
+      }
+    },
+    "floating-x": {
+      "$value": "0",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "floating-x",
+        "description": {
+          "what": "X for floating level",
+          "when": "Use for floating surfaces needing strong depth"
+        }
+      },
+      "name": "cdr-prominence-floating-x",
+      "attributes": {
+        "category": "prominence",
+        "type": "floating-x",
+        "deprecated": false
+      }
+    },
+    "floating-y": {
+      "$value": "0.8rem",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "floating-y",
+        "description": {
+          "what": "Y for floating level",
+          "when": "Use for floating surfaces needing strong depth"
+        }
+      },
+      "name": "cdr-prominence-floating-y",
+      "attributes": {
+        "category": "prominence",
+        "type": "floating-y",
+        "deprecated": false
+      }
+    },
+    "floating-blur": {
+      "$value": "0.8rem",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "floating-blur",
+        "description": {
+          "what": "Blur for floating level",
+          "when": "Use for floating surfaces needing strong depth"
+        }
+      },
+      "name": "cdr-prominence-floating-blur",
+      "attributes": {
+        "category": "prominence",
+        "type": "floating-blur",
+        "deprecated": false
+      }
+    },
+    "floating-spread": {
+      "$value": "0",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "floating-spread",
+        "description": {
+          "what": "Spread for floating level",
+          "when": "Use for floating surfaces needing strong depth"
+        }
+      },
+      "name": "cdr-prominence-floating-spread",
+      "attributes": {
+        "category": "prominence",
+        "type": "floating-spread",
+        "deprecated": false
+      }
+    },
+    "floating-color": {
+      "$value": "rgba(46, 46, 43, 0.2)",
+      "$type": "color",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "floating-color",
+        "description": {
+          "what": "Color for floating level",
+          "when": "Use for floating surfaces needing strong depth"
+        }
+      },
+      "name": "cdr-prominence-floating-color",
+      "attributes": {
+        "category": "prominence",
+        "type": "floating-color",
+        "deprecated": false
+      }
+    },
+    "lifted-x": {
+      "$value": "0",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "lifted-x",
+        "description": {
+          "what": "X for lifted level",
+          "when": "Use for lifted surfaces needing dramatic depth"
+        }
+      },
+      "name": "cdr-prominence-lifted-x",
+      "attributes": {
+        "category": "prominence",
+        "type": "lifted-x",
+        "deprecated": false
+      }
+    },
+    "lifted-y": {
+      "$value": "1.6rem",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "lifted-y",
+        "description": {
+          "what": "Y for lifted level",
+          "when": "Use for lifted surfaces needing dramatic depth"
+        }
+      },
+      "name": "cdr-prominence-lifted-y",
+      "attributes": {
+        "category": "prominence",
+        "type": "lifted-y",
+        "deprecated": false
+      }
+    },
+    "lifted-blur": {
+      "$value": "1.6rem",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "lifted-blur",
+        "description": {
+          "what": "Blur for lifted level",
+          "when": "Use for lifted surfaces needing dramatic depth"
+        }
+      },
+      "name": "cdr-prominence-lifted-blur",
+      "attributes": {
+        "category": "prominence",
+        "type": "lifted-blur",
+        "deprecated": false
+      }
+    },
+    "lifted-spread": {
+      "$value": "0",
+      "$type": "dimension",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "lifted-spread",
+        "description": {
+          "what": "Spread for lifted level",
+          "when": "Use for lifted surfaces needing dramatic depth"
+        }
+      },
+      "name": "cdr-prominence-lifted-spread",
+      "attributes": {
+        "category": "prominence",
+        "type": "lifted-spread",
+        "deprecated": false
+      }
+    },
+    "lifted-color": {
+      "$value": "rgba(46, 46, 43, 0.2)",
+      "$type": "color",
+      "docs": {
+        "type": "shadow",
+        "category": "prominence",
+        "example": "lifted-color",
+        "description": {
+          "what": "Color for lifted level",
+          "when": "Use for lifted surfaces needing dramatic depth"
+        }
+      },
+      "name": "cdr-prominence-lifted-color",
+      "attributes": {
+        "category": "prominence",
+        "type": "lifted-color",
+        "deprecated": false
+      }
+    },
+    "flat": {
+      "$value": "0 0 0 0 rgba(46, 46, 43, 0.2)",
+      "docs": {
+        "type": "prominence",
+        "category": "prominence",
+        "example": "prominence"
+      },
+      "name": "cdr-prominence-flat",
+      "attributes": {
+        "category": "prominence",
+        "type": "flat",
+        "deprecated": false
+      }
+    },
+    "raised": {
+      "$value": "0 0.2rem 0.2rem 0 rgba(46, 46, 43, 0.2)",
+      "docs": {
+        "type": "prominence",
+        "category": "prominence",
+        "example": "prominence"
+      },
+      "name": "cdr-prominence-raised",
+      "attributes": {
+        "category": "prominence",
+        "type": "raised",
+        "deprecated": false
+      }
+    },
+    "elevated": {
+      "$value": "0 0.4rem 0.4rem 0 rgba(46, 46, 43, 0.2)",
+      "docs": {
+        "type": "prominence",
+        "category": "prominence",
+        "example": "prominence"
+      },
+      "name": "cdr-prominence-elevated",
+      "attributes": {
+        "category": "prominence",
+        "type": "elevated",
+        "deprecated": false
+      }
+    },
+    "floating": {
+      "$value": "0 0.8rem 0.8rem 0 rgba(46, 46, 43, 0.2)",
+      "docs": {
+        "type": "prominence",
+        "category": "prominence",
+        "example": "prominence"
+      },
+      "name": "cdr-prominence-floating",
+      "attributes": {
+        "category": "prominence",
+        "type": "floating",
+        "deprecated": false
+      }
+    },
+    "lifted": {
+      "$value": "0 1.6rem 1.6rem 0 rgba(46, 46, 43, 0.2)",
+      "docs": {
+        "type": "prominence",
+        "category": "prominence",
+        "example": "prominence"
+      },
+      "name": "cdr-prominence-lifted",
+      "attributes": {
+        "category": "prominence",
+        "type": "lifted",
+        "deprecated": false
+      }
+    }
+  }
+}
