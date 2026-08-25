@@ -1,0 +1,133 @@
+{
+  "duration": {
+    "1-x": {
+      "$value": "0.10s",
+      "$type": "time",
+      "docs": {
+        "type": "duration",
+        "category": "motion",
+        "example": "duration-1-x",
+        "description": {
+          "what": "Very short animation duration",
+          "when": "Use for micro-interactions",
+          "alternatives": [
+            "0.20s"
+          ]
+        }
+      },
+      "name": "cdr-duration-1-x",
+      "attributes": {
+        "category": "duration",
+        "type": "1-x",
+        "deprecated": false
+      }
+    },
+    "2-x": {
+      "$value": "0.20s",
+      "$type": "time",
+      "docs": {
+        "type": "duration",
+        "category": "motion",
+        "example": "duration-2-x",
+        "description": {
+          "what": "Short animation duration",
+          "when": "Use for quick UI transitions",
+          "alternatives": [
+            "0.30s"
+          ]
+        }
+      },
+      "name": "cdr-duration-2-x",
+      "attributes": {
+        "category": "duration",
+        "type": "2-x",
+        "deprecated": false
+      }
+    },
+    "3-x": {
+      "$value": "0.30s",
+      "$type": "time",
+      "docs": {
+        "type": "duration",
+        "category": "motion",
+        "example": "duration-3-x",
+        "description": {
+          "what": "Medium duration",
+          "when": "Use for standard UI animations",
+          "alternatives": [
+            "0.40s"
+          ]
+        }
+      },
+      "name": "cdr-duration-3-x",
+      "attributes": {
+        "category": "duration",
+        "type": "3-x",
+        "deprecated": false
+      }
+    },
+    "4-x": {
+      "$value": "0.40s",
+      "$type": "time",
+      "docs": {
+        "type": "duration",
+        "category": "motion",
+        "example": "duration-4-x",
+        "description": {
+          "what": "Long duration",
+          "when": "Use for slower transitions",
+          "alternatives": [
+            "0.50s"
+          ]
+        }
+      },
+      "name": "cdr-duration-4-x",
+      "attributes": {
+        "category": "duration",
+        "type": "4-x",
+        "deprecated": false
+      }
+    },
+    "5-x": {
+      "$value": "0.50s",
+      "$type": "time",
+      "docs": {
+        "type": "duration",
+        "category": "motion",
+        "example": "duration-5-x",
+        "description": {
+          "what": "Very long duration",
+          "when": "Use for dramatic or modal transitions",
+          "alternatives": [
+            "0.60s"
+          ]
+        }
+      },
+      "name": "cdr-duration-5-x",
+      "attributes": {
+        "category": "duration",
+        "type": "5-x",
+        "deprecated": false
+      }
+    },
+    "6-x": {
+      "$value": "0.60s",
+      "$type": "time",
+      "docs": {
+        "type": "duration",
+        "category": "motion",
+        "example": "duration-6-x",
+        "description": {
+          "what": "Extra long duration",
+          "when": "Use sparingly for large UI shifts"
+        }
+      },
+      "name": "cdr-duration-6-x",
+      "attributes": {
+        "category": "duration",
+        "type": "6-x",
+        "deprecated": false
+      }
+    }
+  }
+}
