@@ -27,6 +27,10 @@
       "import": "./dist/themes/rei-dot-com/types/index.mjs",
       "default": "./dist/themes/rei-dot-com/types/index.mjs"
     },
+    "./types/base": {
+      "types": "./dist/themes/rei-dot-com/types/base/token-schema.d.ts",
+      "default": "./dist/themes/rei-dot-com/types/base/token-schema.d.ts"
+    },
     "./types/*": {
       "types": "./dist/themes/rei-dot-com/types/foundations/cdr-*.d.ts",
       "import": "./dist/themes/rei-dot-com/types/foundations/cdr-*.mjs",
@@ -40,10 +44,6 @@
     "./json/*": "./dist/themes/rei-dot-com/json/*",
     "./docsite/css": "./dist/themes/docsite/css/cdr-tokens.css",
     "./docsite/scss": "./dist/themes/docsite/scss/cdr-tokens.scss",
-    "./types/base": {
-      "types": "./dist/themes/rei-dot-com/types/base/token-schema.d.ts",
-      "default": "./dist/themes/rei-dot-com/types/base/token-schema.d.ts"
-    },
     "./rei-dot-com/js/*": {
       "types": "./dist/themes/rei-dot-com/js/*.d.ts",
       "import": "./dist/themes/rei-dot-com/js/*.mjs",
@@ -79,7 +79,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "pnpm tokens:build && pnpm postbuild:merge-legacy && pnpm storybook:build",
+    "build": "pnpm tokens:build && pnpm postbuild:merge-legacy && pnpm validate:exports && pnpm storybook:build",
     "lint": "oxlint src",
     "format": "oxfmt --write src",
     "prepare": "husky",
@@ -88,7 +88,7 @@
     "sync:tokens-to-figma": "tsx src/sync/tokens-to-figma.ts",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build -o storybook-static",
-    "build:package": "pnpm tokens:build && pnpm postbuild:merge-legacy",
+    "build:package": "pnpm tokens:build && pnpm postbuild:merge-legacy && pnpm validate:exports",
     "release": "pnpm build:package && pnpm publish --access public",
     "tokens:platforms": "tsx style-dictionary/build.ts",
     "tokens:normalize": "tsx src/normalization/normalize.ts",
@@ -96,6 +96,7 @@
     "tokens:build": "pnpm tokens:normalize && pnpm tokens:sd && pnpm tokens:platforms && pnpm postbuild:normalized",
     "postbuild:normalized": "tsx scripts/postbuild-normalized.js",
     "postbuild:merge-legacy": "node scripts/merge-legacy-dist.js",
+    "validate:exports": "node scripts/validate-package-exports.js",
     "tokens:validate:normalized": "tsx scripts/validate-normalized-json.ts",
     "test:contract": "vitest run src/contract/canonical-contract.test.ts --reporter=verbose",
     "check:canonical": "pnpm tokens:normalize && pnpm test:contract",
