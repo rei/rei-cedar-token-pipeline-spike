@@ -35,18 +35,46 @@ export function getTokenAtPath(tokens: any, dotPath: string): any {
  * Resolution order:
  *   1. $extensions.cedar.platformOverrides.<platform>.<appearance>  (most specific)
  *   2. $extensions.cedar.appearances.<appearance>                    (appearance variant)
- *   3. $value                                                        (web-light fallback)
+ *   3. $value, falling back to `value` only when $value is absent    (DTCG canonical)
+ *
+ * This is the single canonical implementation of option-value resolution.
+ * `src/normalization/color-variants.ts` imports this function directly (rather
+ * than re-implementing the same precedence rules) so the pre-baked
+ * `$extensions.cedar.resolved.*` values written at normalize time always match
+ * what platform actions (ios-color-action.ts, web-css-transform.ts) resolve
+ * at build time. Do not duplicate this logic elsewhere — import it instead.
+ *
+ * `platform`/`appearance` are typed as `string` rather than a literal union
+ * because callers (including the normalization layer) may iterate over
+ * dynamically-derived platform/appearance keys read from the schema.
  */
 export function resolveOptionHex(
   optionNode: CedarOptionNode | undefined,
-  platform: "ios" | "web" | "android",
-  appearance: "light" | "dark"
+  platform: string,
+  appearance: string
 ): string | undefined {
   const cedar = optionNode?.$extensions?.cedar;
   const platformOverride = cedar?.platformOverrides?.[platform]?.[appearance];
-  if (platformOverride) return platformOverride;
-  if (appearance === "dark" && cedar?.appearances?.dark)
+  if (typeof platformOverride === "string") return platformOverride;
+
+  if (appearance === "dark" && typeof cedar?.appearances?.dark === "string") {
     return cedar.appearances.dark;
-  const val = optionNode?.value ?? optionNode?.$value;
-  return typeof val === "string" ? val : undefined;
+  }
+
+  const dtcgValue = optionNode?.$value;
+  const legacyValue = optionNode?.value;
+
+  if (typeof dtcgValue === "string") {
+    if (typeof legacyValue === "string" && legacyValue !== dtcgValue) {
+      console.warn(
+        `[option-resolver] Option token has mismatched "$value" ("${dtcgValue}") and ` +
+          `"value" ("${legacyValue}"). Using "$value" (DTCG canonical field). ` +
+          `Investigate why these diverged — this may indicate a Style Dictionary ` +
+          `transform mutated "value" without updating "$value".`
+      );
+    }
+    return dtcgValue;
+  }
+
+  return typeof legacyValue === "string" ? legacyValue : undefined;
 }
