@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
+import { resolveOptionHex } from "../../style-dictionary/utils/option-resolver.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const schemaPath = path.resolve(__dirname, "../schema/token-schema.json");
@@ -88,24 +89,6 @@ export function mergeColorVariants(
     return cursor as CedarOptionNode;
   }
 
-  function resolveOptionValue(
-    optionNode: CedarOptionNode | undefined,
-    platform: string,
-    appearance: string,
-  ): string | undefined {
-    const cedar = optionNode?.$extensions?.cedar;
-    const platformOverride = cedar?.platformOverrides?.[platform]?.[appearance];
-    if (typeof platformOverride === "string") return platformOverride;
-
-    if (appearance === "dark") {
-      const darkAppearance = cedar?.appearances?.dark;
-      if (typeof darkAppearance === "string") return darkAppearance;
-    }
-
-    const base = optionNode?.$value ?? optionNode?.value;
-    return typeof base === "string" ? base : undefined;
-  }
-
   const webLight = platformLookup.get("web-light") ?? {};
   const webDark = platformLookup.get("web-dark") ?? {};
   const iosLight = platformLookup.get("ios-light") ?? {};
@@ -182,7 +165,7 @@ export function mergeColorVariants(
     for (const [platform, appearances] of Object.entries(platformRefs)) {
       for (const [appearance, optionPath] of Object.entries(appearances)) {
         const optionNode = getNodeAt(optionPath);
-        const resolvedValue = resolveOptionValue(optionNode, platform, appearance);
+        const resolvedValue = resolveOptionHex(optionNode, platform, appearance);
         if (!resolvedValue) continue;
 
         resolved[platform] = resolved[platform] ?? {};
