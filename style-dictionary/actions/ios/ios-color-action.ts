@@ -5,6 +5,7 @@ import { converter } from 'culori';
 import { buildCustomOklch } from '../web/oklch-formulas.js';
 import { iosColorsetFormatter } from '../../formats/ios/ios-colorset.js';
 import { type CedarOptionNode, getTokenAtPath, resolveOptionHex } from '../../utils/option-resolver.js';
+import { formatNumber } from '../../utils/format-number.js';
 
 type CedarPlatformRefs = {
   light: string;
@@ -12,11 +13,6 @@ type CedarPlatformRefs = {
 };
 
 const toP3 = converter('p3');
-
-function formatNumber(value: number, precision: number): string {
-  const rounded = Number(value.toFixed(precision));
-  return String(Object.is(rounded, -0) ? 0 : rounded);
-}
 
 function oklchToP3Components(hex: string, colorFamily?: string) {
   const customOklch = buildCustomOklch(hex, colorFamily);
@@ -26,10 +22,15 @@ function oklchToP3Components(hex: string, colorFamily?: string) {
   }
 
   const clamp = (n: number) => Math.max(0, Math.min(1, n));
-  const r = typeof p3.r === 'number' ? formatNumber(clamp(p3.r), 4) : '0';
-  const g = typeof p3.g === 'number' ? formatNumber(clamp(p3.g), 4) : '0';
-  const b = typeof p3.b === 'number' ? formatNumber(clamp(p3.b), 4) : '0';
-  const alpha = typeof p3.alpha === 'number' ? formatNumber(p3.alpha, 3) : '1.000';
+  const finiteOrZero = (n: unknown) => (typeof n === 'number' && Number.isFinite(n) ? n : 0);
+
+  const r = formatNumber(clamp(finiteOrZero(p3.r)), 4);
+  const g = formatNumber(clamp(finiteOrZero(p3.g)), 4);
+  const b = formatNumber(clamp(finiteOrZero(p3.b)), 4);
+  // culori omits `alpha` for fully-opaque colors — default to 1 rather than a
+  // separately-formatted literal so opaque colors always format identically
+  // regardless of whether the source hex had an explicit alpha channel.
+  const alpha = formatNumber(typeof p3.alpha === 'number' && Number.isFinite(p3.alpha) ? p3.alpha : 1, 3);
 
   return { red: r, green: g, blue: b, alpha };
 }

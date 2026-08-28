@@ -25,7 +25,9 @@ function expectedP3Components(hex: string, colorFamily: string) {
     red: fmt(clamp01(p3.r), 4),
     green: fmt(clamp01(p3.g), 4),
     blue: fmt(clamp01(p3.b), 4),
-    alpha: typeof p3.alpha === "number" ? fmt(p3.alpha, 3) : "1.000",
+    // culori omits `alpha` for fully-opaque colors — default to 1 so opaque
+    // colors format identically regardless of whether alpha was explicit.
+    alpha: fmt(typeof p3.alpha === "number" ? p3.alpha : 1, 3),
   };
 }
 
