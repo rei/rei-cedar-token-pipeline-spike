@@ -1,4 +1,5 @@
 import { parse, converter } from 'culori';
+import { formatNumber } from '../../utils/format-number.js';
 
 const toOklch = converter('oklch');
 
@@ -208,9 +209,17 @@ export function resolveColorFamily(name?: string): ColorFamily | undefined {
 }
 
 /**
- * Calculate chroma at a given lightness using the design spec formula
+ * Calculate chroma at a given lightness using the design spec formula.
+ *
+ * Throws if `l` is not a finite number rather than silently propagating NaN
+ * into the formula (which would otherwise surface as the literal string
+ * "NaN" in generated CSS/JSON output).
  */
 export function calculateChroma(l: number, family: ColorFamily): number {
+  if (!Number.isFinite(l)) {
+    throw new Error(`[oklch] calculateChroma received a non-finite lightness value: ${l}`);
+  }
+
   // Clamp lightness to valid range
   const clampedL = Math.max(LMIN, Math.min(LMAX, l));
 
@@ -229,14 +238,6 @@ export function calculateChroma(l: number, family: ColorFamily): number {
     const chroma = cmin + (family.cmax - cmin) * (1 - normalizedL * normalizedL);
     return Math.max(cmin, chroma);
   }
-}
-
-/**
- * Format number with precision, handling -0
- */
-function formatNumber(value: number, precision: number): string {
-  const rounded = Number(value.toFixed(precision));
-  return String(Object.is(rounded, -0) ? 0 : rounded);
 }
 
 /**
@@ -274,36 +275,50 @@ export function buildCustomOklch(
   }
 
   const oklch = toOklch(parsed) as { l?: number; c?: number; h?: number; alpha?: number } | undefined;
+  const l = oklch?.l;
+  const c = oklch?.c;
 
-  if (!oklch || typeof oklch.l !== 'number' || typeof oklch.c !== 'number') {
-    throw new Error(`[oklch] Could not convert color value "${hex}" to oklch().`);
+  if (typeof l !== 'number' || !Number.isFinite(l) || typeof c !== 'number' || !Number.isFinite(c)) {
+    throw new Error(
+      `[oklch] Could not convert color value "${hex}" to a valid oklch() (got l=${l}, c=${c}).`
+    );
   }
 
   // Only carry alpha when it differs from fully opaque
-  const rawAlpha = typeof oklch.alpha === 'number' ? oklch.alpha : undefined;
+  const rawAlpha = typeof oklch?.alpha === 'number' && Number.isFinite(oklch.alpha) ? oklch.alpha : undefined;
   const alpha = rawAlpha !== undefined && rawAlpha < 1 ? rawAlpha : undefined;
 
   if (!family) {
     // Culori passthrough — no custom chroma
     const hue =
-      typeof oklch.h === 'number' && Number.isFinite(oklch.h)
+      typeof oklch?.h === 'number' && Number.isFinite(oklch.h)
         ? ((oklch.h % 360) + 360) % 360
         : 0;
 
     return {
       mode: 'oklch',
-      l: oklch.l,
-      c: oklch.c,
+      l,
+      c,
       h: hue,
       alpha,
     };
   }
 
-  // Custom formula path: culori L + parabolic chroma + fixed hue
+  // Custom formula path: culori L (clamped to the formula's valid domain) +
+  // parabolic chroma + fixed hue.
+  //
+  // calculateChroma() clamps its lightness input to [LMIN, LMAX] internally
+  // before computing chroma. The `l` returned here is clamped the same way
+  // so the reported lightness always matches the lightness the chroma value
+  // was actually computed for — otherwise a token with a raw L outside
+  // [LMIN, LMAX] (e.g. true black/white) would report an L that doesn't
+  // correspond to its own chroma, producing a visually inconsistent color.
+  const clampedL = Math.max(LMIN, Math.min(LMAX, l));
+
   return {
     mode: 'oklch',
-    l: oklch.l,
-    c: calculateChroma(oklch.l, family),
+    l: clampedL,
+    c: calculateChroma(clampedL, family),
     h: family.hue,
     alpha,
   };

@@ -8,14 +8,70 @@
   "exports": {
     ".": {
       "types": "./dist/themes/rei-dot-com/types/index.d.ts",
+      "import": "./dist/themes/rei-dot-com/js/cdr-tokens.mjs",
+      "require": "./dist/themes/rei-dot-com/js/cdr-tokens.cjs",
       "default": "./index.js"
     },
-    "./types": {
-      "types": "./dist/themes/rei-dot-com/types/index.d.ts"
+    "./tokens": {
+      "types": "./dist/themes/rei-dot-com/types/index.d.ts",
+      "import": "./dist/themes/rei-dot-com/js/cdr-tokens.mjs",
+      "require": "./dist/themes/rei-dot-com/js/cdr-tokens.cjs"
     },
+    "./docsite": {
+      "types": "./dist/themes/docsite/types/tokens.d.ts",
+      "import": "./dist/themes/docsite/js/cdr-tokens.mjs",
+      "require": "./dist/themes/docsite/js/cdr-tokens.cjs"
+    },
+    "./types": {
+      "types": "./dist/themes/rei-dot-com/types/index.d.ts",
+      "import": "./dist/themes/rei-dot-com/types/index.mjs",
+      "default": "./dist/themes/rei-dot-com/types/index.mjs"
+    },
+    "./types/base": {
+      "types": "./dist/themes/rei-dot-com/types/base/token-schema.d.ts",
+      "default": "./dist/themes/rei-dot-com/types/base/token-schema.d.ts"
+    },
+    "./types/*": {
+      "types": "./dist/themes/rei-dot-com/types/foundations/cdr-*.d.ts",
+      "import": "./dist/themes/rei-dot-com/types/foundations/cdr-*.mjs",
+      "default": "./dist/themes/rei-dot-com/types/foundations/cdr-*.mjs"
+    },
+    "./css": "./dist/themes/rei-dot-com/css/cdr-tokens.css",
+    "./css/*": "./dist/themes/rei-dot-com/css/foundations/cdr-*.css",
+    "./scss": "./dist/themes/rei-dot-com/scss/cdr-tokens.scss",
+    "./scss/*": "./dist/themes/rei-dot-com/scss/utilities/cdr-*.scss",
+    "./json": "./dist/themes/rei-dot-com/json/web.json",
+    "./json/*": "./dist/themes/rei-dot-com/json/*",
+    "./docsite/css": "./dist/themes/docsite/css/cdr-tokens.css",
+    "./docsite/scss": "./dist/themes/docsite/scss/cdr-tokens.scss",
+    "./rei-dot-com/js/*": {
+      "types": "./dist/themes/rei-dot-com/js/*.d.ts",
+      "import": "./dist/themes/rei-dot-com/js/*.mjs",
+      "require": "./dist/themes/rei-dot-com/js/*.cjs"
+    },
+    "./rei-dot-com/css/*": "./dist/themes/rei-dot-com/css/*",
+    "./rei-dot-com/scss/*": "./dist/themes/rei-dot-com/scss/*",
+    "./rei-dot-com/types/*": {
+      "types": "./dist/themes/rei-dot-com/types/*.d.ts",
+      "import": "./dist/themes/rei-dot-com/types/*.mjs",
+      "default": "./dist/themes/rei-dot-com/types/*.mjs"
+    },
+    "./rei-dot-com/json/*": "./dist/themes/rei-dot-com/json/*",
+    "./docsite/js/*": {
+      "types": "./dist/themes/docsite/js/*.d.ts",
+      "import": "./dist/themes/docsite/js/*.mjs",
+      "require": "./dist/themes/docsite/js/*.cjs"
+    },
+    "./docsite/css/*": "./dist/themes/docsite/css/*",
+    "./docsite/scss/*": "./dist/themes/docsite/scss/*",
+    "./docsite/types/*": {
+      "types": "./dist/themes/docsite/types/*.d.ts",
+      "import": "./dist/themes/docsite/types/*.mjs",
+      "default": "./dist/themes/docsite/types/*.mjs"
+    },
+    "./docsite/json/*": "./dist/themes/docsite/json/*",
     "./meta/*": "./dist/themes/rei-dot-com/meta/*",
-    "./package.json": "./package.json",
-    "./css": "./dist/themes/rei-dot-com/css/cdr-light.css"
+    "./package.json": "./package.json"
   },
   "files": [
     "dist/themes/**/*",
@@ -23,7 +79,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "pnpm tokens:build && pnpm storybook:build",
+    "build": "pnpm tokens:build && pnpm postbuild:merge-legacy && pnpm validate:exports && pnpm storybook:build",
     "lint": "oxlint src",
     "format": "oxfmt --write src",
     "prepare": "husky",
@@ -32,13 +88,15 @@
     "sync:tokens-to-figma": "tsx src/sync/tokens-to-figma.ts",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build -o storybook-static",
-    "build:package": "pnpm tokens:build",
+    "build:package": "pnpm tokens:build && pnpm postbuild:merge-legacy && pnpm validate:exports",
     "release": "pnpm build:package && pnpm publish --access public",
     "tokens:platforms": "tsx style-dictionary/build.ts",
     "tokens:normalize": "tsx src/normalization/normalize.ts",
     "tokens:sd": "tsx src/build/build-style-dictionary.ts",
     "tokens:build": "pnpm tokens:normalize && pnpm tokens:sd && pnpm tokens:platforms && pnpm postbuild:normalized",
     "postbuild:normalized": "tsx scripts/postbuild-normalized.js",
+    "postbuild:merge-legacy": "node scripts/merge-legacy-dist.js",
+    "validate:exports": "node scripts/validate-package-exports.js",
     "tokens:validate:normalized": "tsx scripts/validate-normalized-json.ts",
     "test:contract": "vitest run src/contract/canonical-contract.test.ts --reporter=verbose",
     "check:canonical": "pnpm tokens:normalize && pnpm test:contract",

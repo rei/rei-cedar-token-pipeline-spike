@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
-import { hexToCustomOklch, calculateChroma, COLOR_FAMILIES, LMAX, LMIN } from "./oklch-formulas.js";
+import { hexToCustomOklch, calculateChroma, buildCustomOklch, COLOR_FAMILIES, LMAX, LMIN } from "./oklch-formulas.js";
 
 /**
  * Read colorFamily names from token-schema.json dynamically.
@@ -52,6 +52,46 @@ describe("oklch-formulas", () => {
         expect(calculateChroma(-0.5, family)).toBeGreaterThanOrEqual(0);
         expect(calculateChroma(2.0, family)).toBeGreaterThanOrEqual(0);
       }
+    });
+
+    it("throws on non-finite lightness instead of silently returning NaN", () => {
+      const family = Object.values(COLOR_FAMILIES)[0];
+      expect(() => calculateChroma(NaN, family)).toThrow(/non-finite/);
+      expect(() => calculateChroma(Infinity, family)).toThrow(/non-finite/);
+      expect(() => calculateChroma(-Infinity, family)).toThrow(/non-finite/);
+    });
+  });
+
+  describe("buildCustomOklch", () => {
+    it("throws for a color value that cannot be parsed", () => {
+      expect(() => buildCustomOklch("not-a-color", "warm-grey")).toThrow();
+    });
+
+    it("reports a lightness consistent with the chroma it computed, even at gamut extremes", () => {
+      // Regression test: previously `l` was returned unclamped while `c` was
+      // computed from a lightness clamped to [LMIN, LMAX] internally, so a
+      // near-black/near-white token could report an L that didn't match the
+      // chroma value actually used. Both must now reflect the same clamped L.
+      const family = COLOR_FAMILIES["warm-grey"];
+
+      const black = buildCustomOklch("#000000", "warm-grey");
+      const white = buildCustomOklch("#ffffff", "warm-grey");
+
+      expect(black.l).toBeGreaterThanOrEqual(LMIN);
+      expect(black.l).toBeLessThanOrEqual(LMAX);
+      expect(black.c).toBeCloseTo(calculateChroma(black.l, family), 10);
+
+      expect(white.l).toBeGreaterThanOrEqual(LMIN);
+      expect(white.l).toBeLessThanOrEqual(LMAX);
+      expect(white.c).toBeCloseTo(calculateChroma(white.l, family), 10);
+    });
+
+    it("does not clamp lightness for the culori-passthrough path (no color family)", () => {
+      // Clamping only applies to the custom parabolic-chroma formula path;
+      // passthrough colors (Storybook previews, etc.) should keep culori's
+      // raw lightness.
+      const black = buildCustomOklch("#000000");
+      expect(black.l).toBeLessThan(LMIN);
     });
   });
 
